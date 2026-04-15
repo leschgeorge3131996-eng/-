@@ -59,6 +59,7 @@
 - Minimal model tier routing is implemented and test-covered
 - Fixed sample set replay script is available
 - Sample replay report can now be exported with route and evidence stats
+- One-click real replay script is available
 - English paper end-to-end validation has been recorded in evidence
 - Chinese academic PDF sample has been added to sample set
 - Frontend result panel now exposes route tier and route reason

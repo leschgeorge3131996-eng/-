@@ -16,6 +16,18 @@ Use the fixed sample set to replay the current system with the real cloud model 
 .venv\Scripts\python.exe scripts\replay_sample_set.py --clear-cache --format md --output evidence\reports\sample_replay_real.md --timestamped
 ```
 
+## One-Click Option
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1
+```
+
+This wrapper will:
+
+1. replay the fixed sample set with the real model
+2. export the replay report
+3. export the latest log summary
+
 ## What It Produces
 
 - A replay report under `evidence/reports/`
@@ -37,4 +49,3 @@ Use the fixed sample set to replay the current system with the real cloud model 
 - For clean measurements, keep `--clear-cache`
 - For repeatable evidence, do not change prompts between runs
 - If one sample fails because of transient provider issues, rerun only after the rate limit window has cooled down
-

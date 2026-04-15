@@ -249,6 +249,12 @@ python scripts\export_log_summary.py --format json
 .venv\Scripts\python.exe scripts\replay_sample_set.py --mock --clear-cache --format md --output evidence\reports\sample_replay_latest.md
 ```
 
+## 真实模型样例复跑
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1
+```
+
 ## 下一步建议
 
 1. 先用真实火山方舟 Endpoint 跑通摘要、问答、提纲三条链路，再决定是否分任务换模型。
