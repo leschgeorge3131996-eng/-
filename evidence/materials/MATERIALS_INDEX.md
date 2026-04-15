@@ -42,6 +42,6 @@
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`
 - 真实模型复跑：优先参考 `REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
-- route-tier / outcome 对比：优先参考 `evidence/reports/sample_replay_summary.md`
+- route-tier / outcome / response-detail / grounding 对比：优先参考 `evidence/reports/sample_replay_summary.md`
 - 答辩准备：优先参考 `QA_BRIEF.md`
 - 真实模型结果总览：优先参考 `evidence/reports/sample_replay_real_summary_latest.md`

@@ -67,6 +67,8 @@
 - Evidence refresh checklist and submission prep guide have been added
 - Real fixed-sample replay has been completed once with the real cloud model
 - Response detail control now supports `concise / balanced / detailed` across frontend, API, prompt routing, cache, and logs
+- Ask grounding now includes model-declared `used_chunk_ids` and `evidence_quotes`
+- Replay reports now aggregate response detail levels and grounding counts
 
 ### Verified Results
 
@@ -76,7 +78,7 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Backend tests pass: `23 passed`
+- Backend tests pass: `27 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
 - Sample replay report exported to `evidence/reports/sample_replay_latest.md`
 - Real replay report exported to `evidence/reports/sample_replay_real_latest.md`
@@ -178,7 +180,7 @@ cd C:\Users\Administrator\Desktop\project
 
 Current status:
 
-- `23 passed`
+- `27 passed`
 
 ## Next Recommended Steps
 

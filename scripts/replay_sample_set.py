@@ -28,6 +28,7 @@ class ReplayRecord:
     file_path: str
     task_type: str
     input_text: str
+    response_detail_level: str | None
     success: bool
     outcome: str | None
     latency_ms: int | None
@@ -37,6 +38,8 @@ class ReplayRecord:
     route_reason: str | None
     cache_hit: bool | None
     retrieval_status: str | None
+    used_chunk_count: int | None
+    evidence_quote_count: int | None
     citation_count: int | None
     source_chunk_count: int | None
     error: str | None
@@ -51,6 +54,7 @@ def render_markdown(records: list[ReplayRecord]) -> str:
                 f"- Scenario: {record.scenario}",
                 f"- File: {record.file_path}",
                 f"- Input: {record.input_text}",
+                f"- Response detail level: {record.response_detail_level}",
                 f"- Success: {record.success}",
                 f"- Outcome: {record.outcome}",
                 f"- Latency (ms): {record.latency_ms}",
@@ -60,6 +64,8 @@ def render_markdown(records: list[ReplayRecord]) -> str:
                 f"- Route reason: {record.route_reason}",
                 f"- Cache hit: {record.cache_hit}",
                 f"- Retrieval status: {record.retrieval_status}",
+                f"- Used chunk count: {record.used_chunk_count}",
+                f"- Evidence quote count: {record.evidence_quote_count}",
                 f"- Citation count: {record.citation_count}",
                 f"- Source chunk count: {record.source_chunk_count}",
                 f"- Error: {record.error}",
@@ -73,11 +79,13 @@ def summarize_records(records: list[ReplayRecord]) -> dict:
     by_task: dict[str, list[ReplayRecord]] = {}
     by_route_tier: dict[str, list[ReplayRecord]] = {}
     by_outcome: dict[str, int] = {}
+    by_detail: dict[str, list[ReplayRecord]] = {}
 
     for record in records:
         by_task.setdefault(record.task_type, []).append(record)
         by_route_tier.setdefault(record.route_tier or "unknown", []).append(record)
         by_outcome[record.outcome or "unknown"] = by_outcome.get(record.outcome or "unknown", 0) + 1
+        by_detail.setdefault(record.response_detail_level or "unknown", []).append(record)
 
     def _task_summary(items: list[ReplayRecord]) -> dict:
         latencies = [item.latency_ms for item in items if item.latency_ms is not None]
@@ -87,6 +95,8 @@ def summarize_records(records: list[ReplayRecord]) -> dict:
             "answered": sum(1 for item in items if item.outcome == "answered"),
             "refused": sum(1 for item in items if item.outcome == "refused"),
             "errors": sum(1 for item in items if item.success is False),
+            "used_chunk_count_sum": sum(item.used_chunk_count or 0 for item in items),
+            "evidence_quote_count_sum": sum(item.evidence_quote_count or 0 for item in items),
         }
 
     return {
@@ -94,6 +104,9 @@ def summarize_records(records: list[ReplayRecord]) -> dict:
         "by_task": {task: _task_summary(items) for task, items in by_task.items()},
         "by_route_tier": {tier: _task_summary(items) for tier, items in by_route_tier.items()},
         "by_outcome": by_outcome,
+        "by_response_detail_level": {
+            level: _task_summary(items) for level, items in by_detail.items()
+        },
     }
 
 
@@ -114,6 +127,8 @@ def render_summary_markdown(summary: dict) -> str:
                 f"- Answered: {item['answered']}",
                 f"- Refused: {item['refused']}",
                 f"- Errors: {item['errors']}",
+                f"- Used chunk count sum: {item['used_chunk_count_sum']}",
+                f"- Evidence quote count sum: {item['evidence_quote_count_sum']}",
                 "",
             ]
         )
@@ -128,6 +143,24 @@ def render_summary_markdown(summary: dict) -> str:
                 f"- Answered: {item['answered']}",
                 f"- Refused: {item['refused']}",
                 f"- Errors: {item['errors']}",
+                f"- Used chunk count sum: {item['used_chunk_count_sum']}",
+                f"- Evidence quote count sum: {item['evidence_quote_count_sum']}",
+                "",
+            ]
+        )
+
+    lines.append("## By Response Detail Level")
+    for level, item in summary["by_response_detail_level"].items():
+        lines.extend(
+            [
+                f"### {level}",
+                f"- Count: {item['count']}",
+                f"- Average latency (ms): {item['average_latency_ms']}",
+                f"- Answered: {item['answered']}",
+                f"- Refused: {item['refused']}",
+                f"- Errors: {item['errors']}",
+                f"- Used chunk count sum: {item['used_chunk_count_sum']}",
+                f"- Evidence quote count sum: {item['evidence_quote_count_sum']}",
                 "",
             ]
         )
@@ -225,6 +258,7 @@ def main() -> None:
                         file_path=item["path"],
                         task_type=task_type,
                         input_text=prompt,
+                        response_detail_level=result.response_detail_level,
                         success=True,
                         outcome=result.outcome,
                         latency_ms=result.latency_ms,
@@ -234,6 +268,8 @@ def main() -> None:
                         route_reason=result.route_reason,
                         cache_hit=result.cache_hit,
                         retrieval_status=result.retrieval_status,
+                        used_chunk_count=len(result.used_chunk_ids),
+                        evidence_quote_count=len(result.evidence_quotes),
                         citation_count=len(result.citations),
                         source_chunk_count=len(result.source_chunks),
                         error=None,
@@ -247,6 +283,7 @@ def main() -> None:
                         file_path=item["path"],
                         task_type=task_type,
                         input_text=prompt,
+                        response_detail_level=None,
                         success=False,
                         outcome="error",
                         latency_ms=None,
@@ -256,6 +293,8 @@ def main() -> None:
                         route_reason=None,
                         cache_hit=None,
                         retrieval_status=None,
+                        used_chunk_count=None,
+                        evidence_quote_count=None,
                         citation_count=None,
                         source_chunk_count=None,
                         error=str(exc),
