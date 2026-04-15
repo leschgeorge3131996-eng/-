@@ -6,6 +6,30 @@ from ..schemas.document import ChunkedDocument, ParsedChunk
 
 
 class RetrievalService:
+    stopwords = {
+        "请",
+        "帮我",
+        "一下",
+        "这个",
+        "这个项目",
+        "这份文档",
+        "这篇文档",
+        "这篇文章",
+        "请问",
+        "一下子",
+        "关于",
+        "一下吧",
+        "the",
+        "a",
+        "an",
+        "is",
+        "are",
+        "what",
+        "does",
+        "do",
+        "about",
+    }
+
     def __init__(
         self,
         *,
@@ -55,21 +79,35 @@ class RetrievalService:
 
     def _score_chunk(self, query: str, text: str) -> float:
         normalized_text = text.lower()
-        normalized_query = query.lower().strip()
+        normalized_query = self._normalize_query(query)
         score = 0.0
         if normalized_query and normalized_query in normalized_text:
             score += 8.0
 
-        for term in self._extract_terms(query):
+        terms = self._extract_terms(normalized_query)
+        title_bonus = self._title_bonus(terms, text)
+        score += title_bonus
+
+        length_norm = max(1.0, len(text) / 600)
+        for term in terms:
             if term in normalized_text:
                 weight = 2.0 if len(term) >= 3 else 1.0
-                score += normalized_text.count(term) * weight
+                score += (normalized_text.count(term) * weight) / length_norm
         return score
+
+    def _normalize_query(self, query: str) -> str:
+        normalized = re.sub(r"[^\w\u4e00-\u9fff]+", " ", query.lower()).strip()
+        for stopword in sorted(self.stopwords, key=len, reverse=True):
+            normalized = normalized.replace(stopword, " ")
+        normalized = re.sub(r"\s+", " ", normalized).strip()
+        return normalized
 
     def _extract_terms(self, query: str) -> list[str]:
         terms: list[str] = []
         for token in re.findall(r"[A-Za-z0-9]+|[\u4e00-\u9fff]+", query.lower()):
             if not token:
+                continue
+            if token in self.stopwords:
                 continue
             if re.fullmatch(r"[\u4e00-\u9fff]+", token):
                 terms.append(token)
@@ -87,3 +125,17 @@ class RetrievalService:
                 seen.add(term)
                 deduped.append(term)
         return deduped
+
+    def _title_bonus(self, terms: list[str], text: str) -> float:
+        if not terms:
+            return 0.0
+        first_line = text.strip().splitlines()[0].lower() if text.strip() else ""
+        if not first_line:
+            return 0.0
+        bonus = 0.0
+        for term in terms:
+            if term in first_line:
+                bonus += 1.5 if len(term) >= 3 else 0.5
+        if first_line.startswith("#") or re.match(r"^\d+(\.\d+)*", first_line):
+            bonus += 0.5
+        return bonus

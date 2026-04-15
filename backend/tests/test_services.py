@@ -9,10 +9,13 @@ import pytest
 from backend.app.core.exceptions import ParseError
 
 from backend.app.core.config import Settings
+from backend.app.schemas.document import ParsedDocument, ParsedPage
 from backend.app.schemas.log import CallLogEntry
+from backend.app.services.chunk_service import ChunkService
 from backend.app.services.file_service import FileService
 from backend.app.services.log_service import LogService
 from backend.app.services.model_client import ModelClient
+from backend.app.services.retrieval_service import RetrievalService
 from backend.app.services.task_service import TaskService
 from backend.app.services.document_parser import DocumentParser
 
@@ -398,3 +401,46 @@ def test_summary_uses_chunk_coverage_context() -> None:
         assert len(result.source_chunks) >= 1
     finally:
         cleanup_workspace(workspace)
+
+
+def test_chunk_ids_are_stable_for_same_text() -> None:
+    parsed_document = ParsedDocument(
+        file_type="md",
+        text="# 标题\n\n第一段\n\n第二段",
+        page_count=1,
+        pages=[
+            ParsedPage(
+                page_number=1,
+                text="# 标题\n\n第一段\n\n第二段",
+                char_count=len("# 标题\n\n第一段\n\n第二段"),
+            )
+        ],
+    )
+    service = ChunkService()
+
+    first = service.build_chunks(parsed_document)
+    second = service.build_chunks(parsed_document)
+
+    assert [chunk.chunk_id for chunk in first.chunks] == [chunk.chunk_id for chunk in second.chunks]
+
+
+def test_retrieval_service_handles_filler_words_and_title_bonus() -> None:
+    parsed_document = ParsedDocument(
+        file_type="md",
+        text="# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。",
+        page_count=1,
+        pages=[
+            ParsedPage(
+                page_number=1,
+                text="# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。",
+                char_count=len("# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。"),
+            )
+        ],
+    )
+    chunked = ChunkService().build_chunks(parsed_document)
+    retrieval = RetrievalService()
+
+    selected = retrieval.retrieve("请问这个项目第一阶段要做什么？", chunked)
+
+    assert selected
+    assert "第一阶段目标" in selected[0].text

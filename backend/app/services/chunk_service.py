@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import hashlib
 import re
-from uuid import uuid4
 
 from ..schemas.document import ChunkedDocument, ParsedChunk, ParsedDocument
 
@@ -91,10 +91,15 @@ class ChunkService:
 
     def _make_chunk(self, text: str, page_numbers: list[int]) -> ParsedChunk:
         clean_text = text.strip()
+        chunk_key = "::".join(
+            [
+                ",".join(str(page) for page in page_numbers),
+                clean_text,
+            ]
+        )
         return ParsedChunk(
-            chunk_id=uuid4().hex,
+            chunk_id=hashlib.sha1(chunk_key.encode("utf-8")).hexdigest()[:16],
             page_numbers=page_numbers,
             text=clean_text,
             char_count=len(clean_text),
         )
-

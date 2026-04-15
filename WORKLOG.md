@@ -54,6 +54,9 @@
 - Log summary now tracks retrieval status and citation counts
 - Task outcome semantics added: answered / refused / error
 - Frontend now distinguishes citations vs source chunks by task type
+- Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
+- Competition materials have been refined into reusable review/demo docs
+- Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 
 ### Verified Results
 
@@ -96,9 +99,9 @@ Notes:
 - Latency is still high
 - Volcengine may return `HTTP 429` with `RequestBurstTooFast` if requests are sent too quickly
 - Current backend has minimal burst retry and local cache, but this is not a full queue/rate-limit system
-- Summary and outline still do not return structured references
-- Retrieval quality controls still need stronger scoring/ordering
-- Competition materials are still missing finalized written assets
+- Summary and outline still use source chunks rather than strict references
+- Retrieval quality controls can still be improved further, but are no longer minimal
+- Competition materials exist and are reusable, but still need final polish against actual submission format
 
 ## Important Files
 
@@ -158,13 +161,11 @@ Current status:
 ## Next Recommended Steps
 
 1. Start phase 2 in this order:
-   - stronger retrieval scoring and ordering
-   - source chunk semantics cleanup in frontend
+   - summary/outline stricter reference semantics
+   - retrieval ranking refinement if needed after sample-set replay
 2. Finalize first version of competition materials:
-   - one-page project summary
-   - demo script
-   - sample set
-   - architecture note
+   - align wording with actual submission form
+   - replay fixed sample set and refresh screenshots/log evidence
 
 ## Session Handoff Rule
 
