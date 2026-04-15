@@ -81,6 +81,7 @@ const RESPONSE_DETAIL_LABELS: Record<ResponseDetailLevel, string> = {
 };
 
 type LoadStage = "idle" | "uploading" | "model";
+type PendingDocumentSource = "demo" | "local";
 
 const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
@@ -129,6 +130,26 @@ function describeLoadStage(stage: LoadStage): string {
   return "";
 }
 
+function describeUploadProgress(stage: LoadStage, progress: number): string {
+  if (stage === "uploading") {
+    if (progress >= 100) {
+      return "文件已上传，正在解析文档...";
+    }
+    return "正在上传文件...";
+  }
+  if (stage === "model") {
+    return "文档已就绪，正在调用模型...";
+  }
+  return "等待开始";
+}
+
+function resolveVisibleUploadProgress(stage: LoadStage, progress: number): number {
+  if (stage === "model") {
+    return 100;
+  }
+  return progress;
+}
+
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof ApiRequestError) {
     if (error.message.includes("请求过快") || error.message.includes("HTTP 429")) {
@@ -152,10 +173,12 @@ function App() {
   const [responseDetailLevel, setResponseDetailLevel] = useState<ResponseDetailLevel>("balanced");
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [pendingDocumentSource, setPendingDocumentSource] = useState<PendingDocumentSource | null>(null);
   const [uploadedMetadata, setUploadedMetadata] = useState<UploadMetadata | null>(null);
   const [result, setResult] = useState<TaskResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadStage, setLoadStage] = useState<LoadStage>("idle");
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage<RecentDocument[]>(RECENT_DOCUMENTS_KEY, [])
@@ -168,6 +191,9 @@ function App() {
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
+  const pendingDocumentType =
+    pendingDocument?.name.split(".").pop()?.toLowerCase() ?? pendingDocument?.type ?? "-";
+  const visibleUploadProgress = resolveVisibleUploadProgress(loadStage, uploadProgress);
   const canSubmit =
     !loading &&
     Boolean(selectedFile || uploadedMetadata) &&
@@ -242,6 +268,7 @@ function App() {
       type: "text/markdown"
     });
     setSelectedFile(file);
+    setPendingDocumentSource("demo");
     setUploadedMetadata(null);
     setResult(null);
     setError(null);
@@ -256,6 +283,7 @@ function App() {
     event.preventDefault();
     setLoading(true);
     setLoadStage("idle");
+    setUploadProgress(0);
     setError(null);
 
     try {
@@ -263,8 +291,10 @@ function App() {
 
       if (selectedFile) {
         setLoadStage("uploading");
-        const upload = await uploadDocument(selectedFile);
+        const upload = await uploadDocument(selectedFile, setUploadProgress);
+        setUploadProgress(100);
         setUploadedMetadata(upload.metadata);
+        setPendingDocumentSource(null);
         upsertRecentDocument(upload.metadata);
         fileId = upload.metadata.file_id;
         setSelectedFile(null);
@@ -289,6 +319,7 @@ function App() {
     } finally {
       setLoading(false);
       setLoadStage("idle");
+      setUploadProgress(0);
     }
   }
 
@@ -382,7 +413,10 @@ function App() {
               ))}
             </div>
             {pendingDocument ? (
-              <p className="demo-feedback">已填充示例文档：{pendingDocument.name}。点击“提交任务”后会自动上传。</p>
+              <p className="demo-feedback">
+                {pendingDocumentSource === "demo" ? "已填充示例文档" : "已选择本地文件"}：{pendingDocument.name}
+                。点击“提交任务”后会自动上传。
+              </p>
             ) : null}
           </article>
         </section>
@@ -402,6 +436,7 @@ function App() {
                   onChange={(event) => {
                     const file = event.target.files?.[0] ?? null;
                     setSelectedFile(file);
+                    setPendingDocumentSource(file ? "local" : null);
                     if (file) {
                       setUploadedMetadata(null);
                       setResult(null);
@@ -410,6 +445,20 @@ function App() {
                   }}
                 />
               </label>
+              {loading && (loadStage === "uploading" || loadStage === "model" || uploadProgress > 0) ? (
+                <div className="upload-progress">
+                  <div className="upload-progress-meta">
+                    <span>{describeUploadProgress(loadStage, uploadProgress)}</span>
+                    <strong>{visibleUploadProgress}%</strong>
+                  </div>
+                  <div className="upload-progress-track" aria-hidden="true">
+                    <div
+                      className="upload-progress-fill"
+                      style={{ width: `${visibleUploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : null}
 
               <label className="field">
                 <span>任务类型</span>
@@ -496,19 +545,19 @@ function App() {
                 <div className="meta-grid">
                   <div className="meta-chip">
                     <span>状态</span>
-                    <strong>待上传</strong>
+                    <strong>本地已选中文件</strong>
                   </div>
                   <div className="meta-chip">
                     <span>类型</span>
-                    <strong>md</strong>
+                    <strong>{pendingDocumentType}</strong>
                   </div>
                   <div className="meta-chip">
                     <span>来源</span>
-                    <strong>示例文档</strong>
+                    <strong>{pendingDocumentSource === "demo" ? "示例文档" : "本地文件"}</strong>
                   </div>
                   <div className="meta-chip">
                     <span>下一步</span>
-                    <strong>点击提交任务</strong>
+                    <strong>点击提交后开始上传</strong>
                   </div>
                 </div>
               ) : (
@@ -523,6 +572,7 @@ function App() {
                     onClick={() => {
                       setUploadedMetadata(null);
                       setSelectedFile(null);
+                      setPendingDocumentSource(null);
                       setResult(null);
                     }}
                   >

@@ -86,6 +86,8 @@ class DocumentParser:
         )
 
     def _normalize_text(self, text: str) -> str:
+        text = re.sub(r"[\ud800-\udfff]", "", text)
+        text = text.replace("\x00", "")
         text = text.replace("\r\n", "\n").replace("\r", "\n")
         text = re.sub(r"\n{3,}", "\n\n", text)
         return text.strip()

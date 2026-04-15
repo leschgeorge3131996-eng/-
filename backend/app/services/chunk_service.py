@@ -50,6 +50,10 @@ class ChunkService:
                 chunks.append(self._make_chunk(current, [page.page_number]))
 
         chunks = self._merge_small_chunks(chunks)
+        chunks = [
+            chunk.model_copy(update={"chunk_index": index})
+            for index, chunk in enumerate(chunks)
+        ]
         return ChunkedDocument(
             file_type=parsed_document.file_type,
             page_count=parsed_document.page_count,
@@ -99,6 +103,7 @@ class ChunkService:
         )
         return ParsedChunk(
             chunk_id=hashlib.sha1(chunk_key.encode("utf-8")).hexdigest()[:16],
+            chunk_index=0,
             page_numbers=page_numbers,
             text=clean_text,
             char_count=len(clean_text),

@@ -33,15 +33,53 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return payload.data;
 }
 
-export async function uploadDocument(file: File): Promise<UploadResponse> {
+function parsePayloadText<T>(text: string, status: number): T {
+  const payload = JSON.parse(text) as ApiResponse<T>;
+  if (status < 200 || status >= 300 || !payload.success || !payload.data) {
+    throw new ApiRequestError(
+      payload.error?.message ?? "请求失败",
+      payload.error?.code,
+      payload.error?.details ?? null
+    );
+  }
+  return payload.data;
+}
+
+export async function uploadDocument(
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(`${API_BASE_URL}/upload`, {
-    method: "POST",
-    body: formData
+  return new Promise<UploadResponse>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_BASE_URL}/upload`);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && onProgress) {
+        onProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+      }
+    };
+
+    xhr.onerror = () => {
+      reject(new ApiRequestError("上传失败，请检查网络连接或服务状态。"));
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = parsePayloadText<UploadResponse>(xhr.responseText, xhr.status);
+        if (onProgress) {
+          onProgress(100);
+        }
+        resolve(data);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    xhr.send(formData);
   });
-  return parseResponse<UploadResponse>(response);
 }
 
 export async function runTask(

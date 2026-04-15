@@ -9,7 +9,7 @@ import pytest
 from backend.app.core.exceptions import ParseError
 
 from backend.app.core.config import Settings
-from backend.app.schemas.document import ParsedDocument, ParsedPage
+from backend.app.schemas.document import ChunkedDocument, ParsedDocument, ParsedPage, ParsedChunk
 from backend.app.schemas.log import CallLogEntry
 from backend.app.schemas.task import ResponseDetailLevel
 from backend.app.services.chunk_service import ChunkService
@@ -204,6 +204,14 @@ def test_parse_error_is_normalized() -> None:
             service.save_upload("bad.pdf", b"%PDF-1.4 fake")
     finally:
         cleanup_workspace(workspace)
+
+
+def test_document_parser_strips_surrogate_codepoints() -> None:
+    parser = DocumentParser()
+
+    normalized = parser._normalize_text("正常文本\ud835保留部分")
+
+    assert normalized == "正常文本保留部分"
 
 
 def test_task_service_still_returns_when_log_write_fails() -> None:
@@ -627,6 +635,26 @@ def test_chunk_ids_are_stable_for_same_text() -> None:
     assert [chunk.chunk_id for chunk in first.chunks] == [chunk.chunk_id for chunk in second.chunks]
 
 
+def test_chunk_service_assigns_stable_source_order() -> None:
+    parsed_document = ParsedDocument(
+        file_type="md",
+        text="# 标题\n\n第一段\n\n第二段\n\n第三段",
+        page_count=1,
+        pages=[
+            ParsedPage(
+                page_number=1,
+                text="# 标题\n\n第一段\n\n第二段\n\n第三段",
+                char_count=len("# 标题\n\n第一段\n\n第二段\n\n第三段"),
+            )
+        ],
+    )
+    service = ChunkService(target_chunk_chars=6, min_chunk_chars=1, long_text_step=6)
+
+    chunked = service.build_chunks(parsed_document)
+
+    assert [chunk.chunk_index for chunk in chunked.chunks] == list(range(chunked.chunk_count))
+
+
 def test_retrieval_service_handles_filler_words_and_title_bonus() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
@@ -655,3 +683,39 @@ def test_retrieval_normalize_query_preserves_english_tokens() -> None:
     normalized = retrieval._normalize_query("what is the architecture")
 
     assert normalized == "architecture"
+
+
+def test_retrieval_skips_oversized_chunk_and_continues() -> None:
+    retrieval = RetrievalService(top_k=2, max_context_chars=60, min_score=0.0)
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=1,
+        chunk_count=3,
+        chunks=[
+            ParsedChunk(
+                chunk_id="big",
+                chunk_index=0,
+                page_numbers=[1],
+                text="方法 " * 80,
+                char_count=len("方法 " * 80),
+            ),
+            ParsedChunk(
+                chunk_id="small-1",
+                chunk_index=1,
+                page_numbers=[1],
+                text="这里介绍方法设计。",
+                char_count=len("这里介绍方法设计。"),
+            ),
+            ParsedChunk(
+                chunk_id="small-2",
+                chunk_index=2,
+                page_numbers=[1],
+                text="这里总结方法优点。",
+                char_count=len("这里总结方法优点。"),
+            ),
+        ],
+    )
+
+    selected = retrieval.retrieve("方法", chunked)
+
+    assert [chunk.chunk_id for chunk in selected] == ["small-1", "small-2"]

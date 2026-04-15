@@ -162,7 +162,7 @@ class ContextPlannerService:
             selected_chunks,
             key=lambda chunk: (
                 chunk.page_numbers[0] if chunk.page_numbers else 0,
-                chunk.chunk_id,
+                chunk.chunk_index,
             ),
         )
         rendered = self._render_chunks(ordered_chunks)

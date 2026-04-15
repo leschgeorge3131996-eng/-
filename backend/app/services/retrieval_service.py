@@ -77,7 +77,9 @@ class RetrievalService:
             if len(selected) >= self.top_k:
                 break
             if current_chars + chunk.char_count > self.max_context_chars and selected:
-                break
+                continue
+            if chunk.char_count > self.max_context_chars and not selected:
+                continue
             selected.append(chunk)
             current_chars += chunk.char_count
         return selected

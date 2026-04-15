@@ -18,6 +18,7 @@ class ParsedDocument(BaseModel):
 
 class ParsedChunk(BaseModel):
     chunk_id: str
+    chunk_index: int = 0
     page_numbers: list[int]
     text: str
     char_count: int
