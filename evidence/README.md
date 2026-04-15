@@ -12,6 +12,7 @@ Use this directory to store reproducible project evidence for demos, reviews, an
   - exported log summaries
   - comparison notes
   - sample replay reports
+  - sample replay summaries
 - `experiments/`
   - experiment records
   - prompt or model comparison notes

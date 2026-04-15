@@ -6,7 +6,7 @@
 - Input: 请用 3 条要点总结这个文档。
 - Success: True
 - Outcome: answered
-- Latency (ms): 13
+- Latency (ms): 9
 - Model: mock::ep-m-20260401130050-qn8nk
 - Route tier: task_specific
 - Route model: ep-m-20260401130050-qn8nk
@@ -151,4 +151,55 @@
 - Retrieval status: coverage
 - Citation count: 0
 - Source chunk count: 1
+- Error: None
+
+## chinese_paper_pdf / summary
+- Scenario: 中文学术论文 PDF
+- File: evidence/samples/chinese_llm_spatial_eval.pdf
+- Input: 请概括这篇论文的研究背景、方法和主要结论。
+- Success: True
+- Outcome: answered
+- Latency (ms): 23
+- Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_summary_model
+- Cache hit: False
+- Retrieval status: coverage
+- Citation count: 0
+- Source chunk count: 6
+- Error: None
+
+## chinese_paper_pdf / ask
+- Scenario: 中文学术论文 PDF
+- File: evidence/samples/chinese_llm_spatial_eval.pdf
+- Input: 这篇论文主要研究了什么问题？
+- Success: True
+- Outcome: answered
+- Latency (ms): 2
+- Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_ask_model
+- Cache hit: False
+- Retrieval status: matched
+- Citation count: 4
+- Source chunk count: 0
+- Error: None
+
+## chinese_paper_pdf / outline
+- Scenario: 中文学术论文 PDF
+- File: evidence/samples/chinese_llm_spatial_eval.pdf
+- Input: 请生成一个中文汇报提纲。
+- Success: True
+- Outcome: answered
+- Latency (ms): 1
+- Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_outline_model
+- Cache hit: False
+- Retrieval status: coverage
+- Citation count: 0
+- Source chunk count: 7
 - Error: None

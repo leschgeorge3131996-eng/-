@@ -8,6 +8,7 @@ import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
+from statistics import mean
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -68,6 +69,76 @@ def render_markdown(records: list[ReplayRecord]) -> str:
     return "\n".join(lines)
 
 
+def summarize_records(records: list[ReplayRecord]) -> dict:
+    by_task: dict[str, list[ReplayRecord]] = {}
+    by_route_tier: dict[str, list[ReplayRecord]] = {}
+    by_outcome: dict[str, int] = {}
+
+    for record in records:
+        by_task.setdefault(record.task_type, []).append(record)
+        by_route_tier.setdefault(record.route_tier or "unknown", []).append(record)
+        by_outcome[record.outcome or "unknown"] = by_outcome.get(record.outcome or "unknown", 0) + 1
+
+    def _task_summary(items: list[ReplayRecord]) -> dict:
+        latencies = [item.latency_ms for item in items if item.latency_ms is not None]
+        return {
+            "count": len(items),
+            "average_latency_ms": int(mean(latencies)) if latencies else 0,
+            "answered": sum(1 for item in items if item.outcome == "answered"),
+            "refused": sum(1 for item in items if item.outcome == "refused"),
+            "errors": sum(1 for item in items if item.success is False),
+        }
+
+    return {
+        "total_records": len(records),
+        "by_task": {task: _task_summary(items) for task, items in by_task.items()},
+        "by_route_tier": {tier: _task_summary(items) for tier, items in by_route_tier.items()},
+        "by_outcome": by_outcome,
+    }
+
+
+def render_summary_markdown(summary: dict) -> str:
+    lines = [
+        "# Sample Replay Summary",
+        "",
+        f"- Total records: {summary['total_records']}",
+        "",
+        "## By Task",
+    ]
+    for task, item in summary["by_task"].items():
+        lines.extend(
+            [
+                f"### {task}",
+                f"- Count: {item['count']}",
+                f"- Average latency (ms): {item['average_latency_ms']}",
+                f"- Answered: {item['answered']}",
+                f"- Refused: {item['refused']}",
+                f"- Errors: {item['errors']}",
+                "",
+            ]
+        )
+
+    lines.append("## By Route Tier")
+    for tier, item in summary["by_route_tier"].items():
+        lines.extend(
+            [
+                f"### {tier}",
+                f"- Count: {item['count']}",
+                f"- Average latency (ms): {item['average_latency_ms']}",
+                f"- Answered: {item['answered']}",
+                f"- Refused: {item['refused']}",
+                f"- Errors: {item['errors']}",
+                "",
+            ]
+        )
+
+    lines.append("## By Outcome")
+    for outcome, count in summary["by_outcome"].items():
+        lines.append(f"- {outcome}: {count}")
+
+    return "\n".join(lines) + "\n"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Replay fixed sample set against current services.")
     parser.add_argument(
@@ -103,6 +174,12 @@ def main() -> None:
         action="store_true",
         help="If output is provided, append a timestamp to the output filename.",
     )
+    parser.add_argument(
+        "--summary-output",
+        type=str,
+        default=None,
+        help="Optional output file path for the aggregated replay summary.",
+    )
     args = parser.parse_args()
 
     if args.mock:
@@ -134,6 +211,7 @@ def main() -> None:
                 if args.clear_cache and settings.cache_dir.exists():
                     shutil.rmtree(settings.cache_dir, ignore_errors=True)
                     settings.cache_dir.mkdir(parents=True, exist_ok=True)
+                    (settings.cache_dir / ".gitkeep").write_text("", encoding="utf-8")
                 result = task_service.run_task(
                     task_type=task_type,
                     endpoint=f"/api/{task_type}",
@@ -189,6 +267,12 @@ def main() -> None:
         if args.format == "json"
         else render_markdown(records)
     )
+    summary = summarize_records(records)
+    summary_rendered = (
+        json.dumps(summary, ensure_ascii=False, indent=2)
+        if args.format == "json"
+        else render_summary_markdown(summary)
+    )
 
     if args.output:
         output_path = Path(args.output)
@@ -200,6 +284,20 @@ def main() -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(rendered, encoding="utf-8")
         print(f"Saved replay report to {output_path}")
+    if args.summary_output:
+        summary_output_path = Path(args.summary_output)
+        if args.timestamped:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            summary_output_path = summary_output_path.with_name(
+                f"{summary_output_path.stem}_{timestamp}{summary_output_path.suffix}"
+            )
+        summary_output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary_output_path.write_text(summary_rendered, encoding="utf-8")
+        print(f"Saved replay summary to {summary_output_path}")
+        if args.output:
+            return
+
+    if args.output:
         return
 
     print(rendered)

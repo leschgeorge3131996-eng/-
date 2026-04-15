@@ -32,3 +32,4 @@
 - 批量复跑与证据刷新：优先参考 `SAMPLE_MANIFEST.json` 与 `scripts/replay_sample_set.py`
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`
+- route-tier / outcome 对比：优先参考 `evidence/reports/sample_replay_summary.md`
