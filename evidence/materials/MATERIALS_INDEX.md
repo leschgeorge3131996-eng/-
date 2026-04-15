@@ -30,7 +30,10 @@
 - 常见答辩问答提纲
 
 10. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
-- 真实模型固定样例集复跑汇总
+- 真实模型固定样例集复跑汇总（权威最新版本）
+
+11. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
+- 真实模型固定样例集逐条复跑明细（权威最新版本）
 
 ## 使用建议
 
@@ -45,3 +48,5 @@
 - route-tier / outcome / response-detail / grounding 对比：优先参考 `evidence/reports/sample_replay_summary.md`
 - 答辩准备：优先参考 `QA_BRIEF.md`
 - 真实模型结果总览：优先参考 `evidence/reports/sample_replay_real_summary_latest.md`
+- 真实模型逐条证据：优先参考 `evidence/reports/sample_replay_real_latest.md`
+- `latest_log_summary.md` 仅作为全历史开发遥测，不作为 replay 权威结论

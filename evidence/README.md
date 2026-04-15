@@ -13,6 +13,8 @@ Use this directory to store reproducible project evidence for demos, reviews, an
   - comparison notes
   - sample replay reports
   - sample replay summaries
+  - use `sample_replay_real_latest.md` and `sample_replay_real_summary_latest.md` as the authoritative real replay outputs
+  - treat `latest_log_summary.md` as global development telemetry unless a replay-specific scope is explicitly stated
 - `experiments/`
   - experiment records
   - prompt or model comparison notes

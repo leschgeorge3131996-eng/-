@@ -25,15 +25,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1
 This wrapper will:
 
 1. replay the fixed sample set with the real model
-2. export the replay report
-3. export the latest log summary
+2. export timestamped replay reports
+3. refresh the authoritative `*_latest` replay files
+4. export the latest global log summary
 
 ## What It Produces
 
-- A replay report under `evidence/reports/`
+- Timestamped replay reports under `evidence/reports/`
+- Authoritative latest files:
+  - `evidence/reports/sample_replay_real_latest.md`
+  - `evidence/reports/sample_replay_real_summary_latest.md`
 - Route tier / route model / route reason
 - Outcome, cache hit, retrieval status
 - Citation count / source chunk count
+- Used chunk count / evidence quote count
 
 ## Suggested Evidence To Refresh After Real Replay
 
@@ -41,11 +46,12 @@ This wrapper will:
 2. Screenshot of the frontend ask result with citations
 3. Screenshot of the frontend refused result for an off-topic question
 4. Screenshot of the frontend outline result
-5. Latest `latest_log_summary.md`
-6. Latest real replay report
+5. Authoritative latest replay summary
+6. If needed, `latest_log_summary.md` as general telemetry only
 
 ## Notes
 
 - For clean measurements, keep `--clear-cache`
 - For repeatable evidence, do not change prompts between runs
 - If one sample fails because of transient provider issues, rerun only after the rate limit window has cooled down
+- `latest_log_summary.md` is a global development telemetry summary, not a replay-scoped benchmark report
