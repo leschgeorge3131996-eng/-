@@ -10,7 +10,7 @@ from uuid import uuid4
 from ..core.exceptions import AppError
 from ..schemas.document import ParsedChunk
 from ..schemas.log import CallLogEntry
-from ..schemas.task import Citation, ResponseDetailLevel, TaskResult, TaskType
+from ..schemas.task import Citation, EvidenceQuote, ResponseDetailLevel, TaskResult, TaskType
 from .cache_service import CacheService
 from .context_planner import ContextPlannerService
 from .file_service import FileService
@@ -54,6 +54,7 @@ class TaskService:
         document_text = ""
         retrieval_status = "not_used"
         retrieval_applied = False
+        evidence_mode = "none"
         retrieved_chunk_count = 0
         retrieved_pages: list[int] = []
         citations: list[Citation] = []
@@ -87,6 +88,7 @@ class TaskService:
                     {page for chunk in selected_chunks for page in chunk.page_numbers}
                 )
                 if task_type == "ask":
+                    evidence_mode = "candidate"
                     citations = []
                 else:
                     display_chunks = self._select_display_chunks(selected_chunks, limit=3)
@@ -118,6 +120,7 @@ class TaskService:
                     retrieval_status=retrieval_status,
                     retrieval_message="当前问题与检索到的文档片段相关性不足，系统已拒绝无依据回答。",
                     retrieval_applied=False,
+                    evidence_mode="none",
                     retrieved_chunk_count=0,
                     retrieved_pages=[],
                     citations=[],
@@ -153,6 +156,7 @@ class TaskService:
                         extra={
                             "context_strategy": context_strategy,
                             "retrieved_pages": [],
+                            "evidence_mode": "none",
                             "citation_count": 0,
                             "source_chunk_count": 0,
                             "degraded_without_answer": True,
@@ -198,13 +202,17 @@ class TaskService:
                     retrieval_status=cached_result.get("retrieval_status", retrieval_status),
                     retrieval_message=cached_result.get("retrieval_message"),
                     retrieval_applied=cached_result.get("retrieval_applied", retrieval_applied),
+                    evidence_mode=cached_result.get("evidence_mode", evidence_mode),
                     retrieved_chunk_count=cached_result.get(
                         "retrieved_chunk_count",
                         retrieved_chunk_count,
                     ),
                     retrieved_pages=cached_result.get("retrieved_pages", retrieved_pages),
                     used_chunk_ids=cached_result.get("used_chunk_ids", []),
-                    evidence_quotes=cached_result.get("evidence_quotes", []),
+                    evidence_quotes=[
+                        EvidenceQuote.model_validate(item)
+                        for item in cached_result.get("evidence_quotes", [])
+                    ],
                     citations=[
                         Citation.model_validate(item)
                         for item in cached_result.get("citations", [])
@@ -259,6 +267,7 @@ class TaskService:
                         extra={
                             "context_strategy": cached_result.get("context_strategy", context_strategy),
                             "retrieved_pages": task_result.retrieved_pages,
+                            "evidence_mode": task_result.evidence_mode,
                             "used_chunk_count": len(task_result.used_chunk_ids),
                             "citation_count": len(task_result.citations),
                             "source_chunk_count": len(task_result.source_chunks),
@@ -276,7 +285,7 @@ class TaskService:
             )
             result_content = model_result.content
             used_chunk_ids: list[str] = []
-            evidence_quotes: list[str] = []
+            evidence_quotes: list[EvidenceQuote] = []
             if task_type == "ask" and selected_chunks:
                 (
                     result_content,
@@ -287,6 +296,7 @@ class TaskService:
                     selected_chunks,
                 )
                 if used_chunk_ids:
+                    evidence_mode = "declared"
                     selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
                     citations = [
                         self._build_chunk_ref(selected_by_id[chunk_id])
@@ -309,10 +319,11 @@ class TaskService:
                     "retrieval_status": retrieval_status,
                     "retrieval_message": None,
                     "retrieval_applied": retrieval_applied,
+                    "evidence_mode": evidence_mode,
                     "retrieved_chunk_count": retrieved_chunk_count,
                     "retrieved_pages": retrieved_pages,
                     "used_chunk_ids": used_chunk_ids,
-                    "evidence_quotes": evidence_quotes,
+                    "evidence_quotes": [quote.model_dump() for quote in evidence_quotes],
                     "citations": [citation.model_dump() for citation in citations],
                     "source_chunks": [chunk.model_dump() for chunk in source_chunks],
                     "source_document_chars": model_result.source_document_chars,
@@ -362,13 +373,16 @@ class TaskService:
                     cache_hit=False,
                     retrieval_status=retrieval_status,
                     retrieval_applied=retrieval_applied,
+                    evidence_mode=evidence_mode,
                     retrieved_chunk_count=retrieved_chunk_count,
                     context_truncated=model_result.context_truncated,
                     extra=(
                         {
                             "context_strategy": context_strategy,
                             "retrieved_pages": retrieved_pages,
+                            "evidence_mode": evidence_mode,
                             "used_chunk_count": len(used_chunk_ids),
+                            "evidence_quote_count": len(evidence_quotes),
                             "citation_count": len(citations),
                             "source_chunk_count": len(source_chunks),
                         }
@@ -396,6 +410,7 @@ class TaskService:
                 retrieval_status=retrieval_status,
                 retrieval_message=None,
                 retrieval_applied=retrieval_applied,
+                evidence_mode=evidence_mode,
                 retrieved_chunk_count=retrieved_chunk_count,
                 retrieved_pages=retrieved_pages,
                 used_chunk_ids=used_chunk_ids,
@@ -438,6 +453,7 @@ class TaskService:
                         {
                             "context_strategy": context_strategy,
                             "retrieved_pages": retrieved_pages,
+                            "evidence_mode": evidence_mode,
                             "citation_count": len(citations),
                             "source_chunk_count": len(source_chunks),
                             **exc.details,
@@ -467,24 +483,78 @@ class TaskService:
         self,
         raw_content: str,
         selected_chunks: list[ParsedChunk],
-    ) -> tuple[str, list[str], list[str]]:
+    ) -> tuple[str, list[str], list[EvidenceQuote]]:
         payload = self._extract_json_payload(raw_content)
         if not payload:
             return raw_content.strip(), [], []
 
-        allowed_chunk_ids = {chunk.chunk_id for chunk in selected_chunks}
+        selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
+        allowed_chunk_ids = set(selected_by_id)
         answer = str(payload.get("answer") or "").strip() or raw_content.strip()
         used_chunk_ids = [
             str(item)
             for item in payload.get("used_chunk_ids", [])
             if str(item) in allowed_chunk_ids
         ]
-        evidence_quotes = [
-            str(item).strip()
-            for item in payload.get("evidence_quotes", [])
-            if str(item).strip()
-        ][:3]
+        evidence_quotes = self._extract_validated_quotes(
+            payload.get("evidence_quotes", []),
+            used_chunk_ids,
+            selected_by_id,
+        )
         return answer, used_chunk_ids, evidence_quotes
+
+    def _extract_validated_quotes(
+        self,
+        raw_quotes: list,
+        used_chunk_ids: list[str],
+        selected_by_id: dict[str, ParsedChunk],
+    ) -> list[EvidenceQuote]:
+        if not used_chunk_ids:
+            return []
+
+        normalized_chunks = {
+            chunk_id: self._normalize_quote_text(selected_by_id[chunk_id].text)
+            for chunk_id in used_chunk_ids
+            if chunk_id in selected_by_id
+        }
+
+        validated: list[EvidenceQuote] = []
+        for item in raw_quotes[:5]:
+            chunk_id, quote = self._coerce_quote_item(item, used_chunk_ids)
+            if not chunk_id or not quote:
+                continue
+            normalized_quote = self._normalize_quote_text(quote)
+            if not normalized_quote:
+                continue
+            if normalized_quote not in normalized_chunks.get(chunk_id, ""):
+                continue
+            validated.append(EvidenceQuote(chunk_id=chunk_id, quote=quote.strip()))
+            if len(validated) >= 3:
+                break
+        return validated
+
+    def _coerce_quote_item(
+        self,
+        item: object,
+        used_chunk_ids: list[str],
+    ) -> tuple[str | None, str | None]:
+        if isinstance(item, dict):
+            chunk_id = str(item.get("chunk_id") or "").strip()
+            quote = str(item.get("quote") or "").strip()
+            if chunk_id in used_chunk_ids and quote:
+                return chunk_id, quote
+            return None, None
+
+        if isinstance(item, str):
+            quote = item.strip()
+            if quote and used_chunk_ids:
+                return used_chunk_ids[0], quote
+        return None, None
+
+    def _normalize_quote_text(self, text: str) -> str:
+        normalized = text.replace("\x00", "")
+        normalized = re.sub(r"\s+", "", normalized)
+        return normalized.strip()
 
     def _extract_json_payload(self, raw_content: str) -> dict | None:
         candidate = raw_content.strip()

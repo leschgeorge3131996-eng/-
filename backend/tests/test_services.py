@@ -437,12 +437,14 @@ def test_task_service_applies_retrieval_for_ask() -> None:
             user_input="第一阶段目标是什么？",
         )
 
+        assert result.evidence_mode == "declared"
         assert result.retrieval_applied is True
         assert result.retrieved_chunk_count >= 1
         assert result.retrieved_pages == [1]
         assert len(result.citations) >= 1
         assert len(result.used_chunk_ids) >= 1
         assert len(result.evidence_quotes) >= 1
+        assert result.evidence_quotes[0].chunk_id in result.used_chunk_ids
         assert result.citations[0].page_numbers == [1]
         assert result.source_chunks == []
     finally:
@@ -504,6 +506,7 @@ def test_ask_plain_text_response_does_not_fallback_to_candidate_citations() -> N
         )
 
         assert result.result == "这是一个没有 JSON 包装的普通回答。"
+        assert result.evidence_mode == "candidate"
         assert result.used_chunk_ids == []
         assert result.evidence_quotes == []
         assert result.citations == []
@@ -534,6 +537,7 @@ def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
         )
 
         assert result.outcome == "refused"
+        assert result.evidence_mode == "none"
         assert result.retrieval_status == "no_match"
         assert result.retrieval_message
         assert result.retrieval_applied is False

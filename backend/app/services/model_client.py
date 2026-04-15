@@ -376,7 +376,12 @@ class ModelClient:
                     {
                         "answer": "；".join(points[:max_points]),
                         "used_chunk_ids": used_chunk_ids,
-                        "evidence_quotes": evidence_quotes,
+                        "evidence_quotes": [
+                            {"chunk_id": used_chunk_ids[0], "quote": quote}
+                            for quote in evidence_quotes
+                        ]
+                        if used_chunk_ids
+                        else [],
                         "question": question,
                     },
                     ensure_ascii=False,

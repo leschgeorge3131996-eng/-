@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 TaskType = Literal["ask", "summary", "outline"]
 ResponseDetailLevel = Literal["concise", "balanced", "detailed"]
+EvidenceMode = Literal["declared", "candidate", "none"]
 
 
 class AskRequest(BaseModel):
@@ -31,6 +32,11 @@ class Citation(BaseModel):
     chunk_id: str
     page_numbers: list[int]
     snippet: str
+
+
+class EvidenceQuote(BaseModel):
+    chunk_id: str
+    quote: str
 
 
 class ModelResult(BaseModel):
@@ -63,10 +69,11 @@ class TaskResult(BaseModel):
     retrieval_status: str = "not_used"
     retrieval_message: str | None = None
     retrieval_applied: bool = False
+    evidence_mode: EvidenceMode = "none"
     retrieved_chunk_count: int = 0
     retrieved_pages: list[int] = []
     used_chunk_ids: list[str] = []
-    evidence_quotes: list[str] = []
+    evidence_quotes: list[EvidenceQuote] = []
     citations: list[Citation] = []
     source_chunks: list[Citation] = []
     source_document_chars: int = 0

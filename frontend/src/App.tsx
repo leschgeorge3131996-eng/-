@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiRequestError, fetchLogSummary, runTask, uploadDocument } from "./api";
 import type {
   LogSummary,
@@ -110,12 +110,12 @@ function writeStorage<T>(key: string, value: T): void {
 }
 
 function isSameRecentDocument(left: RecentDocument, right: RecentDocument): boolean {
-  if (
-    left.document_fingerprint &&
-    right.document_fingerprint &&
-    left.document_fingerprint === right.document_fingerprint
-  ) {
-    return true;
+  if (left.document_fingerprint || right.document_fingerprint) {
+    return Boolean(
+      left.document_fingerprint &&
+        right.document_fingerprint &&
+        left.document_fingerprint === right.document_fingerprint
+    );
   }
   return left.original_name === right.original_name;
 }
@@ -188,8 +188,10 @@ function App() {
   );
   const [logSummary, setLogSummary] = useState<LogSummary | null>(null);
   const [summaryRefreshTick, setSummaryRefreshTick] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
+  const activeResultTaskType = result?.task_type ?? taskType;
   const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
   const pendingDocumentType =
     pendingDocument?.name.split(".").pop()?.toLowerCase() ?? pendingDocument?.type ?? "-";
@@ -251,13 +253,17 @@ function App() {
     });
   }
 
-  function pushRecentResult(taskResult: TaskResult, promptText: string) {
+  function pushRecentResult(
+    taskResult: TaskResult,
+    promptText: string,
+    documentSnapshot: UploadMetadata | null
+  ) {
     const item: RecentResult = {
       id: taskResult.request_id,
       task_type: taskResult.task_type,
       input: promptText,
       created_at: new Date().toISOString(),
-      document_snapshot: uploadedMetadata,
+      document_snapshot: documentSnapshot,
       task_result: taskResult
     };
 
@@ -307,16 +313,21 @@ function App() {
 
     try {
       let fileId = uploadedMetadata?.file_id ?? "";
+      let activeMetadata = uploadedMetadata;
 
       if (selectedFile) {
         setLoadStage("uploading");
         const upload = await uploadDocument(selectedFile, setUploadProgress);
         setUploadProgress(100);
         setUploadedMetadata(upload.metadata);
+        activeMetadata = upload.metadata;
         setPendingDocumentSource(null);
         upsertRecentDocument(upload.metadata);
         fileId = upload.metadata.file_id;
         setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       }
 
       if (!fileId) {
@@ -330,7 +341,7 @@ function App() {
       setLoadStage("model");
       const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
       setResult(taskResult);
-      pushRecentResult(taskResult, input.trim());
+      pushRecentResult(taskResult, input.trim(), activeMetadata ?? null);
       setSummaryRefreshTick((value) => value + 1);
     } catch (submitError) {
       setError(normalizeErrorMessage(submitError));
@@ -449,6 +460,7 @@ function App() {
               <label className="field">
                 <span>上传文档</span>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
                   disabled={loading}
@@ -592,6 +604,9 @@ function App() {
                       setUploadedMetadata(null);
                       setSelectedFile(null);
                       setPendingDocumentSource(null);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                      }
                       setResult(null);
                     }}
                   >
@@ -604,7 +619,7 @@ function App() {
 
           <article className="panel result-panel">
             <div className="section-head">
-              <h2 className="panel-title">{TASK_LABELS[taskType]}结果</h2>
+              <h2 className="panel-title">{TASK_LABELS[activeResultTaskType]}结果</h2>
             </div>
             {error ? <p className="error">{error}</p> : null}
             {!error && loading ? <p className="status">{describeLoadStage(loadStage)}</p> : null}
@@ -658,12 +673,19 @@ function App() {
                     {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
                   </p>
                 ) : null}
-                {result.task_type === "ask" && result.citations.length > 0 ? (
+                {result.task_type === "ask" &&
+                (result.citations.length > 0 ||
+                  result.evidence_quotes.length > 0 ||
+                  result.evidence_mode === "candidate") ? (
                   <div className="citations">
                     <h3>引用依据</h3>
-                    {result.used_chunk_ids.length > 0 ? (
+                    {result.evidence_mode === "declared" && result.used_chunk_ids.length > 0 ? (
                       <p className="citation-helper">
                         模型声明使用了 {result.used_chunk_ids.length} 个证据块。
+                      </p>
+                    ) : result.evidence_mode === "candidate" ? (
+                      <p className="citation-helper">
+                        本轮只命中了候选上下文，模型未明确声明实际使用的证据块。
                       </p>
                     ) : null}
                     <div className="citation-list">
@@ -679,8 +701,9 @@ function App() {
                         <h3>证据摘录</h3>
                         <div className="citation-list">
                           {result.evidence_quotes.map((quote, index) => (
-                            <article key={`${result.request_id}-quote-${index}`} className="citation-card">
-                              <p>{quote}</p>
+                            <article key={`${result.request_id}-${quote.chunk_id}-${index}`} className="citation-card">
+                              <p className="citation-meta">证据块：{quote.chunk_id}</p>
+                              <p>{quote.quote}</p>
                             </article>
                           ))}
                         </div>

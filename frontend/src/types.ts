@@ -42,6 +42,11 @@ export interface Citation {
   snippet: string;
 }
 
+export interface EvidenceQuote {
+  chunk_id: string;
+  quote: string;
+}
+
 export interface TaskResult {
   request_id: string;
   task_type: TaskType;
@@ -60,10 +65,11 @@ export interface TaskResult {
   retrieval_status: string;
   retrieval_message?: string | null;
   retrieval_applied: boolean;
+  evidence_mode?: "declared" | "candidate" | "none";
   retrieved_chunk_count: number;
   retrieved_pages: number[];
   used_chunk_ids: string[];
-  evidence_quotes: string[];
+  evidence_quotes: EvidenceQuote[];
   citations: Citation[];
   source_chunks: Citation[];
   source_document_chars: number;
