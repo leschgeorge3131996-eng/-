@@ -20,6 +20,9 @@ class CallLogEntry(BaseModel):
     token_out: int | None = None
     token_total: int | None = None
     cache_hit: bool = False
+    retrieval_status: str | None = None
+    retrieval_applied: bool = False
+    retrieved_chunk_count: int = 0
     context_truncated: bool = False
     error_message: str | None = None
     error_type: str | None = None

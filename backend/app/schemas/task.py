@@ -24,6 +24,12 @@ class TokenUsage(BaseModel):
     total_tokens: int | None = None
 
 
+class Citation(BaseModel):
+    chunk_id: str
+    page_numbers: list[int]
+    snippet: str
+
+
 class ModelResult(BaseModel):
     content: str
     model_name: str
@@ -46,6 +52,12 @@ class TaskResult(BaseModel):
     latency_ms: int
     result: str
     cache_hit: bool = False
+    retrieval_status: str = "not_used"
+    retrieval_message: str | None = None
+    retrieval_applied: bool = False
+    retrieved_chunk_count: int = 0
+    retrieved_pages: list[int] = []
+    citations: list[Citation] = []
     source_document_chars: int = 0
     used_document_chars: int = 0
     truncation_message: str | None = None

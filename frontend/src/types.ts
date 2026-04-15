@@ -19,6 +19,9 @@ export interface UploadMetadata {
   file_type: string;
   size_bytes: number;
   text_chars: number;
+  page_count: number;
+  chunk_count: number;
+  document_fingerprint?: string | null;
   parse_status: string;
 }
 
@@ -32,6 +35,12 @@ export interface TokenUsage {
   total_tokens?: number | null;
 }
 
+export interface Citation {
+  chunk_id: string;
+  page_numbers: number[];
+  snippet: string;
+}
+
 export interface TaskResult {
   request_id: string;
   task_type: TaskType;
@@ -42,6 +51,12 @@ export interface TaskResult {
   latency_ms: number;
   result: string;
   cache_hit: boolean;
+  retrieval_status: string;
+  retrieval_message?: string | null;
+  retrieval_applied: boolean;
+  retrieved_chunk_count: number;
+  retrieved_pages: number[];
+  citations: Citation[];
   source_document_chars: number;
   used_document_chars: number;
   truncation_message?: string | null;
@@ -54,6 +69,8 @@ export interface RecentDocument {
   original_name: string;
   file_type: string;
   text_chars: number;
+  page_count: number;
+  chunk_count: number;
   parse_status: string;
   saved_at: string;
 }

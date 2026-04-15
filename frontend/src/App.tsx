@@ -145,6 +145,8 @@ function App() {
       original_name: metadata.original_name,
       file_type: metadata.file_type,
       text_chars: metadata.text_chars,
+      page_count: metadata.page_count,
+      chunk_count: metadata.chunk_count,
       parse_status: metadata.parse_status,
       saved_at: new Date().toISOString()
     };
@@ -363,6 +365,8 @@ function App() {
                 <p>文件：{uploadedMetadata.original_name}</p>
                 <p>类型：{uploadedMetadata.file_type}</p>
                 <p>字符数：{uploadedMetadata.text_chars}</p>
+                <p>页数：{uploadedMetadata.page_count}</p>
+                <p>分块数：{uploadedMetadata.chunk_count}</p>
                 <p>状态：{uploadedMetadata.parse_status}</p>
                 <div className="inline-actions">
                   <button
@@ -399,6 +403,35 @@ function App() {
                 </div>
                 {result.cache_hit ? (
                   <p className="cache-hit">本次结果命中本地缓存，未重复调用云端模型。</p>
+                ) : null}
+                {result.retrieval_applied ? (
+                  <p className="status">
+                    已从 {result.retrieved_chunk_count} 个片段构造问答上下文
+                    {result.retrieved_pages.length > 0
+                      ? `，涉及页码：${result.retrieved_pages.join(", ")}`
+                      : ""}
+                    。
+                  </p>
+                ) : null}
+                {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
+                  <p className="warning">
+                    {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
+                  </p>
+                ) : null}
+                {result.citations.length > 0 ? (
+                  <div className="citations">
+                    <h3>引用依据</h3>
+                    <div className="citation-list">
+                      {result.citations.map((citation) => (
+                        <article key={citation.chunk_id} className="citation-card">
+                          <p className="citation-meta">
+                            页码：{citation.page_numbers.join(", ")}
+                          </p>
+                          <p>{citation.snippet}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
                 ) : null}
                 {result.context_truncated ? (
                   <p className="warning">
@@ -438,6 +471,9 @@ function App() {
                         file_type: item.file_type,
                         size_bytes: 0,
                         text_chars: item.text_chars,
+                        page_count: item.page_count,
+                        chunk_count: item.chunk_count,
+                        document_fingerprint: null,
                         parse_status: item.parse_status
                       });
                       setSelectedFile(null);
@@ -446,7 +482,7 @@ function App() {
                   >
                     <strong>{item.original_name}</strong>
                     <span>
-                      {item.file_type} · {item.text_chars} chars
+                      {item.file_type} · {item.page_count} pages · {item.chunk_count} chunks
                     </span>
                   </button>
                 ))}

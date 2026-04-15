@@ -23,6 +23,8 @@ def render_markdown(summary: dict) -> str:
         f"- Average latency (ms): {summary['average_latency_ms']}",
         f"- P95 latency (ms): {summary['p95_latency_ms']}",
         f"- Cache hit count: {summary['cache_hit_count']}",
+        f"- Retrieval applied count: {summary['retrieval_applied_count']}",
+        f"- Citation count sum: {summary['citation_count_sum']}",
         f"- Token total sum: {summary['token_total_sum']}",
         "",
         "## By Task",
@@ -33,6 +35,13 @@ def render_markdown(summary: dict) -> str:
     lines.extend(["", "## By Model"])
     for model, count in summary["by_model"].items():
         lines.append(f"- {model}: {count}")
+
+    lines.extend(["", "## By Retrieval Status"])
+    if summary["by_retrieval_status"]:
+        for status, count in summary["by_retrieval_status"].items():
+            lines.append(f"- {status}: {count}")
+    else:
+        lines.append("- none")
 
     lines.extend(["", "## Error Types"])
     if summary["error_types"]:
@@ -77,4 +86,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -42,6 +42,16 @@
 - API integration tests added for upload, tasks, and log summary
 - Frontend stats panel added
 - Demo mode added with sample document and sample prompts
+- Parsed document structure now saved for TXT/MD/PDF
+- PDF page-aware structure is available as stored parsed output
+- Chunked document structure now saved to parsed outputs
+- Ask task now uses lightweight retrieval over chunks
+- Ask task now returns structured citations with page numbers and snippets
+- Context planner added for task-specific context selection
+- Summary and outline now use chunk coverage context instead of plain whole-text truncation
+- Ask retrieval now rejects low-relevance questions instead of fabricating evidence
+- Summary and outline now also expose source chunk citations
+- Log summary now tracks retrieval status and citation counts
 
 ### Verified Results
 
@@ -84,8 +94,9 @@ Notes:
 - Latency is still high
 - Volcengine may return `HTTP 429` with `RequestBurstTooFast` if requests are sent too quickly
 - Current backend has minimal burst retry and local cache, but this is not a full queue/rate-limit system
-- Current strategy is still "whole document direct send"
-- No local chunking / retrieval / citation yet
+- Summary and outline still do not return structured references
+- Retrieval quality controls still need stronger scoring/ordering
+- Competition materials are still missing finalized written assets
 
 ## Important Files
 
@@ -140,17 +151,17 @@ cd C:\Users\Administrator\Desktop\project
 
 Current status:
 
-- `10 passed`
+- `15 passed`
 
 ## Next Recommended Steps
 
 1. Start phase 2 in this order:
-   - PDF page-aware parsing
-   - text chunking
-   - retrieval
-   - citations
-2. Add a small architecture diagram into `evidence/`
-3. Add first version of competition materials: project summary, demo script, sample set
+   - stronger retrieval scoring and ordering
+2. Finalize first version of competition materials:
+   - one-page project summary
+   - demo script
+   - sample set
+   - architecture note
 
 ## Session Handoff Rule
 

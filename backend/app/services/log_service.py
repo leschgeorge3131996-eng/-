@@ -35,9 +35,12 @@ class LogService:
                 "average_latency_ms": 0,
                 "p95_latency_ms": 0,
                 "cache_hit_count": 0,
+                "retrieval_applied_count": 0,
+                "citation_count_sum": 0,
                 "token_total_sum": 0,
                 "by_task": {},
                 "by_model": {},
+                "by_retrieval_status": {},
                 "error_types": {},
             }
 
@@ -49,12 +52,25 @@ class LogService:
         success_count = sum(1 for entry in entries if entry.get("success") is True)
         failure_count = len(entries) - success_count
         cache_hit_count = sum(1 for entry in entries if entry.get("cache_hit") is True)
+        retrieval_applied_count = sum(
+            1 for entry in entries if entry.get("retrieval_applied") is True
+        )
+        citation_count_sum = sum(
+            int((entry.get("extra") or {}).get("citation_count", 0) or 0)
+            for entry in entries
+            if isinstance(entry.get("extra"), dict)
+        )
         token_total_sum = sum(
             int(entry.get("token_total", 0) or 0)
             for entry in entries
         )
         by_task_counter = Counter(str(entry.get("task_type", "unknown")) for entry in entries)
         by_model_counter = Counter(str(entry.get("model_name", "unknown")) for entry in entries)
+        retrieval_status_counter = Counter(
+            str(entry.get("retrieval_status"))
+            for entry in entries
+            if entry.get("retrieval_status")
+        )
         error_types_counter = Counter(
             str(entry.get("error_type"))
             for entry in entries
@@ -69,6 +85,8 @@ class LogService:
             "average_latency_ms": int(mean(latencies)) if latencies else 0,
             "p95_latency_ms": self._percentile(latencies, 0.95),
             "cache_hit_count": cache_hit_count,
+            "retrieval_applied_count": retrieval_applied_count,
+            "citation_count_sum": citation_count_sum,
             "token_total_sum": token_total_sum,
             "time_range": {
                 "first_timestamp": entries[0].get("timestamp"),
@@ -76,6 +94,7 @@ class LogService:
             },
             "by_task": dict(by_task_counter),
             "by_model": dict(by_model_counter),
+            "by_retrieval_status": dict(retrieval_status_counter),
             "error_types": dict(error_types_counter),
         }
 

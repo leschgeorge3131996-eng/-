@@ -88,6 +88,8 @@ def test_upload_endpoint_returns_fingerprint() -> None:
         payload = response.json()["data"]["metadata"]
         assert payload["parse_status"] == "parsed"
         assert payload["document_fingerprint"]
+        assert payload["page_count"] == 1
+        assert payload["chunk_count"] >= 1
     finally:
         cleanup_workspace(workspace)
 
@@ -113,6 +115,7 @@ def test_summary_endpoint_returns_truncation_fields() -> None:
         assert payload["source_document_chars"] > payload["used_document_chars"]
         assert payload["truncation_message"]
         assert payload["document_fingerprint"]
+        assert len(payload["citations"]) >= 1
     finally:
         cleanup_workspace(workspace)
 
@@ -141,3 +144,54 @@ def test_logs_summary_endpoint_returns_aggregates() -> None:
     finally:
         cleanup_workspace(workspace)
 
+
+def test_ask_endpoint_returns_retrieval_fields() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        upload_response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# 背景\n\n一些背景。\n\n# 目标\n\n第一阶段目标是支持上传文档。".encode("utf-8"), "text/markdown")},
+        )
+        file_id = upload_response.json()["data"]["metadata"]["file_id"]
+
+        response = client.post(
+            "/api/ask",
+            json={"file_id": file_id, "question": "第一阶段目标是什么？"},
+        )
+
+        assert response.status_code == 200
+        payload = response.json()["data"]
+        assert payload["retrieval_applied"] is True
+        assert payload["retrieved_chunk_count"] >= 1
+        assert payload["retrieved_pages"] == [1]
+        assert len(payload["citations"]) >= 1
+        assert payload["citations"][0]["page_numbers"] == [1]
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_ask_endpoint_returns_no_citations_when_not_retrieved() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        upload_response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# 文档\n\n这里讨论项目背景和目标。".encode("utf-8"), "text/markdown")},
+        )
+        file_id = upload_response.json()["data"]["metadata"]["file_id"]
+
+        response = client.post(
+            "/api/ask",
+            json={"file_id": file_id, "question": "完全不相关的天文问题"},
+        )
+
+        assert response.status_code == 200
+        payload = response.json()["data"]
+        assert payload["retrieval_status"] == "no_match"
+        assert payload["retrieval_message"]
+        assert payload["retrieval_applied"] is False
+        assert payload["retrieved_chunk_count"] == 0
+        assert payload["citations"] == []
+    finally:
+        cleanup_workspace(workspace)

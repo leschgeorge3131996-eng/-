@@ -14,6 +14,11 @@ Use this directory to store reproducible project evidence for demos, reviews, an
 - `experiments/`
   - experiment records
   - prompt or model comparison notes
+- `materials/`
+  - one-page project summary
+  - demo script
+  - sample set
+  - architecture description
 
 ## Naming Convention
 
@@ -26,4 +31,3 @@ Examples:
 - `20260415_summary_success.png`
 - `20260415_api_docs.png`
 - `20260415_log_summary.md`
-

@@ -207,6 +207,37 @@ textarea {
   word-break: break-word;
 }
 
+.citations {
+  margin-top: 16px;
+}
+
+.citations h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.citation-list {
+  display: grid;
+  gap: 10px;
+}
+
+.citation-card {
+  padding: 12px 14px;
+  border: 1px solid #d6dbe4;
+  border-radius: 14px;
+  background: #fffdf8;
+}
+
+.citation-card p {
+  margin: 0;
+}
+
+.citation-meta {
+  margin-bottom: 6px !important;
+  color: #6b7280;
+  font-size: 13px;
+}
+
 .status,
 .empty {
   color: #6b7280;

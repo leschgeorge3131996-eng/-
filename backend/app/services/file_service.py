@@ -8,7 +8,8 @@ from uuid import uuid4
 
 from ..core.config import Settings, get_settings
 from ..core.exceptions import NotFoundError, ParseError, ValidationError
-from ..schemas.document import DocumentMetadata, UploadResponseData
+from ..schemas.document import ChunkedDocument, DocumentMetadata, ParsedDocument, UploadResponseData
+from .chunk_service import ChunkService
 from .document_parser import DocumentParser
 
 
@@ -17,9 +18,11 @@ class FileService:
         self,
         settings: Settings | None = None,
         parser: DocumentParser | None = None,
+        chunk_service: ChunkService | None = None,
     ) -> None:
         self.settings = settings or get_settings()
         self.parser = parser or DocumentParser()
+        self.chunk_service = chunk_service or ChunkService()
 
     def save_upload(self, filename: str, content: bytes) -> UploadResponseData:
         if not filename:
@@ -39,6 +42,8 @@ class FileService:
         created_at = datetime.now(timezone.utc).isoformat()
         upload_path = self.settings.uploads_dir / f"{file_id}{suffix}"
         parsed_path = self.settings.parsed_dir / f"{file_id}.txt"
+        parsed_structure_path = self.settings.parsed_dir / f"{file_id}.pages.json"
+        chunk_structure_path = self.settings.parsed_dir / f"{file_id}.chunks.json"
         metadata_path = self.settings.parsed_dir / f"{file_id}.json"
         upload_path.write_bytes(content)
 
@@ -47,22 +52,31 @@ class FileService:
             original_name=filename,
             saved_path=str(upload_path),
             parsed_path=str(parsed_path),
+            parsed_structure_path=str(parsed_structure_path),
+            chunk_structure_path=str(chunk_structure_path),
             document_fingerprint=None,
             file_type=suffix.lstrip("."),
             size_bytes=len(content),
             text_chars=0,
+            page_count=0,
+            chunk_count=0,
             created_at=created_at,
             parse_status="pending",
         )
 
         try:
-            text = self.parser.extract_text(upload_path)
-            if not text:
+            parsed_document = self.parser.parse_document(upload_path)
+            if not parsed_document.text:
                 raise ParseError("文档未提取到有效文本。")
-            parsed_path.write_text(text, encoding="utf-8")
+            chunked_document = self.chunk_service.build_chunks(parsed_document)
+            parsed_path.write_text(parsed_document.text, encoding="utf-8")
+            self._write_structure(parsed_structure_path, parsed_document)
+            self._write_chunks(chunk_structure_path, chunked_document)
             metadata.parse_status = "parsed"
-            metadata.text_chars = len(text)
-            metadata.document_fingerprint = self._build_document_fingerprint(text)
+            metadata.text_chars = len(parsed_document.text)
+            metadata.page_count = parsed_document.page_count
+            metadata.chunk_count = chunked_document.chunk_count
+            metadata.document_fingerprint = self._build_document_fingerprint(parsed_document.text)
         except ParseError as exc:
             metadata.parse_status = "failed"
             metadata.parse_error = exc.message
@@ -81,6 +95,8 @@ class FileService:
             file_type=metadata.file_type,
             size_bytes=metadata.size_bytes,
             text_chars=metadata.text_chars,
+            page_count=metadata.page_count,
+            chunk_count=metadata.chunk_count,
             document_fingerprint=metadata.document_fingerprint,
             parse_status=metadata.parse_status,
         )
@@ -97,8 +113,26 @@ class FileService:
             raise NotFoundError("未找到对应的文档元数据。")
         return DocumentMetadata.model_validate_json(metadata_path.read_text(encoding="utf-8"))
 
+    def get_document_structure(self, file_id: str) -> ParsedDocument:
+        structure_path = self.settings.parsed_dir / f"{file_id}.pages.json"
+        if not structure_path.exists():
+            raise NotFoundError("未找到对应的结构化解析结果。")
+        return ParsedDocument.model_validate_json(structure_path.read_text(encoding="utf-8"))
+
+    def get_document_chunks(self, file_id: str) -> ChunkedDocument:
+        chunk_path = self.settings.parsed_dir / f"{file_id}.chunks.json"
+        if not chunk_path.exists():
+            raise NotFoundError("未找到对应的文档分块结果。")
+        return ChunkedDocument.model_validate_json(chunk_path.read_text(encoding="utf-8"))
+
     def _write_metadata(self, metadata_path: Path, metadata: DocumentMetadata) -> None:
         metadata_path.write_text(metadata.model_dump_json(indent=2), encoding="utf-8")
 
     def _build_document_fingerprint(self, text: str) -> str:
         return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    def _write_structure(self, structure_path: Path, parsed_document: ParsedDocument) -> None:
+        structure_path.write_text(parsed_document.model_dump_json(indent=2), encoding="utf-8")
+
+    def _write_chunks(self, chunk_path: Path, chunked_document: ChunkedDocument) -> None:
+        chunk_path.write_text(chunked_document.model_dump_json(indent=2), encoding="utf-8")

@@ -68,10 +68,17 @@ def test_save_upload_and_load_text() -> None:
 
         result = service.save_upload("demo.txt", "第一段\n第二段".encode("utf-8"))
         text = service.get_document_text(result.file_id)
+        structure = service.get_document_structure(result.file_id)
+        chunks = service.get_document_chunks(result.file_id)
 
         assert result.parse_status == "parsed"
         assert result.text_chars > 0
+        assert result.page_count == 1
+        assert result.chunk_count >= 1
         assert result.document_fingerprint
+        assert structure.page_count == 1
+        assert structure.pages[0].text == text
+        assert chunks.chunk_count >= 1
         assert "第一段" in text
     finally:
         cleanup_workspace(workspace)
@@ -133,6 +140,23 @@ class CountingModelClient(ModelClient):
         user_input: str | None = None,
     ):
         self.call_count += 1
+        return super().call_model(task_type, document_text, user_input)
+
+
+class RecordingModelClient(ModelClient):
+    def __init__(self, settings: Settings) -> None:
+        super().__init__(settings=settings)
+        self.last_document_text = ""
+        self.last_task_type = ""
+
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+    ):
+        self.last_task_type = task_type
+        self.last_document_text = document_text
         return super().call_model(task_type, document_text, user_input)
 
 
@@ -200,9 +224,9 @@ def test_log_service_summary_aggregates_metrics() -> None:
         log_service.log_file.write_text(
             "\n".join(
                 [
-                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false}',
-                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":false,"latency_ms":400,"prompt_chars":10,"output_chars":0,"token_total":0,"cache_hit":false,"error_type":"MODEL_SERVICE_ERROR"}',
-                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":true,"latency_ms":200,"prompt_chars":10,"output_chars":20,"token_total":40,"cache_hit":true}',
+                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
+                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":false,"latency_ms":400,"prompt_chars":10,"output_chars":0,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":0}}',
+                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":true,"latency_ms":200,"prompt_chars":10,"output_chars":20,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","extra":{"citation_count":1}}',
                     "{bad json line}",
                 ]
             ),
@@ -215,11 +239,16 @@ def test_log_service_summary_aggregates_metrics() -> None:
         assert summary["success_count"] == 2
         assert summary["failure_count"] == 1
         assert summary["cache_hit_count"] == 1
+        assert summary["retrieval_applied_count"] == 1
+        assert summary["citation_count_sum"] == 3
         assert summary["token_total_sum"] == 70
         assert summary["by_task"]["summary"] == 2
         assert summary["by_task"]["ask"] == 1
         assert summary["by_model"]["m1"] == 2
         assert summary["by_model"]["m2"] == 1
+        assert summary["by_retrieval_status"]["coverage"] == 1
+        assert summary["by_retrieval_status"]["no_match"] == 1
+        assert summary["by_retrieval_status"]["matched"] == 1
         assert summary["error_types"]["MODEL_SERVICE_ERROR"] == 1
     finally:
         cleanup_workspace(workspace)
@@ -256,5 +285,107 @@ def test_task_service_uses_cache_for_same_request() -> None:
         assert second.cache_hit is True
         assert model_client.call_count == 1
         assert first.result == second.result
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_task_service_applies_retrieval_for_ask() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "retrieval.md",
+            (
+                "# 第一部分\n\n这里讨论无关背景信息。\n\n"
+                "# 第二部分\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。"
+            ).encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            user_input="第一阶段目标是什么？",
+        )
+
+        assert result.retrieval_applied is True
+        assert result.retrieved_chunk_count >= 1
+        assert result.retrieved_pages == [1]
+        assert len(result.citations) >= 1
+        assert result.citations[0].page_numbers == [1]
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "miss.md",
+            "# 文档\n\n这里讨论项目背景和目标。".encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            user_input="完全不相关的天文问题",
+        )
+
+        assert result.retrieval_status == "no_match"
+        assert result.retrieval_message
+        assert result.retrieval_applied is False
+        assert result.retrieved_chunk_count == 0
+        assert result.citations == []
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_summary_uses_chunk_coverage_context() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        model_client = RecordingModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "coverage.md",
+            (
+                "# 第一章\n\n第一章内容。\n\n"
+                "# 第二章\n\n第二章内容。\n\n"
+                "# 第三章\n\n第三章内容。\n\n"
+                "# 第四章\n\n第四章内容。\n\n"
+                "# 第五章\n\n第五章内容。\n\n"
+                "# 第六章\n\n第六章内容。"
+            ).encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请总结",
+        )
+
+        assert result.task_type == "summary"
+        assert "【Chunk" in model_client.last_document_text
+        assert len(result.citations) >= 1
     finally:
         cleanup_workspace(workspace)
