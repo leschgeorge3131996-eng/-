@@ -362,6 +362,13 @@ textarea {
   font-size: 12px;
 }
 
+.demo-feedback {
+  margin: 10px 2px 0;
+  color: var(--accent-deep);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .history-card strong {
   display: -webkit-box;
   -webkit-line-clamp: 2;

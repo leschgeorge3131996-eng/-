@@ -149,6 +149,7 @@ function App() {
   const [summaryRefreshTick, setSummaryRefreshTick] = useState(0);
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
+  const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
   const canSubmit =
     !loading &&
     Boolean(selectedFile || uploadedMetadata) &&
@@ -362,6 +363,9 @@ function App() {
                 </button>
               ))}
             </div>
+            {pendingDocument ? (
+              <p className="demo-feedback">已填充示例文档：{pendingDocument.name}。点击“提交任务”后会自动上传。</p>
+            ) : null}
           </article>
         </section>
 
@@ -426,7 +430,13 @@ function App() {
             <div className="document-brief">
               <div className="section-head compact-head">
                 <p className="section-kicker">当前文档</p>
-                <h3>{uploadedMetadata ? uploadedMetadata.original_name : "暂无文档"}</h3>
+                <h3>
+                  {uploadedMetadata
+                    ? uploadedMetadata.original_name
+                    : pendingDocument
+                      ? pendingDocument.name
+                      : "暂无文档"}
+                </h3>
               </div>
               {uploadedMetadata ? (
                 <div className="meta-grid">
@@ -447,10 +457,29 @@ function App() {
                     <strong>{uploadedMetadata.chunk_count}</strong>
                   </div>
                 </div>
+              ) : pendingDocument ? (
+                <div className="meta-grid">
+                  <div className="meta-chip">
+                    <span>状态</span>
+                    <strong>待上传</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>类型</span>
+                    <strong>md</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>来源</span>
+                    <strong>示例文档</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>下一步</span>
+                    <strong>点击提交任务</strong>
+                  </div>
+                </div>
               ) : (
                 <p className="empty">上传后这里会显示文档规模与结构信息。</p>
               )}
-              {uploadedMetadata ? (
+              {uploadedMetadata || pendingDocument ? (
                 <div className="inline-actions">
                   <button
                     className="ghost-button"
