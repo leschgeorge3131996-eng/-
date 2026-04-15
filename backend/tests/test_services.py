@@ -191,6 +191,39 @@ def test_log_service_skips_malformed_lines() -> None:
         cleanup_workspace(workspace)
 
 
+def test_log_service_summary_aggregates_metrics() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        log_service = LogService(settings=settings)
+        log_service.log_file.write_text(
+            "\n".join(
+                [
+                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false}',
+                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":false,"latency_ms":400,"prompt_chars":10,"output_chars":0,"token_total":0,"cache_hit":false,"error_type":"MODEL_SERVICE_ERROR"}',
+                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":true,"latency_ms":200,"prompt_chars":10,"output_chars":20,"token_total":40,"cache_hit":true}',
+                    "{bad json line}",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        summary = log_service.summarize_logs()
+
+        assert summary["total_requests"] == 3
+        assert summary["success_count"] == 2
+        assert summary["failure_count"] == 1
+        assert summary["cache_hit_count"] == 1
+        assert summary["token_total_sum"] == 70
+        assert summary["by_task"]["summary"] == 2
+        assert summary["by_task"]["ask"] == 1
+        assert summary["by_model"]["m1"] == 2
+        assert summary["by_model"]["m2"] == 1
+        assert summary["error_types"]["MODEL_SERVICE_ERROR"] == 1
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_task_service_uses_cache_for_same_request() -> None:
     workspace = make_workspace()
     try:

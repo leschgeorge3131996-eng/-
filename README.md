@@ -88,6 +88,10 @@ project/
 
 - 返回最近调用日志
 
+### `GET /api/logs/summary?limit=100`
+
+- 返回调用汇总统计，包括成功率、平均延迟、P95、缓存命中、token 总量、任务分布、模型分布和错误类型
+
 ### `GET /api/health`
 
 - 返回服务健康状态、模型提供方和是否启用 mock
@@ -114,6 +118,8 @@ project/
 - React 前端单页 MVP
 - 分阶段加载态、禁用重复提交、429 友好提示
 - 最近文档复用与最近 5 次结果历史
+- 日志汇总接口与日志导出脚本
+- 证据目录与实验记录模板
 - PowerShell 启动脚本
 - 基础服务层测试
 
@@ -206,6 +212,18 @@ npm run dev
 
 ```powershell
 python -m pytest backend/tests
+```
+
+## 日志汇总导出
+
+```powershell
+python scripts\export_log_summary.py --format md --output evidence\reports\latest_log_summary.md
+```
+
+也可以导出 JSON：
+
+```powershell
+python scripts\export_log_summary.py --format json
 ```
 
 ## 下一步建议

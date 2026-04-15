@@ -73,3 +73,7 @@ def outline_document(payload: TaskRequest) -> ApiResponse:
 def recent_logs(limit: int = Query(default=20, ge=1, le=100)) -> ApiResponse:
     return success_response({"items": log_service.list_logs(limit=limit)})
 
+
+@router.get("/logs/summary", response_model=ApiResponse)
+def logs_summary(limit: int | None = Query(default=None, ge=1, le=1000)) -> ApiResponse:
+    return success_response(log_service.summarize_logs(limit=limit))

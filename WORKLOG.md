@@ -34,6 +34,9 @@
 - Friendlier burst-limit error handling added
 - Recent document reuse added in frontend
 - Recent result history added in frontend
+- Log summary API added
+- Log summary export script added
+- Evidence directory and experiment template added
 
 ### Verified Results
 
@@ -43,7 +46,8 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Service tests pass: `6 passed`
+- Service tests pass: `7 passed`
+- Log summary exported to `evidence/reports/latest_log_summary.md`
 
 ## Current Runtime Configuration
 
@@ -135,10 +139,9 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Upgrade logs into queryable summaries/stat tables
-2. Add document length control and clearer truncation hints
-3. Build a tiny experiment record / evidence directory
-4. Start phase 2 in this order:
+1. Add document length control and clearer truncation hints
+2. Add a lightweight stats or ops panel in frontend
+3. Start phase 2 in this order:
    - PDF page-aware parsing
    - text chunking
    - retrieval
