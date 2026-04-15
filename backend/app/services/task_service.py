@@ -54,6 +54,7 @@ class TaskService:
         retrieved_pages: list[int] = []
         citations: list[Citation] = []
         context_strategy = "full_text"
+        outcome = "answered"
 
         try:
             metadata = self.file_service.get_document_metadata(file_id)
@@ -104,6 +105,7 @@ class TaskService:
                     model_name=self.model_client.resolve_model_name(task_type),
                     latency_ms=latency_ms,
                     result=refusal_text,
+                    outcome="refused",
                     cache_hit=False,
                     retrieval_status=retrieval_status,
                     retrieval_message="当前问题与检索到的文档片段相关性不足，系统已拒绝无依据回答。",
@@ -126,6 +128,7 @@ class TaskService:
                         model_name=task_result.model_name,
                         file_id=file_id,
                         success=True,
+                        outcome="refused",
                         latency_ms=latency_ms,
                         prompt_chars=len(user_input or ""),
                         output_chars=len(refusal_text),
@@ -163,6 +166,7 @@ class TaskService:
                     model_name=cached_result["model_name"],
                     latency_ms=latency_ms,
                     result=cached_result["result"],
+                    outcome=cached_result.get("outcome", outcome),
                     cache_hit=True,
                     retrieval_status=cached_result.get("retrieval_status", retrieval_status),
                     retrieval_message=cached_result.get("retrieval_message"),
@@ -191,6 +195,7 @@ class TaskService:
                         model_name=task_result.model_name,
                         file_id=file_id,
                         success=True,
+                        outcome=task_result.outcome,
                         latency_ms=latency_ms,
                         prompt_chars=cached_result.get("prompt_chars", 0),
                         output_chars=len(task_result.result),
@@ -235,6 +240,7 @@ class TaskService:
                     "task_type": task_type,
                     "model_name": model_result.model_name,
                     "result": model_result.content,
+                    "outcome": outcome,
                     "context_strategy": context_strategy,
                     "retrieval_status": retrieval_status,
                     "retrieval_message": None,
@@ -263,6 +269,7 @@ class TaskService:
                     model_name=model_result.model_name,
                     file_id=file_id,
                     success=True,
+                    outcome=outcome,
                     latency_ms=latency_ms,
                     prompt_chars=model_result.prompt_chars,
                     output_chars=model_result.output_chars,
@@ -307,6 +314,7 @@ class TaskService:
                 model_name=model_result.model_name,
                 latency_ms=latency_ms,
                 result=model_result.content,
+                outcome=outcome,
                 cache_hit=False,
                 retrieval_status=retrieval_status,
                 retrieval_message=None,
@@ -331,6 +339,7 @@ class TaskService:
                     model_name=self.model_client.resolve_model_name(task_type),
                     file_id=file_id if metadata or file_id else None,
                     success=False,
+                    outcome="error",
                     latency_ms=latency_ms,
                     prompt_chars=len(document_text) + len(user_input or ""),
                     output_chars=0,

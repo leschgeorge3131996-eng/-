@@ -162,6 +162,7 @@ def test_ask_endpoint_returns_retrieval_fields() -> None:
 
         assert response.status_code == 200
         payload = response.json()["data"]
+        assert payload["outcome"] == "answered"
         assert payload["retrieval_applied"] is True
         assert payload["retrieved_chunk_count"] >= 1
         assert payload["retrieved_pages"] == [1]
@@ -188,6 +189,7 @@ def test_ask_endpoint_returns_no_citations_when_not_retrieved() -> None:
 
         assert response.status_code == 200
         payload = response.json()["data"]
+        assert payload["outcome"] == "refused"
         assert payload["retrieval_status"] == "no_match"
         assert payload["retrieval_message"]
         assert payload["retrieval_applied"] is False

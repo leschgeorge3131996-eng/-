@@ -224,9 +224,9 @@ def test_log_service_summary_aggregates_metrics() -> None:
         log_service.log_file.write_text(
             "\n".join(
                 [
-                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
-                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":false,"latency_ms":400,"prompt_chars":10,"output_chars":0,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":0}}',
-                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":true,"latency_ms":200,"prompt_chars":10,"output_chars":20,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","extra":{"citation_count":1}}',
+                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"outcome":"answered","latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
+                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":true,"outcome":"refused","latency_ms":400,"prompt_chars":10,"output_chars":15,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","extra":{"citation_count":0}}',
+                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":false,"outcome":"error","latency_ms":200,"prompt_chars":10,"output_chars":0,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":1}}',
                     "{bad json line}",
                 ]
             ),
@@ -241,11 +241,17 @@ def test_log_service_summary_aggregates_metrics() -> None:
         assert summary["cache_hit_count"] == 1
         assert summary["retrieval_applied_count"] == 1
         assert summary["citation_count_sum"] == 3
+        assert summary["answered_count"] == 1
+        assert summary["refused_count"] == 1
+        assert summary["error_count"] == 1
         assert summary["token_total_sum"] == 70
         assert summary["by_task"]["summary"] == 2
         assert summary["by_task"]["ask"] == 1
         assert summary["by_model"]["m1"] == 2
         assert summary["by_model"]["m2"] == 1
+        assert summary["by_outcome"]["answered"] == 1
+        assert summary["by_outcome"]["refused"] == 1
+        assert summary["by_outcome"]["error"] == 1
         assert summary["by_retrieval_status"]["coverage"] == 1
         assert summary["by_retrieval_status"]["no_match"] == 1
         assert summary["by_retrieval_status"]["matched"] == 1
@@ -345,6 +351,7 @@ def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
             user_input="完全不相关的天文问题",
         )
 
+        assert result.outcome == "refused"
         assert result.retrieval_status == "no_match"
         assert result.retrieval_message
         assert result.retrieval_applied is False

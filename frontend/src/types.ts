@@ -50,6 +50,7 @@ export interface TaskResult {
   model_name: string;
   latency_ms: number;
   result: string;
+  outcome: string;
   cache_hit: boolean;
   retrieval_status: string;
   retrieval_message?: string | null;
@@ -88,9 +89,16 @@ export interface LogSummary {
   success_count: number;
   failure_count: number;
   success_rate: number;
+  answered_count: number;
+  refused_count: number;
+  error_count: number;
+  answered_rate: number;
+  refused_rate: number;
   average_latency_ms: number;
   p95_latency_ms: number;
   cache_hit_count: number;
+  retrieval_applied_count: number;
+  citation_count_sum: number;
   token_total_sum: number;
   time_range?: {
     first_timestamp?: string | null;
@@ -98,5 +106,7 @@ export interface LogSummary {
   };
   by_task: Record<string, number>;
   by_model: Record<string, number>;
+  by_outcome: Record<string, number>;
+  by_retrieval_status: Record<string, number>;
   error_types: Record<string, number>;
 }

@@ -13,6 +13,7 @@ class CallLogEntry(BaseModel):
     model_name: str
     file_id: str | None = None
     success: bool
+    outcome: str = "answered"
     latency_ms: int
     prompt_chars: int
     output_chars: int

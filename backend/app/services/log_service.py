@@ -37,9 +37,15 @@ class LogService:
                 "cache_hit_count": 0,
                 "retrieval_applied_count": 0,
                 "citation_count_sum": 0,
+                "answered_count": 0,
+                "refused_count": 0,
+                "error_count": 0,
+                "answered_rate": 0.0,
+                "refused_rate": 0.0,
                 "token_total_sum": 0,
                 "by_task": {},
                 "by_model": {},
+                "by_outcome": {},
                 "by_retrieval_status": {},
                 "error_types": {},
             }
@@ -66,6 +72,10 @@ class LogService:
         )
         by_task_counter = Counter(str(entry.get("task_type", "unknown")) for entry in entries)
         by_model_counter = Counter(str(entry.get("model_name", "unknown")) for entry in entries)
+        outcome_counter = Counter(
+            str(entry.get("outcome", "unknown"))
+            for entry in entries
+        )
         retrieval_status_counter = Counter(
             str(entry.get("retrieval_status"))
             for entry in entries
@@ -87,6 +97,11 @@ class LogService:
             "cache_hit_count": cache_hit_count,
             "retrieval_applied_count": retrieval_applied_count,
             "citation_count_sum": citation_count_sum,
+            "answered_count": outcome_counter.get("answered", 0),
+            "refused_count": outcome_counter.get("refused", 0),
+            "error_count": outcome_counter.get("error", 0),
+            "answered_rate": round(outcome_counter.get("answered", 0) / len(entries), 4),
+            "refused_rate": round(outcome_counter.get("refused", 0) / len(entries), 4),
             "token_total_sum": token_total_sum,
             "time_range": {
                 "first_timestamp": entries[0].get("timestamp"),
@@ -94,6 +109,7 @@ class LogService:
             },
             "by_task": dict(by_task_counter),
             "by_model": dict(by_model_counter),
+            "by_outcome": dict(outcome_counter),
             "by_retrieval_status": dict(retrieval_status_counter),
             "error_types": dict(error_types_counter),
         }

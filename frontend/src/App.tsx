@@ -102,6 +102,7 @@ function App() {
     readStorage<RecentResult[]>(RECENT_RESULTS_KEY, [])
   );
   const [logSummary, setLogSummary] = useState<LogSummary | null>(null);
+  const [summaryRefreshTick, setSummaryRefreshTick] = useState(0);
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const canSubmit =
@@ -137,7 +138,7 @@ function App() {
     return () => {
       active = false;
     };
-  }, [recentResults.length]);
+  }, [summaryRefreshTick]);
 
   function upsertRecentDocument(metadata: UploadMetadata) {
     const nextDocument: RecentDocument = {
@@ -212,6 +213,7 @@ function App() {
       const taskResult = await runTask(taskType, fileId, input.trim());
       setResult(taskResult);
       pushRecentResult(taskResult, input.trim());
+      setSummaryRefreshTick((value) => value + 1);
     } catch (submitError) {
       setError(normalizeErrorMessage(submitError));
       setResult(null);
@@ -242,8 +244,16 @@ function App() {
                   <strong>{logSummary.total_requests}</strong>
                 </div>
                 <div className="stat-card">
-                  <span>成功率</span>
-                  <strong>{Math.round(logSummary.success_rate * 100)}%</strong>
+                  <span>有效回答数</span>
+                  <strong>{logSummary.answered_count}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>拒答数</span>
+                  <strong>{logSummary.refused_count}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>错误数</span>
+                  <strong>{logSummary.error_count}</strong>
                 </div>
                 <div className="stat-card">
                   <span>平均延迟</span>
@@ -399,6 +409,7 @@ function App() {
                   <p>任务：{result.task_type}</p>
                   <p>模型：{result.model_name}</p>
                   <p>耗时：{result.latency_ms} ms</p>
+                  <p>结果类型：{result.outcome}</p>
                   <p>请求 ID：{result.request_id}</p>
                 </div>
                 {result.cache_hit ? (

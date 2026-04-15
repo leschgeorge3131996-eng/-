@@ -52,6 +52,7 @@
 - Ask retrieval now rejects low-relevance questions instead of fabricating evidence
 - Summary and outline now also expose source chunk citations
 - Log summary now tracks retrieval status and citation counts
+- Task outcome semantics added: answered / refused / error
 
 ### Verified Results
 
@@ -157,6 +158,7 @@ Current status:
 
 1. Start phase 2 in this order:
    - stronger retrieval scoring and ordering
+   - source chunk semantics cleanup in frontend
 2. Finalize first version of competition materials:
    - one-page project summary
    - demo script

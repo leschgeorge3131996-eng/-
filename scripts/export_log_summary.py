@@ -23,6 +23,11 @@ def render_markdown(summary: dict) -> str:
         f"- Average latency (ms): {summary['average_latency_ms']}",
         f"- P95 latency (ms): {summary['p95_latency_ms']}",
         f"- Cache hit count: {summary['cache_hit_count']}",
+        f"- Answered count: {summary['answered_count']}",
+        f"- Refused count: {summary['refused_count']}",
+        f"- Error count: {summary['error_count']}",
+        f"- Answered rate: {summary['answered_rate']}",
+        f"- Refused rate: {summary['refused_rate']}",
         f"- Retrieval applied count: {summary['retrieval_applied_count']}",
         f"- Citation count sum: {summary['citation_count_sum']}",
         f"- Token total sum: {summary['token_total_sum']}",
@@ -35,6 +40,13 @@ def render_markdown(summary: dict) -> str:
     lines.extend(["", "## By Model"])
     for model, count in summary["by_model"].items():
         lines.append(f"- {model}: {count}")
+
+    lines.extend(["", "## By Outcome"])
+    if summary["by_outcome"]:
+        for outcome, count in summary["by_outcome"].items():
+            lines.append(f"- {outcome}: {count}")
+    else:
+        lines.append("- none")
 
     lines.extend(["", "## By Retrieval Status"])
     if summary["by_retrieval_status"]:

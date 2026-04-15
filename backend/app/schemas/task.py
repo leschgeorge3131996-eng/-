@@ -51,6 +51,7 @@ class TaskResult(BaseModel):
     model_name: str
     latency_ms: int
     result: str
+    outcome: str = "answered"
     cache_hit: bool = False
     retrieval_status: str = "not_used"
     retrieval_message: str | None = None
