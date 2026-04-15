@@ -58,6 +58,7 @@ export interface TaskResult {
   retrieved_chunk_count: number;
   retrieved_pages: number[];
   citations: Citation[];
+  source_chunks: Citation[];
   source_document_chars: number;
   used_document_chars: number;
   truncation_message?: string | null;

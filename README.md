@@ -132,6 +132,7 @@ project/
 - `summary / outline` 现在也可返回结构化来源片段
 - 日志汇总已包含检索状态、引用数量等检索质量指标
 - 日志与统计面板已区分 `answered / refused / error`
+- 前端已区分展示：`ask` 的“引用依据”与 `summary / outline` 的“来源片段”
 - PowerShell 启动脚本
 - 基础服务层测试
 

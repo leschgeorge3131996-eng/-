@@ -429,7 +429,7 @@ function App() {
                     {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
                   </p>
                 ) : null}
-                {result.citations.length > 0 ? (
+                {result.task_type === "ask" && result.citations.length > 0 ? (
                   <div className="citations">
                     <h3>引用依据</h3>
                     <div className="citation-list">
@@ -439,6 +439,21 @@ function App() {
                             页码：{citation.page_numbers.join(", ")}
                           </p>
                           <p>{citation.snippet}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                {result.task_type !== "ask" && result.source_chunks.length > 0 ? (
+                  <div className="citations">
+                    <h3>来源片段</h3>
+                    <div className="citation-list">
+                      {result.source_chunks.map((chunk) => (
+                        <article key={chunk.chunk_id} className="citation-card">
+                          <p className="citation-meta">
+                            页码：{chunk.page_numbers.join(", ")}
+                          </p>
+                          <p>{chunk.snippet}</p>
                         </article>
                       ))}
                     </div>

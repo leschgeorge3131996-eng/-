@@ -59,6 +59,7 @@ class TaskResult(BaseModel):
     retrieved_chunk_count: int = 0
     retrieved_pages: list[int] = []
     citations: list[Citation] = []
+    source_chunks: list[Citation] = []
     source_document_chars: int = 0
     used_document_chars: int = 0
     truncation_message: str | None = None

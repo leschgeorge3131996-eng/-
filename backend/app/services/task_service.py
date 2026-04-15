@@ -53,6 +53,7 @@ class TaskService:
         retrieved_chunk_count = 0
         retrieved_pages: list[int] = []
         citations: list[Citation] = []
+        source_chunks: list[Citation] = []
         context_strategy = "full_text"
         outcome = "answered"
 
@@ -78,7 +79,7 @@ class TaskService:
                 retrieved_pages = sorted(
                     {page for chunk in selected_chunks for page in chunk.page_numbers}
                 )
-                citations = [
+                chunk_refs = [
                     Citation(
                         chunk_id=chunk.chunk_id,
                         page_numbers=chunk.page_numbers,
@@ -90,6 +91,10 @@ class TaskService:
                         )
                         for chunk in selected_chunks
                     ]
+                if task_type == "ask":
+                    citations = chunk_refs
+                else:
+                    source_chunks = chunk_refs
             if task_type == "ask" and selected_chunks:
                 retrieval_applied = True
 
@@ -113,6 +118,7 @@ class TaskService:
                     retrieved_chunk_count=0,
                     retrieved_pages=[],
                     citations=[],
+                    source_chunks=[],
                     source_document_chars=len(raw_document_text),
                     used_document_chars=0,
                     truncation_message=None,
@@ -141,6 +147,7 @@ class TaskService:
                             "context_strategy": context_strategy,
                             "retrieved_pages": [],
                             "citation_count": 0,
+                            "source_chunk_count": 0,
                             "degraded_without_answer": True,
                         },
                     )
@@ -179,6 +186,10 @@ class TaskService:
                     citations=[
                         Citation.model_validate(item)
                         for item in cached_result.get("citations", [])
+                    ],
+                    source_chunks=[
+                        Citation.model_validate(item)
+                        for item in cached_result.get("source_chunks", [])
                     ],
                     source_document_chars=cached_result.get("source_document_chars", 0),
                     used_document_chars=cached_result.get("used_document_chars", 0),
@@ -223,6 +234,7 @@ class TaskService:
                             "context_strategy": cached_result.get("context_strategy", context_strategy),
                             "retrieved_pages": task_result.retrieved_pages,
                             "citation_count": len(task_result.citations),
+                            "source_chunk_count": len(task_result.source_chunks),
                         },
                     )
                 )
@@ -248,6 +260,7 @@ class TaskService:
                     "retrieved_chunk_count": retrieved_chunk_count,
                     "retrieved_pages": retrieved_pages,
                     "citations": [citation.model_dump() for citation in citations],
+                    "source_chunks": [chunk.model_dump() for chunk in source_chunks],
                     "source_document_chars": model_result.source_document_chars,
                     "used_document_chars": model_result.used_document_chars,
                     "truncation_message": model_result.truncation_message,
@@ -298,8 +311,9 @@ class TaskService:
                             "context_strategy": context_strategy,
                             "retrieved_pages": retrieved_pages,
                             "citation_count": len(citations),
+                            "source_chunk_count": len(source_chunks),
                         }
-                        if retrieved_pages or citations
+                        if retrieved_pages or citations or source_chunks
                         else None
                     ),
                 )
@@ -322,6 +336,7 @@ class TaskService:
                 retrieved_chunk_count=retrieved_chunk_count,
                 retrieved_pages=retrieved_pages,
                 citations=citations,
+                source_chunks=source_chunks,
                 source_document_chars=model_result.source_document_chars,
                 used_document_chars=model_result.used_document_chars,
                 truncation_message=model_result.truncation_message,
@@ -355,6 +370,7 @@ class TaskService:
                             "context_strategy": context_strategy,
                             "retrieved_pages": retrieved_pages,
                             "citation_count": len(citations),
+                            "source_chunk_count": len(source_chunks),
                             **exc.details,
                         }
                         if retrieved_pages

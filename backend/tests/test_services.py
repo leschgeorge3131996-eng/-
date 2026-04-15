@@ -325,6 +325,7 @@ def test_task_service_applies_retrieval_for_ask() -> None:
         assert result.retrieved_pages == [1]
         assert len(result.citations) >= 1
         assert result.citations[0].page_numbers == [1]
+        assert result.source_chunks == []
     finally:
         cleanup_workspace(workspace)
 
@@ -393,6 +394,7 @@ def test_summary_uses_chunk_coverage_context() -> None:
 
         assert result.task_type == "summary"
         assert "【Chunk" in model_client.last_document_text
-        assert len(result.citations) >= 1
+        assert result.citations == []
+        assert len(result.source_chunks) >= 1
     finally:
         cleanup_workspace(workspace)

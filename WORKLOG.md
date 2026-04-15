@@ -53,6 +53,7 @@
 - Summary and outline now also expose source chunk citations
 - Log summary now tracks retrieval status and citation counts
 - Task outcome semantics added: answered / refused / error
+- Frontend now distinguishes citations vs source chunks by task type
 
 ### Verified Results
 

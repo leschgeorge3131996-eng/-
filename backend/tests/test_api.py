@@ -115,7 +115,8 @@ def test_summary_endpoint_returns_truncation_fields() -> None:
         assert payload["source_document_chars"] > payload["used_document_chars"]
         assert payload["truncation_message"]
         assert payload["document_fingerprint"]
-        assert len(payload["citations"]) >= 1
+        assert payload["citations"] == []
+        assert len(payload["source_chunks"]) >= 1
     finally:
         cleanup_workspace(workspace)
 
@@ -168,6 +169,7 @@ def test_ask_endpoint_returns_retrieval_fields() -> None:
         assert payload["retrieved_pages"] == [1]
         assert len(payload["citations"]) >= 1
         assert payload["citations"][0]["page_numbers"] == [1]
+        assert payload["source_chunks"] == []
     finally:
         cleanup_workspace(workspace)
 
@@ -195,5 +197,6 @@ def test_ask_endpoint_returns_no_citations_when_not_retrieved() -> None:
         assert payload["retrieval_applied"] is False
         assert payload["retrieved_chunk_count"] == 0
         assert payload["citations"] == []
+        assert payload["source_chunks"] == []
     finally:
         cleanup_workspace(workspace)
