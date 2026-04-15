@@ -49,6 +49,9 @@ class TaskResult(BaseModel):
     document_name: str
     document_fingerprint: str | None = None
     model_name: str
+    route_tier: str = "task_specific"
+    route_model: str | None = None
+    route_reason: str | None = None
     latency_ms: int
     result: str
     outcome: str = "answered"

@@ -58,9 +58,12 @@ class Settings:
     use_mock_model: bool
     wuqiong_base_url: str
     wuqiong_api_key: str
+    model_lite: str
+    model_pro: str
     model_qa: str
     model_summary: str
     model_outline: str
+    route_upgrade_chars: int
 
     @property
     def max_upload_bytes(self) -> int:
@@ -105,9 +108,12 @@ def get_settings() -> Settings:
         use_mock_model=_to_bool(os.getenv("USE_MOCK_MODEL"), True),
         wuqiong_base_url=os.getenv("WUQIONG_BASE_URL", "").rstrip("/"),
         wuqiong_api_key=os.getenv("WUQIONG_API_KEY", ""),
+        model_lite=os.getenv("MODEL_LITE", ""),
+        model_pro=os.getenv("MODEL_PRO", ""),
         model_qa=os.getenv("MODEL_QA", "placeholder-qa-model"),
         model_summary=os.getenv("MODEL_SUMMARY", "placeholder-summary-model"),
         model_outline=os.getenv("MODEL_OUTLINE", "placeholder-outline-model"),
+        route_upgrade_chars=_to_int(os.getenv("ROUTE_UPGRADE_CHARS"), 12000),
     )
     settings.ensure_directories()
     return settings

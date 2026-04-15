@@ -56,6 +56,7 @@
 - Frontend now distinguishes citations vs source chunks by task type
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 - Competition materials have been refined into reusable review/demo docs
+- Minimal model tier routing is implemented and test-covered
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 
 ### Verified Results
@@ -161,8 +162,8 @@ Current status:
 ## Next Recommended Steps
 
 1. Start phase 2 in this order:
+   - sample-set replay with current route strategy
    - summary/outline stricter reference semantics
-   - retrieval ranking refinement if needed after sample-set replay
 2. Finalize first version of competition materials:
    - align wording with actual submission form
    - replay fixed sample set and refresh screenshots/log evidence

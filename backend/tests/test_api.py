@@ -26,7 +26,14 @@ def cleanup_workspace(path: Path) -> None:
     shutil.rmtree(path, ignore_errors=True)
 
 
-def build_settings(tmp_root: Path, *, max_document_chars: int = 10000) -> Settings:
+def build_settings(
+    tmp_root: Path,
+    *,
+    max_document_chars: int = 10000,
+    model_lite: str = "",
+    model_pro: str = "",
+    route_upgrade_chars: int = 12000,
+) -> Settings:
     data_dir = tmp_root / "data"
     settings = Settings(
         project_root=tmp_root,
@@ -47,16 +54,32 @@ def build_settings(tmp_root: Path, *, max_document_chars: int = 10000) -> Settin
         use_mock_model=True,
         wuqiong_base_url="",
         wuqiong_api_key="",
+        model_lite=model_lite,
+        model_pro=model_pro,
         model_qa="mock-qa",
         model_summary="mock-summary",
         model_outline="mock-outline",
+        route_upgrade_chars=route_upgrade_chars,
     )
     settings.ensure_directories()
     return settings
 
 
-def build_client(tmp_root: Path, *, max_document_chars: int = 10000) -> TestClient:
-    settings = build_settings(tmp_root, max_document_chars=max_document_chars)
+def build_client(
+    tmp_root: Path,
+    *,
+    max_document_chars: int = 10000,
+    model_lite: str = "",
+    model_pro: str = "",
+    route_upgrade_chars: int = 12000,
+) -> TestClient:
+    settings = build_settings(
+        tmp_root,
+        max_document_chars=max_document_chars,
+        model_lite=model_lite,
+        model_pro=model_pro,
+        route_upgrade_chars=route_upgrade_chars,
+    )
     file_service = FileService(settings=settings)
     log_service = LogService(settings=settings)
     model_client = ModelClient(settings=settings)
@@ -198,5 +221,28 @@ def test_ask_endpoint_returns_no_citations_when_not_retrieved() -> None:
         assert payload["retrieved_chunk_count"] == 0
         assert payload["citations"] == []
         assert payload["source_chunks"] == []
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_summary_endpoint_returns_route_fields_when_tiered() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace, model_lite="lite-model", model_pro="pro-model")
+        upload_response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# 标题\n\n内容".encode("utf-8"), "text/markdown")},
+        )
+        file_id = upload_response.json()["data"]["metadata"]["file_id"]
+
+        response = client.post(
+            "/api/summary",
+            json={"file_id": file_id, "instruction": "请总结"},
+        )
+
+        assert response.status_code == 200
+        payload = response.json()["data"]
+        assert payload["route_tier"] == "lite"
+        assert payload["route_model"] == "lite-model"
     finally:
         cleanup_workspace(workspace)

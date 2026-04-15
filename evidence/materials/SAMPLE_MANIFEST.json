@@ -1,0 +1,33 @@
+[
+  {
+    "id": "research_brief",
+    "path": "evidence/samples/research_brief.md",
+    "scenario": "科研/项目简介",
+    "tasks": {
+      "summary": "请用 3 条要点总结这个文档。",
+      "ask": "这个项目第一阶段要做什么？",
+      "outline": "请生成一个 5 页汇报提纲。"
+    }
+  },
+  {
+    "id": "office_notice",
+    "path": "evidence/samples/office_notice.txt",
+    "scenario": "智能办公/制度通知",
+    "tasks": {
+      "summary": "请概括制度的核心要求。",
+      "ask": "关于请假流程有哪些规定？",
+      "outline": "请整理成培训提纲。"
+    }
+  },
+  {
+    "id": "paper_report",
+    "path": "evidence/samples/paper_report.md",
+    "scenario": "论文/报告摘要",
+    "tasks": {
+      "summary": "请概括研究背景、方法和结论。",
+      "ask": "这篇文档的核心方法是什么？",
+      "outline": "请生成答辩提纲。"
+    }
+  }
+]
+

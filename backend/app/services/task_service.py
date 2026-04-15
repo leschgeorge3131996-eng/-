@@ -56,6 +56,9 @@ class TaskService:
         source_chunks: list[Citation] = []
         context_strategy = "full_text"
         outcome = "answered"
+        route_tier = "task_specific"
+        route_model: str | None = None
+        route_reason: str | None = None
 
         try:
             metadata = self.file_service.get_document_metadata(file_id)
@@ -101,6 +104,9 @@ class TaskService:
             if task_type == "ask" and not selected_chunks:
                 latency_ms = int((perf_counter() - started_timer) * 1000)
                 refusal_text = "未在文档中检索到足够依据来回答这个问题。请换一个更贴近文档内容的问题，或上传更相关的文档。"
+                route_tier = "none"
+                route_model = None
+                route_reason = "retrieval_no_match"
                 task_result = TaskResult(
                     request_id=request_id,
                     task_type=task_type,
@@ -108,6 +114,9 @@ class TaskService:
                     document_name=metadata.original_name,
                     document_fingerprint=metadata.document_fingerprint,
                     model_name=self.model_client.resolve_model_name(task_type),
+                    route_tier=route_tier,
+                    route_model=route_model,
+                    route_reason=route_reason,
                     latency_ms=latency_ms,
                     result=refusal_text,
                     outcome="refused",
@@ -132,6 +141,9 @@ class TaskService:
                         endpoint=endpoint,
                         task_type=task_type,
                         model_name=task_result.model_name,
+                        route_tier=route_tier,
+                        route_model=route_model,
+                        route_reason=route_reason,
                         file_id=file_id,
                         success=True,
                         outcome="refused",
@@ -154,7 +166,15 @@ class TaskService:
                 )
                 return task_result
 
-            resolved_model_name = self.model_client.resolve_model_name(task_type)
+            route_decision = self.model_client.resolve_route(
+                task_type=task_type,
+                user_input=user_input,
+                source_document_chars=len(raw_document_text),
+            )
+            resolved_model_name = route_decision.model_name
+            route_tier = route_decision.route_tier
+            route_model = route_decision.model_name
+            route_reason = route_decision.route_reason
             cache_key = self.cache_service.build_cache_key(
                 document_fingerprint=metadata.document_fingerprint or "",
                 task_type=task_type,
@@ -171,6 +191,9 @@ class TaskService:
                     document_name=metadata.original_name,
                     document_fingerprint=metadata.document_fingerprint,
                     model_name=cached_result["model_name"],
+                    route_tier=cached_result.get("route_tier", route_tier),
+                    route_model=cached_result.get("route_model", route_model),
+                    route_reason=cached_result.get("route_reason", route_reason),
                     latency_ms=latency_ms,
                     result=cached_result["result"],
                     outcome=cached_result.get("outcome", outcome),
@@ -204,6 +227,9 @@ class TaskService:
                         endpoint=endpoint,
                         task_type=task_type,
                         model_name=task_result.model_name,
+                        route_tier=task_result.route_tier,
+                        route_model=task_result.route_model,
+                        route_reason=task_result.route_reason,
                         file_id=file_id,
                         success=True,
                         outcome=task_result.outcome,
@@ -244,6 +270,7 @@ class TaskService:
                 task_type=task_type,
                 document_text=document_text,
                 user_input=user_input,
+                model_name_override=resolved_model_name,
             )
             latency_ms = int((perf_counter() - started_timer) * 1000)
             self.cache_service.set(
@@ -251,6 +278,9 @@ class TaskService:
                 {
                     "task_type": task_type,
                     "model_name": model_result.model_name,
+                    "route_tier": route_tier,
+                    "route_model": route_model,
+                    "route_reason": route_reason,
                     "result": model_result.content,
                     "outcome": outcome,
                     "context_strategy": context_strategy,
@@ -280,6 +310,9 @@ class TaskService:
                     endpoint=endpoint,
                     task_type=task_type,
                     model_name=model_result.model_name,
+                    route_tier=route_tier,
+                    route_model=route_model,
+                    route_reason=route_reason,
                     file_id=file_id,
                     success=True,
                     outcome=outcome,
@@ -326,6 +359,9 @@ class TaskService:
                 document_name=metadata.original_name,
                 document_fingerprint=metadata.document_fingerprint,
                 model_name=model_result.model_name,
+                route_tier=route_tier,
+                route_model=route_model,
+                route_reason=route_reason,
                 latency_ms=latency_ms,
                 result=model_result.content,
                 outcome=outcome,
@@ -352,6 +388,9 @@ class TaskService:
                     endpoint=endpoint,
                     task_type=task_type,
                     model_name=self.model_client.resolve_model_name(task_type),
+                    route_tier=route_tier,
+                    route_model=route_model,
+                    route_reason=route_reason,
                     file_id=file_id if metadata or file_id else None,
                     success=False,
                     outcome="error",

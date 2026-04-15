@@ -5,13 +5,35 @@ import textwrap
 import time
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
 
 from ..core.config import Settings, get_settings
 from ..core.exceptions import ModelServiceError
 from ..schemas.task import ModelResult, TaskType, TokenUsage
 
 
+@dataclass(slots=True)
+class RouteDecision:
+    model_name: str
+    route_tier: str
+    route_reason: str
+
+
 class ModelClient:
+    complex_keywords = (
+        "对比",
+        "原因",
+        "风险",
+        "方案",
+        "结合全文",
+        "深入分析",
+        "答辩",
+        "compare",
+        "analysis",
+        "risk",
+        "reason",
+    )
+
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
 
@@ -20,6 +42,7 @@ class ModelClient:
         task_type: TaskType,
         document_text: str,
         user_input: str | None = None,
+        model_name_override: str | None = None,
     ) -> ModelResult:
         source_document_chars = len(document_text)
         truncated_text = document_text[: self.settings.max_document_chars]
@@ -31,7 +54,7 @@ class ModelClient:
                 f"文档原始长度为 {source_document_chars} 字符，本次请求仅发送前 "
                 f"{used_document_chars} 字符到模型。"
             )
-        model_name = self.resolve_model_name(task_type)
+        model_name = model_name_override or self.resolve_model_name(task_type)
         prompt_chars = len(truncated_text) + len(user_input or "")
 
         if self.settings.use_mock_model or not self._has_real_model_config():
@@ -79,6 +102,46 @@ class ModelClient:
         if task_type == "summary":
             return self.settings.model_summary
         return self.settings.model_outline
+
+    def resolve_route(
+        self,
+        *,
+        task_type: TaskType,
+        user_input: str | None = None,
+        source_document_chars: int = 0,
+    ) -> RouteDecision:
+        normalized_input = (user_input or "").lower()
+        has_explicit_route_models = bool(self.settings.model_lite and self.settings.model_pro)
+
+        if has_explicit_route_models:
+            if task_type == "ask":
+                return RouteDecision(
+                    model_name=self.settings.model_pro,
+                    route_tier="pro",
+                    route_reason="task_default_ask",
+                )
+
+            if (
+                source_document_chars >= self.settings.route_upgrade_chars
+                or any(keyword in normalized_input for keyword in self.complex_keywords)
+            ):
+                return RouteDecision(
+                    model_name=self.settings.model_pro,
+                    route_tier="pro",
+                    route_reason="long_doc_or_complex_instruction",
+                )
+
+            return RouteDecision(
+                model_name=self.settings.model_lite,
+                route_tier="lite",
+                route_reason=f"default_{task_type}_lite",
+            )
+
+        return RouteDecision(
+            model_name=self.resolve_model_name(task_type),
+            route_tier="task_specific",
+            route_reason=f"configured_{task_type}_model",
+        )
 
     def _has_real_model_config(self) -> bool:
         return bool(self.settings.wuqiong_base_url and self.settings.wuqiong_api_key)

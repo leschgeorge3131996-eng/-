@@ -11,6 +11,9 @@ class CallLogEntry(BaseModel):
     endpoint: str
     task_type: str
     model_name: str
+    route_tier: str | None = None
+    route_model: str | None = None
+    route_reason: str | None = None
     file_id: str | None = None
     success: bool
     outcome: str = "answered"

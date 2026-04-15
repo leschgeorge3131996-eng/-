@@ -30,7 +30,13 @@ def cleanup_workspace(path: Path) -> None:
     shutil.rmtree(path, ignore_errors=True)
 
 
-def build_settings(tmp_root: Path) -> Settings:
+def build_settings(
+    tmp_root: Path,
+    *,
+    model_lite: str = "",
+    model_pro: str = "",
+    route_upgrade_chars: int = 12000,
+) -> Settings:
     data_dir = tmp_root / "data"
     uploads_dir = data_dir / "uploads"
     parsed_dir = data_dir / "parsed"
@@ -55,9 +61,12 @@ def build_settings(tmp_root: Path) -> Settings:
         use_mock_model=True,
         wuqiong_base_url="",
         wuqiong_api_key="",
+        model_lite=model_lite,
+        model_pro=model_pro,
         model_qa="mock-qa",
         model_summary="mock-summary",
         model_outline="mock-outline",
+        route_upgrade_chars=route_upgrade_chars,
     )
     settings.ensure_directories()
     return settings
@@ -141,9 +150,15 @@ class CountingModelClient(ModelClient):
         task_type: str,
         document_text: str,
         user_input: str | None = None,
+        model_name_override: str | None = None,
     ):
         self.call_count += 1
-        return super().call_model(task_type, document_text, user_input)
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+        )
 
 
 class RecordingModelClient(ModelClient):
@@ -157,10 +172,16 @@ class RecordingModelClient(ModelClient):
         task_type: str,
         document_text: str,
         user_input: str | None = None,
+        model_name_override: str | None = None,
     ):
         self.last_task_type = task_type
         self.last_document_text = document_text
-        return super().call_model(task_type, document_text, user_input)
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+        )
 
 
 def test_parse_error_is_normalized() -> None:
@@ -399,6 +420,44 @@ def test_summary_uses_chunk_coverage_context() -> None:
         assert "【Chunk" in model_client.last_document_text
         assert result.citations == []
         assert len(result.source_chunks) >= 1
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_task_service_uses_task_tier_route_when_configured() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(
+            workspace,
+            model_lite="lite-model",
+            model_pro="pro-model",
+        )
+        file_service = FileService(settings=settings)
+        model_client = RecordingModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload("demo.md", "# 标题\n\n内容".encode("utf-8"))
+
+        summary_result = task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请总结",
+        )
+        ask_result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            user_input="标题是什么？",
+        )
+
+        assert summary_result.route_tier == "lite"
+        assert summary_result.route_model == "lite-model"
+        assert ask_result.route_tier == "pro"
+        assert ask_result.route_model == "pro-model"
     finally:
         cleanup_workspace(workspace)
 

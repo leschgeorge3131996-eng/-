@@ -133,6 +133,7 @@ project/
 - 日志汇总已包含检索状态、引用数量等检索质量指标
 - 日志与统计面板已区分 `answered / refused / error`
 - 前端已区分展示：`ask` 的“引用依据”与 `summary / outline` 的“来源片段”
+- 已支持最小模型分层路由：可按任务将 `ask`、`summary`、`outline` 分配到不同 tier/model
 - PowerShell 启动脚本
 - 基础服务层测试
 
