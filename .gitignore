@@ -8,6 +8,8 @@ pytest-cache-files-*/
 review_bundle*.zip
 tmp_*.log
 evidence/reports/sample_replay_latest_*.md
+evidence/reports/sample_replay_real_*.md
+evidence/reports/sample_replay_real_summary_*.md
 __pycache__/
 *.pyc
 *.pyo

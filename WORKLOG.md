@@ -64,9 +64,8 @@
 - Chinese academic PDF sample has been added to sample set
 - Frontend result panel now exposes route tier and route reason
 - Log summary now normalizes legacy outcome values and aggregates route tiers
-- Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 - Evidence refresh checklist and submission prep guide have been added
-- V1 model tier routing is implemented and test-covered
+- Real fixed-sample replay has been completed once with the real cloud model
 
 ### Verified Results
 
@@ -79,6 +78,8 @@
 - Backend tests pass: `19 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
 - Sample replay report exported to `evidence/reports/sample_replay_latest.md`
+- Real replay report exported to `evidence/reports/sample_replay_real_latest.md`
+- Real replay summary exported to `evidence/reports/sample_replay_real_summary_latest.md`
 - English paper validation recorded in `evidence/experiments/20260415_attention_is_all_you_need_validation.md`
 
 ## Current Runtime Configuration
@@ -101,10 +102,12 @@ Notes:
 - Log screenshot exists
 - Swagger/API screenshot exists
 - Sample replay report exists
+- Real sample replay report exists
 - One-page project summary exists
 - Demo script exists
 - Sample set exists
 - Architecture note exists
+- QA brief exists
 - Real call logs contain:
   - `model_name`
   - `success`
@@ -179,12 +182,11 @@ Current status:
 ## Next Recommended Steps
 
 1. Start phase 2 in this order:
-   - real-model replay on fixed sample set
-   - route-tier comparison on sample set
+   - route-tier comparison on the real sample set
    - summary/outline stricter reference semantics
 2. Finalize first version of competition materials:
    - align wording with actual submission form
-   - replay fixed sample set and refresh screenshots/log evidence
+   - refresh screenshots/log evidence from the successful real replay
 3. Prefer controlled demo sharing unless a more stable exposure path is prepared
 
 ## Session Handoff Rule

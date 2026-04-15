@@ -1,42 +1,45 @@
 # Log Summary
 
-- Total requests: 59
-- Success count: 56
-- Failure count: 3
-- Success rate: 0.9492
-- Average latency (ms): 2449
-- P95 latency (ms): 15728
+- Total requests: 139
+- Success count: 117
+- Failure count: 22
+- Success rate: 0.8417
+- Average latency (ms): 10500
+- P95 latency (ms): 54104
 - Cache hit count: 18
-- Answered count: 56
-- Refused count: 0
-- Error count: 3
-- Answered rate: 0.9492
-- Refused rate: 0.0
-- Retrieval applied count: 16
-- Citation count sum: 16
-- Token total sum: 5180
+- Answered count: 113
+- Refused count: 4
+- Error count: 22
+- Answered rate: 0.8129
+- Refused rate: 0.0288
+- Retrieval applied count: 40
+- Citation count sum: 67
+- Token total sum: 80376
 
 ## By Task
-- summary: 23
-- outline: 18
-- ask: 18
+- summary: 48
+- outline: 45
+- ask: 46
 
 ## By Model
 - mock::mock-summary: 1
 - mock::mock-outline: 1
-- ep-m-20260401130050-qn8nk: 11
-- mock::ep-m-20260401130050-qn8nk: 46
+- ep-m-20260401130050-qn8nk: 67
+- mock::ep-m-20260401130050-qn8nk: 70
 
 ## By Outcome
-- answered: 56
-- error: 3
+- answered: 113
+- error: 22
+- refused: 4
 
 ## By Route Tier
-- task_specific: 37
+- task_specific: 113
+- none: 4
 
 ## By Retrieval Status
-- matched: 16
-- coverage: 31
+- matched: 40
+- coverage: 83
+- no_match: 4
 
 ## Error Types
-- MODEL_SERVICE_ERROR: 3
+- MODEL_SERVICE_ERROR: 22

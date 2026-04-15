@@ -29,6 +29,9 @@
 9. [QA_BRIEF.md](./QA_BRIEF.md)
 - 常见答辩问答提纲
 
+10. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
+- 真实模型固定样例集复跑汇总
+
 ## 使用建议
 
 - 报名表/作品简介：优先参考 `PROJECT_ONE_PAGER.md`
@@ -41,3 +44,4 @@
 - 真实模型复跑：优先参考 `REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
 - route-tier / outcome 对比：优先参考 `evidence/reports/sample_replay_summary.md`
 - 答辩准备：优先参考 `QA_BRIEF.md`
+- 真实模型结果总览：优先参考 `evidence/reports/sample_replay_real_summary_latest.md`

@@ -248,7 +248,7 @@ def main() -> None:
                         task_type=task_type,
                         input_text=prompt,
                         success=False,
-                        outcome=None,
+                        outcome="error",
                         latency_ms=None,
                         model_name=None,
                         route_tier=None,
