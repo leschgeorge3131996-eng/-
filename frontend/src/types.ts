@@ -62,6 +62,8 @@ export interface TaskResult {
   retrieval_applied: boolean;
   retrieved_chunk_count: number;
   retrieved_pages: number[];
+  used_chunk_ids: string[];
+  evidence_quotes: string[];
   citations: Citation[];
   source_chunks: Citation[];
   source_document_chars: number;

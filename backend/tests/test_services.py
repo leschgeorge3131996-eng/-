@@ -409,8 +409,42 @@ def test_task_service_applies_retrieval_for_ask() -> None:
         assert result.retrieved_chunk_count >= 1
         assert result.retrieved_pages == [1]
         assert len(result.citations) >= 1
+        assert len(result.used_chunk_ids) >= 1
+        assert len(result.evidence_quotes) >= 1
         assert result.citations[0].page_numbers == [1]
         assert result.source_chunks == []
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_ask_citations_follow_model_declared_chunk_ids() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "evidence.md",
+            (
+                "# 背景\n\n这里是背景说明。\n\n"
+                "# 目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n"
+                "# 方法\n\n这里是方法说明。"
+            ).encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            user_input="第一阶段目标是什么？",
+        )
+
+        assert result.used_chunk_ids
+        assert {citation.chunk_id for citation in result.citations}.issubset(set(result.used_chunk_ids))
     finally:
         cleanup_workspace(workspace)
 

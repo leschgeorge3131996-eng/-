@@ -87,8 +87,8 @@ class RetrievalService:
     def build_context(self, query: str, chunked_document: ChunkedDocument) -> tuple[list[ParsedChunk], str]:
         selected = self.retrieve(query, chunked_document)
         context = "\n\n".join(
-            f"【Chunk {index} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
-            for index, chunk in enumerate(selected, start=1)
+            f"【Chunk {chunk.chunk_id} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
+            for chunk in selected
         )
         return selected, context
 

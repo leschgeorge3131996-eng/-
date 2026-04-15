@@ -577,10 +577,20 @@ textarea {
   font-size: 15px;
 }
 
+.citation-helper {
+  margin: -2px 0 10px;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
 .citation-list,
 .history-list {
   display: grid;
   gap: 12px;
+}
+
+.evidence-quotes {
+  margin-top: 12px;
 }
 
 .citation-card {

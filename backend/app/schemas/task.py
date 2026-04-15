@@ -65,6 +65,8 @@ class TaskResult(BaseModel):
     retrieval_applied: bool = False
     retrieved_chunk_count: int = 0
     retrieved_pages: list[int] = []
+    used_chunk_ids: list[str] = []
+    evidence_quotes: list[str] = []
     citations: list[Citation] = []
     source_chunks: list[Citation] = []
     source_document_chars: int = 0

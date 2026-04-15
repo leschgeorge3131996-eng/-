@@ -642,6 +642,11 @@ function App() {
                 {result.task_type === "ask" && result.citations.length > 0 ? (
                   <div className="citations">
                     <h3>引用依据</h3>
+                    {result.used_chunk_ids.length > 0 ? (
+                      <p className="citation-helper">
+                        模型声明使用了 {result.used_chunk_ids.length} 个证据块。
+                      </p>
+                    ) : null}
                     <div className="citation-list">
                       {result.citations.map((citation) => (
                         <article key={citation.chunk_id} className="citation-card">
@@ -650,6 +655,18 @@ function App() {
                         </article>
                       ))}
                     </div>
+                    {result.evidence_quotes.length > 0 ? (
+                      <div className="evidence-quotes">
+                        <h3>证据摘录</h3>
+                        <div className="citation-list">
+                          {result.evidence_quotes.map((quote, index) => (
+                            <article key={`${result.request_id}-quote-${index}`} className="citation-card">
+                              <p>{quote}</p>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
                 {result.task_type !== "ask" && result.source_chunks.length > 0 ? (

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import textwrap
 import time
 import urllib.error
@@ -169,6 +170,7 @@ class ModelClient:
         if task_type == "ask":
             system_prompt = (
                 "你是文档问答助手。只能依据给定文档回答，回答要准确、结构清晰。"
+                "你必须只从给定的 Chunk 中选取你实际使用的证据块，并严格返回 JSON。"
                 f"{detail_instruction}"
             )
             user_prompt = textwrap.dedent(
@@ -178,6 +180,13 @@ class ModelClient:
 
                 用户问题：
                 {user_input or "请基于文档回答问题。"}
+
+                请只返回一个 JSON 对象，不要输出额外解释，格式如下：
+                {{
+                  "answer": "你的最终回答",
+                  "used_chunk_ids": ["实际使用的 chunk_id"],
+                  "evidence_quotes": ["可选：直接摘录的证据短句"]
+                }}
                 """
             ).strip()
         elif task_type == "summary":
@@ -340,11 +349,19 @@ class ModelClient:
 
         if task_type == "ask":
             question = user_input or "未提供问题"
+            chunk_ids = re.findall(r"【Chunk ([^|]+) \| Pages [^】]+】", document_text)
+            used_chunk_ids = chunk_ids[: min(2, len(chunk_ids))]
+            evidence_quotes = [line[:60] for line in lines[: min(2, len(lines))]]
             return (
-                "【Mock 模型返回】\n"
-                f"问题：{question}\n\n"
-                "基于当前文档可见内容，相关信息如下：\n"
-                + "\n".join(f"- {point}" for point in points[:max_points])
+                json.dumps(
+                    {
+                        "answer": "；".join(points[:max_points]),
+                        "used_chunk_ids": used_chunk_ids,
+                        "evidence_quotes": evidence_quotes,
+                        "question": question,
+                    },
+                    ensure_ascii=False,
+                )
             )
 
         if task_type == "summary":

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from datetime import datetime, timezone
@@ -202,6 +203,8 @@ class TaskService:
                         retrieved_chunk_count,
                     ),
                     retrieved_pages=cached_result.get("retrieved_pages", retrieved_pages),
+                    used_chunk_ids=cached_result.get("used_chunk_ids", []),
+                    evidence_quotes=cached_result.get("evidence_quotes", []),
                     citations=[
                         Citation.model_validate(item)
                         for item in cached_result.get("citations", [])
@@ -256,6 +259,7 @@ class TaskService:
                         extra={
                             "context_strategy": cached_result.get("context_strategy", context_strategy),
                             "retrieved_pages": task_result.retrieved_pages,
+                            "used_chunk_count": len(task_result.used_chunk_ids),
                             "citation_count": len(task_result.citations),
                             "source_chunk_count": len(task_result.source_chunks),
                         },
@@ -270,6 +274,25 @@ class TaskService:
                 model_name_override=resolved_model_name,
                 response_detail_level=response_detail_level,
             )
+            result_content = model_result.content
+            used_chunk_ids: list[str] = []
+            evidence_quotes: list[str] = []
+            if task_type == "ask" and selected_chunks:
+                (
+                    result_content,
+                    used_chunk_ids,
+                    evidence_quotes,
+                ) = self._extract_ask_evidence(
+                    model_result.content,
+                    selected_chunks,
+                )
+                if used_chunk_ids:
+                    selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
+                    citations = [
+                        self._build_chunk_ref(selected_by_id[chunk_id])
+                        for chunk_id in used_chunk_ids
+                        if chunk_id in selected_by_id
+                    ]
             latency_ms = int((perf_counter() - started_timer) * 1000)
             self.cache_service.set(
                 cache_key,
@@ -280,7 +303,7 @@ class TaskService:
                     "route_model": route_model,
                     "route_reason": route_reason,
                     "response_detail_level": response_detail_level,
-                    "result": model_result.content,
+                    "result": result_content,
                     "outcome": outcome,
                     "context_strategy": context_strategy,
                     "retrieval_status": retrieval_status,
@@ -288,6 +311,8 @@ class TaskService:
                     "retrieval_applied": retrieval_applied,
                     "retrieved_chunk_count": retrieved_chunk_count,
                     "retrieved_pages": retrieved_pages,
+                    "used_chunk_ids": used_chunk_ids,
+                    "evidence_quotes": evidence_quotes,
                     "citations": [citation.model_dump() for citation in citations],
                     "source_chunks": [chunk.model_dump() for chunk in source_chunks],
                     "source_document_chars": model_result.source_document_chars,
@@ -318,7 +343,7 @@ class TaskService:
                     outcome=outcome,
                     latency_ms=latency_ms,
                     prompt_chars=model_result.prompt_chars,
-                    output_chars=model_result.output_chars,
+                    output_chars=len(result_content),
                     token_in=(
                         model_result.token_usage.prompt_tokens
                         if model_result.token_usage
@@ -343,6 +368,7 @@ class TaskService:
                         {
                             "context_strategy": context_strategy,
                             "retrieved_pages": retrieved_pages,
+                            "used_chunk_count": len(used_chunk_ids),
                             "citation_count": len(citations),
                             "source_chunk_count": len(source_chunks),
                         }
@@ -364,7 +390,7 @@ class TaskService:
                 route_reason=route_reason,
                 response_detail_level=response_detail_level,
                 latency_ms=latency_ms,
-                result=model_result.content,
+                result=result_content,
                 outcome=outcome,
                 cache_hit=False,
                 retrieval_status=retrieval_status,
@@ -372,6 +398,8 @@ class TaskService:
                 retrieval_applied=retrieval_applied,
                 retrieved_chunk_count=retrieved_chunk_count,
                 retrieved_pages=retrieved_pages,
+                used_chunk_ids=used_chunk_ids,
+                evidence_quotes=evidence_quotes,
                 citations=citations,
                 source_chunks=source_chunks,
                 source_document_chars=model_result.source_document_chars,
@@ -434,6 +462,52 @@ class TaskService:
             page_numbers=chunk.page_numbers,
             snippet=self._build_display_snippet(chunk.text),
         )
+
+    def _extract_ask_evidence(
+        self,
+        raw_content: str,
+        selected_chunks: list[ParsedChunk],
+    ) -> tuple[str, list[str], list[str]]:
+        payload = self._extract_json_payload(raw_content)
+        if not payload:
+            return raw_content.strip(), [], []
+
+        allowed_chunk_ids = {chunk.chunk_id for chunk in selected_chunks}
+        answer = str(payload.get("answer") or "").strip() or raw_content.strip()
+        used_chunk_ids = [
+            str(item)
+            for item in payload.get("used_chunk_ids", [])
+            if str(item) in allowed_chunk_ids
+        ]
+        evidence_quotes = [
+            str(item).strip()
+            for item in payload.get("evidence_quotes", [])
+            if str(item).strip()
+        ][:3]
+        return answer, used_chunk_ids, evidence_quotes
+
+    def _extract_json_payload(self, raw_content: str) -> dict | None:
+        candidate = raw_content.strip()
+        if candidate.startswith("```"):
+            candidate = re.sub(r"^```(?:json)?\s*|\s*```$", "", candidate, flags=re.DOTALL).strip()
+
+        for value in (candidate, self._extract_braced_object(candidate)):
+            if not value:
+                continue
+            try:
+                payload = json.loads(value)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict):
+                return payload
+        return None
+
+    def _extract_braced_object(self, content: str) -> str | None:
+        start = content.find("{")
+        end = content.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            return None
+        return content[start : end + 1]
 
     def _select_display_chunks(
         self,
