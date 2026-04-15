@@ -98,6 +98,11 @@ def main() -> None:
         action="store_true",
         help="Clear local cache before replay so the report reflects fresh runs.",
     )
+    parser.add_argument(
+        "--timestamped",
+        action="store_true",
+        help="If output is provided, append a timestamp to the output filename.",
+    )
     args = parser.parse_args()
 
     if args.mock:
@@ -187,6 +192,11 @@ def main() -> None:
 
     if args.output:
         output_path = Path(args.output)
+        if args.timestamped:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = output_path.with_name(
+                f"{output_path.stem}_{timestamp}{output_path.suffix}"
+            )
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(rendered, encoding="utf-8")
         print(f"Saved replay report to {output_path}")

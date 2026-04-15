@@ -7,6 +7,7 @@ pytest-cache-files-*/
 .env
 review_bundle*.zip
 tmp_*.log
+evidence/reports/sample_replay_latest_*.md
 __pycache__/
 *.pyc
 *.pyo

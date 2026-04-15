@@ -64,6 +64,7 @@
 - Frontend result panel now exposes route tier and route reason
 - Log summary now normalizes legacy outcome values and aggregates route tiers
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
+- Evidence refresh checklist and submission prep guide have been added
 - V1 model tier routing is implemented and test-covered
 
 ### Verified Results

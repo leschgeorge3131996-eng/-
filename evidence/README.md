@@ -20,6 +20,8 @@ Use this directory to store reproducible project evidence for demos, reviews, an
   - demo script
   - sample set
   - architecture description
+  - evidence refresh checklist
+  - submission prep guide
 
 ## Naming Convention
 
