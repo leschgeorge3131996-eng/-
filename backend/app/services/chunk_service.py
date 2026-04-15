@@ -51,7 +51,16 @@ class ChunkService:
 
         chunks = self._merge_small_chunks(chunks)
         chunks = [
-            chunk.model_copy(update={"chunk_index": index})
+            chunk.model_copy(
+                update={
+                    "chunk_index": index,
+                    "chunk_id": self._stable_chunk_id(
+                        text=chunk.text,
+                        page_numbers=chunk.page_numbers,
+                        chunk_index=index,
+                    ),
+                }
+            )
             for index, chunk in enumerate(chunks)
         ]
         return ChunkedDocument(
@@ -95,16 +104,26 @@ class ChunkService:
 
     def _make_chunk(self, text: str, page_numbers: list[int]) -> ParsedChunk:
         clean_text = text.strip()
-        chunk_key = "::".join(
-            [
-                ",".join(str(page) for page in page_numbers),
-                clean_text,
-            ]
-        )
         return ParsedChunk(
-            chunk_id=hashlib.sha1(chunk_key.encode("utf-8")).hexdigest()[:16],
+            chunk_id="pending",
             chunk_index=0,
             page_numbers=page_numbers,
             text=clean_text,
             char_count=len(clean_text),
         )
+
+    def _stable_chunk_id(
+        self,
+        *,
+        text: str,
+        page_numbers: list[int],
+        chunk_index: int,
+    ) -> str:
+        chunk_key = "::".join(
+            [
+                ",".join(str(page) for page in page_numbers),
+                str(chunk_index),
+                text.strip(),
+            ]
+        )
+        return hashlib.sha1(chunk_key.encode("utf-8")).hexdigest()[:16]

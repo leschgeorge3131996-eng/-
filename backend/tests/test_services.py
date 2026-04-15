@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import urllib.error
 from pathlib import Path
 from uuid import uuid4
 
@@ -185,6 +186,37 @@ class RecordingModelClient(ModelClient):
         self.last_task_type = task_type
         self.last_document_text = document_text
         self.last_response_detail_level = response_detail_level
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
+        )
+
+
+class PlainTextAskModelClient(ModelClient):
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+        model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
+    ):
+        if task_type == "ask":
+            return super().call_model(
+                task_type,
+                document_text,
+                user_input,
+                model_name_override=model_name_override,
+                response_detail_level=response_detail_level,
+            ).model_copy(
+                update={
+                    "content": "这是一个没有 JSON 包装的普通回答。",
+                    "output_chars": len("这是一个没有 JSON 包装的普通回答。"),
+                }
+            )
         return super().call_model(
             task_type,
             document_text,
@@ -449,6 +481,36 @@ def test_ask_citations_follow_model_declared_chunk_ids() -> None:
         cleanup_workspace(workspace)
 
 
+def test_ask_plain_text_response_does_not_fallback_to_candidate_citations() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=PlainTextAskModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "plain_text.md",
+            "# 目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。".encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            user_input="第一阶段目标是什么？",
+        )
+
+        assert result.result == "这是一个没有 JSON 包装的普通回答。"
+        assert result.used_chunk_ids == []
+        assert result.evidence_quotes == []
+        assert result.citations == []
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
     workspace = make_workspace()
     try:
@@ -669,6 +731,26 @@ def test_chunk_ids_are_stable_for_same_text() -> None:
     assert [chunk.chunk_id for chunk in first.chunks] == [chunk.chunk_id for chunk in second.chunks]
 
 
+def test_chunk_ids_do_not_collide_for_repeated_same_page_text() -> None:
+    parsed_document = ParsedDocument(
+        file_type="md",
+        text="第一段\n\n第一段\n\n第二段",
+        page_count=1,
+        pages=[
+            ParsedPage(
+                page_number=1,
+                text="第一段\n\n第一段\n\n第二段",
+                char_count=len("第一段\n\n第一段\n\n第二段"),
+            )
+        ],
+    )
+    service = ChunkService(target_chunk_chars=3, min_chunk_chars=1, long_text_step=3)
+
+    chunked = service.build_chunks(parsed_document)
+
+    assert len({chunk.chunk_id for chunk in chunked.chunks}) == chunked.chunk_count
+
+
 def test_chunk_service_assigns_stable_source_order() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
@@ -717,6 +799,41 @@ def test_retrieval_normalize_query_preserves_english_tokens() -> None:
     normalized = retrieval._normalize_query("what is the architecture")
 
     assert normalized == "architecture"
+
+
+def test_model_client_retries_transient_urlerror(monkeypatch: pytest.MonkeyPatch) -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        settings.wuqiong_base_url = "https://example.com/api/v3"
+        settings.wuqiong_api_key = "test-key"
+        client = ModelClient(settings=settings)
+        attempts = {"count": 0}
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self):
+                return b'{"choices":[{"message":{"content":"ok"}}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}'
+
+        def fake_urlopen(request, timeout):
+            attempts["count"] += 1
+            if attempts["count"] < 3:
+                raise urllib.error.URLError("timed out")
+            return FakeResponse()
+
+        monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+        response = client._call_openai_compatible_api({"model": "x", "messages": []})
+
+        assert response["choices"][0]["message"]["content"] == "ok"
+        assert attempts["count"] == 3
+    finally:
+        cleanup_workspace(workspace)
 
 
 def test_retrieval_skips_oversized_chunk_and_continues() -> None:

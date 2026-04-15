@@ -87,7 +87,7 @@ class TaskService:
                     {page for chunk in selected_chunks for page in chunk.page_numbers}
                 )
                 if task_type == "ask":
-                    citations = [self._build_chunk_ref(chunk) for chunk in selected_chunks]
+                    citations = []
                 else:
                     display_chunks = self._select_display_chunks(selected_chunks, limit=3)
                     source_chunks = [self._build_chunk_ref(chunk) for chunk in display_chunks]

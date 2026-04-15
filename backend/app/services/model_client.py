@@ -281,9 +281,15 @@ class ModelClient:
                     "云端模型调用失败，请检查网络、Base URL 或证书配置。",
                     details={"reason": str(exc.reason)},
                 )
+                if attempt < 2 and self._is_retryable_network_error(str(exc.reason)):
+                    time.sleep(2 * (attempt + 1))
+                    continue
                 break
-            except TimeoutError as exc:
+            except TimeoutError:
                 last_error = ModelServiceError("云端模型调用超时。")
+                if attempt < 2:
+                    time.sleep(2 * (attempt + 1))
+                    continue
                 break
 
             try:
@@ -307,6 +313,19 @@ class ModelClient:
 
         error = payload.get("error") or {}
         return error.get("code") == "RequestBurstTooFast"
+
+    def _is_retryable_network_error(self, reason: str) -> bool:
+        normalized = reason.lower()
+        retryable_markers = (
+            "timed out",
+            "timeout",
+            "unexpected eof",
+            "temporarily unavailable",
+            "connection reset",
+            "connection aborted",
+            "eof occurred in violation of protocol",
+        )
+        return any(marker in normalized for marker in retryable_markers)
 
     def _resolve_chat_url(self) -> str:
         if self.settings.wuqiong_base_url.endswith("/chat/completions"):
