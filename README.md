@@ -134,6 +134,9 @@ project/
 - 日志与统计面板已区分 `answered / refused / error`
 - 前端已区分展示：`ask` 的“引用依据”与 `summary / outline` 的“来源片段”
 - 已支持最小模型分层路由：可按任务将 `ask`、`summary`、`outline` 分配到不同 tier/model
+- 已支持固定样例集复跑脚本与样例报告导出
+- 结果区已可展示模型路由层级与路由原因
+- 日志汇总已兼容旧日志字段并可按 route tier 聚合
 - PowerShell 启动脚本
 - 基础服务层测试
 
@@ -238,6 +241,12 @@ python scripts\export_log_summary.py --format md --output evidence\reports\lates
 
 ```powershell
 python scripts\export_log_summary.py --format json
+```
+
+## 固定样例集复跑
+
+```powershell
+.venv\Scripts\python.exe scripts\replay_sample_set.py --mock --clear-cache --format md --output evidence\reports\sample_replay_latest.md
 ```
 
 ## 下一步建议

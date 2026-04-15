@@ -248,9 +248,9 @@ def test_log_service_summary_aggregates_metrics() -> None:
         log_service.log_file.write_text(
             "\n".join(
                 [
-                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","success":true,"outcome":"answered","latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
-                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","success":true,"outcome":"refused","latency_ms":400,"prompt_chars":10,"output_chars":15,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","extra":{"citation_count":0}}',
-                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","success":false,"outcome":"error","latency_ms":200,"prompt_chars":10,"output_chars":0,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":1}}',
+                    '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","route_tier":"lite","success":true,"outcome":"answered","latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
+                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","route_tier":"none","success":true,"outcome":"refused","latency_ms":400,"prompt_chars":10,"output_chars":15,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","extra":{"citation_count":0}}',
+                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","route_tier":"pro","success":false,"outcome":"error","latency_ms":200,"prompt_chars":10,"output_chars":0,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":1}}',
                     "{bad json line}",
                 ]
             ),
@@ -276,6 +276,9 @@ def test_log_service_summary_aggregates_metrics() -> None:
         assert summary["by_outcome"]["answered"] == 1
         assert summary["by_outcome"]["refused"] == 1
         assert summary["by_outcome"]["error"] == 1
+        assert summary["by_route_tier"]["lite"] == 1
+        assert summary["by_route_tier"]["none"] == 1
+        assert summary["by_route_tier"]["pro"] == 1
         assert summary["by_retrieval_status"]["coverage"] == 1
         assert summary["by_retrieval_status"]["no_match"] == 1
         assert summary["by_retrieval_status"]["matched"] == 1

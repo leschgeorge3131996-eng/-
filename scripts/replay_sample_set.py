@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime
@@ -30,6 +31,9 @@ class ReplayRecord:
     outcome: str | None
     latency_ms: int | None
     model_name: str | None
+    route_tier: str | None
+    route_model: str | None
+    route_reason: str | None
     cache_hit: bool | None
     retrieval_status: str | None
     citation_count: int | None
@@ -50,6 +54,9 @@ def render_markdown(records: list[ReplayRecord]) -> str:
                 f"- Outcome: {record.outcome}",
                 f"- Latency (ms): {record.latency_ms}",
                 f"- Model: {record.model_name}",
+                f"- Route tier: {record.route_tier}",
+                f"- Route model: {record.route_model}",
+                f"- Route reason: {record.route_reason}",
                 f"- Cache hit: {record.cache_hit}",
                 f"- Retrieval status: {record.retrieval_status}",
                 f"- Citation count: {record.citation_count}",
@@ -86,6 +93,11 @@ def main() -> None:
         action="store_true",
         help="Force mock model mode for dry replay.",
     )
+    parser.add_argument(
+        "--clear-cache",
+        action="store_true",
+        help="Clear local cache before replay so the report reflects fresh runs.",
+    )
     args = parser.parse_args()
 
     if args.mock:
@@ -114,6 +126,9 @@ def main() -> None:
 
         for task_type, prompt in item["tasks"].items():
             try:
+                if args.clear_cache and settings.cache_dir.exists():
+                    shutil.rmtree(settings.cache_dir, ignore_errors=True)
+                    settings.cache_dir.mkdir(parents=True, exist_ok=True)
                 result = task_service.run_task(
                     task_type=task_type,
                     endpoint=f"/api/{task_type}",
@@ -131,6 +146,9 @@ def main() -> None:
                         outcome=result.outcome,
                         latency_ms=result.latency_ms,
                         model_name=result.model_name,
+                        route_tier=result.route_tier,
+                        route_model=result.route_model,
+                        route_reason=result.route_reason,
                         cache_hit=result.cache_hit,
                         retrieval_status=result.retrieval_status,
                         citation_count=len(result.citations),
@@ -150,6 +168,9 @@ def main() -> None:
                         outcome=None,
                         latency_ms=None,
                         model_name=None,
+                        route_tier=None,
+                        route_model=None,
+                        route_reason=None,
                         cache_hit=None,
                         retrieval_status=None,
                         citation_count=None,
@@ -176,4 +197,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -408,6 +408,8 @@ function App() {
                 <div className="result-meta">
                   <p>任务：{result.task_type}</p>
                   <p>模型：{result.model_name}</p>
+                  {result.route_tier ? <p>路由层级：{result.route_tier}</p> : null}
+                  {result.route_reason ? <p>路由原因：{result.route_reason}</p> : null}
                   <p>耗时：{result.latency_ms} ms</p>
                   <p>结果类型：{result.outcome}</p>
                   <p>请求 ID：{result.request_id}</p>

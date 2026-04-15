@@ -57,6 +57,10 @@
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 - Competition materials have been refined into reusable review/demo docs
 - Minimal model tier routing is implemented and test-covered
+- Fixed sample set replay script is available
+- Sample replay report can now be exported with route and evidence stats
+- Frontend result panel now exposes route tier and route reason
+- Log summary now normalizes legacy outcome values and aggregates route tiers
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 
 ### Verified Results
@@ -162,7 +166,8 @@ Current status:
 ## Next Recommended Steps
 
 1. Start phase 2 in this order:
-   - sample-set replay with current route strategy
+   - real-model replay on fixed sample set
+   - route-tier comparison on sample set
    - summary/outline stricter reference semantics
 2. Finalize first version of competition materials:
    - align wording with actual submission form

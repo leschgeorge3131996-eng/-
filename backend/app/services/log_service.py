@@ -46,6 +46,7 @@ class LogService:
                 "by_task": {},
                 "by_model": {},
                 "by_outcome": {},
+                "by_route_tier": {},
                 "by_retrieval_status": {},
                 "error_types": {},
             }
@@ -73,8 +74,13 @@ class LogService:
         by_task_counter = Counter(str(entry.get("task_type", "unknown")) for entry in entries)
         by_model_counter = Counter(str(entry.get("model_name", "unknown")) for entry in entries)
         outcome_counter = Counter(
-            str(entry.get("outcome", "unknown"))
+            self._normalize_outcome(entry)
             for entry in entries
+        )
+        route_tier_counter = Counter(
+            str(entry.get("route_tier"))
+            for entry in entries
+            if entry.get("route_tier")
         )
         retrieval_status_counter = Counter(
             str(entry.get("retrieval_status"))
@@ -110,6 +116,7 @@ class LogService:
             "by_task": dict(by_task_counter),
             "by_model": dict(by_model_counter),
             "by_outcome": dict(outcome_counter),
+            "by_route_tier": dict(route_tier_counter),
             "by_retrieval_status": dict(retrieval_status_counter),
             "error_types": dict(error_types_counter),
         }
@@ -136,3 +143,11 @@ class LogService:
             return 0
         index = max(0, min(len(values) - 1, int((len(values) - 1) * ratio)))
         return values[index]
+
+    def _normalize_outcome(self, entry: dict) -> str:
+        outcome = entry.get("outcome")
+        if outcome and str(outcome) != "unknown":
+            return str(outcome)
+        if entry.get("success") is True:
+            return "answered"
+        return "error"

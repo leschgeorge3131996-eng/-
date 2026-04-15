@@ -48,6 +48,13 @@ def render_markdown(summary: dict) -> str:
     else:
         lines.append("- none")
 
+    lines.extend(["", "## By Route Tier"])
+    if summary["by_route_tier"]:
+        for route_tier, count in summary["by_route_tier"].items():
+            lines.append(f"- {route_tier}: {count}")
+    else:
+        lines.append("- none")
+
     lines.extend(["", "## By Retrieval Status"])
     if summary["by_retrieval_status"]:
         for status, count in summary["by_retrieval_status"].items():

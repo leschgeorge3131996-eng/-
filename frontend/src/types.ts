@@ -48,6 +48,9 @@ export interface TaskResult {
   document_name: string;
   document_fingerprint?: string | null;
   model_name: string;
+  route_tier?: string | null;
+  route_model?: string | null;
+  route_reason?: string | null;
   latency_ms: number;
   result: string;
   outcome: string;

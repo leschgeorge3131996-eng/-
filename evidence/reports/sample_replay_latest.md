@@ -6,8 +6,11 @@
 - Input: 请用 3 条要点总结这个文档。
 - Success: True
 - Outcome: answered
-- Latency (ms): 21
+- Latency (ms): 13
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_summary_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
@@ -22,6 +25,9 @@
 - Outcome: answered
 - Latency (ms): 2
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_ask_model
 - Cache hit: False
 - Retrieval status: matched
 - Citation count: 1
@@ -36,6 +42,9 @@
 - Outcome: answered
 - Latency (ms): 0
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_outline_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
@@ -48,8 +57,11 @@
 - Input: 请概括制度的核心要求。
 - Success: True
 - Outcome: answered
-- Latency (ms): 19
+- Latency (ms): 7
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_summary_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
@@ -64,6 +76,9 @@
 - Outcome: answered
 - Latency (ms): 0
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_ask_model
 - Cache hit: False
 - Retrieval status: matched
 - Citation count: 1
@@ -78,6 +93,9 @@
 - Outcome: answered
 - Latency (ms): 0
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_outline_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
@@ -90,8 +108,11 @@
 - Input: 请概括研究背景、方法和结论。
 - Success: True
 - Outcome: answered
-- Latency (ms): 18
+- Latency (ms): 8
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_summary_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
@@ -106,6 +127,9 @@
 - Outcome: answered
 - Latency (ms): 0
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_ask_model
 - Cache hit: False
 - Retrieval status: matched
 - Citation count: 1
@@ -120,6 +144,9 @@
 - Outcome: answered
 - Latency (ms): 0
 - Model: mock::ep-m-20260401130050-qn8nk
+- Route tier: task_specific
+- Route model: ep-m-20260401130050-qn8nk
+- Route reason: configured_outline_model
 - Cache hit: False
 - Retrieval status: coverage
 - Citation count: 0
