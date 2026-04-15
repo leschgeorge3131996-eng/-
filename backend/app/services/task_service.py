@@ -48,7 +48,7 @@ class TaskService:
             document_text = self.file_service.get_document_text(file_id)
             resolved_model_name = self.model_client.resolve_model_name(task_type)
             cache_key = self.cache_service.build_cache_key(
-                document_text=document_text,
+                document_fingerprint=metadata.document_fingerprint or "",
                 task_type=task_type,
                 user_input=user_input,
                 model_name=resolved_model_name,
@@ -61,10 +61,14 @@ class TaskService:
                     task_type=task_type,
                     file_id=file_id,
                     document_name=metadata.original_name,
+                    document_fingerprint=metadata.document_fingerprint,
                     model_name=cached_result["model_name"],
                     latency_ms=latency_ms,
                     result=cached_result["result"],
                     cache_hit=True,
+                    source_document_chars=cached_result.get("source_document_chars", 0),
+                    used_document_chars=cached_result.get("used_document_chars", 0),
+                    truncation_message=cached_result.get("truncation_message"),
                     context_truncated=cached_result.get("context_truncated", False),
                     token_usage=cached_result.get("token_usage"),
                 )
@@ -113,6 +117,9 @@ class TaskService:
                     "task_type": task_type,
                     "model_name": model_result.model_name,
                     "result": model_result.content,
+                    "source_document_chars": model_result.source_document_chars,
+                    "used_document_chars": model_result.used_document_chars,
+                    "truncation_message": model_result.truncation_message,
                     "context_truncated": model_result.context_truncated,
                     "prompt_chars": model_result.prompt_chars,
                     "token_usage": (
@@ -159,10 +166,14 @@ class TaskService:
                 task_type=task_type,
                 file_id=file_id,
                 document_name=metadata.original_name,
+                document_fingerprint=metadata.document_fingerprint,
                 model_name=model_result.model_name,
                 latency_ms=latency_ms,
                 result=model_result.content,
                 cache_hit=False,
+                source_document_chars=model_result.source_document_chars,
+                used_document_chars=model_result.used_document_chars,
+                truncation_message=model_result.truncation_message,
                 context_truncated=model_result.context_truncated,
                 token_usage=model_result.token_usage,
             )

@@ -71,6 +71,7 @@ def test_save_upload_and_load_text() -> None:
 
         assert result.parse_status == "parsed"
         assert result.text_chars > 0
+        assert result.document_fingerprint
         assert "第一段" in text
     finally:
         cleanup_workspace(workspace)

@@ -1,4 +1,4 @@
-import type { ApiResponse, TaskResult, TaskType, UploadResponse } from "./types";
+import type { ApiResponse, LogSummary, TaskResult, TaskType, UploadResponse } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -56,4 +56,9 @@ export async function runTask(
     body: JSON.stringify(payload)
   });
   return parseResponse<TaskResult>(response);
+}
+
+export async function fetchLogSummary(): Promise<LogSummary> {
+  const response = await fetch(`${API_BASE_URL}/logs/summary`);
+  return parseResponse<LogSummary>(response);
 }

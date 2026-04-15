@@ -17,17 +17,16 @@ class CacheService:
     def build_cache_key(
         self,
         *,
-        document_text: str,
+        document_fingerprint: str,
         task_type: str,
         user_input: str | None,
         model_name: str,
     ) -> str:
         normalized_input = (user_input or "").strip()
-        document_hash = hashlib.sha256(document_text.encode("utf-8")).hexdigest()
         raw_key = "::".join(
             [
                 self.cache_version,
-                document_hash,
+                document_fingerprint,
                 task_type,
                 model_name,
                 normalized_input,

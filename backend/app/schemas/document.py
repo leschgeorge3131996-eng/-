@@ -8,6 +8,7 @@ class DocumentMetadata(BaseModel):
     original_name: str
     saved_path: str
     parsed_path: str
+    document_fingerprint: str | None = None
     file_type: str
     size_bytes: int
     text_chars: int = 0
@@ -22,5 +23,5 @@ class UploadResponseData(BaseModel):
     file_type: str
     size_bytes: int
     text_chars: int
+    document_fingerprint: str | None = None
     parse_status: str
-

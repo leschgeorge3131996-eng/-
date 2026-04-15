@@ -37,6 +37,11 @@
 - Log summary API added
 - Log summary export script added
 - Evidence directory and experiment template added
+- Document fingerprint added to upload metadata and task results
+- Clearer truncation feedback added to task results
+- API integration tests added for upload, tasks, and log summary
+- Frontend stats panel added
+- Demo mode added with sample document and sample prompts
 
 ### Verified Results
 
@@ -46,7 +51,7 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Service tests pass: `7 passed`
+- Backend tests pass: `10 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
 
 ## Current Runtime Configuration
@@ -130,22 +135,22 @@ powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 
 ```powershell
 cd C:\Users\Administrator\Desktop\project
-python -m pytest backend/tests/test_services.py
+.venv\Scripts\python.exe -m pytest backend/tests
 ```
 
 Current status:
 
-- `5 passed`
+- `10 passed`
 
 ## Next Recommended Steps
 
-1. Add document length control and clearer truncation hints
-2. Add a lightweight stats or ops panel in frontend
-3. Start phase 2 in this order:
+1. Start phase 2 in this order:
    - PDF page-aware parsing
    - text chunking
    - retrieval
    - citations
+2. Add a small architecture diagram into `evidence/`
+3. Add first version of competition materials: project summary, demo script, sample set
 
 ## Session Handoff Rule
 

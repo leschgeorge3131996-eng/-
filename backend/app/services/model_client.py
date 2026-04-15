@@ -21,8 +21,16 @@ class ModelClient:
         document_text: str,
         user_input: str | None = None,
     ) -> ModelResult:
+        source_document_chars = len(document_text)
         truncated_text = document_text[: self.settings.max_document_chars]
         context_truncated = len(truncated_text) < len(document_text)
+        used_document_chars = len(truncated_text)
+        truncation_message = None
+        if context_truncated:
+            truncation_message = (
+                f"文档原始长度为 {source_document_chars} 字符，本次请求仅发送前 "
+                f"{used_document_chars} 字符到模型。"
+            )
         model_name = self.resolve_model_name(task_type)
         prompt_chars = len(truncated_text) + len(user_input or "")
 
@@ -33,6 +41,9 @@ class ModelClient:
                 model_name=f"mock::{model_name}",
                 prompt_chars=prompt_chars,
                 output_chars=len(content),
+                source_document_chars=source_document_chars,
+                used_document_chars=used_document_chars,
+                truncation_message=truncation_message,
                 token_usage=None,
                 context_truncated=context_truncated,
             )
@@ -51,6 +62,9 @@ class ModelClient:
             model_name=model_name,
             prompt_chars=prompt_chars,
             output_chars=len(content),
+            source_document_chars=source_document_chars,
+            used_document_chars=used_document_chars,
+            truncation_message=truncation_message,
             token_usage=TokenUsage(
                 prompt_tokens=usage.get("prompt_tokens"),
                 completion_tokens=usage.get("completion_tokens"),

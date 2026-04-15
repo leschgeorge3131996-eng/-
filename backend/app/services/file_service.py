@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,6 +47,7 @@ class FileService:
             original_name=filename,
             saved_path=str(upload_path),
             parsed_path=str(parsed_path),
+            document_fingerprint=None,
             file_type=suffix.lstrip("."),
             size_bytes=len(content),
             text_chars=0,
@@ -60,6 +62,7 @@ class FileService:
             parsed_path.write_text(text, encoding="utf-8")
             metadata.parse_status = "parsed"
             metadata.text_chars = len(text)
+            metadata.document_fingerprint = self._build_document_fingerprint(text)
         except ParseError as exc:
             metadata.parse_status = "failed"
             metadata.parse_error = exc.message
@@ -78,6 +81,7 @@ class FileService:
             file_type=metadata.file_type,
             size_bytes=metadata.size_bytes,
             text_chars=metadata.text_chars,
+            document_fingerprint=metadata.document_fingerprint,
             parse_status=metadata.parse_status,
         )
 
@@ -95,3 +99,6 @@ class FileService:
 
     def _write_metadata(self, metadata_path: Path, metadata: DocumentMetadata) -> None:
         metadata_path.write_text(metadata.model_dump_json(indent=2), encoding="utf-8")
+
+    def _build_document_fingerprint(self, text: str) -> str:
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()

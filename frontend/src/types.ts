@@ -37,10 +37,14 @@ export interface TaskResult {
   task_type: TaskType;
   file_id: string;
   document_name: string;
+  document_fingerprint?: string | null;
   model_name: string;
   latency_ms: number;
   result: string;
   cache_hit: boolean;
+  source_document_chars: number;
+  used_document_chars: number;
+  truncation_message?: string | null;
   context_truncated: boolean;
   token_usage?: TokenUsage | null;
 }
@@ -60,4 +64,22 @@ export interface RecentResult {
   input: string;
   created_at: string;
   task_result: TaskResult;
+}
+
+export interface LogSummary {
+  total_requests: number;
+  success_count: number;
+  failure_count: number;
+  success_rate: number;
+  average_latency_ms: number;
+  p95_latency_ms: number;
+  cache_hit_count: number;
+  token_total_sum: number;
+  time_range?: {
+    first_timestamp?: string | null;
+    last_timestamp?: string | null;
+  };
+  by_task: Record<string, number>;
+  by_model: Record<string, number>;
+  error_types: Record<string, number>;
 }

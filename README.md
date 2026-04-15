@@ -120,6 +120,10 @@ project/
 - 最近文档复用与最近 5 次结果历史
 - 日志汇总接口与日志导出脚本
 - 证据目录与实验记录模板
+- 文档稳定指纹与更明确的截断反馈字段
+- API 集成测试覆盖上传、任务调用与日志汇总
+- 前端统计面板直接读取 `/api/logs/summary`
+- Demo 模式支持一键填充示例文档与示例提示
 - PowerShell 启动脚本
 - 基础服务层测试
 
@@ -211,7 +215,7 @@ npm run dev
 ## 测试
 
 ```powershell
-python -m pytest backend/tests
+.venv\Scripts\python.exe -m pytest backend/tests
 ```
 
 ## 日志汇总导出

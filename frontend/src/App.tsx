@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { ApiRequestError, runTask, uploadDocument } from "./api";
+import { ApiRequestError, fetchLogSummary, runTask, uploadDocument } from "./api";
 import type {
+  LogSummary,
   RecentDocument,
   RecentResult,
   TaskResult,
@@ -35,6 +36,14 @@ const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
 const MAX_RECENT_DOCUMENTS = 5;
 const MAX_RECENT_RESULTS = 5;
+const DEMO_DOCUMENT_NAME = "demo_research_brief.md";
+const DEMO_DOCUMENT_CONTENT = `# 项目简介
+
+研答通是一个面向科研与智能办公场景的个人智能文档助理。
+第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
+
+系统当前采用端云协同路线，优先保证能跑通、能演示、能扩展。
+后续将逐步补充 PDF 结构化解析、文本分块、轻量检索、引用返回和评测闭环。`;
 
 function readStorage<T>(key: string, fallback: T): T {
   try {
@@ -92,6 +101,7 @@ function App() {
   const [recentResults, setRecentResults] = useState<RecentResult[]>(() =>
     readStorage<RecentResult[]>(RECENT_RESULTS_KEY, [])
   );
+  const [logSummary, setLogSummary] = useState<LogSummary | null>(null);
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const canSubmit =
@@ -106,6 +116,28 @@ function App() {
   useEffect(() => {
     writeStorage(RECENT_RESULTS_KEY, recentResults);
   }, [recentResults]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadSummary() {
+      try {
+        const summary = await fetchLogSummary();
+        if (active) {
+          setLogSummary(summary);
+        }
+      } catch {
+        if (active) {
+          setLogSummary(null);
+        }
+      }
+    }
+
+    void loadSummary();
+    return () => {
+      active = false;
+    };
+  }, [recentResults.length]);
 
   function upsertRecentDocument(metadata: UploadMetadata) {
     const nextDocument: RecentDocument = {
@@ -136,6 +168,16 @@ function App() {
     };
 
     setRecentResults((current) => [item, ...current].slice(0, MAX_RECENT_RESULTS));
+  }
+
+  function loadDemoDocument() {
+    const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
+      type: "text/markdown"
+    });
+    setSelectedFile(file);
+    setUploadedMetadata(null);
+    setResult(null);
+    setError(null);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -186,6 +228,79 @@ function App() {
           <p className="subtitle">
             第一阶段只做最小闭环：上传 TXT / Markdown / PDF，选择任务，后端调用模型并返回结果。
           </p>
+        </section>
+
+        <section className="grid secondary-grid">
+          <article className="panel">
+            <h2>运行统计</h2>
+            {logSummary ? (
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <span>总请求数</span>
+                  <strong>{logSummary.total_requests}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>成功率</span>
+                  <strong>{Math.round(logSummary.success_rate * 100)}%</strong>
+                </div>
+                <div className="stat-card">
+                  <span>平均延迟</span>
+                  <strong>{logSummary.average_latency_ms} ms</strong>
+                </div>
+                <div className="stat-card">
+                  <span>P95 延迟</span>
+                  <strong>{logSummary.p95_latency_ms} ms</strong>
+                </div>
+              </div>
+            ) : (
+              <p className="empty">当前暂无统计数据，完成一次任务后会自动刷新。</p>
+            )}
+          </article>
+
+          <article className="panel">
+            <h2>Demo 模式</h2>
+            <p className="subtitle compact">
+              一键填充示例文档和常用指令，方便演示摘要、问答和提纲的完整链路。
+            </p>
+            <div className="demo-actions">
+              <button className="ghost-button" type="button" disabled={loading} onClick={loadDemoDocument}>
+                填充示例文档
+              </button>
+              <button
+                className="ghost-button"
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  setTaskType("summary");
+                  setInput("请用 3 条要点总结这个文档。");
+                }}
+              >
+                示例摘要
+              </button>
+              <button
+                className="ghost-button"
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  setTaskType("ask");
+                  setInput("这个项目第一阶段要做什么？");
+                }}
+              >
+                示例问答
+              </button>
+              <button
+                className="ghost-button"
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  setTaskType("outline");
+                  setInput("请生成一个 5 页汇报提纲。");
+                }}
+              >
+                示例提纲
+              </button>
+            </div>
+          </article>
         </section>
 
         <section className="panel">
@@ -286,7 +401,10 @@ function App() {
                   <p className="cache-hit">本次结果命中本地缓存，未重复调用云端模型。</p>
                 ) : null}
                 {result.context_truncated ? (
-                  <p className="warning">文档内容过长，后端已按配置截断部分上下文。</p>
+                  <p className="warning">
+                    {result.truncation_message ??
+                      `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
+                  </p>
                 ) : null}
                 {result.token_usage?.total_tokens ? (
                   <p className="status">
