@@ -6,6 +6,7 @@ tmp/
 pytest-cache-files-*/
 .env
 review_bundle*.zip
+tmp_*.log
 __pycache__/
 *.pyc
 *.pyo

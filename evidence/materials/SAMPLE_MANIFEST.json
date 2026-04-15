@@ -28,6 +28,15 @@
       "ask": "这篇文档的核心方法是什么？",
       "outline": "请生成答辩提纲。"
     }
+  },
+  {
+    "id": "chinese_paper_pdf",
+    "path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+    "scenario": "中文学术论文 PDF",
+    "tasks": {
+      "summary": "请概括这篇论文的研究背景、方法和主要结论。",
+      "ask": "这篇论文主要研究了什么问题？",
+      "outline": "请生成一个中文汇报提纲。"
+    }
   }
 ]
-

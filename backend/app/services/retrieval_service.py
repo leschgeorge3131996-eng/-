@@ -30,6 +30,19 @@ class RetrievalService:
         "about",
     }
 
+    bilingual_query_hints = {
+        "为什么": ["why", "because"],
+        "放弃": ["avoid", "replace", "dispense with"],
+        "循环": ["recurrent", "rnn"],
+        "卷积": ["convolutional", "cnn"],
+        "结构": ["architecture", "structure"],
+        "核心方法": ["method", "approach", "model"],
+        "创新点": ["contribution", "novel", "novelty"],
+        "实验结果": ["experiment", "results"],
+        "研究背景": ["background", "motivation"],
+        "结论": ["conclusion"],
+    }
+
     def __init__(
         self,
         *,
@@ -84,14 +97,19 @@ class RetrievalService:
         if normalized_query and normalized_query in normalized_text:
             score += 8.0
 
-        terms = self._extract_terms(normalized_query)
+        normalized_terms = self._extract_terms(normalized_query)
+        raw_terms = self._extract_terms(query.lower())
+        terms = self._dedupe_terms(normalized_terms + raw_terms)
         title_bonus = self._title_bonus(terms, text)
         score += title_bonus
 
         length_norm = max(1.0, len(text) / 600)
         for term in terms:
             if term in normalized_text:
-                weight = 2.0 if len(term) >= 3 else 1.0
+                if term in {"recurrent", "convolutional", "rnn", "cnn", "architecture", "method", "results", "background", "conclusion"}:
+                    weight = 4.0
+                else:
+                    weight = 2.0 if len(term) >= 3 else 1.0
                 score += (normalized_text.count(term) * weight) / length_norm
         return score
 
@@ -118,13 +136,11 @@ class RetrievalService:
             else:
                 terms.append(token)
 
-        deduped: list[str] = []
-        seen: set[str] = set()
-        for term in terms:
-            if term not in seen:
-                seen.add(term)
-                deduped.append(term)
-        return deduped
+        for chinese_term, english_terms in self.bilingual_query_hints.items():
+            if chinese_term in query:
+                terms.extend(english_terms)
+
+        return self._dedupe_terms(terms)
 
     def _title_bonus(self, terms: list[str], text: str) -> float:
         if not terms:
@@ -139,3 +155,12 @@ class RetrievalService:
         if first_line.startswith("#") or re.match(r"^\d+(\.\d+)*", first_line):
             bonus += 0.5
         return bonus
+
+    def _dedupe_terms(self, terms: list[str]) -> list[str]:
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for term in terms:
+            if term not in seen:
+                seen.add(term)
+                deduped.append(term)
+        return deduped

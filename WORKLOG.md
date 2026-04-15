@@ -8,8 +8,8 @@
 
 ## Current Status
 
-- Phase: `P0 / MVP`
-- Status: `running end-to-end`
+- Phase: `P1 / Demo-ready prototype`
+- Status: `running end-to-end with retrieval, citations, stats, sample replay tooling, and competition materials`
 - Verified on: `2026-04-15`
 
 ### Completed
@@ -59,9 +59,12 @@
 - Minimal model tier routing is implemented and test-covered
 - Fixed sample set replay script is available
 - Sample replay report can now be exported with route and evidence stats
+- English paper end-to-end validation has been recorded in evidence
+- Chinese academic PDF sample has been added to sample set
 - Frontend result panel now exposes route tier and route reason
 - Log summary now normalizes legacy outcome values and aggregates route tiers
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
+- V1 model tier routing is implemented and test-covered
 
 ### Verified Results
 
@@ -71,8 +74,10 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Backend tests pass: `10 passed`
+- Backend tests pass: `19 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
+- Sample replay report exported to `evidence/reports/sample_replay_latest.md`
+- English paper validation recorded in `evidence/experiments/20260415_attention_is_all_you_need_validation.md`
 
 ## Current Runtime Configuration
 
@@ -93,6 +98,11 @@ Notes:
 - Frontend success screenshot exists
 - Log screenshot exists
 - Swagger/API screenshot exists
+- Sample replay report exists
+- One-page project summary exists
+- Demo script exists
+- Sample set exists
+- Architecture note exists
 - Real call logs contain:
   - `model_name`
   - `success`
@@ -107,6 +117,7 @@ Notes:
 - Summary and outline still use source chunks rather than strict references
 - Retrieval quality controls can still be improved further, but are no longer minimal
 - Competition materials exist and are reusable, but still need final polish against actual submission format
+- Public external sharing is only suitable for short-lived controlled demos in the current network environment
 
 ## Important Files
 
@@ -161,7 +172,7 @@ cd C:\Users\Administrator\Desktop\project
 
 Current status:
 
-- `15 passed`
+- `19 passed`
 
 ## Next Recommended Steps
 
@@ -172,6 +183,7 @@ Current status:
 2. Finalize first version of competition materials:
    - align wording with actual submission form
    - replay fixed sample set and refresh screenshots/log evidence
+3. Prefer controlled demo sharing unless a more stable exposure path is prepared
 
 ## Session Handoff Rule
 
