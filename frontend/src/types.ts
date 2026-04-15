@@ -90,6 +90,7 @@ export interface RecentResult {
   task_type: TaskType;
   input: string;
   created_at: string;
+  document_snapshot?: UploadMetadata | null;
   task_result: TaskResult;
 }
 

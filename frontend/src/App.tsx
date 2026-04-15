@@ -257,10 +257,29 @@ function App() {
       task_type: taskResult.task_type,
       input: promptText,
       created_at: new Date().toISOString(),
+      document_snapshot: uploadedMetadata,
       task_result: taskResult
     };
 
     setRecentResults((current) => [item, ...current].slice(0, MAX_RECENT_RESULTS));
+  }
+
+  function findRecentDocument(fileId: string): UploadMetadata | null {
+    const matched = recentDocuments.find((item) => item.file_id === fileId);
+    if (!matched) {
+      return null;
+    }
+    return {
+      file_id: matched.file_id,
+      original_name: matched.original_name,
+      file_type: matched.file_type,
+      size_bytes: 0,
+      text_chars: matched.text_chars,
+      page_count: matched.page_count,
+      chunk_count: matched.chunk_count,
+      document_fingerprint: matched.document_fingerprint ?? null,
+      parse_status: matched.parse_status
+    };
   }
 
   function loadDemoDocument() {
@@ -728,6 +747,8 @@ function App() {
                         parse_status: item.parse_status
                       });
                       setSelectedFile(null);
+                      setPendingDocumentSource(null);
+                      setResult(null);
                       setError(null);
                     }}
                   >
@@ -756,8 +777,16 @@ function App() {
                     type="button"
                     disabled={loading}
                     onClick={() => {
+                      const restoredMetadata =
+                        item.document_snapshot ?? findRecentDocument(item.task_result.file_id);
                       setTaskType(item.task_type);
+                      if (item.task_result.response_detail_level) {
+                        setResponseDetailLevel(item.task_result.response_detail_level);
+                      }
                       setInput(item.input);
+                      setUploadedMetadata(restoredMetadata);
+                      setSelectedFile(null);
+                      setPendingDocumentSource(null);
                       setResult(item.task_result);
                       setError(null);
                     }}
