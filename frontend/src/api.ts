@@ -1,4 +1,11 @@
-import type { ApiResponse, LogSummary, TaskResult, TaskType, UploadResponse } from "./types";
+import type {
+  ApiResponse,
+  LogSummary,
+  ResponseDetailLevel,
+  TaskResult,
+  TaskType,
+  UploadResponse
+} from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -40,13 +47,14 @@ export async function uploadDocument(file: File): Promise<UploadResponse> {
 export async function runTask(
   taskType: TaskType,
   fileId: string,
-  input: string
+  input: string,
+  responseDetailLevel: ResponseDetailLevel
 ): Promise<TaskResult> {
   const endpoint = `${API_BASE_URL}/${taskType}`;
   const payload =
     taskType === "ask"
-      ? { file_id: fileId, question: input }
-      : { file_id: fileId, instruction: input || null };
+      ? { file_id: fileId, question: input, response_detail_level: responseDetailLevel }
+      : { file_id: fileId, instruction: input || null, response_detail_level: responseDetailLevel };
 
   const response = await fetch(endpoint, {
     method: "POST",

@@ -9,7 +9,7 @@ from uuid import uuid4
 from ..core.exceptions import AppError
 from ..schemas.document import ParsedChunk
 from ..schemas.log import CallLogEntry
-from ..schemas.task import Citation, TaskResult, TaskType
+from ..schemas.task import Citation, ResponseDetailLevel, TaskResult, TaskType
 from .cache_service import CacheService
 from .context_planner import ContextPlannerService
 from .file_service import FileService
@@ -44,6 +44,7 @@ class TaskService:
         endpoint: str,
         file_id: str,
         user_input: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
     ) -> TaskResult:
         request_id = uuid4().hex
         started_at = datetime.now(timezone.utc).isoformat()
@@ -108,6 +109,7 @@ class TaskService:
                     route_tier=route_tier,
                     route_model=route_model,
                     route_reason=route_reason,
+                    response_detail_level=response_detail_level,
                     latency_ms=latency_ms,
                     result=refusal_text,
                     outcome="refused",
@@ -135,6 +137,7 @@ class TaskService:
                         route_tier=route_tier,
                         route_model=route_model,
                         route_reason=route_reason,
+                        response_detail_level=response_detail_level,
                         file_id=file_id,
                         success=True,
                         outcome="refused",
@@ -171,6 +174,7 @@ class TaskService:
                 task_type=task_type,
                 user_input=user_input,
                 model_name=resolved_model_name,
+                response_detail_level=response_detail_level,
             )
             cached_result = self.cache_service.get(cache_key)
             if cached_result is not None:
@@ -185,6 +189,7 @@ class TaskService:
                     route_tier=cached_result.get("route_tier", route_tier),
                     route_model=cached_result.get("route_model", route_model),
                     route_reason=cached_result.get("route_reason", route_reason),
+                    response_detail_level=cached_result.get("response_detail_level", response_detail_level),
                     latency_ms=latency_ms,
                     result=cached_result["result"],
                     outcome=cached_result.get("outcome", outcome),
@@ -221,6 +226,7 @@ class TaskService:
                         route_tier=task_result.route_tier,
                         route_model=task_result.route_model,
                         route_reason=task_result.route_reason,
+                        response_detail_level=task_result.response_detail_level,
                         file_id=file_id,
                         success=True,
                         outcome=task_result.outcome,
@@ -262,6 +268,7 @@ class TaskService:
                 document_text=document_text,
                 user_input=user_input,
                 model_name_override=resolved_model_name,
+                response_detail_level=response_detail_level,
             )
             latency_ms = int((perf_counter() - started_timer) * 1000)
             self.cache_service.set(
@@ -272,6 +279,7 @@ class TaskService:
                     "route_tier": route_tier,
                     "route_model": route_model,
                     "route_reason": route_reason,
+                    "response_detail_level": response_detail_level,
                     "result": model_result.content,
                     "outcome": outcome,
                     "context_strategy": context_strategy,
@@ -304,6 +312,7 @@ class TaskService:
                     route_tier=route_tier,
                     route_model=route_model,
                     route_reason=route_reason,
+                    response_detail_level=response_detail_level,
                     file_id=file_id,
                     success=True,
                     outcome=outcome,
@@ -353,6 +362,7 @@ class TaskService:
                 route_tier=route_tier,
                 route_model=route_model,
                 route_reason=route_reason,
+                response_detail_level=response_detail_level,
                 latency_ms=latency_ms,
                 result=model_result.content,
                 outcome=outcome,
@@ -382,6 +392,7 @@ class TaskService:
                     route_tier=route_tier,
                     route_model=route_model,
                     route_reason=route_reason,
+                    response_detail_level=response_detail_level,
                     file_id=file_id if metadata or file_id else None,
                     success=False,
                     outcome="error",

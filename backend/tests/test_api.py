@@ -129,7 +129,7 @@ def test_summary_endpoint_returns_truncation_fields() -> None:
 
         response = client.post(
             "/api/summary",
-            json={"file_id": file_id, "instruction": "请总结"},
+            json={"file_id": file_id, "instruction": "请总结", "response_detail_level": "detailed"},
         )
 
         assert response.status_code == 200
@@ -138,6 +138,7 @@ def test_summary_endpoint_returns_truncation_fields() -> None:
         assert payload["source_document_chars"] > payload["used_document_chars"]
         assert payload["truncation_message"]
         assert payload["document_fingerprint"]
+        assert payload["response_detail_level"] == "detailed"
         assert payload["citations"] == []
         assert len(payload["source_chunks"]) >= 1
     finally:

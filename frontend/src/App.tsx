@@ -4,6 +4,7 @@ import type {
   LogSummary,
   RecentDocument,
   RecentResult,
+  ResponseDetailLevel,
   TaskResult,
   TaskType,
   UploadMetadata
@@ -62,6 +63,22 @@ const DEMO_ACTIONS: Array<{
     input: "请生成一个 5 页汇报提纲。"
   }
 ];
+
+const RESPONSE_DETAIL_OPTIONS: Array<{
+  value: ResponseDetailLevel;
+  label: string;
+  description: string;
+}> = [
+  { value: "concise", label: "简洁", description: "只保留核心结论" },
+  { value: "balanced", label: "适中", description: "兼顾完整与可读性" },
+  { value: "detailed", label: "详细", description: "补充更多背景与展开" }
+];
+
+const RESPONSE_DETAIL_LABELS: Record<ResponseDetailLevel, string> = {
+  concise: "简洁",
+  balanced: "适中",
+  detailed: "详细"
+};
 
 type LoadStage = "idle" | "uploading" | "model";
 
@@ -132,6 +149,7 @@ function normalizeErrorMessage(error: unknown): string {
 
 function App() {
   const [taskType, setTaskType] = useState<TaskType>("summary");
+  const [responseDetailLevel, setResponseDetailLevel] = useState<ResponseDetailLevel>("balanced");
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedMetadata, setUploadedMetadata] = useState<UploadMetadata | null>(null);
@@ -261,7 +279,7 @@ function App() {
       }
 
       setLoadStage("model");
-      const taskResult = await runTask(taskType, fileId, input.trim());
+      const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
       setResult(taskResult);
       pushRecentResult(taskResult, input.trim());
       setSummaryRefreshTick((value) => value + 1);
@@ -409,6 +427,23 @@ function App() {
               </label>
 
               <label className="field">
+                <span>回答粒度</span>
+                <select
+                  value={responseDetailLevel}
+                  disabled={loading}
+                  onChange={(event) =>
+                    setResponseDetailLevel(event.target.value as ResponseDetailLevel)
+                  }
+                >
+                  {RESPONSE_DETAIL_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label} · {option.description}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
                 <span>问题或指令</span>
                 <textarea
                   rows={6}
@@ -513,6 +548,11 @@ function App() {
                   <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
                   <span className="badge badge-route">{result.route_tier ?? "default"}</span>
                   <span className="badge badge-outcome">{result.outcome}</span>
+                  {result.response_detail_level ? (
+                    <span className="badge badge-detail">
+                      {RESPONSE_DETAIL_LABELS[result.response_detail_level] ?? result.response_detail_level}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="result-meta-grid">
                   <div className="result-meta-card">

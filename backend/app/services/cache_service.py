@@ -9,7 +9,7 @@ from ..core.config import Settings, get_settings
 
 
 class CacheService:
-    cache_version = "v5"
+    cache_version = "v6"
 
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
@@ -21,6 +21,7 @@ class CacheService:
         task_type: str,
         user_input: str | None,
         model_name: str,
+        response_detail_level: str = "balanced",
     ) -> str:
         normalized_input = (user_input or "").strip()
         raw_key = "::".join(
@@ -29,6 +30,7 @@ class CacheService:
                 document_fingerprint,
                 task_type,
                 model_name,
+                response_detail_level,
                 normalized_input,
             ]
         )

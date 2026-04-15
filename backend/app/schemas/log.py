@@ -14,6 +14,7 @@ class CallLogEntry(BaseModel):
     route_tier: str | None = None
     route_model: str | None = None
     route_reason: str | None = None
+    response_detail_level: str | None = None
     file_id: str | None = None
     success: bool
     outcome: str = "answered"

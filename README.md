@@ -62,7 +62,8 @@ project/
 ```json
 {
   "file_id": "xxx",
-  "question": "请概括这篇文章的核心方法"
+  "question": "请概括这篇文章的核心方法",
+  "response_detail_level": "balanced"
 }
 ```
 
@@ -71,7 +72,8 @@ project/
 ```json
 {
   "file_id": "xxx",
-  "instruction": "突出研究背景和创新点"
+  "instruction": "突出研究背景和创新点",
+  "response_detail_level": "balanced"
 }
 ```
 
@@ -80,7 +82,8 @@ project/
 ```json
 {
   "file_id": "xxx",
-  "instruction": "生成 6 页答辩提纲"
+  "instruction": "生成 6 页答辩提纲",
+  "response_detail_level": "balanced"
 }
 ```
 
@@ -133,6 +136,7 @@ project/
 - 日志汇总已包含检索状态、引用数量等检索质量指标
 - 日志与统计面板已区分 `answered / refused / error`
 - 前端已区分展示：`ask` 的“引用依据”与 `summary / outline` 的“来源片段”
+- 已支持三档回答粒度：`简洁 / 适中 / 详细`
 - 已支持最小模型分层路由：可按任务将 `ask`、`summary`、`outline` 分配到不同 tier/model
 - 已支持固定样例集复跑脚本与样例报告导出
 - 结果区已可展示模型路由层级与路由原因
@@ -230,6 +234,8 @@ npm run dev
 ```powershell
 .venv\Scripts\python.exe -m pytest backend/tests
 ```
+
+当前状态：`23 passed`
 
 ## 日志汇总导出
 

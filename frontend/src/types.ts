@@ -1,4 +1,5 @@
 export type TaskType = "summary" | "ask" | "outline";
+export type ResponseDetailLevel = "concise" | "balanced" | "detailed";
 
 export interface ApiError {
   code: string;
@@ -51,6 +52,7 @@ export interface TaskResult {
   route_tier?: string | null;
   route_model?: string | null;
   route_reason?: string | null;
+  response_detail_level?: ResponseDetailLevel | null;
   latency_ms: number;
   result: string;
   outcome: string;
@@ -112,6 +114,7 @@ export interface LogSummary {
   by_task: Record<string, number>;
   by_model: Record<string, number>;
   by_outcome: Record<string, number>;
+  by_response_detail_level?: Record<string, number>;
   by_retrieval_status: Record<string, number>;
   error_types: Record<string, number>;
 }

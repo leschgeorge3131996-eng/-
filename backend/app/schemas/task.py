@@ -6,16 +6,19 @@ from pydantic import BaseModel, Field
 
 
 TaskType = Literal["ask", "summary", "outline"]
+ResponseDetailLevel = Literal["concise", "balanced", "detailed"]
 
 
 class AskRequest(BaseModel):
     file_id: str = Field(..., min_length=1)
     question: str = Field(..., min_length=1, max_length=4000)
+    response_detail_level: ResponseDetailLevel = "balanced"
 
 
 class TaskRequest(BaseModel):
     file_id: str = Field(..., min_length=1)
     instruction: str | None = Field(default=None, max_length=4000)
+    response_detail_level: ResponseDetailLevel = "balanced"
 
 
 class TokenUsage(BaseModel):
@@ -52,6 +55,7 @@ class TaskResult(BaseModel):
     route_tier: str = "task_specific"
     route_model: str | None = None
     route_reason: str | None = None
+    response_detail_level: ResponseDetailLevel = "balanced"
     latency_ms: int
     result: str
     outcome: str = "answered"

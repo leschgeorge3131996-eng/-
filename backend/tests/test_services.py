@@ -11,6 +11,7 @@ from backend.app.core.exceptions import ParseError
 from backend.app.core.config import Settings
 from backend.app.schemas.document import ParsedDocument, ParsedPage
 from backend.app.schemas.log import CallLogEntry
+from backend.app.schemas.task import ResponseDetailLevel
 from backend.app.services.chunk_service import ChunkService
 from backend.app.services.file_service import FileService
 from backend.app.services.log_service import LogService
@@ -118,14 +119,17 @@ def test_task_service_writes_log() -> None:
             endpoint="/api/summary",
             file_id=upload.file_id,
             user_input="请突出创新点",
+            response_detail_level="detailed",
         )
         logs = log_service.list_logs(limit=10)
 
         assert result.task_type == "summary"
+        assert result.response_detail_level == "detailed"
         assert result.request_id
         assert logs
         assert logs[0]["success"] is True
         assert logs[0]["task_type"] == "summary"
+        assert logs[0]["response_detail_level"] == "detailed"
     finally:
         cleanup_workspace(workspace)
 
@@ -151,6 +155,7 @@ class CountingModelClient(ModelClient):
         document_text: str,
         user_input: str | None = None,
         model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
     ):
         self.call_count += 1
         return super().call_model(
@@ -158,6 +163,7 @@ class CountingModelClient(ModelClient):
             document_text,
             user_input,
             model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
         )
 
 
@@ -166,6 +172,7 @@ class RecordingModelClient(ModelClient):
         super().__init__(settings=settings)
         self.last_document_text = ""
         self.last_task_type = ""
+        self.last_response_detail_level: ResponseDetailLevel = "balanced"
 
     def call_model(
         self,
@@ -173,14 +180,17 @@ class RecordingModelClient(ModelClient):
         document_text: str,
         user_input: str | None = None,
         model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
     ):
         self.last_task_type = task_type
         self.last_document_text = document_text
+        self.last_response_detail_level = response_detail_level
         return super().call_model(
             task_type,
             document_text,
             user_input,
             model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
         )
 
 
@@ -249,8 +259,8 @@ def test_log_service_summary_aggregates_metrics() -> None:
             "\n".join(
                 [
                     '{"request_id":"1","timestamp":"2026-04-15T01:00:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m1","route_tier":"lite","success":true,"outcome":"answered","latency_ms":100,"prompt_chars":10,"output_chars":20,"token_total":30,"cache_hit":false,"retrieval_status":"coverage","extra":{"citation_count":2}}',
-                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","route_tier":"none","success":true,"outcome":"refused","latency_ms":400,"prompt_chars":10,"output_chars":15,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","extra":{"citation_count":0}}',
-                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","route_tier":"pro","success":false,"outcome":"error","latency_ms":200,"prompt_chars":10,"output_chars":0,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":1}}',
+                    '{"request_id":"2","timestamp":"2026-04-15T01:01:00+00:00","endpoint":"/api/ask","task_type":"ask","model_name":"m1","route_tier":"none","response_detail_level":"concise","success":true,"outcome":"refused","latency_ms":400,"prompt_chars":10,"output_chars":15,"token_total":0,"cache_hit":false,"retrieval_status":"no_match","extra":{"citation_count":0}}',
+                    '{"request_id":"3","timestamp":"2026-04-15T01:02:00+00:00","endpoint":"/api/summary","task_type":"summary","model_name":"m2","route_tier":"pro","response_detail_level":"detailed","success":false,"outcome":"error","latency_ms":200,"prompt_chars":10,"output_chars":0,"token_total":40,"cache_hit":true,"retrieval_applied":true,"retrieval_status":"matched","error_type":"MODEL_SERVICE_ERROR","extra":{"citation_count":1}}',
                     "{bad json line}",
                 ]
             ),
@@ -276,6 +286,8 @@ def test_log_service_summary_aggregates_metrics() -> None:
         assert summary["by_outcome"]["answered"] == 1
         assert summary["by_outcome"]["refused"] == 1
         assert summary["by_outcome"]["error"] == 1
+        assert summary["by_response_detail_level"]["concise"] == 1
+        assert summary["by_response_detail_level"]["detailed"] == 1
         assert summary["by_route_tier"]["lite"] == 1
         assert summary["by_route_tier"]["none"] == 1
         assert summary["by_route_tier"]["pro"] == 1
@@ -306,18 +318,56 @@ def test_task_service_uses_cache_for_same_request() -> None:
             endpoint="/api/summary",
             file_id=upload.file_id,
             user_input="请总结",
+            response_detail_level="concise",
         )
         second = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
             user_input="请总结",
+            response_detail_level="concise",
         )
 
         assert first.cache_hit is False
         assert second.cache_hit is True
         assert model_client.call_count == 1
         assert first.result == second.result
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_task_service_separates_cache_by_response_detail_level() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        log_service = LogService(settings=settings)
+        model_client = CountingModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=log_service,
+        )
+        upload = file_service.save_upload("demo.txt", "缓存测试内容".encode("utf-8"))
+
+        concise = task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请总结",
+            response_detail_level="concise",
+        )
+        detailed = task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请总结",
+            response_detail_level="detailed",
+        )
+
+        assert concise.response_detail_level == "concise"
+        assert detailed.response_detail_level == "detailed"
+        assert model_client.call_count == 2
     finally:
         cleanup_workspace(workspace)
 

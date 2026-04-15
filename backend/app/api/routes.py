@@ -43,6 +43,7 @@ def ask_document(payload: AskRequest) -> ApiResponse:
         endpoint="/api/ask",
         file_id=payload.file_id,
         user_input=payload.question,
+        response_detail_level=payload.response_detail_level,
     )
     return success_response(result.model_dump(), request_id=result.request_id)
 
@@ -54,6 +55,7 @@ def summarize_document(payload: TaskRequest) -> ApiResponse:
         endpoint="/api/summary",
         file_id=payload.file_id,
         user_input=payload.instruction,
+        response_detail_level=payload.response_detail_level,
     )
     return success_response(result.model_dump(), request_id=result.request_id)
 
@@ -65,6 +67,7 @@ def outline_document(payload: TaskRequest) -> ApiResponse:
         endpoint="/api/outline",
         file_id=payload.file_id,
         user_input=payload.instruction,
+        response_detail_level=payload.response_detail_level,
     )
     return success_response(result.model_dump(), request_id=result.request_id)
 

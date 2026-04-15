@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from ..core.config import Settings, get_settings
 from ..core.exceptions import ModelServiceError
-from ..schemas.task import ModelResult, TaskType, TokenUsage
+from ..schemas.task import ModelResult, ResponseDetailLevel, TaskType, TokenUsage
 
 
 @dataclass(slots=True)
@@ -43,6 +43,7 @@ class ModelClient:
         document_text: str,
         user_input: str | None = None,
         model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
     ) -> ModelResult:
         source_document_chars = len(document_text)
         truncated_text = document_text[: self.settings.max_document_chars]
@@ -58,7 +59,12 @@ class ModelClient:
         prompt_chars = len(truncated_text) + len(user_input or "")
 
         if self.settings.use_mock_model or not self._has_real_model_config():
-            content = self._mock_response(task_type, truncated_text, user_input)
+            content = self._mock_response(
+                task_type,
+                truncated_text,
+                user_input,
+                response_detail_level=response_detail_level,
+            )
             return ModelResult(
                 content=content,
                 model_name=f"mock::{model_name}",
@@ -73,7 +79,12 @@ class ModelClient:
 
         payload = {
             "model": model_name,
-            "messages": self._build_messages(task_type, truncated_text, user_input),
+            "messages": self._build_messages(
+                task_type,
+                truncated_text,
+                user_input,
+                response_detail_level=response_detail_level,
+            ),
             "temperature": 0.2,
         }
         response_json = self._call_openai_compatible_api(payload)
@@ -151,9 +162,15 @@ class ModelClient:
         task_type: TaskType,
         document_text: str,
         user_input: str | None,
+        *,
+        response_detail_level: ResponseDetailLevel,
     ) -> list[dict[str, str]]:
+        detail_instruction = self._detail_instruction(response_detail_level, task_type)
         if task_type == "ask":
-            system_prompt = "你是文档问答助手。只能依据给定文档回答，回答要准确、简洁、结构清晰。"
+            system_prompt = (
+                "你是文档问答助手。只能依据给定文档回答，回答要准确、结构清晰。"
+                f"{detail_instruction}"
+            )
             user_prompt = textwrap.dedent(
                 f"""
                 文档内容如下：
@@ -164,7 +181,10 @@ class ModelClient:
                 """
             ).strip()
         elif task_type == "summary":
-            system_prompt = "你是文档摘要助手。请输出结构化摘要，突出关键信息、核心结论和可行动建议。"
+            system_prompt = (
+                "你是文档摘要助手。请输出结构化摘要，突出关键信息、核心结论和可行动建议。"
+                f"{detail_instruction}"
+            )
             user_prompt = textwrap.dedent(
                 f"""
                 文档内容如下：
@@ -175,7 +195,10 @@ class ModelClient:
                 """
             ).strip()
         else:
-            system_prompt = "你是提纲生成助手。请基于文档生成清晰、可展示的层级提纲。"
+            system_prompt = (
+                "你是提纲生成助手。请基于文档生成清晰、可展示的层级提纲。"
+                f"{detail_instruction}"
+            )
             user_prompt = textwrap.dedent(
                 f"""
                 文档内容如下：
@@ -190,6 +213,21 @@ class ModelClient:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
+
+    def _detail_instruction(
+        self,
+        response_detail_level: ResponseDetailLevel,
+        task_type: TaskType,
+    ) -> str:
+        if response_detail_level == "concise":
+            if task_type == "outline":
+                return " 输出尽量精炼，层级不要过深，每一项只保留必要信息。"
+            return " 输出尽量精炼，优先给关键结论，不展开冗余说明。"
+        if response_detail_level == "detailed":
+            if task_type == "outline":
+                return " 输出更详细的层级提纲，补充每页重点和展开方向。"
+            return " 输出更详细，适当补充背景、方法、依据和展开说明。"
+        return " 输出保持适中篇幅，兼顾完整性和可读性。"
 
     def _call_openai_compatible_api(self, payload: dict) -> dict:
         url = self._resolve_chat_url()
@@ -288,10 +326,17 @@ class ModelClient:
         task_type: TaskType,
         document_text: str,
         user_input: str | None,
+        response_detail_level: ResponseDetailLevel = "balanced",
     ) -> str:
         preview = document_text[:800].strip()
         lines = [line.strip() for line in preview.splitlines() if line.strip()]
         points = lines[:5] if lines else ["文档内容较短，建议上传更完整内容。"]
+        if response_detail_level == "concise":
+            max_points = 2
+        elif response_detail_level == "detailed":
+            max_points = 5
+        else:
+            max_points = 3
 
         if task_type == "ask":
             question = user_input or "未提供问题"
@@ -299,7 +344,7 @@ class ModelClient:
                 "【Mock 模型返回】\n"
                 f"问题：{question}\n\n"
                 "基于当前文档可见内容，相关信息如下：\n"
-                + "\n".join(f"- {point}" for point in points)
+                + "\n".join(f"- {point}" for point in points[:max_points])
             )
 
         if task_type == "summary":
@@ -308,11 +353,11 @@ class ModelClient:
                 "【Mock 模型返回】\n"
                 f"摘要要求：{instruction}\n\n"
                 "摘要：\n"
-                + "\n".join(f"- {point}" for point in points[:3])
+                + "\n".join(f"- {point}" for point in points[:max_points])
             )
 
         instruction = user_input or "默认提纲"
         rendered = "\n".join(
-            f"{index}. {point}" for index, point in enumerate(points[:4], start=1)
+            f"{index}. {point}" for index, point in enumerate(points[:max(3, max_points)], start=1)
         )
         return f"【Mock 模型返回】\n提纲要求：{instruction}\n\n{rendered}"

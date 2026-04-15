@@ -484,6 +484,11 @@ textarea {
   color: var(--success);
 }
 
+.badge-detail {
+  background: rgba(19, 34, 56, 0.1);
+  color: var(--navy);
+}
+
 .result-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

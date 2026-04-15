@@ -46,6 +46,7 @@ class LogService:
                 "by_task": {},
                 "by_model": {},
                 "by_outcome": {},
+                "by_response_detail_level": {},
                 "by_route_tier": {},
                 "by_retrieval_status": {},
                 "error_types": {},
@@ -82,6 +83,11 @@ class LogService:
             for entry in entries
             if entry.get("route_tier")
         )
+        response_detail_level_counter = Counter(
+            str(entry.get("response_detail_level"))
+            for entry in entries
+            if entry.get("response_detail_level")
+        )
         retrieval_status_counter = Counter(
             str(entry.get("retrieval_status"))
             for entry in entries
@@ -116,6 +122,7 @@ class LogService:
             "by_task": dict(by_task_counter),
             "by_model": dict(by_model_counter),
             "by_outcome": dict(outcome_counter),
+            "by_response_detail_level": dict(response_detail_level_counter),
             "by_route_tier": dict(route_tier_counter),
             "by_retrieval_status": dict(retrieval_status_counter),
             "error_types": dict(error_types_counter),
