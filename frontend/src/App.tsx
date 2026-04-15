@@ -31,7 +31,40 @@ const TASK_OPTIONS: Array<{
   }
 ];
 
+const TASK_LABELS: Record<TaskType, string> = {
+  summary: "摘要",
+  ask: "问答",
+  outline: "提纲生成"
+};
+
+const DEMO_ACTIONS: Array<{
+  label: string;
+  description: string;
+  taskType: TaskType;
+  input: string;
+}> = [
+  {
+    label: "示例摘要",
+    description: "快速验证摘要链路",
+    taskType: "summary",
+    input: "请用 3 条要点总结这个文档。"
+  },
+  {
+    label: "示例问答",
+    description: "验证检索与引用",
+    taskType: "ask",
+    input: "这个项目第一阶段要做什么？"
+  },
+  {
+    label: "示例提纲",
+    description: "验证结构化提纲生成",
+    taskType: "outline",
+    input: "请生成一个 5 页汇报提纲。"
+  }
+];
+
 type LoadStage = "idle" | "uploading" | "model";
+
 const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
 const MAX_RECENT_DOCUMENTS = 5;
@@ -183,6 +216,11 @@ function App() {
     setError(null);
   }
 
+  function applyDemoAction(task: TaskType, value: string) {
+    setTaskType(task);
+    setInput(value);
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -227,16 +265,27 @@ function App() {
     <div className="page">
       <main className="container">
         <section className="hero">
-          <p className="eyebrow">研答通 MVP</p>
-          <h1>文档上传、云端处理、结果返回、日志留痕</h1>
-          <p className="subtitle">
-            第一阶段只做最小闭环：上传 TXT / Markdown / PDF，选择任务，后端调用模型并返回结果。
-          </p>
+          <div className="hero-copy">
+            <p className="eyebrow">研答通</p>
+            <h1>为科研与智能办公准备的文档工作台</h1>
+            <p className="subtitle">
+              上传文档，完成摘要、问答和提纲生成，并通过来源片段、引用依据、统计与日志把结果变成可解释的工作流。
+            </p>
+          </div>
+          <div className="hero-pills">
+            <span className="hero-pill">页级结构</span>
+            <span className="hero-pill">轻量检索</span>
+            <span className="hero-pill">证据返回</span>
+            <span className="hero-pill">样例复跑</span>
+          </div>
         </section>
 
-        <section className="grid secondary-grid">
-          <article className="panel">
-            <h2>运行统计</h2>
+        <section className="dashboard-grid">
+          <article className="panel stats-panel">
+            <div className="section-head">
+              <p className="section-kicker">运行概览</p>
+              <h2>当前系统状态</h2>
+            </div>
             {logSummary ? (
               <div className="stats-grid">
                 <div className="stat-card">
@@ -269,115 +318,121 @@ function App() {
             )}
           </article>
 
-          <article className="panel">
-            <h2>Demo 模式</h2>
+          <article className="panel demo-panel">
+            <div className="section-head">
+              <p className="section-kicker">展示模式</p>
+              <h2>一键演示入口</h2>
+            </div>
             <p className="subtitle compact">
-              一键填充示例文档和常用指令，方便演示摘要、问答和提纲的完整链路。
+              先填充一份示例文档，再切换摘要、问答和提纲任务，快速演示完整链路。
             </p>
             <div className="demo-actions">
-              <button className="ghost-button" type="button" disabled={loading} onClick={loadDemoDocument}>
+              <button className="hero-button" type="button" disabled={loading} onClick={loadDemoDocument}>
                 填充示例文档
               </button>
-              <button
-                className="ghost-button"
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setTaskType("summary");
-                  setInput("请用 3 条要点总结这个文档。");
-                }}
-              >
-                示例摘要
-              </button>
-              <button
-                className="ghost-button"
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setTaskType("ask");
-                  setInput("这个项目第一阶段要做什么？");
-                }}
-              >
-                示例问答
-              </button>
-              <button
-                className="ghost-button"
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setTaskType("outline");
-                  setInput("请生成一个 5 页汇报提纲。");
-                }}
-              >
-                示例提纲
-              </button>
+              {DEMO_ACTIONS.map((action) => (
+                <button
+                  key={action.label}
+                  className="demo-card"
+                  type="button"
+                  disabled={loading}
+                  onClick={() => applyDemoAction(action.taskType, action.input)}
+                >
+                  <strong>{action.label}</strong>
+                  <span>{action.description}</span>
+                </button>
+              ))}
             </div>
           </article>
         </section>
 
-        <section className="panel">
-          <form className="form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span>上传文档</span>
-              <input
-                type="file"
-                accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
-                disabled={loading}
-                onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  setSelectedFile(file);
-                  if (file) {
-                    setUploadedMetadata(null);
-                    setResult(null);
-                    setError(null);
-                  }
-                }}
-              />
-            </label>
+        <section className="workspace">
+          <article className="panel control-panel">
+            <div className="section-head">
+              <p className="section-kicker">主工作区</p>
+              <h2>上传文档并启动任务</h2>
+            </div>
+            <form className="form" onSubmit={handleSubmit}>
+              <label className="field">
+                <span>上传文档</span>
+                <input
+                  type="file"
+                  accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
+                  disabled={loading}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    setSelectedFile(file);
+                    if (file) {
+                      setUploadedMetadata(null);
+                      setResult(null);
+                      setError(null);
+                    }
+                  }}
+                />
+              </label>
 
-            <label className="field">
-              <span>任务类型</span>
-              <select
-                value={taskType}
-                disabled={loading}
-                onChange={(event) => setTaskType(event.target.value as TaskType)}
-              >
-                {TASK_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className="field">
+                <span>任务类型</span>
+                <select
+                  value={taskType}
+                  disabled={loading}
+                  onChange={(event) => setTaskType(event.target.value as TaskType)}
+                >
+                  {TASK_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="field">
-              <span>问题或指令</span>
-              <textarea
-                rows={5}
-                value={input}
-                placeholder={currentOption.placeholder}
-                disabled={loading}
-                onChange={(event) => setInput(event.target.value)}
-              />
-            </label>
+              <label className="field">
+                <span>问题或指令</span>
+                <textarea
+                  rows={6}
+                  value={input}
+                  placeholder={currentOption.placeholder}
+                  disabled={loading}
+                  onChange={(event) => setInput(event.target.value)}
+                />
+              </label>
 
-            <button className="submit" type="submit" disabled={!canSubmit}>
-              {loading ? "处理中..." : "提交任务"}
-            </button>
-          </form>
-        </section>
+              <div className="control-actions">
+                <button className="submit" type="submit" disabled={!canSubmit}>
+                  {loading ? "处理中..." : "提交任务"}
+                </button>
+                <p className="control-hint">建议先用 Demo 模式体验完整链路，再换真实文档。</p>
+              </div>
+            </form>
 
-        <section className="grid">
-          <article className="panel">
-            <h2>当前文档</h2>
-            {uploadedMetadata ? (
-              <div className="meta">
-                <p>文件：{uploadedMetadata.original_name}</p>
-                <p>类型：{uploadedMetadata.file_type}</p>
-                <p>字符数：{uploadedMetadata.text_chars}</p>
-                <p>页数：{uploadedMetadata.page_count}</p>
-                <p>分块数：{uploadedMetadata.chunk_count}</p>
-                <p>状态：{uploadedMetadata.parse_status}</p>
+            <div className="document-brief">
+              <div className="section-head compact-head">
+                <p className="section-kicker">当前文档</p>
+                <h3>{uploadedMetadata ? uploadedMetadata.original_name : "暂无文档"}</h3>
+              </div>
+              {uploadedMetadata ? (
+                <div className="meta-grid">
+                  <div className="meta-chip">
+                    <span>类型</span>
+                    <strong>{uploadedMetadata.file_type}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>字符数</span>
+                    <strong>{uploadedMetadata.text_chars}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>页数</span>
+                    <strong>{uploadedMetadata.page_count}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>分块数</span>
+                    <strong>{uploadedMetadata.chunk_count}</strong>
+                  </div>
+                </div>
+              ) : (
+                <p className="empty">上传后这里会显示文档规模与结构信息。</p>
+              )}
+              {uploadedMetadata ? (
                 <div className="inline-actions">
                   <button
                     className="ghost-button"
@@ -392,26 +447,31 @@ function App() {
                     清空当前文档
                   </button>
                 </div>
-              </div>
-            ) : (
-              <p className="empty">尚未上传文档。</p>
-            )}
+              ) : null}
+            </div>
           </article>
 
-          <article className="panel">
-            <h2>处理结果</h2>
+          <article className="panel result-panel">
+            <div className="section-head">
+              <p className="section-kicker">结果舞台</p>
+              <h2>{TASK_LABELS[taskType]}结果</h2>
+            </div>
             {error ? <p className="error">{error}</p> : null}
             {!error && loading ? <p className="status">{describeLoadStage(loadStage)}</p> : null}
-            {!error && !loading && !result ? <p className="empty">提交任务后，这里会显示结果。</p> : null}
+            {!error && !loading && !result ? (
+              <p className="empty">提交任务后，这里会展示完整结果、来源信息和路由详情。</p>
+            ) : null}
             {!error && result ? (
               <div className="result">
-                <div className="result-meta">
-                  <p>任务：{result.task_type}</p>
+                <div className="result-badges">
+                  <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
+                  <span className="badge badge-route">{result.route_tier ?? "default"}</span>
+                  <span className="badge badge-outcome">{result.outcome}</span>
+                </div>
+                <div className="result-meta-grid">
                   <p>模型：{result.model_name}</p>
-                  {result.route_tier ? <p>路由层级：{result.route_tier}</p> : null}
                   {result.route_reason ? <p>路由原因：{result.route_reason}</p> : null}
                   <p>耗时：{result.latency_ms} ms</p>
-                  <p>结果类型：{result.outcome}</p>
                   <p>请求 ID：{result.request_id}</p>
                 </div>
                 {result.cache_hit ? (
@@ -420,9 +480,7 @@ function App() {
                 {result.retrieval_applied ? (
                   <p className="status">
                     已从 {result.retrieved_chunk_count} 个片段构造问答上下文
-                    {result.retrieved_pages.length > 0
-                      ? `，涉及页码：${result.retrieved_pages.join(", ")}`
-                      : ""}
+                    {result.retrieved_pages.length > 0 ? `，涉及页码：${result.retrieved_pages.join(", ")}` : ""}
                     。
                   </p>
                 ) : null}
@@ -437,9 +495,7 @@ function App() {
                     <div className="citation-list">
                       {result.citations.map((citation) => (
                         <article key={citation.chunk_id} className="citation-card">
-                          <p className="citation-meta">
-                            页码：{citation.page_numbers.join(", ")}
-                          </p>
+                          <p className="citation-meta">页码：{citation.page_numbers.join(", ")}</p>
                           <p>{citation.snippet}</p>
                         </article>
                       ))}
@@ -452,9 +508,7 @@ function App() {
                     <div className="citation-list">
                       {result.source_chunks.map((chunk) => (
                         <article key={chunk.chunk_id} className="citation-card">
-                          <p className="citation-meta">
-                            页码：{chunk.page_numbers.join(", ")}
-                          </p>
+                          <p className="citation-meta">页码：{chunk.page_numbers.join(", ")}</p>
                           <p>{chunk.snippet}</p>
                         </article>
                       ))}
@@ -479,9 +533,12 @@ function App() {
           </article>
         </section>
 
-        <section className="grid secondary-grid">
+        <section className="grid secondary-grid history-section">
           <article className="panel">
-            <h2>最近文档</h2>
+            <div className="section-head compact-head">
+              <p className="section-kicker">文档记录</p>
+              <h2>最近文档</h2>
+            </div>
             {recentDocuments.length === 0 ? (
               <p className="empty">最近上传的文档会显示在这里，便于复用。</p>
             ) : (
@@ -519,7 +576,10 @@ function App() {
           </article>
 
           <article className="panel">
-            <h2>最近结果</h2>
+            <div className="section-head compact-head">
+              <p className="section-kicker">结果轨迹</p>
+              <h2>最近结果</h2>
+            </div>
             {recentResults.length === 0 ? (
               <p className="empty">最近 5 次任务结果会显示在这里，方便回看演示。</p>
             ) : (
