@@ -91,6 +91,17 @@ function writeStorage<T>(key: string, value: T): void {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+function isSameRecentDocument(left: RecentDocument, right: RecentDocument): boolean {
+  if (
+    left.document_fingerprint &&
+    right.document_fingerprint &&
+    left.document_fingerprint === right.document_fingerprint
+  ) {
+    return true;
+  }
+  return left.original_name === right.original_name;
+}
+
 function describeLoadStage(stage: LoadStage): string {
   if (stage === "uploading") {
     return "正在上传并解析文档...";
@@ -177,6 +188,7 @@ function App() {
     const nextDocument: RecentDocument = {
       file_id: metadata.file_id,
       original_name: metadata.original_name,
+      document_fingerprint: metadata.document_fingerprint,
       file_type: metadata.file_type,
       text_chars: metadata.text_chars,
       page_count: metadata.page_count,
@@ -188,7 +200,7 @@ function App() {
     setRecentDocuments((current) => {
       const next = [
         nextDocument,
-        ...current.filter((item) => item.file_id !== metadata.file_id)
+        ...current.filter((item) => !isSameRecentDocument(item, nextDocument))
       ];
       return next.slice(0, MAX_RECENT_DOCUMENTS);
     });
@@ -474,10 +486,24 @@ function App() {
                   <span className="badge badge-outcome">{result.outcome}</span>
                 </div>
                 <div className="result-meta-grid">
-                  <p>模型：{result.model_name}</p>
-                  {result.route_reason ? <p>路由原因：{result.route_reason}</p> : null}
-                  <p>耗时：{result.latency_ms} ms</p>
-                  <p>请求 ID：{result.request_id}</p>
+                  <div className="result-meta-card">
+                    <span>模型</span>
+                    <strong>{result.model_name}</strong>
+                  </div>
+                  {result.route_reason ? (
+                    <div className="result-meta-card">
+                      <span>路由原因</span>
+                      <strong>{result.route_reason}</strong>
+                    </div>
+                  ) : null}
+                  <div className="result-meta-card">
+                    <span>耗时</span>
+                    <strong>{result.latency_ms} ms</strong>
+                  </div>
+                  <div className="result-meta-card">
+                    <span>请求 ID</span>
+                    <strong>{result.request_id}</strong>
+                  </div>
                 </div>
                 {result.cache_hit ? (
                   <p className="cache-hit">本次结果命中本地缓存，未重复调用云端模型。</p>
@@ -527,7 +553,7 @@ function App() {
                   </p>
                 ) : null}
                 {result.token_usage?.total_tokens ? (
-                  <p className="status">
+                  <p className="status token-usage">
                     Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} · 输出{" "}
                     {result.token_usage.completion_tokens ?? 0} · 总计 {result.token_usage.total_tokens}
                   </p>
@@ -562,7 +588,7 @@ function App() {
                         text_chars: item.text_chars,
                         page_count: item.page_count,
                         chunk_count: item.chunk_count,
-                        document_fingerprint: null,
+                        document_fingerprint: item.document_fingerprint ?? null,
                         parse_status: item.parse_status
                       });
                       setSelectedFile(null);

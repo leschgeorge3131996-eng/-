@@ -72,6 +72,7 @@ export interface TaskResult {
 export interface RecentDocument {
   file_id: string;
   original_name: string;
+  document_fingerprint?: string | null;
   file_type: string;
   text_chars: number;
   page_count: number;
