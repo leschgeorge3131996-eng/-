@@ -266,8 +266,17 @@ function App() {
       <main className="container">
         <section className="hero">
           <div className="hero-copy">
-            <p className="eyebrow">研答通</p>
-            <h1>为科研与智能办公准备的文档工作台</h1>
+            <p className="eyebrow">面向科研与智能办公的文档工作台</p>
+            <h1 className="brandmark">研答通</h1>
+            <div className="hero-flow" aria-label="文档任务流程">
+              <span className="flow-step">上传</span>
+              <span className="flow-separator">·</span>
+              <span className="flow-step">解析</span>
+              <span className="flow-separator">·</span>
+              <span className="flow-step">检索</span>
+              <span className="flow-separator">·</span>
+              <span className="flow-step">生成</span>
+            </div>
             <p className="subtitle">
               上传文档，完成摘要、问答和提纲生成，并通过来源片段、引用依据、统计与日志把结果变成可解释的工作流。
             </p>
@@ -283,8 +292,7 @@ function App() {
         <section className="dashboard-grid">
           <article className="panel stats-panel">
             <div className="section-head">
-              <p className="section-kicker">运行概览</p>
-              <h2>当前系统状态</h2>
+              <h2 className="panel-title">当前系统状态</h2>
             </div>
             {logSummary ? (
               <div className="stats-grid">
@@ -320,8 +328,7 @@ function App() {
 
           <article className="panel demo-panel">
             <div className="section-head">
-              <p className="section-kicker">展示模式</p>
-              <h2>一键演示入口</h2>
+              <h2 className="panel-title">一键演示入口</h2>
             </div>
             <p className="subtitle compact">
               先填充一份示例文档，再切换摘要、问答和提纲任务，快速演示完整链路。
@@ -349,8 +356,7 @@ function App() {
         <section className="workspace">
           <article className="panel control-panel">
             <div className="section-head">
-              <p className="section-kicker">主工作区</p>
-              <h2>上传文档并启动任务</h2>
+              <h2 className="panel-title">上传文档并启动任务</h2>
             </div>
             <form className="form" onSubmit={handleSubmit}>
               <label className="field">
@@ -453,8 +459,7 @@ function App() {
 
           <article className="panel result-panel">
             <div className="section-head">
-              <p className="section-kicker">结果舞台</p>
-              <h2>{TASK_LABELS[taskType]}结果</h2>
+              <h2 className="panel-title">{TASK_LABELS[taskType]}结果</h2>
             </div>
             {error ? <p className="error">{error}</p> : null}
             {!error && loading ? <p className="status">{describeLoadStage(loadStage)}</p> : null}
@@ -523,8 +528,8 @@ function App() {
                 ) : null}
                 {result.token_usage?.total_tokens ? (
                   <p className="status">
-                    Token 用量：{result.token_usage.prompt_tokens ?? 0} / {result.token_usage.completion_tokens ?? 0} /{" "}
-                    {result.token_usage.total_tokens}
+                    Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} · 输出{" "}
+                    {result.token_usage.completion_tokens ?? 0} · 总计 {result.token_usage.total_tokens}
                   </p>
                 ) : null}
                 <pre>{result.result}</pre>
@@ -536,8 +541,7 @@ function App() {
         <section className="grid secondary-grid history-section">
           <article className="panel">
             <div className="section-head compact-head">
-              <p className="section-kicker">文档记录</p>
-              <h2>最近文档</h2>
+              <h2 className="panel-title">最近文档</h2>
             </div>
             {recentDocuments.length === 0 ? (
               <p className="empty">最近上传的文档会显示在这里，便于复用。</p>
@@ -577,8 +581,7 @@ function App() {
 
           <article className="panel">
             <div className="section-head compact-head">
-              <p className="section-kicker">结果轨迹</p>
-              <h2>最近结果</h2>
+              <h2 className="panel-title">最近结果</h2>
             </div>
             {recentResults.length === 0 ? (
               <p className="empty">最近 5 次任务结果会显示在这里，方便回看演示。</p>

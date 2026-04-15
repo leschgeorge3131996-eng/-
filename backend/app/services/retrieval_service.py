@@ -114,18 +114,12 @@ class RetrievalService:
         return score
 
     def _normalize_query(self, query: str) -> str:
-        normalized = re.sub(r"[^\w\u4e00-\u9fff]+", " ", query.lower()).strip()
-        for stopword in sorted(self.stopwords, key=len, reverse=True):
-            normalized = normalized.replace(stopword, " ")
-        normalized = re.sub(r"\s+", " ", normalized).strip()
-        return normalized
+        return " ".join(self._query_tokens(query))
 
     def _extract_terms(self, query: str) -> list[str]:
         terms: list[str] = []
-        for token in re.findall(r"[A-Za-z0-9]+|[\u4e00-\u9fff]+", query.lower()):
+        for token in self._query_tokens(query):
             if not token:
-                continue
-            if token in self.stopwords:
                 continue
             if re.fullmatch(r"[\u4e00-\u9fff]+", token):
                 terms.append(token)
@@ -141,6 +135,41 @@ class RetrievalService:
                 terms.extend(english_terms)
 
         return self._dedupe_terms(terms)
+
+    def _query_tokens(self, query: str) -> list[str]:
+        normalized = re.sub(r"[^\w\u4e00-\u9fff]+", " ", query.lower()).strip()
+        raw_tokens = re.findall(r"[A-Za-z0-9]+|[\u4e00-\u9fff]+", normalized)
+        if not raw_tokens:
+            return []
+
+        cjk_stopwords = sorted(
+            [word for word in self.stopwords if re.fullmatch(r"[\u4e00-\u9fff]+", word)],
+            key=len,
+            reverse=True,
+        )
+
+        tokens: list[str] = []
+        for token in raw_tokens:
+            if token in self.stopwords:
+                continue
+
+            if re.fullmatch(r"[\u4e00-\u9fff]+", token):
+                fragments = [token]
+                for stopword in cjk_stopwords:
+                    next_fragments: list[str] = []
+                    for fragment in fragments:
+                        next_fragments.extend(fragment.split(stopword))
+                    fragments = next_fragments
+
+                for fragment in fragments:
+                    cleaned = fragment.strip()
+                    if cleaned and cleaned not in self.stopwords:
+                        tokens.append(cleaned)
+                continue
+
+            tokens.append(token)
+
+        return tokens
 
     def _title_bonus(self, terms: list[str], text: str) -> float:
         if not terms:

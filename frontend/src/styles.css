@@ -1,24 +1,26 @@
 :root {
-  --ink-strong: #1c2633;
-  --ink-muted: #617087;
-  --ink-soft: #8491a4;
-  --surface-1: rgba(255, 251, 244, 0.92);
-  --surface-2: rgba(245, 239, 229, 0.88);
-  --surface-3: rgba(255, 255, 255, 0.75);
-  --line-soft: rgba(135, 147, 166, 0.24);
-  --line-strong: rgba(44, 63, 85, 0.16);
-  --accent: #b6541f;
-  --accent-deep: #8c3b16;
-  --accent-soft: rgba(182, 84, 31, 0.14);
+  --ink-strong: #1e2430;
+  --ink-muted: #59667c;
+  --ink-soft: #7a879a;
+  --surface-1: rgba(255, 253, 247, 0.95);
+  --surface-2: rgba(243, 236, 225, 0.9);
+  --surface-3: rgba(255, 255, 255, 0.82);
+  --line-soft: rgba(112, 125, 146, 0.2);
+  --line-strong: rgba(31, 43, 60, 0.16);
+  --accent: #ad4c23;
+  --accent-deep: #7a3317;
+  --accent-soft: rgba(173, 76, 35, 0.16);
+  --navy: #132238;
+  --navy-soft: rgba(19, 34, 56, 0.08);
   --success: #1f6a4e;
   --warning: #935d11;
   --error: #b1351a;
   background:
-    radial-gradient(circle at top left, rgba(208, 168, 119, 0.28), transparent 38%),
-    radial-gradient(circle at top right, rgba(102, 133, 164, 0.22), transparent 34%),
-    linear-gradient(180deg, #f3efe8 0%, #eef2f5 48%, #e6edf2 100%);
+    radial-gradient(circle at top left, rgba(173, 76, 35, 0.22), transparent 32%),
+    radial-gradient(circle at 85% 10%, rgba(19, 34, 56, 0.16), transparent 28%),
+    linear-gradient(180deg, #f7f2e8 0%, #eef1f4 54%, #e5ebf0 100%);
   color: var(--ink-strong);
-  font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+  font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   line-height: 1.6;
   font-weight: 400;
 }
@@ -46,92 +48,146 @@ textarea {
 
 .page {
   min-height: 100vh;
-  padding: 36px 18px 56px;
+  padding: 20px 14px 36px;
 }
 
 .container {
-  max-width: 1240px;
+  max-width: 1220px;
   margin: 0 auto;
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: end;
-  margin-bottom: 28px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 18px 24px;
+  border: 1px solid rgba(173, 76, 35, 0.12);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(173, 76, 35, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(255, 252, 246, 0.96), rgba(247, 241, 232, 0.92));
+  box-shadow:
+    0 22px 42px rgba(28, 38, 51, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
 }
 
 .hero-copy {
-  max-width: 760px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  max-width: 780px;
 }
 
 .eyebrow {
-  margin: 0 0 10px;
+  margin: 0;
   color: var(--accent);
-  font-size: 13px;
+  font-size: clamp(19px, 2.3vw, 25px);
   font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.hero h1 {
+.brandmark {
   margin: 0;
-  font-size: clamp(38px, 6vw, 68px);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  color: var(--accent);
+  font-size: clamp(36px, 5.8vw, 62px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  text-shadow: 0 8px 30px rgba(173, 76, 35, 0.16);
+}
+
+.hero-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.flow-step {
+  padding: 8px 12px;
+  border: 1px solid rgba(173, 76, 35, 0.16);
+  border-radius: 999px;
+  background: rgba(173, 76, 35, 0.08);
+  color: var(--accent-deep);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.flow-separator {
+  color: rgba(122, 51, 23, 0.42);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .subtitle {
-  margin: 16px 0 0;
+  margin: 0;
   color: var(--ink-muted);
-  font-size: 17px;
+  font-size: 15px;
+  line-height: 1.75;
+  max-width: 60ch;
 }
 
 .subtitle.compact {
   margin-top: 2px;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .hero-pills {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 12px;
+  align-content: center;
+  justify-content: end;
+  justify-self: end;
+  padding: 0;
 }
 
 .hero-pill {
-  padding: 10px 14px;
-  border: 1px solid var(--line-soft);
+  padding: 12px 16px;
+  border: 1px solid rgba(19, 34, 56, 0.12);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.56);
-  color: var(--ink-muted);
-  font-size: 13px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 108px;
 }
 
 .dashboard-grid,
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 .workspace {
   display: grid;
   grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
-  gap: 20px;
-  margin-top: 22px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .secondary-grid,
 .history-section {
-  margin-top: 22px;
+  margin-top: 16px;
 }
 
 .panel {
-  padding: 24px;
+  padding: 18px;
   border: 1px solid var(--line-soft);
-  border-radius: 28px;
+  border-radius: 24px;
   background: linear-gradient(180deg, var(--surface-1), var(--surface-3));
   box-shadow:
     0 18px 42px rgba(35, 48, 68, 0.08),
@@ -140,69 +196,75 @@ textarea {
 }
 
 .stats-panel {
-  background: linear-gradient(180deg, rgba(255, 252, 245, 0.95), rgba(248, 243, 235, 0.88));
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.97), rgba(248, 242, 234, 0.9));
 }
 
 .demo-panel {
   background:
-    radial-gradient(circle at top right, rgba(182, 84, 31, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(255, 251, 244, 0.96), rgba(245, 239, 229, 0.9));
+    radial-gradient(circle at top right, rgba(173, 76, 35, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 252, 245, 0.98), rgba(246, 239, 228, 0.92));
 }
 
 .control-panel {
   background:
-    radial-gradient(circle at top left, rgba(182, 84, 31, 0.1), transparent 36%),
-    linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(247, 241, 232, 0.9));
+    radial-gradient(circle at top left, rgba(173, 76, 35, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 241, 232, 0.92));
 }
 
 .result-panel {
   background:
-    radial-gradient(circle at top right, rgba(75, 106, 143, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(243, 247, 252, 0.88));
+    radial-gradient(circle at top right, rgba(19, 34, 56, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 246, 252, 0.92));
+  border-color: rgba(19, 34, 56, 0.14);
 }
 
 .section-head {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .compact-head {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .section-kicker {
   margin: 0 0 6px;
   color: var(--accent);
-  font-size: 12px;
+  font-size: 19px;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .section-head h2,
 .section-head h3 {
   margin: 0;
-  font-size: clamp(26px, 3vw, 34px);
-  line-height: 1.05;
+  font-size: clamp(17px, 1.9vw, 22px);
+  line-height: 1.08;
+}
+
+.panel-title {
+  color: var(--accent);
 }
 
 .compact-head h2,
 .compact-head h3 {
-  font-size: 26px;
+  font-size: 17px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .stat-card {
   display: grid;
   gap: 8px;
-  padding: 16px;
-  border: 1px solid rgba(177, 188, 205, 0.32);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.74);
+  padding: 12px;
+  border: 1px solid rgba(19, 34, 56, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .stat-card span {
@@ -211,14 +273,14 @@ textarea {
 }
 
 .stat-card strong {
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1;
 }
 
 .demo-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .hero-button,
@@ -243,12 +305,12 @@ textarea {
 }
 
 .hero-button {
-  padding: 13px 18px;
+  padding: 11px 16px;
 }
 
 .submit {
   width: fit-content;
-  padding: 14px 24px;
+  padding: 12px 20px;
 }
 
 .hero-button:hover,
@@ -279,33 +341,33 @@ textarea {
   display: grid;
   gap: 6px;
   width: 100%;
-  padding: 15px 16px;
-  border: 1px solid rgba(182, 188, 198, 0.4);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
+  padding: 12px 14px;
+  border: 1px solid rgba(182, 188, 198, 0.36);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
   text-align: left;
   cursor: pointer;
 }
 
 .demo-card strong,
 .history-card strong {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .demo-card span,
 .history-card span {
   color: var(--ink-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .form {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .field {
   display: grid;
-  gap: 9px;
+  gap: 7px;
 }
 
 .field span,
@@ -317,20 +379,20 @@ textarea {
 .field select,
 .field textarea {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(185, 195, 209, 0.65);
-  border-radius: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(185, 195, 209, 0.54);
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.86);
 }
 
 .field textarea {
   resize: vertical;
-  min-height: 142px;
+  min-height: 118px;
 }
 
 .control-actions {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -338,27 +400,27 @@ textarea {
 .control-hint {
   margin: 0;
   color: var(--ink-muted);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .document-brief {
-  margin-top: 20px;
-  padding-top: 18px;
+  margin-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--line-soft);
 }
 
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .meta-chip {
   display: grid;
   gap: 6px;
-  padding: 14px;
-  border: 1px solid rgba(185, 195, 209, 0.45);
-  border-radius: 18px;
+  padding: 12px;
+  border: 1px solid rgba(185, 195, 209, 0.36);
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.68);
 }
 
@@ -368,12 +430,12 @@ textarea {
 }
 
 .meta-chip strong {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .result {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .result-badges {
@@ -383,9 +445,9 @@ textarea {
 }
 
 .badge {
-  padding: 8px 12px;
+  padding: 7px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -409,31 +471,34 @@ textarea {
 .result-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
+  gap: 6px 12px;
 }
 
 .result-meta-grid p,
 .citation-card p {
   margin: 0;
+  font-size: 14px;
 }
 
 .result pre {
   margin: 2px 0 0;
-  padding: 18px;
-  border-radius: 20px;
-  background: #192130;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #182132, #101827);
   color: #f7f6f2;
   white-space: pre-wrap;
   word-break: break-word;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  font-size: 14px;
 }
 
 .citations {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .citations h3 {
   margin: 0 0 10px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .citation-list,
@@ -443,20 +508,20 @@ textarea {
 }
 
 .citation-card {
-  padding: 13px 15px;
+  padding: 11px 13px;
   border: 1px solid rgba(183, 190, 203, 0.45);
-  border-radius: 16px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.74);
 }
 
 .citation-meta {
   margin-bottom: 6px !important;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .inline-actions {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .status,
@@ -482,7 +547,8 @@ textarea {
   }
 
   .hero-pills {
-    justify-content: flex-start;
+    justify-content: start;
+    justify-self: start;
   }
 
   .workspace {

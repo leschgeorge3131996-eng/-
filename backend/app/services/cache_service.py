@@ -9,7 +9,7 @@ from ..core.config import Settings, get_settings
 
 
 class CacheService:
-    cache_version = "v3"
+    cache_version = "v5"
 
     def __init__(self, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()

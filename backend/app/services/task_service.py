@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import logging
+import re
 from datetime import datetime, timezone
 from time import perf_counter
 from uuid import uuid4
 
 from ..core.exceptions import AppError
+from ..schemas.document import ParsedChunk
 from ..schemas.log import CallLogEntry
 from ..schemas.task import Citation, TaskResult, TaskType
 from .cache_service import CacheService
@@ -82,22 +84,11 @@ class TaskService:
                 retrieved_pages = sorted(
                     {page for chunk in selected_chunks for page in chunk.page_numbers}
                 )
-                chunk_refs = [
-                    Citation(
-                        chunk_id=chunk.chunk_id,
-                        page_numbers=chunk.page_numbers,
-                        snippet=(
-                            chunk.text[:220].strip() + "..."
-                            if len(chunk.text) > 220
-                            else chunk.text
-                        ),
-                        )
-                        for chunk in selected_chunks
-                    ]
                 if task_type == "ask":
-                    citations = chunk_refs
+                    citations = [self._build_chunk_ref(chunk) for chunk in selected_chunks]
                 else:
-                    source_chunks = chunk_refs
+                    display_chunks = self._select_display_chunks(selected_chunks, limit=3)
+                    source_chunks = [self._build_chunk_ref(chunk) for chunk in display_chunks]
             if task_type == "ask" and selected_chunks:
                 retrieval_applied = True
 
@@ -169,7 +160,7 @@ class TaskService:
             route_decision = self.model_client.resolve_route(
                 task_type=task_type,
                 user_input=user_input,
-                source_document_chars=len(raw_document_text),
+                source_document_chars=len(document_text) if document_text else len(raw_document_text),
             )
             resolved_model_name = route_decision.model_name
             route_tier = route_decision.route_tier
@@ -425,3 +416,159 @@ class TaskService:
             self.log_service.write_log(entry)
         except Exception:
             logger.exception("Failed to write call log")
+
+    def _build_chunk_ref(self, chunk) -> Citation:
+        return Citation(
+            chunk_id=chunk.chunk_id,
+            page_numbers=chunk.page_numbers,
+            snippet=self._build_display_snippet(chunk.text),
+        )
+
+    def _select_display_chunks(
+        self,
+        chunks: list[ParsedChunk],
+        *,
+        limit: int,
+    ) -> list[ParsedChunk]:
+        if len(chunks) <= limit:
+            return chunks
+
+        scored = [
+            (self._score_display_chunk(chunk.text, index=index), index, chunk)
+            for index, chunk in enumerate(chunks)
+        ]
+        scored.sort(
+            key=lambda item: (
+                -item[0],
+                item[2].page_numbers[0] if item[2].page_numbers else 0,
+                item[1],
+            )
+        )
+
+        selected: list[tuple[int, ParsedChunk]] = []
+        used_pages: set[int] = set()
+        for _, index, chunk in scored:
+            page_set = set(chunk.page_numbers)
+            if used_pages & page_set and len(selected) < limit - 1:
+                continue
+            selected.append((index, chunk))
+            used_pages.update(page_set)
+            if len(selected) >= limit:
+                break
+
+        if len(selected) < limit:
+            existing_ids = {chunk.chunk_id for _, chunk in selected}
+            for _, index, chunk in scored:
+                if chunk.chunk_id in existing_ids:
+                    continue
+                selected.append((index, chunk))
+                if len(selected) >= limit:
+                    break
+
+        selected.sort(key=lambda item: item[0])
+        return [chunk for _, chunk in selected]
+
+    def _build_display_snippet(self, text: str, *, limit: int = 220) -> str:
+        cleaned_lines: list[str] = []
+        for raw_line in text.replace("\x00", "").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            if self._is_display_artifact(line):
+                continue
+            normalized = self._normalize_display_line(line)
+            if normalized:
+                cleaned_lines.append(normalized)
+
+        snippet = " ".join(cleaned_lines)
+        if not snippet:
+            snippet = self._normalize_display_line(text)
+
+        if len(snippet) <= limit:
+            return snippet
+        return snippet[:limit].rstrip() + "..."
+
+    def _score_display_chunk(self, text: str, *, index: int = 0) -> float:
+        snippet = self._build_display_snippet(text, limit=280)
+        lowered = snippet.lower()
+        cjk_count = sum("\u4e00" <= char <= "\u9fff" for char in snippet)
+        digit_count = sum(char.isdigit() for char in snippet)
+        alpha_count = sum(char.isalpha() for char in snippet)
+
+        score = 0.0
+        score += min(len(snippet), 220) / 36
+        score += min(cjk_count, 120) / 28
+
+        if index == 0:
+            score += 1.5
+
+        for keyword in ("摘要", "引言", "研究", "方法", "实验", "结果", "结论", "讨论"):
+            if keyword in snippet:
+                score += 2.0
+
+        for keyword in ("abstract", "introduction", "method", "result", "conclusion"):
+            if keyword in lowered:
+                score += 1.2
+
+        noisy_markers = (
+            "table",
+            "workflow",
+            "goal:",
+            "option",
+            "answer",
+            "thought",
+            "prompt engineering",
+            "@mail",
+        )
+        if any(marker in lowered for marker in noisy_markers):
+            score -= 7.5
+
+        if "第" in snippet and "页" in snippet and digit_count >= 4:
+            score -= 4.0
+
+        if digit_count >= max(10, len(snippet) // 5):
+            score -= 3.0
+
+        if alpha_count > cjk_count and alpha_count >= 40:
+            score -= 2.5
+
+        if re.search(r"([\u4e00-\u9fff])(?:\s+\1){1,}", text):
+            score -= 2.0
+
+        return score
+
+    def _normalize_display_line(self, text: str) -> str:
+        text = text.replace("\x00", " ")
+        text = re.sub(r"(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])", "", text)
+        text = re.sub(r"([\u4e00-\u9fff])\1{2,}", r"\1", text)
+        text = re.sub(r"\s+", " ", text)
+        return text.strip()
+
+    def _is_display_artifact(self, line: str) -> bool:
+        normalized = re.sub(r"\s+", "", line).lower()
+        if not normalized:
+            return True
+
+        artifact_patterns = (
+            "第二十三届中国计算语言学大会论文集",
+            "中国中文信息学会计算语言学专业委员会",
+            "creativecommons attribution 4.0 international license",
+            "ccl2024",
+            "卷3：评测报告",
+        )
+        if any(pattern in normalized for pattern in artifact_patterns):
+            return True
+
+        if re.fullmatch(r"[\[\]()（）\-—·,.，。:：;；/\\\d\s]+", line):
+            return True
+
+        digit_count = sum(char.isdigit() for char in line)
+        alpha_count = sum(char.isalpha() for char in line)
+        cjk_count = sum("\u4e00" <= char <= "\u9fff" for char in line)
+        if digit_count >= 8 and cjk_count <= 4 and alpha_count <= 18:
+            return True
+
+        if digit_count >= max(6, len(line) // 3) and line.count(" ") >= 4:
+            return True
+
+        return False

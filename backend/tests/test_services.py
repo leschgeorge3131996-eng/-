@@ -427,6 +427,97 @@ def test_summary_uses_chunk_coverage_context() -> None:
         cleanup_workspace(workspace)
 
 
+def test_summary_planner_responds_to_instruction_intent() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        model_client = RecordingModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "intent.md",
+            (
+                "# 背景\n\n"
+                + ("这是研究背景。" * 80)
+                + "\n\n# 数据集\n\n"
+                + ("这里介绍数据集构成与标注方式。" * 80)
+                + "\n\n# 方法\n\n"
+                + ("这里重点介绍方法设计与实现。" * 80)
+                + "\n\n# 消融实验\n\n"
+                + ("这里介绍消融实验设置与比较结果。" * 80)
+                + "\n\n# 实验结果\n\n"
+                + ("这里重点介绍实验结果和性能表现。" * 80)
+                + "\n\n# 误差分析\n\n"
+                + ("这里分析模型误差与失败案例。" * 80)
+                + "\n\n# 结论\n\n"
+                + ("这里给出最终结论。" * 50)
+                + "\n\n# 附录\n\n"
+                + ("这里是补充说明与附录内容。" * 60)
+            ).encode("utf-8"),
+        )
+
+        task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请重点总结实验结果",
+        )
+        experiment_text = model_client.last_document_text
+
+        task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请重点总结方法部分",
+        )
+        method_text = model_client.last_document_text
+
+        assert "实验结果" in experiment_text
+        assert "方法设计" in method_text
+        assert experiment_text != method_text
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_summary_source_chunks_are_cleaned_for_display() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "cleaning.md",
+            (
+                "任 任 任 任务 务 务报 报 报告 告 告\n\n"
+                "第二十三届中国计算语言学大会论文集\n\n"
+                "这里是一段正常的研究说明，应该保留在来源片段里。"
+            ).encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="summary",
+            endpoint="/api/summary",
+            file_id=upload.file_id,
+            user_input="请总结",
+        )
+
+        assert result.source_chunks
+        snippet = result.source_chunks[0].snippet
+        assert "任 任 任" not in snippet
+        assert "第二十三届中国计算语言学大会论文集" not in snippet
+        assert "正常的研究说明" in snippet
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_task_service_uses_task_tier_route_when_configured() -> None:
     workspace = make_workspace()
     try:
@@ -506,3 +597,11 @@ def test_retrieval_service_handles_filler_words_and_title_bonus() -> None:
 
     assert selected
     assert "第一阶段目标" in selected[0].text
+
+
+def test_retrieval_normalize_query_preserves_english_tokens() -> None:
+    retrieval = RetrievalService()
+
+    normalized = retrieval._normalize_query("what is the architecture")
+
+    assert normalized == "architecture"
