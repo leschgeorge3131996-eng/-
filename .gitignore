@@ -26,6 +26,7 @@ data/uploads/*
 data/parsed/*
 data/logs/*
 data/cache/*
+data/sessions/*
 !data/uploads/.gitkeep
 !data/parsed/.gitkeep
 !data/logs/.gitkeep

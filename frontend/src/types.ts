@@ -1,5 +1,11 @@
 export type TaskType = "summary" | "ask" | "outline";
 export type ResponseDetailLevel = "concise" | "balanced" | "detailed";
+export type EvidenceMode = "declared" | "candidate" | "none";
+export type PdfPreviewMatchState =
+  | "exact_match"
+  | "fragment_match"
+  | "not_found"
+  | "no_snippet";
 
 export interface ApiError {
   code: string;
@@ -14,15 +20,26 @@ export interface ApiResponse<T> {
   request_id?: string | null;
 }
 
+export interface SessionInfo {
+  session_id: string;
+  label: string;
+  created_at: string;
+  expires_at: string;
+}
+
+export type AuthSession = SessionInfo;
+
 export interface UploadMetadata {
   file_id: string;
   original_name: string;
+  access_token?: string | null;
   file_type: string;
   size_bytes: number;
   text_chars: number;
   page_count: number;
   chunk_count: number;
   document_fingerprint?: string | null;
+  expires_at?: string | null;
   parse_status: string;
 }
 
@@ -71,12 +88,13 @@ export interface TaskResult {
   retrieval_status: string;
   retrieval_message?: string | null;
   retrieval_applied: boolean;
-  evidence_mode?: "declared" | "candidate" | "none";
+  evidence_mode?: EvidenceMode;
   retrieved_chunk_count: number;
   retrieved_pages: number[];
   used_chunk_ids: string[];
   evidence_quotes: EvidenceQuote[];
   citations: Citation[];
+  candidate_chunks: Citation[];
   source_chunks: Citation[];
   source_document_chars: number;
   used_document_chars: number;
@@ -88,11 +106,13 @@ export interface TaskResult {
 export interface RecentDocument {
   file_id: string;
   original_name: string;
+  access_token?: string | null;
   document_fingerprint?: string | null;
   file_type: string;
   text_chars: number;
   page_count: number;
   chunk_count: number;
+  expires_at?: string | null;
   parse_status: string;
   saved_at: string;
 }

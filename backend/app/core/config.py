@@ -48,6 +48,15 @@ def _to_path(value: str | None, default: Path, base_dir: Path) -> Path:
     return (base_dir / candidate).resolve()
 
 
+def _to_same_site(value: str | None, default: str) -> str:
+    if value is None or not value.strip():
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"lax", "strict", "none"}:
+        return normalized
+    return default
+
+
 @dataclass(slots=True)
 class Settings:
     project_root: Path
@@ -59,9 +68,17 @@ class Settings:
     max_upload_mb: int
     max_document_chars: int
     request_timeout_seconds: int
+    document_retention_hours: int
+    session_retention_hours: int
+    session_cookie_name: str
+    session_cookie_secure: bool
+    session_cookie_samesite: str
+    alpha_invite_codes: list[str]
+    demo_mode: bool
     data_dir: Path
     uploads_dir: Path
     parsed_dir: Path
+    sessions_dir: Path
     logs_dir: Path
     cache_dir: Path
     model_provider: str
@@ -84,6 +101,7 @@ class Settings:
             self.data_dir,
             self.uploads_dir,
             self.parsed_dir,
+            self.sessions_dir,
             self.logs_dir,
             self.cache_dir,
         ):
@@ -109,9 +127,23 @@ def get_settings() -> Settings:
         max_upload_mb=_to_int(os.getenv("MAX_UPLOAD_MB"), 20),
         max_document_chars=_to_int(os.getenv("MAX_DOCUMENT_CHARS"), 30000),
         request_timeout_seconds=_to_int(os.getenv("REQUEST_TIMEOUT_SECONDS"), 60),
+        document_retention_hours=_to_int(os.getenv("DOCUMENT_RETENTION_HOURS"), 72),
+        session_retention_hours=_to_int(os.getenv("SESSION_RETENTION_HOURS"), 168),
+        session_cookie_name=os.getenv("SESSION_COOKIE_NAME", "yandatong_session"),
+        session_cookie_secure=_to_bool(
+            os.getenv("SESSION_COOKIE_SECURE"),
+            os.getenv("APP_ENV", "development").strip().lower() == "production",
+        ),
+        session_cookie_samesite=_to_same_site(
+            os.getenv("SESSION_COOKIE_SAMESITE"),
+            "lax",
+        ),
+        alpha_invite_codes=_to_list(os.getenv("ALPHA_INVITE_CODES"), ["alpha-demo"]),
+        demo_mode=_to_bool(os.getenv("DEMO_MODE"), False),
         data_dir=data_dir,
         uploads_dir=data_dir / "uploads",
         parsed_dir=data_dir / "parsed",
+        sessions_dir=data_dir / "sessions",
         logs_dir=data_dir / "logs",
         cache_dir=data_dir / "cache",
         model_provider=os.getenv("MODEL_PROVIDER", "mock"),

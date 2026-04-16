@@ -29,6 +29,7 @@ def test_get_settings_respects_data_dir_env(monkeypatch) -> None:
         assert settings.data_dir == workspace / "persistent-data"
         assert settings.uploads_dir == settings.data_dir / "uploads"
         assert settings.parsed_dir == settings.data_dir / "parsed"
+        assert settings.sessions_dir == settings.data_dir / "sessions"
         assert settings.logs_dir == settings.data_dir / "logs"
         assert settings.cache_dir == settings.data_dir / "cache"
         assert settings.data_dir.exists()

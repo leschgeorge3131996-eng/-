@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchDocumentPage } from "../api";
+import type { PdfPreviewMatchState } from "../types";
 
 type PdfPreviewPanelProps = {
   documentName: string;
   fileId: string;
+  accessToken?: string | null;
   page: number;
   availablePages?: number[];
   src: string;
@@ -15,12 +17,14 @@ type PdfPreviewPanelProps = {
 type HighlightRange = {
   start: number;
   end: number;
+  matchState: Extract<PdfPreviewMatchState, "exact_match" | "fragment_match">;
 };
 
 type SentenceView = {
   focusBefore: string;
   focus: string;
   focusAfter: string;
+  matchState: PdfPreviewMatchState;
 };
 
 function buildCollapsedTextMap(text: string) {
@@ -54,15 +58,18 @@ function locateHighlightRange(text: string, snippet: string | null | undefined):
 
   const source = buildCollapsedTextMap(text);
   const snippetMap = buildCollapsedTextMap(cleanSnippet);
+  if (!snippetMap.collapsed) {
+    return null;
+  }
   const exactIndex = source.collapsed.indexOf(snippetMap.collapsed);
   if (exactIndex !== -1) {
     const start = source.map[exactIndex];
     const end = source.map[exactIndex + snippetMap.collapsed.length - 1] + 1;
-    return { start, end };
+    return { start, end, matchState: "exact_match" };
   }
 
   const fragmentCandidates = cleanSnippet
-    .split(/[，。；：,.!?、\n]/)
+    .split(/[，。；：,.!?\n]/)
     .map((item) => item.trim())
     .filter((item) => item.length >= 8)
     .sort((left, right) => right.length - left.length);
@@ -73,7 +80,7 @@ function locateHighlightRange(text: string, snippet: string | null | undefined):
     if (fragmentIndex !== -1) {
       const start = source.map[fragmentIndex];
       const end = source.map[fragmentIndex + collapsedFragment.length - 1] + 1;
-      return { start, end };
+      return { start, end, matchState: "fragment_match" };
     }
   }
 
@@ -90,7 +97,7 @@ function looksLikeArtifactLine(line: string): boolean {
     return true;
   }
 
-  if (/(大学|学院|实验室|研究所|通信作者|作者简介|基金项目)/.test(line) && /\d{5,}/.test(line)) {
+  if (/(大学|学院|实验室|研究所|通讯作者|作者简介|基金项目)/.test(line) && /\d{5,}/.test(line)) {
     return true;
   }
 
@@ -132,14 +139,27 @@ function extractDisplaySentences(text: string): string[] {
 
   const merged = cleanedLines.join(" ");
   return merged
-    .split(/(?<=[。！？!?；;])\s+|\n+/)
+    .split(/(?<=[。！？!?])\s+|\n+/)
     .map((item) => item.trim())
     .filter((item) => item.length >= 4);
+}
+
+function buildFallbackText(sentences: string[]): string {
+  return sentences.slice(0, 3).join(" ").trim();
 }
 
 function buildSentenceView(sentences: string[], snippet: string | null | undefined): SentenceView | null {
   if (sentences.length === 0) {
     return null;
+  }
+
+  if (!snippet) {
+    return {
+      focusBefore: buildFallbackText(sentences),
+      focus: "",
+      focusAfter: "",
+      matchState: "no_snippet"
+    };
   }
 
   for (const sentence of sentences) {
@@ -151,20 +171,36 @@ function buildSentenceView(sentences: string[], snippet: string | null | undefin
     return {
       focusBefore: sentence.slice(0, range.start),
       focus: sentence.slice(range.start, range.end),
-      focusAfter: sentence.slice(range.end)
+      focusAfter: sentence.slice(range.end),
+      matchState: range.matchState
     };
   }
 
   return {
-    focusBefore: sentences[0] ?? "",
+    focusBefore: buildFallbackText(sentences),
     focus: "",
-    focusAfter: ""
+    focusAfter: "",
+    matchState: "not_found"
   };
+}
+
+function describeMatchState(matchState: PdfPreviewMatchState): string {
+  if (matchState === "exact_match") {
+    return "已在当前页定位到证据原句";
+  }
+  if (matchState === "fragment_match") {
+    return "已在当前页定位到证据片段";
+  }
+  if (matchState === "not_found") {
+    return "未在当前页精确定位到该片段，仅展示本页清洗文本";
+  }
+  return "当前页未提供独立定位片段，仅展示本页清洗文本";
 }
 
 export default function PdfPreviewPanel({
   documentName,
   fileId,
+  accessToken,
   page,
   availablePages = [],
   src,
@@ -181,7 +217,7 @@ export default function PdfPreviewPanel({
     setTextLoading(true);
     setTextError(null);
 
-    void fetchDocumentPage(fileId, page)
+    void fetchDocumentPage(fileId, page, accessToken)
       .then((payload) => {
         if (!active) {
           return;
@@ -204,15 +240,16 @@ export default function PdfPreviewPanel({
     return () => {
       active = false;
     };
-  }, [fileId, page]);
+  }, [accessToken, fileId, page]);
 
   const sentenceView = useMemo(
     () => buildSentenceView(extractDisplaySentences(pageText), highlightText),
     [pageText, highlightText]
   );
+  const matchState = sentenceView?.matchState ?? "no_snippet";
 
   return (
-    <section className="panel pdf-preview-panel">
+    <section className="panel pdf-preview-panel" data-testid="pdf-preview-panel">
       <div className="pdf-preview-head">
         <div>
           <p className="section-kicker">PDF 预览</p>
@@ -231,6 +268,7 @@ export default function PdfPreviewPanel({
           {availablePages.map((candidatePage) => (
             <button
               key={candidatePage}
+              data-testid={`pdf-page-button-${candidatePage}`}
               className={`pdf-page-button${candidatePage === page ? " active" : ""}`}
               type="button"
               onClick={() => onSelectPage?.(candidatePage)}
@@ -243,19 +281,29 @@ export default function PdfPreviewPanel({
 
       <div className="pdf-preview-body">
         <div className="pdf-frame-wrap">
-          <iframe className="pdf-frame" src={src} title={`${documentName} PDF 预览`} />
+          <iframe
+            className="pdf-frame"
+            data-testid="pdf-preview-frame"
+            src={src}
+            title={`${documentName} PDF 预览`}
+          />
         </div>
 
         <aside className="page-text-panel">
           <div className="page-text-head">
             <strong>文本定位</strong>
-            <span>{sentenceView?.focus ? "只显示命中的这一段" : "显示最接近的清洗后句子"}</span>
+            <span>{describeMatchState(matchState)}</span>
           </div>
 
           {textLoading ? <p className="status-card">正在加载第 {page} 页文本...</p> : null}
           {!textLoading && textError ? <p className="error status-card">{textError}</p> : null}
+          {!textLoading && !textError && matchState === "not_found" ? (
+            <p className="warning status-card preview-state-note">
+              未在当前页精确定位到该片段，仅展示本页清洗文本。
+            </p>
+          ) : null}
           {!textLoading && !textError ? (
-            <div className="page-text-content">
+            <div className="page-text-content" data-testid="pdf-page-text">
               {sentenceView ? (
                 <p className="page-text-block">
                   <span className="page-text-sentence">

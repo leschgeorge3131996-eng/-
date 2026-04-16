@@ -18,17 +18,27 @@ This repo is prepared for a two-service Render deployment:
 2. Make sure the branch you want to deploy contains `render.yaml`.
 3. Prepare these backend values:
    - `CORS_ORIGINS`
+   - `ALPHA_INVITE_CODES`
    - `WUQIONG_API_KEY`
    - `MODEL_QA`
    - `MODEL_SUMMARY`
    - `MODEL_OUTLINE`
+   - `DOCUMENT_RETENTION_HOURS`
+   - `SESSION_RETENTION_HOURS`
+   - `SESSION_COOKIE_SECURE`
+   - `SESSION_COOKIE_SAMESITE`
 4. Prepare this frontend value:
    - `VITE_API_BASE_URL`
 
 Recommended values:
 
 - `CORS_ORIGINS=https://your-frontend.onrender.com`
+- `ALPHA_INVITE_CODES=share-this-only-with-invited-testers`
 - `VITE_API_BASE_URL=https://your-api.onrender.com/api`
+- `DOCUMENT_RETENTION_HOURS=72`
+- `SESSION_RETENTION_HOURS=168`
+- `SESSION_COOKIE_SECURE=true`
+- `SESSION_COOKIE_SAMESITE=lax`
 
 If you cut over to a custom domain later, temporarily include both origins in `CORS_ORIGINS` until DNS and TLS are live:
 
@@ -54,6 +64,19 @@ If you cut over to a custom domain later, temporarily include both origins in `C
 - Persistent disk mount path: `/var/data`
 
 The backend now uses `DATA_DIR`, so production writes stay under `/var/data` instead of the ephemeral repo filesystem.
+
+Recommended alpha guardrails:
+
+- users now need a valid invite code to create a short-lived trial session before they can upload or access documents
+- the session now rides on an `HttpOnly` cookie, so the frontend no longer stores the session token or appends it to PDF preview URLs
+- uploaded documents are bound to the current trial session and still require a per-document access token for preview, metadata, page text, and task execution
+- users should still be told to upload only non-sensitive documents
+- schedule `python scripts/cleanup_expired_documents.py --json` to clear expired files from the persistent disk
+
+If your frontend and API are deployed on truly cross-site domains, switch the cookie to:
+
+- `SESSION_COOKIE_SECURE=true`
+- `SESSION_COOKIE_SAMESITE=none`
 
 ### Frontend
 
@@ -82,5 +105,6 @@ Suggested split:
 - Render persistent disks preserve only files written under the disk mount path.
 - A Render service with a persistent disk cannot scale to multiple instances.
 - Disk-backed deploys are not zero-downtime on Render.
+- Expired document cleanup is not automatic unless you schedule `scripts/cleanup_expired_documents.py`.
 
 Those constraints are acceptable for the current MVP because uploads, parsed outputs, logs, and cache are all local-disk based today.

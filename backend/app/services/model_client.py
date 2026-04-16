@@ -86,7 +86,7 @@ class ModelClient:
                 user_input,
                 response_detail_level=response_detail_level,
             ),
-            "temperature": 0.2,
+            "temperature": 0 if task_type == "ask" else 0.2,
         }
         response_json = self._call_openai_compatible_api(payload)
         content = self._extract_content(response_json)
@@ -185,7 +185,12 @@ class ModelClient:
                 {{
                   "answer": "你的最终回答",
                   "used_chunk_ids": ["实际使用的 chunk_id"],
-                  "evidence_quotes": ["可选：直接摘录的证据短句"]
+                  "evidence_quotes": [
+                    {
+                      "chunk_id": "实际使用的 chunk_id",
+                      "quote": "可选：直接摘录的证据短句"
+                    }
+                  ]
                 }}
                 """
             ).strip()

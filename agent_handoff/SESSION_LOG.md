@@ -84,6 +84,32 @@ Entry format:
   - Ask user whether to also rewrite PROJECT_ONE_PAGER body + QA_BRIEF opening for full tonal consistency
   - TASK_BOARD #1 (demo-mode invite-code bypass) is still the largest remaining demo-friction lever
 
+## 2026-04-17 / Claude Code (demo mode: auto-session, no invite code)
+
+- Summary:
+  - User clarified context: this is an electronics competition (电赛), not a public alpha. Judges are a small trusted audience, so the invite-code gate adds pure demo friction with no real abuse-protection value.
+  - Decision: keep the session/ownership plumbing intact (still need per-session document isolation), but remove the invite-code UI gate under a new `DEMO_MODE=true` env switch. Production alpha deploys with `DEMO_MODE=false` behave exactly as before.
+  - Flow in demo mode: on first visit the frontend tries cookie-restore, falls back to `POST /api/auth/demo-session` which returns a new session with a `demo-xxxxxx` label. Zero clicks between opening the URL and uploading a document.
+  - UI changes in demo mode: trial-boundary-card says "演示模式" + safer copy; "退出会话" button hidden (there is no logout concept when demo self-issues); if demo-session creation ever fails a friendly retry button appears instead of the invite-code form.
+- Files touched:
+  - `backend/app/core/config.py` (new `demo_mode` field)
+  - `backend/app/services/auth_service.py` (extracted `_issue_session`, added `create_demo_session`, parameterized label prefix)
+  - `backend/app/api/routes.py` (new `POST /auth/demo-session`; `/health` now returns `demo_mode`)
+  - `backend/tests/test_api.py` + `backend/tests/test_services.py` (fixture `demo_mode=False`; two new tests — disabled-by-default returns 401, enabled issues cookie-backed session and advertises `demo_mode` on `/health`)
+  - `frontend/src/api.ts` (`ensureDemoSession`, `fetchDemoMode`)
+  - `frontend/src/App.tsx` (mount flow reads demo_mode first, then cookie-session, then auto demo-session; demo-mode-aware auth panel with retry)
+  - `.env.example` (new `DEMO_MODE=false` with a comment block)
+- Verification:
+  - backend: `46 passed` (was 44, +2 demo-session tests)
+  - frontend: smoke tests `7 passed`, `tsc && vite build` passed (598 modules)
+- Open risks:
+  - If `DEMO_MODE` is ever set to `true` on a public internet-exposed URL, anyone who finds the URL can upload docs and burn model tokens. Deploy DEMO_MODE=true only for the judging URL window.
+  - `handleLogout` still exists but its button is hidden in demo mode; if someone wires another trigger to it, workspace clears and the user is dropped back to the "重新进入演示" retry card. Acceptable, but worth knowing.
+  - Smoke tests still assert the invite-code form; if we later decide to default-enable DEMO_MODE, those tests need to mock `/health` to return `demo_mode=false` or be updated.
+- Recommended next step:
+  - Before the 电赛 demo: set `DEMO_MODE=true` in the deployed backend env and confirm the opening flow ("打开 URL → 立刻能上传") on the actual staging URL.
+  - TASK_BOARD #3 (CSRF/origin validation) is the next logical security item; in demo-mode-only deployments it's even more important since the demo-session endpoint is unauthenticated.
+
 ## 2026-04-17 / Claude Code (one-pager body + QA brief + first commit)
 
 - Summary:

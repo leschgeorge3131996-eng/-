@@ -13,12 +13,14 @@ EvidenceMode = Literal["declared", "candidate", "none"]
 class AskRequest(BaseModel):
     file_id: str = Field(..., min_length=1)
     question: str = Field(..., min_length=1, max_length=4000)
+    document_access_token: str | None = Field(default=None, min_length=1)
     response_detail_level: ResponseDetailLevel = "balanced"
 
 
 class TaskRequest(BaseModel):
     file_id: str = Field(..., min_length=1)
     instruction: str | None = Field(default=None, max_length=4000)
+    document_access_token: str | None = Field(default=None, min_length=1)
     response_detail_level: ResponseDetailLevel = "balanced"
 
 
@@ -75,6 +77,7 @@ class TaskResult(BaseModel):
     used_chunk_ids: list[str] = []
     evidence_quotes: list[EvidenceQuote] = []
     citations: list[Citation] = []
+    candidate_chunks: list[Citation] = []
     source_chunks: list[Citation] = []
     source_document_chars: int = 0
     used_document_chars: int = 0

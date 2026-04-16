@@ -47,6 +47,26 @@ class NotFoundError(AppError):
         )
 
 
+class ForbiddenError(AppError):
+    def __init__(self, message: str, *, details: dict | None = None) -> None:
+        super().__init__(
+            message,
+            code="FORBIDDEN",
+            status_code=403,
+            details=details,
+        )
+
+
+class UnauthorizedError(AppError):
+    def __init__(self, message: str, *, details: dict | None = None) -> None:
+        super().__init__(
+            message,
+            code="UNAUTHORIZED",
+            status_code=401,
+            details=details,
+        )
+
+
 class ModelServiceError(AppError):
     def __init__(self, message: str, *, details: dict | None = None) -> None:
         super().__init__(
@@ -55,4 +75,3 @@ class ModelServiceError(AppError):
             status_code=502,
             details=details,
         )
-

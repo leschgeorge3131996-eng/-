@@ -7,10 +7,11 @@
 
 ## Next Best Tasks
 
-1. Decide whether demo mode should bypass or hide invite-code login
-2. Decide whether the current stats panel should be softened, hidden, or cleaned before presentation
-3. Add CSRF / origin validation for cookie-backed state-changing routes
+1. ~~Demo-mode invite-code bypass~~ **DONE 2026-04-17** — `DEMO_MODE=true` env switch auto-creates sessions; invite form hidden in demo builds
+2. ~~Soften stats panel for demo~~ **DONE 2026-04-17** — collapsed by default, single-line summary
+3. Add CSRF / origin validation for cookie-backed state-changing routes (more important now that demo-session is unauthenticated)
 4. Add expired-session cleanup script
+5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 
 ## Useful But Not Urgent
 

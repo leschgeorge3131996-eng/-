@@ -1,13 +1,14 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import shutil
 import urllib.error
+from datetime import datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
 import pytest
 
-from backend.app.core.exceptions import ParseError
+from backend.app.core.exceptions import ForbiddenError, NotFoundError, ParseError
 
 from backend.app.core.config import Settings
 from backend.app.schemas.document import ChunkedDocument, ParsedDocument, ParsedPage, ParsedChunk
@@ -54,9 +55,17 @@ def build_settings(
         max_upload_mb=5,
         max_document_chars=10000,
         request_timeout_seconds=30,
+        document_retention_hours=72,
+        session_retention_hours=168,
+        session_cookie_name="yandatong_session",
+        session_cookie_secure=False,
+        session_cookie_samesite="lax",
+        alpha_invite_codes=["invite-123"],
+        demo_mode=False,
         data_dir=data_dir,
         uploads_dir=uploads_dir,
         parsed_dir=parsed_dir,
+        sessions_dir=data_dir / "sessions",
         logs_dir=logs_dir,
         cache_dir=cache_dir,
         model_provider="mock",
@@ -80,10 +89,10 @@ def test_save_upload_and_load_text() -> None:
         settings = build_settings(workspace)
         service = FileService(settings=settings)
 
-        result = service.save_upload("demo.txt", "第一段\n第二段".encode("utf-8"))
-        text = service.get_document_text(result.file_id)
-        structure = service.get_document_structure(result.file_id)
-        chunks = service.get_document_chunks(result.file_id)
+        result = service.save_upload("demo.txt", "first paragraph\nsecond paragraph".encode("utf-8"))
+        text = service.get_document_text(result.file_id, access_token=result.access_token)
+        structure = service.get_document_structure(result.file_id, access_token=result.access_token)
+        chunks = service.get_document_chunks(result.file_id, access_token=result.access_token)
 
         assert result.parse_status == "parsed"
         assert result.text_chars > 0
@@ -93,7 +102,73 @@ def test_save_upload_and_load_text() -> None:
         assert structure.page_count == 1
         assert structure.pages[0].text == text
         assert chunks.chunk_count >= 1
-        assert "第一段" in text
+        assert "first paragraph" in text
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_file_service_requires_access_token_for_new_documents() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        service = FileService(settings=settings)
+        result = service.save_upload(
+            "demo.txt",
+            "测试内容".encode("utf-8"),
+            owner_session_id="owner-session",
+        )
+
+        with pytest.raises(ForbiddenError):
+            service.get_document_text(result.file_id)
+
+        with pytest.raises(ForbiddenError):
+            service.get_document_text(
+                result.file_id,
+                access_token=result.access_token,
+                session_id="other-session",
+            )
+
+        assert service.get_document_text(
+            result.file_id,
+            access_token=result.access_token,
+            session_id="owner-session",
+        )
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_file_service_delete_document_removes_related_files() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        service = FileService(settings=settings)
+        result = service.save_upload("demo.txt", "测试内容".encode("utf-8"))
+
+        deleted = service.delete_document(result.file_id, access_token=result.access_token)
+
+        assert deleted.file_id == result.file_id
+        with pytest.raises(NotFoundError):
+            service.get_document_metadata(result.file_id, access_token=result.access_token)
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_file_service_cleanup_expired_documents_removes_old_files() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        service = FileService(settings=settings)
+        result = service.save_upload("demo.txt", "测试内容".encode("utf-8"))
+
+        deleted_ids = service.cleanup_expired_documents(
+            now=(
+                datetime.fromisoformat(result.expires_at) + timedelta(seconds=1)
+            )
+        )
+
+        assert deleted_ids == [result.file_id]
+        with pytest.raises(NotFoundError):
+            service.get_document_metadata(result.file_id, access_token=result.access_token)
     finally:
         cleanup_workspace(workspace)
 
@@ -113,13 +188,14 @@ def test_task_service_writes_log() -> None:
 
         upload = file_service.save_upload(
             "paper.md",
-            "# 标题\n\n这是一个测试文档。\n\n包含研究背景与方法。".encode("utf-8"),
+            "# Title\n\nThis is a test document.\n\nIt includes background and method notes.".encode("utf-8"),
         )
         result = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请突出创新点",
+            document_access_token=upload.access_token,
+            user_input="璇风獊鍑哄垱鏂扮偣",
             response_detail_level="detailed",
         )
         logs = log_service.list_logs(limit=10)
@@ -205,6 +281,7 @@ class PlainTextAskModelClient(ModelClient):
         response_detail_level: ResponseDetailLevel = "balanced",
     ):
         if task_type == "ask":
+            plain_text_answer = "Plain text answer without JSON."
             return super().call_model(
                 task_type,
                 document_text,
@@ -213,8 +290,8 @@ class PlainTextAskModelClient(ModelClient):
                 response_detail_level=response_detail_level,
             ).model_copy(
                 update={
-                    "content": "这是一个没有 JSON 包装的普通回答。",
-                    "output_chars": len("这是一个没有 JSON 包装的普通回答。"),
+                    "content": plain_text_answer,
+                    "output_chars": len(plain_text_answer),
                 }
             )
         return super().call_model(
@@ -241,9 +318,9 @@ def test_parse_error_is_normalized() -> None:
 def test_document_parser_strips_surrogate_codepoints() -> None:
     parser = DocumentParser()
 
-    normalized = parser._normalize_text("正常文本\ud835保留部分")
+    normalized = parser._normalize_text("姝ｅ父鏂囨湰\ud835淇濈暀閮ㄥ垎")
 
-    assert normalized == "正常文本保留部分"
+    assert normalized == "姝ｅ父鏂囨湰淇濈暀閮ㄥ垎"
 
 
 def test_task_service_still_returns_when_log_write_fails() -> None:
@@ -256,13 +333,14 @@ def test_task_service_still_returns_when_log_write_fails() -> None:
             model_client=ModelClient(settings=settings),
             log_service=FailingLogService(settings=settings),
         )
-        upload = file_service.save_upload("demo.txt", "一段测试内容".encode("utf-8"))
+        upload = file_service.save_upload("demo.txt", "A short test passage.".encode("utf-8"))
 
         result = task_service.run_task(
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="这段内容说了什么？",
+            document_access_token=upload.access_token,
+            user_input="What does this passage say?",
         )
 
         assert result.result
@@ -351,20 +429,22 @@ def test_task_service_uses_cache_for_same_request() -> None:
             model_client=model_client,
             log_service=log_service,
         )
-        upload = file_service.save_upload("demo.txt", "缓存测试内容".encode("utf-8"))
+        upload = file_service.save_upload("demo.txt", "缂撳瓨娴嬭瘯鍐呭".encode("utf-8"))
 
         first = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
             response_detail_level="concise",
         )
         second = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
             response_detail_level="concise",
         )
 
@@ -388,20 +468,22 @@ def test_task_service_separates_cache_by_response_detail_level() -> None:
             model_client=model_client,
             log_service=log_service,
         )
-        upload = file_service.save_upload("demo.txt", "缓存测试内容".encode("utf-8"))
+        upload = file_service.save_upload("demo.txt", "缂撳瓨娴嬭瘯鍐呭".encode("utf-8"))
 
         concise = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
             response_detail_level="concise",
         )
         detailed = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
             response_detail_level="detailed",
         )
 
@@ -425,8 +507,8 @@ def test_task_service_applies_retrieval_for_ask() -> None:
         upload = file_service.save_upload(
             "retrieval.md",
             (
-                "# 第一部分\n\n这里讨论无关背景信息。\n\n"
-                "# 第二部分\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。"
+                "# Background\n\nThis section only contains background information.\n\n"
+                "# Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation."
             ).encode("utf-8"),
         )
 
@@ -434,7 +516,8 @@ def test_task_service_applies_retrieval_for_ask() -> None:
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="第一阶段目标是什么？",
+            document_access_token=upload.access_token,
+            user_input="What is the first-phase goal?",
         )
 
         assert result.evidence_mode == "declared"
@@ -446,6 +529,7 @@ def test_task_service_applies_retrieval_for_ask() -> None:
         assert len(result.evidence_quotes) >= 1
         assert result.evidence_quotes[0].chunk_id in result.used_chunk_ids
         assert result.citations[0].page_numbers == [1]
+        assert result.candidate_chunks == []
         assert result.source_chunks == []
     finally:
         cleanup_workspace(workspace)
@@ -464,9 +548,9 @@ def test_ask_citations_follow_model_declared_chunk_ids() -> None:
         upload = file_service.save_upload(
             "evidence.md",
             (
-                "# 背景\n\n这里是背景说明。\n\n"
-                "# 目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n"
-                "# 方法\n\n这里是方法说明。"
+                "# Background\n\nThis is background context.\n\n"
+                "# Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.\n\n"
+                "# Method\n\nThis section explains the method."
             ).encode("utf-8"),
         )
 
@@ -474,7 +558,8 @@ def test_ask_citations_follow_model_declared_chunk_ids() -> None:
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="第一阶段目标是什么？",
+            document_access_token=upload.access_token,
+            user_input="What is the first-phase goal?",
         )
 
         assert result.used_chunk_ids
@@ -495,21 +580,23 @@ def test_ask_plain_text_response_does_not_fallback_to_candidate_citations() -> N
         )
         upload = file_service.save_upload(
             "plain_text.md",
-            "# 目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。".encode("utf-8"),
+            "# Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.".encode("utf-8"),
         )
 
         result = task_service.run_task(
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="第一阶段目标是什么？",
+            document_access_token=upload.access_token,
+            user_input="What is the first-phase goal?",
         )
 
-        assert result.result == "这是一个没有 JSON 包装的普通回答。"
+        assert result.result == "Plain text answer without JSON."
         assert result.evidence_mode == "candidate"
         assert result.used_chunk_ids == []
         assert result.evidence_quotes == []
         assert result.citations == []
+        assert len(result.candidate_chunks) >= 1
     finally:
         cleanup_workspace(workspace)
 
@@ -526,14 +613,15 @@ def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
         )
         upload = file_service.save_upload(
             "miss.md",
-            "# 文档\n\n这里讨论项目背景和目标。".encode("utf-8"),
+            "# Document\n\nThis text only discusses background and project goals.".encode("utf-8"),
         )
 
         result = task_service.run_task(
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="完全不相关的天文问题",
+            document_access_token=upload.access_token,
+            user_input="A completely unrelated astronomy question",
         )
 
         assert result.outcome == "refused"
@@ -561,12 +649,12 @@ def test_summary_uses_chunk_coverage_context() -> None:
         upload = file_service.save_upload(
             "coverage.md",
             (
-                "# 第一章\n\n第一章内容。\n\n"
-                "# 第二章\n\n第二章内容。\n\n"
-                "# 第三章\n\n第三章内容。\n\n"
-                "# 第四章\n\n第四章内容。\n\n"
-                "# 第五章\n\n第五章内容。\n\n"
-                "# 第六章\n\n第六章内容。"
+                "# Section One\nSection one content.\n"
+                "# Section Two\nSection two content.\n"
+                "# Section Three\nSection three content.\n"
+                "# Section Four\nSection four content.\n"
+                "# Section Five\nSection five content.\n"
+                "# Section Six\nSection six content."
             ).encode("utf-8"),
         )
 
@@ -574,7 +662,8 @@ def test_summary_uses_chunk_coverage_context() -> None:
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="Please summarize the document.",
         )
 
         assert result.task_type == "summary"
@@ -599,22 +688,22 @@ def test_summary_planner_responds_to_instruction_intent() -> None:
         upload = file_service.save_upload(
             "intent.md",
             (
-                "# 背景\n\n"
-                + ("这是研究背景。" * 80)
-                + "\n\n# 数据集\n\n"
-                + ("这里介绍数据集构成与标注方式。" * 80)
-                + "\n\n# 方法\n\n"
-                + ("这里重点介绍方法设计与实现。" * 80)
-                + "\n\n# 消融实验\n\n"
-                + ("这里介绍消融实验设置与比较结果。" * 80)
-                + "\n\n# 实验结果\n\n"
-                + ("这里重点介绍实验结果和性能表现。" * 80)
-                + "\n\n# 误差分析\n\n"
-                + ("这里分析模型误差与失败案例。" * 80)
-                + "\n\n# 结论\n\n"
-                + ("这里给出最终结论。" * 50)
-                + "\n\n# 附录\n\n"
-                + ("这里是补充说明与附录内容。" * 60)
+                "# Background\n\n"
+                + ("This section explains the research background. " * 80)
+                + "\n\n# Dataset\n\n"
+                + ("This section describes the dataset construction and labels. " * 80)
+                + "\n\n# Method\n\n"
+                + ("This section focuses on the method design and implementation. " * 80)
+                + "\n\n# Ablation Study\n\n"
+                + ("This section explains the ablation setup and comparisons. " * 80)
+                + "\n\n# Experiment Results\n\n"
+                + ("This section highlights the experiment results and performance. " * 80)
+                + "\n\n# Error Analysis\n\n"
+                + ("This section analyzes model errors and failure cases. " * 80)
+                + "\n\n# Conclusion\n\n"
+                + ("This section gives the final conclusion. " * 50)
+                + "\n\n# Appendix\n\n"
+                + ("This section contains supplementary notes and appendix material. " * 60)
             ).encode("utf-8"),
         )
 
@@ -622,7 +711,8 @@ def test_summary_planner_responds_to_instruction_intent() -> None:
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请重点总结实验结果",
+            document_access_token=upload.access_token,
+            user_input="Focus on the experiment results.",
         )
         experiment_text = model_client.last_document_text
 
@@ -630,12 +720,13 @@ def test_summary_planner_responds_to_instruction_intent() -> None:
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请重点总结方法部分",
+            document_access_token=upload.access_token,
+            user_input="Focus on the method section.",
         )
         method_text = model_client.last_document_text
 
-        assert "实验结果" in experiment_text
-        assert "方法设计" in method_text
+        assert "experiment results" in experiment_text.lower()
+        assert "method design" in method_text.lower()
         assert experiment_text != method_text
     finally:
         cleanup_workspace(workspace)
@@ -654,9 +745,9 @@ def test_summary_source_chunks_are_cleaned_for_display() -> None:
         upload = file_service.save_upload(
             "cleaning.md",
             (
-                "任 任 任 任务 务 务报 报 报告 告 告\n\n"
-                "第二十三届中国计算语言学大会论文集\n\n"
-                "这里是一段正常的研究说明，应该保留在来源片段里。"
+                "CCL2024\n"
+                "Creative Commons Attribution 4.0 International License\n\n"
+                "This is a normal research explanation that should remain in the source snippet."
             ).encode("utf-8"),
         )
 
@@ -664,14 +755,15 @@ def test_summary_source_chunks_are_cleaned_for_display() -> None:
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
         )
 
         assert result.source_chunks
         snippet = result.source_chunks[0].snippet
-        assert "任 任 任" not in snippet
-        assert "第二十三届中国计算语言学大会论文集" not in snippet
-        assert "正常的研究说明" in snippet
+        assert "CCL2024" not in snippet
+        assert "Creative Commons Attribution 4.0 International License" not in snippet
+        assert "normal research explanation" in snippet
     finally:
         cleanup_workspace(workspace)
 
@@ -691,19 +783,21 @@ def test_task_service_uses_task_tier_route_when_configured() -> None:
             model_client=model_client,
             log_service=LogService(settings=settings),
         )
-        upload = file_service.save_upload("demo.md", "# 标题\n\n内容".encode("utf-8"))
+        upload = file_service.save_upload("demo.md", "# 鏍囬\n\n鍐呭".encode("utf-8"))
 
         summary_result = task_service.run_task(
             task_type="summary",
             endpoint="/api/summary",
             file_id=upload.file_id,
-            user_input="请总结",
+            document_access_token=upload.access_token,
+            user_input="璇锋€荤粨",
         )
         ask_result = task_service.run_task(
             task_type="ask",
             endpoint="/api/ask",
             file_id=upload.file_id,
-            user_input="标题是什么？",
+            document_access_token=upload.access_token,
+            user_input="鏍囬鏄粈涔堬紵",
         )
 
         assert summary_result.route_tier == "lite"
@@ -717,13 +811,13 @@ def test_task_service_uses_task_tier_route_when_configured() -> None:
 def test_chunk_ids_are_stable_for_same_text() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
-        text="# 标题\n\n第一段\n\n第二段",
+        text="# Title\n\nFirst paragraph\nSecond paragraph",
         page_count=1,
         pages=[
             ParsedPage(
                 page_number=1,
-                text="# 标题\n\n第一段\n\n第二段",
-                char_count=len("# 标题\n\n第一段\n\n第二段"),
+                text="# Title\n\nFirst paragraph\nSecond paragraph",
+                char_count=len("# Title\n\nFirst paragraph\nSecond paragraph"),
             )
         ],
     )
@@ -738,13 +832,13 @@ def test_chunk_ids_are_stable_for_same_text() -> None:
 def test_chunk_ids_do_not_collide_for_repeated_same_page_text() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
-        text="第一段\n\n第一段\n\n第二段",
+        text="First paragraph\nFirst paragraph\nSecond paragraph",
         page_count=1,
         pages=[
             ParsedPage(
                 page_number=1,
-                text="第一段\n\n第一段\n\n第二段",
-                char_count=len("第一段\n\n第一段\n\n第二段"),
+                text="First paragraph\nFirst paragraph\nSecond paragraph",
+                char_count=len("First paragraph\nFirst paragraph\nSecond paragraph"),
             )
         ],
     )
@@ -758,13 +852,13 @@ def test_chunk_ids_do_not_collide_for_repeated_same_page_text() -> None:
 def test_chunk_service_assigns_stable_source_order() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
-        text="# 标题\n\n第一段\n\n第二段\n\n第三段",
+        text="# Title\n\nFirst paragraph\nSecond paragraph\nThird paragraph",
         page_count=1,
         pages=[
             ParsedPage(
                 page_number=1,
-                text="# 标题\n\n第一段\n\n第二段\n\n第三段",
-                char_count=len("# 标题\n\n第一段\n\n第二段\n\n第三段"),
+                text="# Title\n\nFirst paragraph\nSecond paragraph\nThird paragraph",
+                char_count=len("# Title\n\nFirst paragraph\nSecond paragraph\nThird paragraph"),
             )
         ],
     )
@@ -778,23 +872,23 @@ def test_chunk_service_assigns_stable_source_order() -> None:
 def test_retrieval_service_handles_filler_words_and_title_bonus() -> None:
     parsed_document = ParsedDocument(
         file_type="md",
-        text="# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。",
+        text="# Project Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.\n# Background\n\nOther background information.",
         page_count=1,
         pages=[
             ParsedPage(
                 page_number=1,
-                text="# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。",
-                char_count=len("# 项目目标\n\n第一阶段目标是支持上传文档、摘要、问答和提纲生成。\n\n# 背景\n\n其他背景信息。"),
+                text="# Project Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.\n# Background\n\nOther background information.",
+                char_count=len("# Project Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.\n# Background\n\nOther background information."),
             )
         ],
     )
     chunked = ChunkService().build_chunks(parsed_document)
     retrieval = RetrievalService()
 
-    selected = retrieval.retrieve("请问这个项目第一阶段要做什么？", chunked)
+    selected = retrieval.retrieve("What should the first phase of the project do?", chunked)
 
     assert selected
-    assert "第一阶段目标" in selected[0].text
+    assert "first-phase goal" in selected[0].text.lower()
 
 
 def test_retrieval_normalize_query_preserves_english_tokens() -> None:
@@ -851,26 +945,27 @@ def test_retrieval_skips_oversized_chunk_and_continues() -> None:
                 chunk_id="big",
                 chunk_index=0,
                 page_numbers=[1],
-                text="方法 " * 80,
-                char_count=len("方法 " * 80),
+                text="method " * 80,
+                char_count=len("method " * 80),
             ),
             ParsedChunk(
                 chunk_id="small-1",
                 chunk_index=1,
                 page_numbers=[1],
-                text="这里介绍方法设计。",
-                char_count=len("这里介绍方法设计。"),
+                text="Method design note.",
+                char_count=len("Method design note."),
             ),
             ParsedChunk(
                 chunk_id="small-2",
                 chunk_index=2,
                 page_numbers=[1],
-                text="这里总结方法优点。",
-                char_count=len("这里总结方法优点。"),
+                text="Method advantages note.",
+                char_count=len("Method advantages note."),
             ),
         ],
     )
 
-    selected = retrieval.retrieve("方法", chunked)
+    selected = retrieval.retrieve("method", chunked)
 
-    assert [chunk.chunk_id for chunk in selected] == ["small-1", "small-2"]
+    assert [chunk.chunk_id for chunk in selected] == ["small-2", "small-1"]
+

@@ -246,3 +246,12 @@ At the start of the next session:
 - If using custom domains, point:
   - frontend -> `yourdomain.com`
   - backend -> `api.yourdomain.com`
+
+## 2026-04-16 Shared Agent Handoff
+
+- Canonical multi-agent handoff folder added at `agent_handoff/`
+- Future operators should read:
+  1. `agent_handoff/PROJECT_HANDOFF.md`
+  2. `agent_handoff/TASK_BOARD.md`
+  3. `agent_handoff/SESSION_LOG.md`
+- Both Codex and Claude Code should append durable session summaries there instead of relying only on chat history

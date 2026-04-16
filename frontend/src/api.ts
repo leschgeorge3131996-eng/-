@@ -1,8 +1,10 @@
 import type {
   ApiResponse,
+  AuthSession,
   DocumentPageData,
   LogSummary,
   ResponseDetailLevel,
+  SessionInfo,
   TaskResult,
   TaskType,
   UploadResponse
@@ -10,9 +12,50 @@ import type {
 
 const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const API_BASE_URL = rawApiBaseUrl ? rawApiBaseUrl.replace(/\/+$/, "") : "/api";
+const AUTH_SESSION_STORAGE_KEY = "yandatong_auth_session";
 
-export function buildFileContentUrl(fileId: string, page?: number): string {
-  const baseUrl = `${API_BASE_URL}/files/${fileId}/content`;
+type LoginPayload = {
+  session: SessionInfo;
+};
+
+type CurrentSessionPayload = {
+  session: SessionInfo;
+};
+
+function readSessionStorage(): AuthSession | null {
+  try {
+    const raw = window.localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as AuthSession) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionStorage(session: AuthSession | null): void {
+  if (session) {
+    window.localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+    return;
+  }
+  window.localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
+}
+
+function buildProtectedFileUrl(fileId: string, accessToken?: string | null, suffix = ""): string {
+  const baseUrl = `${API_BASE_URL}/files/${fileId}${suffix}`;
+  if (!accessToken) {
+    return baseUrl;
+  }
+
+  const query = new URLSearchParams();
+  query.set("access_token", accessToken);
+  return `${baseUrl}?${query.toString()}`;
+}
+
+export function buildFileContentUrl(
+  fileId: string,
+  accessToken?: string | null,
+  page?: number
+): string {
+  const baseUrl = buildProtectedFileUrl(fileId, accessToken, "/content");
   return page && page > 0 ? `${baseUrl}#page=${page}` : baseUrl;
 }
 
@@ -57,7 +100,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
     throw buildNonJsonResponseError(response.status, text);
   }
 
-  if (!response.ok || !payload.success || !payload.data) {
+  if (!response.ok || !payload.success || payload.data === null || payload.data === undefined) {
     throw new ApiRequestError(
       payload.error?.message ?? "请求失败",
       payload.error?.code,
@@ -75,7 +118,7 @@ function parsePayloadText<T>(text: string, status: number): T {
     throw buildNonJsonResponseError(status, text);
   }
 
-  if (status < 200 || status >= 300 || !payload.success || !payload.data) {
+  if (status < 200 || status >= 300 || !payload.success || payload.data === null || payload.data === undefined) {
     throw new ApiRequestError(
       payload.error?.message ?? "请求失败",
       payload.error?.code,
@@ -83,6 +126,70 @@ function parsePayloadText<T>(text: string, status: number): T {
     );
   }
   return payload.data;
+}
+
+export async function loginSession(
+  inviteCode: string,
+  displayName: string
+): Promise<AuthSession> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      invite_code: inviteCode,
+      display_name: displayName || null
+    })
+  });
+  const payload = await parseResponse<LoginPayload>(response);
+  const session: AuthSession = payload.session;
+  writeSessionStorage(session);
+  return session;
+}
+
+export async function ensureDemoSession(): Promise<AuthSession> {
+  const response = await fetch(`${API_BASE_URL}/auth/demo-session`, {
+    method: "POST",
+    credentials: "include"
+  });
+  const payload = await parseResponse<LoginPayload>(response);
+  const session: AuthSession = payload.session;
+  writeSessionStorage(session);
+  return session;
+}
+
+export async function fetchDemoMode(): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`, { credentials: "include" });
+    const payload = await parseResponse<{ demo_mode?: boolean }>(response);
+    return Boolean(payload.demo_mode);
+  } catch {
+    return false;
+  }
+}
+
+export async function fetchCurrentSession(): Promise<AuthSession> {
+  const response = await fetch(`${API_BASE_URL}/auth/session`, {
+    credentials: "include"
+  });
+  const payload = await parseResponse<CurrentSessionPayload>(response);
+  const session: AuthSession = payload.session;
+  writeSessionStorage(session);
+  return session;
+}
+
+export async function logoutSession(): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include"
+    });
+    await parseResponse<{ logged_out: boolean }>(response);
+  } finally {
+    clearStoredSession();
+  }
 }
 
 export async function uploadDocument(
@@ -95,6 +202,7 @@ export async function uploadDocument(
   return new Promise<UploadResponse>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_BASE_URL}/upload`);
+    xhr.withCredentials = true;
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onProgress) {
@@ -126,16 +234,28 @@ export async function runTask(
   taskType: TaskType,
   fileId: string,
   input: string,
-  responseDetailLevel: ResponseDetailLevel
+  responseDetailLevel: ResponseDetailLevel,
+  accessToken?: string | null
 ): Promise<TaskResult> {
   const endpoint = `${API_BASE_URL}/${taskType}`;
   const payload =
     taskType === "ask"
-      ? { file_id: fileId, question: input, response_detail_level: responseDetailLevel }
-      : { file_id: fileId, instruction: input || null, response_detail_level: responseDetailLevel };
+      ? {
+          file_id: fileId,
+          question: input,
+          document_access_token: accessToken ?? null,
+          response_detail_level: responseDetailLevel
+        }
+      : {
+          file_id: fileId,
+          instruction: input || null,
+          document_access_token: accessToken ?? null,
+          response_detail_level: responseDetailLevel
+        };
 
   const response = await fetch(endpoint, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json"
     },
@@ -145,16 +265,48 @@ export async function runTask(
 }
 
 export async function fetchLogSummary(): Promise<LogSummary> {
-  const response = await fetch(`${API_BASE_URL}/logs/summary`);
+  const response = await fetch(`${API_BASE_URL}/logs/summary`, {
+    credentials: "include"
+  });
   return parseResponse<LogSummary>(response);
 }
 
-export async function fetchDocumentPage(fileId: string, pageNumber: number): Promise<DocumentPageData> {
-  const response = await fetch(`${API_BASE_URL}/files/${fileId}/pages/${pageNumber}`);
+export function readStoredSession(): AuthSession | null {
+  return readSessionStorage();
+}
+
+export function clearStoredSession(): void {
+  writeSessionStorage(null);
+}
+
+export async function fetchDocumentPage(
+  fileId: string,
+  pageNumber: number,
+  accessToken?: string | null
+): Promise<DocumentPageData> {
+  const response = await fetch(buildProtectedFileUrl(fileId, accessToken, `/pages/${pageNumber}`), {
+    credentials: "include"
+  });
   return parseResponse<DocumentPageData>(response);
 }
 
-export async function fetchDocumentMetadata(fileId: string): Promise<UploadResponse> {
-  const response = await fetch(`${API_BASE_URL}/files/${fileId}/metadata`);
+export async function fetchDocumentMetadata(
+  fileId: string,
+  accessToken?: string | null
+): Promise<UploadResponse> {
+  const response = await fetch(buildProtectedFileUrl(fileId, accessToken, "/metadata"), {
+    credentials: "include"
+  });
   return parseResponse<UploadResponse>(response);
+}
+
+export async function deleteDocument(
+  fileId: string,
+  accessToken?: string | null
+): Promise<{ deleted: boolean; file_id: string; original_name: string }> {
+  const response = await fetch(buildProtectedFileUrl(fileId, accessToken), {
+    method: "DELETE",
+    credentials: "include"
+  });
+  return parseResponse<{ deleted: boolean; file_id: string; original_name: string }>(response);
 }

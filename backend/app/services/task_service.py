@@ -44,6 +44,8 @@ class TaskService:
         task_type: TaskType,
         endpoint: str,
         file_id: str,
+        session_id: str | None = None,
+        document_access_token: str | None = None,
         user_input: str | None = None,
         response_detail_level: ResponseDetailLevel = "balanced",
     ) -> TaskResult:
@@ -58,6 +60,7 @@ class TaskService:
         retrieved_chunk_count = 0
         retrieved_pages: list[int] = []
         citations: list[Citation] = []
+        candidate_chunks: list[Citation] = []
         source_chunks: list[Citation] = []
         context_strategy = "full_text"
         outcome = "answered"
@@ -66,9 +69,21 @@ class TaskService:
         route_reason: str | None = None
 
         try:
-            metadata = self.file_service.get_document_metadata(file_id)
-            raw_document_text = self.file_service.get_document_text(file_id)
-            chunked_document = self.file_service.get_document_chunks(file_id)
+            metadata = self.file_service.get_document_metadata(
+                file_id,
+                access_token=document_access_token,
+                session_id=session_id,
+            )
+            raw_document_text = self.file_service.get_document_text(
+                file_id,
+                access_token=document_access_token,
+                session_id=session_id,
+            )
+            chunked_document = self.file_service.get_document_chunks(
+                file_id,
+                access_token=document_access_token,
+                session_id=session_id,
+            )
             planned_context = self.context_planner.plan(
                 task_type=task_type,
                 user_input=user_input,
@@ -90,6 +105,10 @@ class TaskService:
                 if task_type == "ask":
                     evidence_mode = "candidate"
                     citations = []
+                    candidate_chunks = [
+                        self._build_chunk_ref(chunk)
+                        for chunk in self._select_display_chunks(selected_chunks, limit=3)
+                    ]
                 else:
                     display_chunks = self._select_display_chunks(selected_chunks, limit=3)
                     source_chunks = [self._build_chunk_ref(chunk) for chunk in display_chunks]
@@ -124,6 +143,7 @@ class TaskService:
                     retrieved_chunk_count=0,
                     retrieved_pages=[],
                     citations=[],
+                    candidate_chunks=[],
                     source_chunks=[],
                     source_document_chars=len(raw_document_text),
                     used_document_chars=0,
@@ -217,6 +237,10 @@ class TaskService:
                         Citation.model_validate(item)
                         for item in cached_result.get("citations", [])
                     ],
+                    candidate_chunks=[
+                        Citation.model_validate(item)
+                        for item in cached_result.get("candidate_chunks", [])
+                    ],
                     source_chunks=[
                         Citation.model_validate(item)
                         for item in cached_result.get("source_chunks", [])
@@ -270,6 +294,7 @@ class TaskService:
                             "evidence_mode": task_result.evidence_mode,
                             "used_chunk_count": len(task_result.used_chunk_ids),
                             "citation_count": len(task_result.citations),
+                            "candidate_chunk_count": len(task_result.candidate_chunks),
                             "source_chunk_count": len(task_result.source_chunks),
                         },
                     )
@@ -303,6 +328,7 @@ class TaskService:
                         for chunk_id in used_chunk_ids
                         if chunk_id in selected_by_id
                     ]
+                    candidate_chunks = []
             latency_ms = int((perf_counter() - started_timer) * 1000)
             self.cache_service.set(
                 cache_key,
@@ -325,6 +351,7 @@ class TaskService:
                     "used_chunk_ids": used_chunk_ids,
                     "evidence_quotes": [quote.model_dump() for quote in evidence_quotes],
                     "citations": [citation.model_dump() for citation in citations],
+                    "candidate_chunks": [chunk.model_dump() for chunk in candidate_chunks],
                     "source_chunks": [chunk.model_dump() for chunk in source_chunks],
                     "source_document_chars": model_result.source_document_chars,
                     "used_document_chars": model_result.used_document_chars,
@@ -384,9 +411,10 @@ class TaskService:
                             "used_chunk_count": len(used_chunk_ids),
                             "evidence_quote_count": len(evidence_quotes),
                             "citation_count": len(citations),
+                            "candidate_chunk_count": len(candidate_chunks),
                             "source_chunk_count": len(source_chunks),
                         }
-                        if retrieved_pages or citations or source_chunks
+                        if retrieved_pages or citations or candidate_chunks or source_chunks
                         else None
                     ),
                 )
@@ -416,6 +444,7 @@ class TaskService:
                 used_chunk_ids=used_chunk_ids,
                 evidence_quotes=evidence_quotes,
                 citations=citations,
+                candidate_chunks=candidate_chunks,
                 source_chunks=source_chunks,
                 source_document_chars=model_result.source_document_chars,
                 used_document_chars=model_result.used_document_chars,
@@ -455,10 +484,11 @@ class TaskService:
                             "retrieved_pages": retrieved_pages,
                             "evidence_mode": evidence_mode,
                             "citation_count": len(citations),
+                            "candidate_chunk_count": len(candidate_chunks),
                             "source_chunk_count": len(source_chunks),
                             **exc.details,
                         }
-                        if retrieved_pages
+                        if retrieved_pages or citations or candidate_chunks or source_chunks
                         else exc.details
                     ),
                 )
@@ -711,7 +741,7 @@ class TaskService:
             "ccl2024",
             "卷3：评测报告",
         )
-        if any(pattern in normalized for pattern in artifact_patterns):
+        if any(re.sub(r"\s+", "", pattern).lower() in normalized for pattern in artifact_patterns):
             return True
 
         if re.fullmatch(r"[\[\]()（）\-—·,.，。:：;；/\\\d\s]+", line):

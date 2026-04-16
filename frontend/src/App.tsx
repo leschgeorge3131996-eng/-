@@ -3,18 +3,28 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ApiRequestError,
   buildFileContentUrl,
+  clearStoredSession,
+  deleteDocument,
+  ensureDemoSession,
+  fetchCurrentSession,
+  fetchDemoMode,
   fetchDocumentMetadata,
   fetchLogSummary,
+  loginSession,
+  logoutSession,
+  readStoredSession,
   runTask,
   uploadDocument
 } from "./api";
 import PdfPreviewPanel from "./components/PdfPreviewPanel";
 import ResultPanel from "./components/ResultPanel";
 import type {
+  AuthSession,
   LogSummary,
   RecentDocument,
   RecentResult,
   ResponseDetailLevel,
+  TaskResult,
   TaskType,
   UploadMetadata
 } from "./types";
@@ -89,7 +99,8 @@ const RECENT_RESULTS_KEY = "yandatong_recent_results";
 const DEMO_DOCUMENT_NAME = "demo_research_brief.md";
 const DEMO_DOCUMENT_CONTENT = `# 项目简介
 
-研答通是一个面向科研与智能办公场景的个人智能文档助理。
+研答通是一个面向论文与报告阅读、答辩准备的文档助手。
+核心能力是带证据回链的问答——每一条回答都能跳回 PDF 原文证据。
 第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
 系统当前采用端云协同路线，优先保证能跑通、能演示、能扩展。`;
 
@@ -113,15 +124,33 @@ function describeLoadStage(stage: "idle" | "uploading" | "model"): string {
 }
 
 function normalizeErrorMessage(error: unknown): string {
+  if (error instanceof ApiRequestError && error.code === "UNAUTHORIZED") {
+    return "当前试用会话已失效，请重新登录。";
+  }
   if (error instanceof ApiRequestError) return error.message;
   if (error instanceof Error) return error.message;
   return "提交任务失败";
+}
+
+function normalizeAuthErrorMessage(error: unknown): string {
+  if (error instanceof ApiRequestError && error.code === "UNAUTHORIZED") {
+    return error.message || "邀请码无效或试用会话已失效。";
+  }
+  if (error instanceof ApiRequestError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "试用会话初始化失败，请稍后重试。";
 }
 
 function normalizeRecordErrorMessage(error: unknown): string {
   if (error instanceof ApiRequestError) {
     if (error.code === "NOT_FOUND") {
       return "对应文档已不存在，记录已从最近列表移除。";
+    }
+    if (error.code === "FORBIDDEN") {
+      return "当前文档访问凭证已失效，无法恢复该记录。";
+    }
+    if (error.code === "UNAUTHORIZED") {
+      return "当前试用会话已失效，请重新登录后再恢复记录。";
     }
     if (error.code === "NON_JSON_RESPONSE") {
       return "服务返回了异常页面，最近记录恢复失败，请刷新页面或重启本地服务。";
@@ -138,7 +167,112 @@ function shouldRemoveMissingRecord(error: unknown): boolean {
   return error instanceof ApiRequestError && error.code === "NOT_FOUND";
 }
 
+function shouldRemoveInaccessibleRecord(error: unknown): boolean {
+  return (
+    error instanceof ApiRequestError &&
+    (error.code === "NOT_FOUND" || error.code === "FORBIDDEN")
+  );
+}
+
+function isSessionError(error: unknown): boolean {
+  return error instanceof ApiRequestError && error.code === "UNAUTHORIZED";
+}
+
+type PreviewReference = {
+  page: number;
+  pages: number[];
+  snippet: string | null;
+  snippetPage: number | null;
+};
+
+function resolveAccessToken(
+  fileId: string,
+  ...candidates: Array<string | null | undefined>
+): string | null {
+  for (const candidate of candidates) {
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  const recentDocuments = readStorage<RecentDocument[]>(RECENT_DOCUMENTS_KEY, []);
+  return recentDocuments.find((item) => item.file_id === fileId)?.access_token ?? null;
+}
+
+function normalizePreviewPages(pages: number[], fallbackPage = 1): number[] {
+  const normalized = Array.from(
+    new Set(pages.filter((page) => Number.isInteger(page) && page > 0))
+  );
+  return normalized.length > 0 ? normalized : [fallbackPage];
+}
+
+function buildPreviewReference(taskResult: TaskResult): PreviewReference {
+  if (taskResult.task_type === "ask") {
+    const primaryReference =
+      (taskResult.evidence_mode === "declared"
+        ? taskResult.citations?.[0]
+        : taskResult.candidate_chunks?.[0]) ?? null;
+    const retrievedPages = taskResult.retrieved_pages ?? [];
+    const page = primaryReference?.page_numbers[0] ?? retrievedPages[0] ?? 1;
+    const pages = normalizePreviewPages(
+      primaryReference?.page_numbers ?? retrievedPages,
+      page
+    );
+    const snippet = primaryReference?.snippet ?? taskResult.evidence_quotes[0]?.quote ?? null;
+    return {
+      page,
+      pages,
+      snippet,
+      snippetPage: snippet ? page : null
+    };
+  }
+
+  const primaryReference = taskResult.source_chunks?.[0] ?? null;
+  const page = primaryReference?.page_numbers[0] ?? 1;
+  const pages = normalizePreviewPages(primaryReference?.page_numbers ?? [page], page);
+  const snippet = primaryReference?.snippet ?? null;
+  return {
+    page,
+    pages,
+    snippet,
+    snippetPage: snippet ? page : null
+  };
+}
+
+function upsertRecentDocument(
+  current: RecentDocument[],
+  metadata: UploadMetadata
+): RecentDocument[] {
+  const dedupeKey = metadata.document_fingerprint || metadata.file_id;
+  return [
+    {
+      file_id: metadata.file_id,
+      original_name: metadata.original_name,
+      access_token: metadata.access_token,
+      document_fingerprint: metadata.document_fingerprint,
+      file_type: metadata.file_type,
+      text_chars: metadata.text_chars,
+      page_count: metadata.page_count,
+      chunk_count: metadata.chunk_count,
+      expires_at: metadata.expires_at,
+      parse_status: metadata.parse_status,
+      saved_at: new Date().toISOString()
+    },
+    ...current.filter(
+      (item) => (item.document_fingerprint || item.file_id) !== dedupeKey
+    )
+  ].slice(0, 5);
+}
+
 export default function App() {
+  const [session, setSession] = useState<AuthSession | null>(() => readStoredSession());
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authPending, setAuthPending] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [taskType, setTaskType] = useState<TaskType>("summary");
   const [responseDetailLevel, setResponseDetailLevel] =
     useState<ResponseDetailLevel>("balanced");
@@ -150,10 +284,12 @@ export default function App() {
   const [loadStage, setLoadStage] = useState<"idle" | "uploading" | "model">("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPage, setPreviewPage] = useState(1);
   const [previewPages, setPreviewPages] = useState<number[]>([1]);
   const [previewSnippet, setPreviewSnippet] = useState<string | null>(null);
+  const [previewSnippetPage, setPreviewSnippetPage] = useState<number | null>(null);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage(RECENT_DOCUMENTS_KEY, [])
   );
@@ -161,17 +297,22 @@ export default function App() {
     readStorage(RECENT_RESULTS_KEY, [])
   );
   const [logSummary, setLogSummary] = useState<LogSummary | null>(null);
+  const [statsExpanded, setStatsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const hadStoredSessionRef = useRef(Boolean(readStoredSession()));
 
+  const isAuthenticated = Boolean(session);
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
   const pendingDocumentType =
     pendingDocument?.name.split(".").pop()?.toLowerCase() ?? pendingDocument?.type ?? "-";
   const canSubmit =
+    isAuthenticated &&
     !loading &&
     Boolean(selectedFile || uploadedMetadata) &&
     (taskType !== "ask" || Boolean(input.trim()));
   const previewMetadata = uploadedMetadata?.file_type === "pdf" ? uploadedMetadata : null;
+  const interactionLocked = loading || authPending || authLoading;
 
   useEffect(() => {
     writeStorage(RECENT_DOCUMENTS_KEY, recentDocuments);
@@ -182,17 +323,84 @@ export default function App() {
   }, [recentResults]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLogSummary(null);
+      return;
+    }
     void fetchLogSummary().then(setLogSummary).catch(() => setLogSummary(null));
-  }, [result]);
+  }, [isAuthenticated, result]);
 
-  function applyActiveDocument(metadata: UploadMetadata | null, page = 1, pages: number[] = [page]) {
+  useEffect(() => {
+    setAuthLoading(true);
+    let cancelled = false;
+    void (async () => {
+      const isDemo = await fetchDemoMode();
+      if (cancelled) return;
+      setDemoMode(isDemo);
+
+      try {
+        const currentSession = await fetchCurrentSession();
+        if (cancelled) return;
+        hadStoredSessionRef.current = true;
+        setSession(currentSession);
+        setAuthError(null);
+        return;
+      } catch (sessionError) {
+        if (cancelled) return;
+
+        if (isDemo) {
+          try {
+            const demoSession = await ensureDemoSession();
+            if (cancelled) return;
+            hadStoredSessionRef.current = true;
+            setSession(demoSession);
+            setAuthError(null);
+            return;
+          } catch {
+            // fall through to reset + show error
+          }
+        }
+
+        clearStoredSession();
+        setSession(null);
+        setRecentDocuments([]);
+        setRecentResults([]);
+        setUploadedMetadata(null);
+        setSelectedFile(null);
+        setResult(null);
+        setError(null);
+        setNotice(null);
+        setPreviewOpen(false);
+        setPreviewPage(1);
+        setPreviewPages([1]);
+        setPreviewSnippet(null);
+        setPreviewSnippetPage(null);
+        setAuthError(
+          hadStoredSessionRef.current ? normalizeAuthErrorMessage(sessionError) : null
+        );
+      }
+    })().finally(() => {
+      if (!cancelled) setAuthLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function applyActiveDocument(metadata: UploadMetadata | null, preview?: PreviewReference) {
+    const nextPage = preview?.page ?? 1;
+    const nextPages = preview?.pages ?? [nextPage];
     setUploadedMetadata(metadata);
     setSelectedFile(null);
-    setPreviewPage(page);
-    setPreviewPages(pages.length > 0 ? pages : [page]);
+    setPreviewPage(nextPage);
+    setPreviewPages(nextPages.length > 0 ? nextPages : [nextPage]);
     setPreviewOpen(Boolean(metadata && metadata.file_type === "pdf"));
     if (!metadata || metadata.file_type !== "pdf") {
       setPreviewSnippet(null);
+      setPreviewSnippetPage(null);
+    } else {
+      setPreviewSnippet(preview?.snippet ?? null);
+      setPreviewSnippetPage(preview?.snippetPage ?? null);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -204,31 +412,109 @@ export default function App() {
     setSelectedFile(null);
     setResult(null);
     setError(null);
+    setNotice(null);
     setPreviewOpen(false);
     setPreviewPage(1);
     setPreviewPages([1]);
     setPreviewSnippet(null);
+    setPreviewSnippetPage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }
 
+  function removeDocumentRecords(fileId: string) {
+    setRecentDocuments((current) => current.filter((item) => item.file_id !== fileId));
+    setRecentResults((current) => current.filter((item) => item.task_result.file_id !== fileId));
+  }
+
+  function clearSessionWorkspace() {
+    clearStoredSession();
+    setSession(null);
+    setRecentDocuments([]);
+    setRecentResults([]);
+    clearCurrentDocument();
+  }
+
+  function handleSessionExpired(error: unknown): boolean {
+    if (!isSessionError(error)) {
+      return false;
+    }
+    clearSessionWorkspace();
+    setAuthError(normalizeAuthErrorMessage(error));
+    setAuthNotice(null);
+    return true;
+  }
+
+  function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthPending(true);
+    setAuthError(null);
+    setAuthNotice(null);
+
+    void loginSession(inviteCode.trim(), displayName.trim())
+      .then((nextSession) => {
+        setSession(nextSession);
+        setInviteCode("");
+        setDisplayName("");
+        setRecentDocuments([]);
+        setRecentResults([]);
+        clearCurrentDocument();
+        setAuthNotice(`已进入试用会话：${nextSession.label}`);
+      })
+      .catch((loginError) => {
+        setAuthError(normalizeAuthErrorMessage(loginError));
+      })
+      .finally(() => {
+        setAuthPending(false);
+      });
+  }
+
+  function handleRetryDemoSession() {
+    setAuthPending(true);
+    setAuthError(null);
+    void ensureDemoSession()
+      .then((demoSession) => {
+        hadStoredSessionRef.current = true;
+        setSession(demoSession);
+      })
+      .catch((retryError) => {
+        setAuthError(normalizeAuthErrorMessage(retryError));
+      })
+      .finally(() => {
+        setAuthPending(false);
+      });
+  }
+
+  function handleLogout() {
+    setAuthPending(true);
+    setAuthError(null);
+    setAuthNotice(null);
+    void logoutSession()
+      .catch(() => undefined)
+      .finally(() => {
+        clearSessionWorkspace();
+        setAuthNotice("已退出当前试用会话。");
+        setAuthPending(false);
+      });
+  }
+
   function restoreRecentDocument(document: RecentDocument) {
     void (async () => {
+      setNotice(null);
       try {
-        const metadata = (await fetchDocumentMetadata(document.file_id)).metadata;
-        setPreviewSnippet(null);
-        applyActiveDocument(metadata, 1, [1]);
+        const metadata = (
+          await fetchDocumentMetadata(document.file_id, document.access_token)
+        ).metadata;
+        applyActiveDocument(metadata);
         setResult(null);
         setError(null);
       } catch (restoreError) {
-        if (shouldRemoveMissingRecord(restoreError)) {
-          setRecentDocuments((current) =>
-            current.filter((item) => item.file_id !== document.file_id)
-          );
-          setRecentResults((current) =>
-            current.filter((item) => item.task_result.file_id !== document.file_id)
-          );
+        if (handleSessionExpired(restoreError)) {
+          return;
+        }
+        if (shouldRemoveInaccessibleRecord(restoreError)) {
+          removeDocumentRecords(document.file_id);
         }
         setError(normalizeRecordErrorMessage(restoreError));
       }
@@ -237,20 +523,16 @@ export default function App() {
 
   function restoreRecentResult(item: RecentResult) {
     void (async () => {
+      setNotice(null);
       try {
-        const metadata = (await fetchDocumentMetadata(item.task_result.file_id)).metadata;
-        const firstPage =
-          (item.task_result.task_type === "ask"
-            ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
-            : item.task_result.source_chunks[0]?.page_numbers[0]) ?? 1;
-        const firstSnippet =
-          (item.task_result.task_type === "ask"
-            ? item.task_result.citations[0]?.snippet ?? item.task_result.evidence_quotes[0]?.quote
-            : item.task_result.source_chunks[0]?.snippet) ?? null;
-        const candidatePages =
-          (item.task_result.task_type === "ask"
-            ? item.task_result.citations[0]?.page_numbers ?? item.task_result.retrieved_pages
-            : item.task_result.source_chunks[0]?.page_numbers) ?? [firstPage];
+        const accessToken = resolveAccessToken(
+          item.task_result.file_id,
+          item.document_snapshot?.access_token
+        );
+        const metadata = (
+          await fetchDocumentMetadata(item.task_result.file_id, accessToken)
+        ).metadata;
+        const preview = buildPreviewReference(item.task_result);
 
         setTaskType(item.task_type);
         if (item.task_result.response_detail_level) {
@@ -259,18 +541,54 @@ export default function App() {
         setInput(item.input);
         setResult(item.task_result);
         setError(null);
-        setPreviewSnippet(firstSnippet);
-        applyActiveDocument(metadata, firstPage, candidatePages);
+        applyActiveDocument(metadata, preview);
       } catch (restoreError) {
-        if (shouldRemoveMissingRecord(restoreError)) {
+        if (handleSessionExpired(restoreError)) {
+          return;
+        }
+        if (shouldRemoveInaccessibleRecord(restoreError)) {
           setRecentResults((current) => current.filter((entry) => entry.id !== item.id));
-          setRecentDocuments((current) =>
-            current.filter((document) => document.file_id !== item.task_result.file_id)
-          );
+          removeDocumentRecords(item.task_result.file_id);
         }
         setError(normalizeRecordErrorMessage(restoreError));
       }
     })();
+  }
+
+  function handleDeleteCurrentDocument() {
+    if (!uploadedMetadata?.file_id) {
+      setNotice(null);
+      setError("当前没有可删除的文档。");
+      return;
+    }
+
+    if (!window.confirm(`确认删除文档“${uploadedMetadata.original_name}”吗？此操作不可撤销。`)) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setNotice(null);
+    void deleteDocument(uploadedMetadata.file_id, uploadedMetadata.access_token)
+      .then(() => {
+        const deletedName = uploadedMetadata.original_name;
+        removeDocumentRecords(uploadedMetadata.file_id);
+        clearCurrentDocument();
+        setNotice(`文档“${deletedName}”已删除，最近记录已同步清理。`);
+      })
+      .catch((deleteError) => {
+        if (handleSessionExpired(deleteError)) {
+          return;
+        }
+        if (shouldRemoveInaccessibleRecord(deleteError)) {
+          removeDocumentRecords(uploadedMetadata.file_id);
+          clearCurrentDocument();
+        }
+        setError(normalizeErrorMessage(deleteError));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -278,6 +596,7 @@ export default function App() {
     setLoading(true);
     setLoadStage("idle");
     setError(null);
+    setNotice(null);
 
     try {
       let metadata = uploadedMetadata;
@@ -291,22 +610,7 @@ export default function App() {
         fileId = nextMetadata.file_id;
         setUploadedMetadata(nextMetadata);
         setSelectedFile(null);
-        setRecentDocuments((current) =>
-          [
-            {
-              file_id: nextMetadata.file_id,
-              original_name: nextMetadata.original_name,
-              document_fingerprint: nextMetadata.document_fingerprint,
-              file_type: nextMetadata.file_type,
-              text_chars: nextMetadata.text_chars,
-              page_count: nextMetadata.page_count,
-              chunk_count: nextMetadata.chunk_count,
-              parse_status: nextMetadata.parse_status,
-              saved_at: new Date().toISOString()
-            },
-            ...current.filter((item) => item.file_id !== nextMetadata.file_id)
-          ].slice(0, 5)
-        );
+        setRecentDocuments((current) => upsertRecentDocument(current, nextMetadata));
       }
 
       if (!fileId) {
@@ -314,19 +618,16 @@ export default function App() {
       }
 
       setLoadStage("model");
-      const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
+      const taskResult = await runTask(
+        taskType,
+        fileId,
+        input.trim(),
+        responseDetailLevel,
+        metadata?.access_token
+      );
       setResult(taskResult);
       if (metadata?.file_type === "pdf") {
-        const defaultSnippet =
-          taskResult.task_type === "ask"
-            ? taskResult.citations[0]?.snippet ?? taskResult.evidence_quotes[0]?.quote ?? null
-            : taskResult.source_chunks[0]?.snippet ?? null;
-        const defaultPages =
-          (taskResult.task_type === "ask"
-            ? taskResult.citations[0]?.page_numbers ?? taskResult.retrieved_pages
-            : taskResult.source_chunks[0]?.page_numbers) ?? [1];
-        setPreviewSnippet(defaultSnippet);
-        applyActiveDocument(metadata, defaultPages[0] ?? 1, defaultPages);
+        applyActiveDocument(metadata, buildPreviewReference(taskResult));
       }
 
       setRecentResults((current) =>
@@ -343,6 +644,9 @@ export default function App() {
         ].slice(0, 5)
       );
     } catch (submitError) {
+      if (handleSessionExpired(submitError)) {
+        return;
+      }
       setError(normalizeErrorMessage(submitError));
       setResult(null);
     } finally {
@@ -372,7 +676,7 @@ export default function App() {
               <span className="flow-step">生成</span>
             </div>
             <p className="subtitle">
-              上传文档，完成摘要、问答和提纲生成，并把结果组织成可解释的工作流。
+              面向论文与报告阅读、答辩准备的文档助手，每一条回答都能跳回 PDF 原文证据。
             </p>
           </div>
           <div className="hero-pills">
@@ -386,36 +690,62 @@ export default function App() {
 
         <section className="dashboard-grid">
           <article className="panel stats-panel">
-            <div className="section-head">
+            <div className="section-head stats-head">
               <h2 className="panel-title">当前系统状态</h2>
+              {logSummary ? (
+                <button
+                  className="ghost-button stats-toggle"
+                  data-testid="stats-toggle"
+                  type="button"
+                  aria-expanded={statsExpanded}
+                  onClick={() => setStatsExpanded((prev) => !prev)}
+                >
+                  {statsExpanded ? "收起 ▴" : "展开详情 ▾"}
+                </button>
+              ) : null}
             </div>
             {logSummary ? (
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <span>总请求数</span>
-                  <strong>{logSummary.total_requests}</strong>
+              <>
+                <div
+                  className={`stats-summary${logSummary.error_count > 0 ? " has-errors" : ""}`}
+                  data-testid="stats-summary"
+                >
+                  <span className="stats-dot" aria-hidden="true" />
+                  <span className="stats-summary-text">
+                    {logSummary.error_count > 0
+                      ? `运行中 · 有效 ${logSummary.answered_count} / 总计 ${logSummary.total_requests}`
+                      : `系统正常 · 已完成 ${logSummary.total_requests} 次任务`}
+                  </span>
                 </div>
-                <div className="stat-card">
-                  <span>有效回答数</span>
-                  <strong>{logSummary.answered_count}</strong>
-                </div>
-                <div className="stat-card">
-                  <span>拒答数</span>
-                  <strong>{logSummary.refused_count}</strong>
-                </div>
-                <div className="stat-card">
-                  <span>错误数</span>
-                  <strong>{logSummary.error_count}</strong>
-                </div>
-                <div className="stat-card">
-                  <span>平均延迟</span>
-                  <strong>{logSummary.average_latency_ms} ms</strong>
-                </div>
-                <div className="stat-card">
-                  <span>P95 延迟</span>
-                  <strong>{logSummary.p95_latency_ms} ms</strong>
-                </div>
-              </div>
+                {statsExpanded ? (
+                  <div className="stats-grid" data-testid="stats-grid">
+                    <div className="stat-card">
+                      <span>总请求数</span>
+                      <strong>{logSummary.total_requests}</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>有效回答数</span>
+                      <strong>{logSummary.answered_count}</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>拒答数</span>
+                      <strong>{logSummary.refused_count}</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>错误数</span>
+                      <strong>{logSummary.error_count}</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>平均延迟</span>
+                      <strong>{logSummary.average_latency_ms} ms</strong>
+                    </div>
+                    <div className="stat-card">
+                      <span>P95 延迟</span>
+                      <strong>{logSummary.p95_latency_ms} ms</strong>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : (
               <p className="empty">当前暂无统计数据，完成一次任务后会自动刷新。</p>
             )}
@@ -430,7 +760,7 @@ export default function App() {
               <button
                 className="hero-button"
                 type="button"
-                disabled={loading}
+                disabled={!isAuthenticated || interactionLocked}
                 onClick={() => {
                   const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
                     type: "text/markdown"
@@ -443,6 +773,7 @@ export default function App() {
                   setPreviewPage(1);
                   setPreviewPages([1]);
                   setPreviewSnippet(null);
+                  setPreviewSnippetPage(null);
                 }}
               >
                 填充示例文档
@@ -452,7 +783,7 @@ export default function App() {
                   key={action.label}
                   className="demo-card"
                   type="button"
-                  disabled={loading}
+                  disabled={!isAuthenticated || interactionLocked}
                   onClick={() => {
                     setTaskType(action.taskType);
                     setInput(action.input);
@@ -476,10 +807,116 @@ export default function App() {
             <div className="section-head">
               <h2 className="panel-title">上传文档并启动任务</h2>
             </div>
-            <form className="form" onSubmit={handleSubmit}>
+            <div className="trial-boundary-card">
+              <strong>
+                {demoMode ? "演示模式" : "受控 Alpha"}
+                {session ? ` / ${session.label}` : ""}
+              </strong>
+              <span>
+                {demoMode
+                  ? "当前为演示环境，上传的文档仅用于现场体验，会话过期后会自动清理；请勿使用敏感资料。"
+                  : "当前版本仅面向邀请码试用，上传、检索、预览和删除都会绑定到当前试用会话；请仅使用非敏感文档。"}
+              </span>
+              {session && !demoMode ? (
+                <div className="inline-actions">
+                  <button
+                    className="ghost-button"
+                    data-testid="logout-button"
+                    type="button"
+                    disabled={interactionLocked}
+                    onClick={handleLogout}
+                  >
+                    退出会话
+                  </button>
+                </div>
+              ) : null}
+            </div>
+            {!isAuthenticated ? (
+              demoMode ? (
+                <div className="auth-panel-card">
+                  {authLoading ? (
+                    <p className="status status-card">正在准备演示环境...</p>
+                  ) : (
+                    <>
+                      <p className="error status-card" data-testid="auth-error">
+                        {authError ?? "演示会话暂时无法创建，请稍后重试。"}
+                      </p>
+                      <div className="control-actions">
+                        <button
+                          className="submit"
+                          type="button"
+                          disabled={authPending}
+                          onClick={handleRetryDemoSession}
+                        >
+                          {authPending ? "正在重试..." : "重新进入演示"}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+              <div className="auth-panel-card">
+                <div className="section-head compact-head">
+                  <p className="section-kicker">邀请码登录</p>
+                  <h3>先登录再开始试用</h3>
+                </div>
+                <p className="subtitle compact">
+                  输入邀请码后，系统会创建一个短期试用会话，并把当前浏览器里的文档访问权限绑定到该会话。
+                </p>
+                {authError ? (
+                  <p className="error status-card" data-testid="auth-error">
+                    {authError}
+                  </p>
+                ) : null}
+                {authNotice ? (
+                  <p className="status status-card success-status" data-testid="auth-notice">
+                    {authNotice}
+                  </p>
+                ) : null}
+                {authLoading ? (
+                  <p className="status status-card">正在校验试用会话...</p>
+                ) : null}
+                <form className="form" onSubmit={handleLogin}>
+                  <label className="field">
+                    <span>邀请码</span>
+                    <input
+                      data-testid="invite-code-input"
+                      type="password"
+                      value={inviteCode}
+                      disabled={authPending || authLoading}
+                      onChange={(event) => setInviteCode(event.target.value)}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>显示名称（可选）</span>
+                    <input
+                      data-testid="display-name-input"
+                      type="text"
+                      value={displayName}
+                      disabled={authPending || authLoading}
+                      onChange={(event) => setDisplayName(event.target.value)}
+                    />
+                  </label>
+                  <div className="control-actions">
+                    <button
+                      className="submit"
+                      data-testid="login-submit-button"
+                      type="submit"
+                      disabled={authPending || authLoading || !inviteCode.trim()}
+                    >
+                      {authPending ? "正在登录..." : "登录试用"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+              )
+            ) : (
+              <>
+                <form className="form" onSubmit={handleSubmit}>
               <label className="field">
                 <span>上传文档</span>
                 <input
+                  data-testid="file-input"
                   ref={fileInputRef}
                   type="file"
                   accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
@@ -491,10 +928,12 @@ export default function App() {
                       setUploadedMetadata(null);
                       setResult(null);
                       setError(null);
+                      setNotice(null);
                       setPreviewOpen(false);
                       setPreviewPage(1);
                       setPreviewPages([1]);
                       setPreviewSnippet(null);
+                      setPreviewSnippetPage(null);
                     }
                   }}
                 />
@@ -520,6 +959,8 @@ export default function App() {
                   {TASK_OPTIONS.map((option) => (
                     <button
                       key={option.value}
+                      data-testid={`task-option-${option.value}`}
+                      aria-pressed={taskType === option.value}
                       className={`option-card${taskType === option.value ? " active" : ""}`}
                       type="button"
                       disabled={loading}
@@ -538,6 +979,8 @@ export default function App() {
                   {DETAIL_OPTIONS.map((option) => (
                     <button
                       key={option.value}
+                      data-testid={`detail-option-${option.value}`}
+                      aria-pressed={responseDetailLevel === option.value}
                       className={`detail-card${responseDetailLevel === option.value ? " active" : ""}`}
                       type="button"
                       disabled={loading}
@@ -553,6 +996,7 @@ export default function App() {
               <label className="field">
                 <span>问题或指令</span>
                 <textarea
+                  data-testid="task-input"
                   rows={6}
                   value={input}
                   placeholder={currentOption.placeholder}
@@ -562,17 +1006,28 @@ export default function App() {
               </label>
 
               <div className="control-actions">
-                <button className="submit" type="submit" disabled={!canSubmit}>
+                <button
+                  className="submit"
+                  data-testid="submit-task-button"
+                  type="submit"
+                  disabled={!canSubmit}
+                >
                   {loading ? "处理中..." : "提交任务"}
                 </button>
                 <p className="control-hint">建议先用 Demo 模式体验完整链路，再换真实文档。</p>
               </div>
             </form>
 
+            {notice ? (
+              <p className="status status-card success-status" data-testid="notice-banner">
+                {notice}
+              </p>
+            ) : null}
+
             <div className="document-brief">
               <div className="section-head compact-head">
                 <p className="section-kicker">当前文档</p>
-                <h3>
+                <h3 data-testid="current-document-name">
                   {uploadedMetadata
                     ? uploadedMetadata.original_name
                     : pendingDocument
@@ -598,6 +1053,12 @@ export default function App() {
                     <span>分块数</span>
                     <strong>{uploadedMetadata.chunk_count}</strong>
                   </div>
+                  {uploadedMetadata.expires_at ? (
+                    <div className="meta-chip">
+                      <span>保留至</span>
+                      <strong>{new Date(uploadedMetadata.expires_at).toLocaleString()}</strong>
+                    </div>
+                  ) : null}
                 </div>
               ) : pendingDocument ? (
                 <div className="meta-grid">
@@ -626,11 +1087,23 @@ export default function App() {
                   {previewMetadata && !previewOpen ? (
                     <button
                       className="ghost-button"
+                      data-testid="open-pdf-preview-button"
                       type="button"
                       disabled={loading}
                       onClick={() => setPreviewOpen(true)}
                     >
                       打开 PDF 预览
+                    </button>
+                  ) : null}
+                  {uploadedMetadata ? (
+                    <button
+                      className="ghost-button danger-button"
+                      data-testid="delete-current-document-button"
+                      type="button"
+                      disabled={loading}
+                      onClick={handleDeleteCurrentDocument}
+                    >
+                      删除当前文档
                     </button>
                   ) : null}
                   <button className="ghost-button" type="button" disabled={loading} onClick={clearCurrentDocument}>
@@ -639,6 +1112,8 @@ export default function App() {
                 </div>
               ) : null}
             </div>
+              </>
+            )}
           </article>
 
           <ResultPanel
@@ -649,10 +1124,12 @@ export default function App() {
             result={result}
             canOpenPdfPreview={Boolean(previewMetadata)}
             onOpenPdfPage={(pages, snippet) => {
-              const nextPages = pages.length > 0 ? pages : [1];
+              const nextPages = normalizePreviewPages(pages);
+              const nextPrimaryPage = nextPages[0] ?? 1;
               setPreviewPages(nextPages);
-              setPreviewPage(nextPages[0] ?? 1);
+              setPreviewPage(nextPrimaryPage);
               setPreviewSnippet(snippet);
+              setPreviewSnippetPage(snippet ? nextPrimaryPage : null);
               setPreviewOpen(true);
             }}
           />
@@ -662,10 +1139,15 @@ export default function App() {
           <PdfPreviewPanel
             documentName={previewMetadata.original_name}
             fileId={previewMetadata.file_id}
+            accessToken={previewMetadata.access_token}
             page={previewPage}
             availablePages={previewPages}
-            src={buildFileContentUrl(previewMetadata.file_id, previewPage)}
-            highlightText={previewSnippet}
+            src={buildFileContentUrl(
+              previewMetadata.file_id,
+              previewMetadata.access_token,
+              previewPage
+            )}
+            highlightText={previewPage === previewSnippetPage ? previewSnippet : null}
             onSelectPage={(page) => setPreviewPage(page)}
             onClose={() => setPreviewOpen(false)}
           />
@@ -676,16 +1158,19 @@ export default function App() {
             <div className="section-head compact-head">
               <h2 className="panel-title">最近文档</h2>
             </div>
-            {recentDocuments.length === 0 ? (
+            {!isAuthenticated ? (
+              <p className="empty">登录后才会显示当前试用会话下的最近文档。</p>
+            ) : recentDocuments.length === 0 ? (
               <p className="empty">最近上传的文档会显示在这里，便于复用。</p>
             ) : (
               <div className="history-list">
                 {recentDocuments.map((item) => (
                   <button
                     key={item.file_id}
+                    data-testid={`recent-document-${item.file_id}`}
                     className="history-card"
                     type="button"
-                    disabled={loading}
+                    disabled={interactionLocked}
                     onClick={() => restoreRecentDocument(item)}
                   >
                     <strong>{item.original_name}</strong>
@@ -699,16 +1184,19 @@ export default function App() {
             <div className="section-head compact-head">
               <h2 className="panel-title">最近结果</h2>
             </div>
-            {recentResults.length === 0 ? (
+            {!isAuthenticated ? (
+              <p className="empty">登录后才会显示当前试用会话下的最近结果。</p>
+            ) : recentResults.length === 0 ? (
               <p className="empty">最近 5 次任务结果会显示在这里，方便回看演示。</p>
             ) : (
               <div className="history-list">
                 {recentResults.map((item) => (
                   <button
                     key={item.id}
+                    data-testid={`recent-result-${item.id}`}
                     className="history-card"
                     type="button"
-                    disabled={loading}
+                    disabled={interactionLocked}
                     onClick={() => restoreRecentResult(item)}
                   >
                     <strong>{TASK_LABELS[item.task_type]}</strong>

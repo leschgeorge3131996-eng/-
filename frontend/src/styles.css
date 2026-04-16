@@ -16,13 +16,28 @@
   --warning: #935d11;
   --error: #b1351a;
   background:
-    radial-gradient(circle at top left, rgba(173, 76, 35, 0.22), transparent 32%),
-    radial-gradient(circle at 85% 10%, rgba(19, 34, 56, 0.16), transparent 28%),
-    linear-gradient(180deg, #f7f2e8 0%, #eef1f4 54%, #e5ebf0 100%);
+    radial-gradient(ellipse 60% 45% at 8% 0%, rgba(173, 76, 35, 0.28), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 92% 6%, rgba(19, 34, 56, 0.2), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 110%, rgba(173, 76, 35, 0.1), transparent 60%),
+    linear-gradient(180deg, #f9f4ea 0%, #eef1f4 54%, #e3e9ef 100%);
+  background-attachment: fixed;
   color: var(--ink-strong);
-  font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "Aptos", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   line-height: 1.6;
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+button:focus-visible,
+.citation-button:focus-visible {
+  outline-offset: 4px;
 }
 
 @keyframes fadeUp {
@@ -150,12 +165,15 @@ textarea {
 
 .brandmark {
   margin: 0;
-  color: var(--accent);
-  font-size: clamp(36px, 5.8vw, 62px);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-size: clamp(40px, 6.2vw, 68px);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
   font-weight: 800;
-  text-shadow: 0 8px 30px rgba(173, 76, 35, 0.16);
+  background: linear-gradient(135deg, #c4562a 0%, #7a3317 55%, #3a1e10 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 10px 28px rgba(173, 76, 35, 0.2));
 }
 
 .hero-flow {
@@ -167,28 +185,55 @@ textarea {
 }
 
 .flow-step {
-  padding: 8px 12px;
-  border: 1px solid rgba(173, 76, 35, 0.16);
+  padding: 7px 14px;
+  border: 1px solid rgba(173, 76, 35, 0.22);
   border-radius: 999px;
-  background: rgba(173, 76, 35, 0.08);
+  background: linear-gradient(180deg, rgba(255, 249, 243, 0.95), rgba(255, 240, 228, 0.78));
   color: var(--accent-deep);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
+  box-shadow:
+    0 2px 6px rgba(173, 76, 35, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.flow-step:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 12px rgba(173, 76, 35, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .flow-separator {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(122, 51, 23, 0.42);
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1;
+  width: 24px;
+  height: 2px;
+  color: transparent;
+  position: relative;
 }
 
 .flow-separator::before {
-  content: "/";
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(173, 76, 35, 0.5), rgba(173, 76, 35, 0.15));
+  border-radius: 2px;
+}
+
+.flow-separator::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(173, 76, 35, 0.35);
+  transform: translateY(-50%);
 }
 
 .subtitle {
@@ -264,22 +309,27 @@ textarea {
   border-radius: 24px;
   background: linear-gradient(180deg, var(--surface-1), var(--surface-3));
   box-shadow:
-    0 18px 42px rgba(35, 48, 68, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
+    0 1px 2px rgba(35, 48, 68, 0.04),
+    0 8px 18px rgba(35, 48, 68, 0.06),
+    0 24px 48px rgba(35, 48, 68, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease,
+    border-color 260ms ease;
   animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .panel:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow:
-    0 24px 48px rgba(35, 48, 68, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.86);
-  border-color: rgba(173, 76, 35, 0.18);
+    0 2px 4px rgba(35, 48, 68, 0.05),
+    0 12px 24px rgba(35, 48, 68, 0.08),
+    0 32px 56px rgba(35, 48, 68, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(173, 76, 35, 0.2);
 }
 
 .stats-panel {
@@ -300,6 +350,38 @@ textarea {
   align-self: start;
   position: sticky;
   top: 18px;
+}
+
+.trial-boundary-card {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(147, 93, 17, 0.22);
+  border-radius: 18px;
+  background: rgba(255, 247, 232, 0.92);
+}
+
+.trial-boundary-card strong {
+  color: var(--warning);
+  font-size: 14px;
+}
+
+.trial-boundary-card span {
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.auth-panel-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(19, 34, 56, 0.1);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(19, 34, 56, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.82);
 }
 
 .result-panel {
@@ -342,10 +424,63 @@ textarea {
   font-size: 17px;
 }
 
+.stats-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-toggle {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.stats-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(19, 34, 56, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.stats-summary.has-errors {
+  border-color: rgba(177, 53, 26, 0.22);
+  background: rgba(255, 243, 237, 0.82);
+  color: var(--ink-strong);
+}
+
+.stats-summary-text {
+  flex: 1;
+}
+
+.stats-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3fa463;
+  box-shadow: 0 0 0 3px rgba(63, 164, 99, 0.16);
+  flex-shrink: 0;
+}
+
+.stats-summary.has-errors .stats-dot {
+  background: var(--warning, #c07b1a);
+  box-shadow: 0 0 0 3px rgba(192, 123, 26, 0.18);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  margin-top: 10px;
 }
 
 .stat-card {
@@ -404,12 +539,41 @@ textarea {
 
 .hero-button,
 .submit {
+  position: relative;
+  overflow: hidden;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  background: linear-gradient(135deg, #c65730 0%, var(--accent) 45%, var(--accent-deep) 100%);
   color: white;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(182, 84, 31, 0.22);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 10px 24px rgba(182, 84, 31, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.hero-button::before,
+.submit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.32) 50%, transparent 80%);
+  transform: translateX(-130%);
+  transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.hero-button:hover::before,
+.submit:hover::before {
+  transform: translateX(130%);
+}
+
+.hero-button:hover,
+.submit:hover {
+  box-shadow:
+    0 14px 30px rgba(182, 84, 31, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .hero-button {
@@ -446,6 +610,16 @@ textarea {
   background: rgba(255, 255, 255, 0.74);
   color: var(--ink-strong);
   cursor: pointer;
+}
+
+.danger-button {
+  border-color: rgba(177, 53, 26, 0.2);
+  color: var(--error);
+}
+
+.danger-button:hover {
+  border-color: rgba(177, 53, 26, 0.34);
+  background: rgba(255, 244, 242, 0.96);
 }
 
 .demo-card,
@@ -773,6 +947,11 @@ textarea {
   color: var(--navy);
 }
 
+.badge-evidence {
+  background: rgba(173, 76, 35, 0.12);
+  color: var(--accent-deep);
+}
+
 .result-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -813,6 +992,51 @@ textarea {
   color: var(--ink-strong);
   font-weight: 700;
   word-break: break-word;
+}
+
+.evidence-mode-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid rgba(19, 34, 56, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.evidence-mode-card strong {
+  font-size: 14px;
+}
+
+.evidence-mode-card span {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.evidence-mode-declared {
+  border-color: rgba(31, 106, 78, 0.2);
+  background: rgba(240, 250, 245, 0.86);
+}
+
+.evidence-mode-declared strong {
+  color: var(--success);
+}
+
+.evidence-mode-candidate {
+  border-color: rgba(173, 76, 35, 0.18);
+  background: rgba(255, 249, 242, 0.9);
+}
+
+.evidence-mode-candidate strong {
+  color: var(--accent-deep);
+}
+
+.evidence-mode-none {
+  border-color: rgba(177, 53, 26, 0.18);
+  background: rgba(255, 244, 242, 0.9);
+}
+
+.evidence-mode-none strong {
+  color: var(--error);
 }
 
 .terminal-shell {
@@ -1007,6 +1231,10 @@ textarea {
   font-size: 13px;
 }
 
+.preview-state-note {
+  margin-bottom: 0;
+}
+
 .citation-list,
 .history-list {
   display: grid;
@@ -1018,20 +1246,55 @@ textarea {
 }
 
 .citation-card {
-  padding: 11px 13px;
+  position: relative;
+  padding: 12px 14px 12px 18px;
   border: 1px solid rgba(183, 190, 203, 0.45);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.74);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(253, 248, 240, 0.82));
+  overflow: hidden;
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease;
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.citation-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  opacity: 0.55;
+  transition: opacity 220ms ease, top 220ms ease, bottom 220ms ease;
 }
 
 .citation-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(173, 76, 35, 0.18);
-  box-shadow: 0 12px 22px rgba(35, 48, 68, 0.06);
+  border-color: rgba(173, 76, 35, 0.32);
+  box-shadow:
+    0 14px 28px rgba(35, 48, 68, 0.09),
+    0 2px 4px rgba(173, 76, 35, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 237, 0.9));
+}
+
+.citation-card:hover::before {
+  opacity: 1;
+  top: 0;
+  bottom: 0;
+}
+
+.citation-card p,
+.citation-card blockquote {
+  font-family: "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  font-size: 14px;
+  line-height: 1.72;
+  color: var(--ink-strong);
 }
 
 .citation-button {
@@ -1039,6 +1302,34 @@ textarea {
   text-align: left;
   cursor: pointer;
   font: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  position: relative;
+}
+
+.citation-button::after {
+  content: "→ 跳转 PDF";
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  color: white;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+
+.citation-card:hover .citation-button::after {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .citation-meta {
@@ -1106,6 +1397,12 @@ textarea {
 
 .warning {
   color: var(--warning);
+}
+
+.success-status {
+  color: var(--success);
+  border-color: rgba(31, 106, 78, 0.18);
+  background: rgba(242, 251, 247, 0.9);
 }
 
 .pdf-preview-panel {
