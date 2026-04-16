@@ -149,10 +149,7 @@ export async function fetchLogSummary(): Promise<LogSummary> {
   return parseResponse<LogSummary>(response);
 }
 
-export async function fetchDocumentPage(
-  fileId: string,
-  pageNumber: number
-): Promise<DocumentPageData> {
+export async function fetchDocumentPage(fileId: string, pageNumber: number): Promise<DocumentPageData> {
   const response = await fetch(`${API_BASE_URL}/files/${fileId}/pages/${pageNumber}`);
   return parseResponse<DocumentPageData>(response);
 }

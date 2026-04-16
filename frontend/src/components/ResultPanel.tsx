@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import MarkdownResult from "./MarkdownResult";
-import type { ResponseDetailLevel, TaskResult, TaskType, UploadMetadata } from "../types";
+import type { ResponseDetailLevel, TaskResult, TaskType } from "../types";
 
 const MOTION_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -44,7 +44,6 @@ async function copyText(text: string): Promise<void> {
 
 type ResultPanelProps = {
   activeTaskType: TaskType;
-  currentDocument?: UploadMetadata | null;
   error: string | null;
   loading: boolean;
   loadMessage: string;
@@ -55,7 +54,6 @@ type ResultPanelProps = {
 
 export default function ResultPanel({
   activeTaskType,
-  currentDocument = null,
   error,
   loading,
   loadMessage,
@@ -65,7 +63,7 @@ export default function ResultPanel({
 }: ResultPanelProps) {
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
   const stateKey = error ? "error" : loading ? "loading" : result ? result.request_id : "idle";
-  const evidenceItems = result
+  const previewableItems = result
     ? result.task_type === "ask"
       ? result.citations
       : result.source_chunks
@@ -74,26 +72,6 @@ export default function ResultPanel({
   useEffect(() => {
     setCopyState("idle");
   }, [result?.request_id]);
-
-  const usedEvidenceCount = useMemo(() => {
-    if (!result) {
-      return 0;
-    }
-    if (result.task_type === "ask") {
-      return result.used_chunk_ids.length || result.citations.length;
-    }
-    return result.source_chunks.length;
-  }, [result]);
-
-  const compressionRate = useMemo(() => {
-    if (!result || result.source_document_chars <= 0 || result.used_document_chars <= 0) {
-      return null;
-    }
-    return Math.max(
-      0,
-      Math.round((1 - result.used_document_chars / result.source_document_chars) * 100)
-    );
-  }, [result]);
 
   async function handleCopyResult() {
     if (!result?.result) {
@@ -108,38 +86,6 @@ export default function ResultPanel({
       setCopyState("error");
       window.setTimeout(() => setCopyState("idle"), 2200);
     }
-  }
-
-  function renderEvidenceCard(
-    item: { chunk_id: string; page_numbers: number[]; snippet: string },
-    index: number
-  ) {
-    const content = (
-      <>
-        <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
-        <p>{item.snippet}</p>
-      </>
-    );
-
-    return canOpenPdfPreview && onOpenPdfPage ? (
-      <motion.button
-        key={item.chunk_id}
-        className="citation-card citation-button"
-        type="button"
-        onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
-        {...revealMotion(index * 0.04)}
-      >
-        {content}
-      </motion.button>
-    ) : (
-      <motion.article
-        key={item.chunk_id}
-        className="citation-card"
-        {...revealMotion(index * 0.04)}
-      >
-        {content}
-      </motion.article>
-    );
   }
 
   return (
@@ -179,85 +125,144 @@ export default function ResultPanel({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: MOTION_EASE }}
           >
-            提交任务后，这里会展示结果、证据、路由和请求指标。
+            提交任务后，这里会展示完整结果、来源信息和路由详情。
           </motion.p>
         ) : (
           <motion.div
             key={stateKey}
-            className="result-stage"
+            className="result"
             exit={{ opacity: 0, y: -14 }}
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: MOTION_EASE }}
           >
-            <div className="result-stage-head">
-              <div className="result-stage-copy">
-                <p className="result-kicker">结果舞台</p>
-                <h3>{TASK_LABELS[result.task_type]}输出</h3>
-                <p className="result-stage-subtitle">
-                  当前回答围绕文档证据链展开，你可以直接查看来源片段并回到 PDF 原页。
-                </p>
+            <div className="result-badges">
+              <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
+              <span className="badge badge-route">{result.route_tier ?? "default"}</span>
+              <span className="badge badge-outcome">{result.outcome}</span>
+              {result.response_detail_level ? (
+                <span className="badge badge-detail">
+                  {RESPONSE_DETAIL_LABELS[result.response_detail_level] ??
+                    result.response_detail_level}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="result-meta-grid">
+              <div className="result-meta-card">
+                <span>模型</span>
+                <strong>{result.model_name}</strong>
               </div>
-              <div className="result-badges">
-                <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
-                <span className="badge badge-route">{result.route_tier ?? "default"}</span>
-                <span className="badge badge-outcome">{result.outcome}</span>
-                {result.response_detail_level ? (
-                  <span className="badge badge-detail">
-                    {RESPONSE_DETAIL_LABELS[result.response_detail_level] ??
-                      result.response_detail_level}
-                  </span>
-                ) : null}
+              {result.route_reason ? (
+                <div className="result-meta-card">
+                  <span>路由原因</span>
+                  <strong>{result.route_reason}</strong>
+                </div>
+              ) : null}
+              <div className="result-meta-card">
+                <span>耗时</span>
+                <strong>{result.latency_ms} ms</strong>
+              </div>
+              <div className="result-meta-card">
+                <span>请求 ID</span>
+                <strong>{result.request_id}</strong>
               </div>
             </div>
 
-            <div className="result-path-grid">
-              <div className="result-path-card">
-                <label>源文档</label>
-                <strong>{currentDocument?.page_count ?? result.retrieved_pages.length}</strong>
-                <span>
-                  {currentDocument
-                    ? `${currentDocument.chunk_count} 个分块 / ${currentDocument.file_type.toUpperCase()}`
-                    : result.document_name}
-                </span>
-              </div>
-              <div className="result-path-card">
-                <label>检索结果</label>
-                <strong>{result.retrieved_chunk_count}</strong>
-                <span>
-                  {result.retrieved_pages.length > 0
-                    ? `页码：${result.retrieved_pages.join(", ")}`
-                    : "未使用检索"}
-                </span>
-              </div>
-              <div className="result-path-card">
-                <label>使用证据</label>
-                <strong>{usedEvidenceCount}</strong>
-                <span>
-                  {result.task_type === "ask"
-                    ? `evidence mode: ${result.evidence_mode ?? "none"}`
-                    : "来源片段已选出"}
-                </span>
-              </div>
-              <div className="result-path-card">
-                <label>输出控制</label>
-                <strong>
-                  {result.response_detail_level
-                    ? RESPONSE_DETAIL_LABELS[result.response_detail_level]
-                    : "默认"}
-                </strong>
-                <span>{result.route_reason ?? "按当前策略路由"}</span>
-              </div>
-            </div>
+            {result.cache_hit ? <p className="cache-hit">本次结果命中本地缓存。</p> : null}
+            {result.retrieval_applied ? (
+              <p className="status">
+                已从 {result.retrieved_chunk_count} 个片段构造上下文
+                {result.retrieved_pages.length > 0
+                  ? `，涉及页码：${result.retrieved_pages.join(", ")}`
+                  : ""}
+                。
+              </p>
+            ) : null}
+            {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
+              <p className="warning">
+                {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
+              </p>
+            ) : null}
+            {result.context_truncated ? (
+              <p className="warning">
+                {result.truncation_message ??
+                  `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
+              </p>
+            ) : null}
+            {result.token_usage?.total_tokens ? (
+              <p className="status token-usage">
+                Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
+                {result.token_usage.completion_tokens ?? 0} / 总计{" "}
+                {result.token_usage.total_tokens}
+              </p>
+            ) : null}
 
-            <div className="result-surface">
-              <section className="answer-stage">
-                <div className="answer-stage-head">
-                  <div>
-                    <h4>模型结果</h4>
-                    <p>当前输出已经过结构化展示和可复制收口。</p>
-                  </div>
-                  <button className="copy-button stage-copy-button" type="button" onClick={handleCopyResult}>
+            {previewableItems.length > 0 ? (
+              <div className="citation-list">
+                {previewableItems.map((item, index) => {
+                  const cardContent = (
+                    <>
+                      <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
+                      <p>{item.snippet}</p>
+                    </>
+                  );
+                  return canOpenPdfPreview && onOpenPdfPage ? (
+                    <motion.button
+                      key={item.chunk_id}
+                      className="citation-card citation-button"
+                      type="button"
+                      onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
+                      {...revealMotion(index * 0.04)}
+                    >
+                      {cardContent}
+                    </motion.button>
+                  ) : (
+                    <motion.article
+                      key={item.chunk_id}
+                      className="citation-card"
+                      {...revealMotion(index * 0.04)}
+                    >
+                      {cardContent}
+                    </motion.article>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {result.evidence_quotes.length > 0 ? (
+              <div className="evidence-quotes">
+                <h3>证据摘录</h3>
+                <div className="citation-list">
+                  {result.evidence_quotes.map((quote, index) => (
+                    <motion.article
+                      key={`${result.request_id}-${quote.chunk_id}-${index}`}
+                      className="citation-card"
+                      {...revealMotion(index * 0.04)}
+                    >
+                      <p className="citation-meta">证据块：{quote.chunk_id}</p>
+                      <p>{quote.quote}</p>
+                    </motion.article>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <motion.div
+              className="terminal-shell"
+              initial={{ opacity: 0, scale: 0.985 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.28, delay: 0.08, ease: MOTION_EASE }}
+            >
+              <div className="terminal-head">
+                <div className="terminal-lights" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="terminal-actions">
+                  <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
+                  <button className="copy-button" type="button" onClick={handleCopyResult}>
                     {copyState === "done"
                       ? "已复制"
                       : copyState === "error"
@@ -265,102 +270,11 @@ export default function ResultPanel({
                         : "复制结果"}
                   </button>
                 </div>
-
-                <div className="answer-output">
-                  <MarkdownResult content={result.result} />
-                </div>
-
-                {result.cache_hit ? <p className="cache-hit">本次结果命中本地缓存。</p> : null}
-                {result.retrieval_applied ? (
-                  <p className="status">
-                    已从 {result.retrieved_chunk_count} 个片段构造上下文
-                    {result.retrieved_pages.length > 0
-                      ? `，涉及页码：${result.retrieved_pages.join(", ")}`
-                      : ""}
-                    。
-                  </p>
-                ) : null}
-                {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
-                  <p className="warning">
-                    {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
-                  </p>
-                ) : null}
-                {result.context_truncated ? (
-                  <p className="warning">
-                    {result.truncation_message ??
-                      `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
-                  </p>
-                ) : null}
-              </section>
-
-              <aside className="result-rail">
-                <div className="rail-card">
-                  <h4>{result.task_type === "ask" ? "引用依据" : "来源片段"}</h4>
-                  {evidenceItems.length > 0 ? (
-                    <div className="citation-list">
-                      {evidenceItems.map((item, index) => renderEvidenceCard(item, index))}
-                    </div>
-                  ) : (
-                    <p className="empty">当前结果没有可展示的来源片段。</p>
-                  )}
-                </div>
-
-                {result.evidence_quotes.length > 0 ? (
-                  <div className="rail-card">
-                    <h4>证据摘录</h4>
-                    <div className="citation-list">
-                      {result.evidence_quotes.map((quote, index) => (
-                        <motion.article
-                          key={`${result.request_id}-${quote.chunk_id}-${index}`}
-                          className="citation-card"
-                          {...revealMotion(index * 0.04)}
-                        >
-                          <p className="citation-meta">证据块：{quote.chunk_id}</p>
-                          <p>{quote.quote}</p>
-                        </motion.article>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </aside>
-            </div>
-
-            <div className="result-metrics-grid">
-              <div className="result-metric-card">
-                <label>请求耗时</label>
-                <strong>{result.latency_ms} ms</strong>
-                <span>本次任务端到端耗时</span>
               </div>
-              <div className="result-metric-card">
-                <label>Token 用量</label>
-                <strong>{result.token_usage?.total_tokens ?? 0}</strong>
-                <span>
-                  输入 {result.token_usage?.prompt_tokens ?? 0} / 输出{" "}
-                  {result.token_usage?.completion_tokens ?? 0}
-                </span>
+              <div className="terminal-output markdown-stage">
+                <MarkdownResult content={result.result} />
               </div>
-              <div className="result-metric-card">
-                <label>请求追踪</label>
-                <strong>{result.request_id}</strong>
-                <span>可对齐日志与回放材料</span>
-              </div>
-              <div className="result-metric-card">
-                <label>上下文压缩</label>
-                <strong>
-                  {result.source_document_chars > 0 && result.used_document_chars > 0
-                    ? `${Math.max(
-                        0,
-                        Math.round(
-                          (1 - result.used_document_chars / result.source_document_chars) * 100
-                        )
-                      )}%`
-                    : "未压缩"}
-                </strong>
-                <span>
-                  {result.used_document_chars} / {result.source_document_chars} 字符送模
-                </span>
-              </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
