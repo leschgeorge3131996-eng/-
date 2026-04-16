@@ -1,6 +1,6 @@
 # 研答通（MVP）
 
-基于 React + TypeScript + Vite 与 FastAPI 的文档智能助手第一阶段实现。当前目标只做最小可用闭环：
+研答通是一个面向论文与报告阅读、答辩准备的文档助手，核心能力是带证据回链的问答——每一条回答都能跳回 PDF 原文证据。仓库基于 React + TypeScript + Vite 与 FastAPI，当前目标只做最小可用闭环：
 
 - 上传 TXT / Markdown / PDF 文档
 - 选择任务：摘要、问答、提纲生成

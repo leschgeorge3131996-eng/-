@@ -8,6 +8,8 @@ pytest-cache-files-*/
 无问芯穹赛题一_项目交接文档_Codex版_v2.docx
 研答通_云端前预处理模块分工建议.docx
 review_bundle*.zip
+review_bundle_stage_*/
+.claude/
 tmp_*.log
 evidence/reports/sample_replay_latest_*.md
 evidence/reports/sample_replay_real_*.md
