@@ -9,7 +9,13 @@ from uuid import uuid4
 
 from ..core.config import Settings, get_settings
 from ..core.exceptions import NotFoundError, ParseError, ValidationError
-from ..schemas.document import ChunkedDocument, DocumentMetadata, ParsedDocument, UploadResponseData
+from ..schemas.document import (
+    ChunkedDocument,
+    DocumentMetadata,
+    ParsedDocument,
+    ParsedPage,
+    UploadResponseData,
+)
 from .chunk_service import ChunkService
 from .document_parser import DocumentParser
 
@@ -125,6 +131,13 @@ class FileService:
         if not chunk_path.exists():
             raise NotFoundError("未找到对应的文档分块结果。")
         return ChunkedDocument.model_validate_json(chunk_path.read_text(encoding="utf-8"))
+
+    def get_document_page(self, file_id: str, page_number: int) -> ParsedPage:
+        structure = self.get_document_structure(file_id)
+        for page in structure.pages:
+            if page.page_number == page_number:
+                return page
+        raise NotFoundError("未找到对应的页面内容。")
 
     def get_upload_path(self, file_id: str) -> Path:
         metadata = self.get_document_metadata(file_id)

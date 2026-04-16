@@ -266,3 +266,24 @@ def test_file_content_endpoint_returns_inline_uploaded_file() -> None:
         assert "inline" in fetch_response.headers.get("content-disposition", "")
     finally:
         cleanup_workspace(workspace)
+
+
+def test_file_page_endpoint_returns_page_text() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# title\n\nbody".encode("utf-8"), "text/markdown")},
+        )
+        file_id = response.json()["data"]["metadata"]["file_id"]
+
+        fetch_response = client.get(f"/api/files/{file_id}/pages/1")
+
+        assert fetch_response.status_code == 200
+        payload = fetch_response.json()["data"]
+        assert payload["page_number"] == 1
+        assert payload["text"] == "# title\n\nbody"
+        assert payload["char_count"] > 0
+    finally:
+        cleanup_workspace(workspace)

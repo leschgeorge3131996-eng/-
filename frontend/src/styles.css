@@ -995,6 +995,13 @@ textarea {
   gap: 12px;
 }
 
+.pdf-preview-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 14px;
+  align-items: start;
+}
+
 .pdf-preview-head {
   display: flex;
   align-items: flex-start;
@@ -1036,6 +1043,52 @@ textarea {
   background: #dfe6ee;
 }
 
+.page-text-panel {
+  min-height: 720px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(19, 34, 56, 0.12);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(245, 240, 232, 0.92));
+}
+
+.page-text-head {
+  display: grid;
+  gap: 4px;
+}
+
+.page-text-head strong {
+  color: var(--navy);
+  font-size: 15px;
+}
+
+.page-text-head span {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.page-text-content {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.page-text-block {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  color: var(--ink-strong);
+}
+
+.page-text-highlight {
+  padding: 0.08em 0.14em;
+  border-radius: 0.35rem;
+  background: rgba(173, 76, 35, 0.24);
+  color: var(--accent-deep);
+  box-shadow: 0 0 0 1px rgba(173, 76, 35, 0.12);
+}
+
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1056,6 +1109,15 @@ textarea {
 
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pdf-preview-body {
+    grid-template-columns: 1fr;
+  }
+
+  .page-text-panel,
+  .pdf-frame {
+    min-height: 520px;
   }
 }
 

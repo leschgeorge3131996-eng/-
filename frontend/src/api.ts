@@ -1,5 +1,6 @@
 import type {
   ApiResponse,
+  DocumentPageData,
   LogSummary,
   ResponseDetailLevel,
   TaskResult,
@@ -113,4 +114,9 @@ export async function runTask(
 export async function fetchLogSummary(): Promise<LogSummary> {
   const response = await fetch(`${API_BASE_URL}/logs/summary`);
   return parseResponse<LogSummary>(response);
+}
+
+export async function fetchDocumentPage(fileId: string, pageNumber: number): Promise<DocumentPageData> {
+  const response = await fetch(`${API_BASE_URL}/files/${fileId}/pages/${pageNumber}`);
+  return parseResponse<DocumentPageData>(response);
 }

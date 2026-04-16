@@ -107,6 +107,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPage, setPreviewPage] = useState(1);
+  const [previewSnippet, setPreviewSnippet] = useState<string | null>(null);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage(RECENT_DOCUMENTS_KEY, [])
   );
@@ -138,12 +139,16 @@ export default function App() {
     setSelectedFile(null);
     setPreviewPage(page);
     setPreviewOpen(Boolean(metadata && metadata.file_type === "pdf"));
+    if (!metadata || metadata.file_type !== "pdf") {
+      setPreviewSnippet(null);
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }
 
   function restoreRecentDocument(document: RecentDocument) {
+    setPreviewSnippet(null);
     applyActiveDocument(toUploadMetadata(document), 1);
     setResult(null);
     setError(null);
@@ -158,6 +163,10 @@ export default function App() {
       (item.task_result.task_type === "ask"
         ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
         : item.task_result.source_chunks[0]?.page_numbers[0]) ?? 1;
+    const firstSnippet =
+      (item.task_result.task_type === "ask"
+        ? item.task_result.citations[0]?.snippet ?? item.task_result.evidence_quotes[0]?.quote
+        : item.task_result.source_chunks[0]?.snippet) ?? null;
 
     setTaskType(item.task_type);
     if (item.task_result.response_detail_level) {
@@ -166,6 +175,7 @@ export default function App() {
     setInput(item.input);
     setResult(item.task_result);
     setError(null);
+    setPreviewSnippet(firstSnippet);
     applyActiveDocument(restoredMetadata, firstPage);
   }
 
@@ -209,6 +219,11 @@ export default function App() {
       const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
       setResult(taskResult);
       if (metadata?.file_type === "pdf") {
+        const defaultSnippet =
+          taskResult.task_type === "ask"
+            ? taskResult.citations[0]?.snippet ?? taskResult.evidence_quotes[0]?.quote ?? null
+            : taskResult.source_chunks[0]?.snippet ?? null;
+        setPreviewSnippet(defaultSnippet);
         setPreviewOpen(true);
       }
       setRecentResults((current) => [
@@ -311,6 +326,7 @@ export default function App() {
                 setError(null);
                 setPreviewOpen(false);
                 setPreviewPage(1);
+                setPreviewSnippet(null);
               }}>
                 填充示例文档
               </button>
@@ -355,6 +371,7 @@ export default function App() {
                       setError(null);
                       setPreviewOpen(false);
                       setPreviewPage(1);
+                      setPreviewSnippet(null);
                     }
                   }}
                 />
@@ -416,8 +433,9 @@ export default function App() {
             loadMessage={describeLoadStage(loadStage)}
             result={result}
             canOpenPdfPreview={Boolean(previewMetadata)}
-            onOpenPdfPage={(page) => {
+            onOpenPdfPage={(page, snippet) => {
               setPreviewPage(page);
+              setPreviewSnippet(snippet);
               setPreviewOpen(true);
             }}
           />
@@ -426,8 +444,10 @@ export default function App() {
         {previewMetadata && previewOpen ? (
           <PdfPreviewPanel
             documentName={previewMetadata.original_name}
+            fileId={previewMetadata.file_id}
             page={previewPage}
             src={buildFileContentUrl(previewMetadata.file_id, previewPage)}
+            highlightText={previewSnippet}
             onClose={() => setPreviewOpen(false)}
           />
         ) : null}

@@ -50,6 +50,18 @@ def get_uploaded_file_content(file_id: str) -> FileResponse:
     )
 
 
+@router.get("/files/{file_id}/pages/{page_number}", response_model=ApiResponse)
+def get_uploaded_file_page(file_id: str, page_number: int) -> ApiResponse:
+    page = file_service.get_document_page(file_id, page_number)
+    return success_response(
+        {
+            "page_number": page.page_number,
+            "char_count": page.char_count,
+            "text": page.text,
+        }
+    )
+
+
 @router.post("/ask", response_model=ApiResponse)
 def ask_document(payload: AskRequest) -> ApiResponse:
     result = task_service.run_task(

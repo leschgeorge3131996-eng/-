@@ -31,7 +31,7 @@ type ResultPanelProps = {
   loadMessage: string;
   result: TaskResult | null;
   canOpenPdfPreview?: boolean;
-  onOpenPdfPage?: (page: number) => void;
+  onOpenPdfPage?: (page: number, snippet: string) => void;
 };
 
 export default function ResultPanel({
@@ -171,7 +171,7 @@ export default function ResultPanel({
                       key={item.chunk_id}
                       className="citation-card citation-button"
                       type="button"
-                      onClick={() => onOpenPdfPage(primaryPage)}
+                      onClick={() => onOpenPdfPage(primaryPage, item.snippet)}
                       {...revealMotion(index * 0.04)}
                     >
                       {cardContent}

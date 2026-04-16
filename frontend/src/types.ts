@@ -30,6 +30,12 @@ export interface UploadResponse {
   metadata: UploadMetadata;
 }
 
+export interface DocumentPageData {
+  page_number: number;
+  char_count: number;
+  text: string;
+}
+
 export interface TokenUsage {
   prompt_tokens?: number | null;
   completion_tokens?: number | null;
