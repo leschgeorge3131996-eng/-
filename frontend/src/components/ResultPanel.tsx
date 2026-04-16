@@ -42,6 +42,18 @@ async function copyText(text: string): Promise<void> {
   document.body.removeChild(textarea);
 }
 
+function downloadText(filename: string, content: string): void {
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 type ResultPanelProps = {
   activeTaskType: TaskType;
   error: string | null;
@@ -62,6 +74,8 @@ export default function ResultPanel({
   onOpenPdfPage
 }: ResultPanelProps) {
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
+  const [evidenceCopyState, setEvidenceCopyState] = useState<string | null>(null);
+  const [exportState, setExportState] = useState<"idle" | "done" | "error">("idle");
   const stateKey = error ? "error" : loading ? "loading" : result ? result.request_id : "idle";
   const previewableItems = result
     ? result.task_type === "ask"
@@ -71,6 +85,8 @@ export default function ResultPanel({
 
   useEffect(() => {
     setCopyState("idle");
+    setExportState("idle");
+    setEvidenceCopyState(null);
   }, [result?.request_id]);
 
   async function handleCopyResult() {
@@ -86,6 +102,124 @@ export default function ResultPanel({
       setCopyState("error");
       window.setTimeout(() => setCopyState("idle"), 2200);
     }
+  }
+
+  async function handleCopyEvidence(id: string, text: string) {
+    try {
+      await copyText(text);
+      setEvidenceCopyState(id);
+      window.setTimeout(() => setEvidenceCopyState(null), 1800);
+    } catch {
+      setEvidenceCopyState(`error:${id}`);
+      window.setTimeout(() => setEvidenceCopyState(null), 2200);
+    }
+  }
+
+  function handleExportResult() {
+    if (!result?.result) {
+      return;
+    }
+
+    try {
+      const lines = [
+        `# ${TASK_LABELS[result.task_type]}结果`,
+        "",
+        `- 文档：${result.document_name}`,
+        `- 请求 ID：${result.request_id}`,
+        `- 模型：${result.model_name}`,
+        `- 路由：${result.route_tier ?? "default"}`,
+        result.route_reason ? `- 路由原因：${result.route_reason}` : null,
+        result.response_detail_level
+          ? `- 粒度：${RESPONSE_DETAIL_LABELS[result.response_detail_level] ?? result.response_detail_level}`
+          : null,
+        "",
+        "## 正文",
+        "",
+        result.result
+      ].filter(Boolean);
+
+      downloadText(`yandatong-${result.task_type}-${result.request_id}.md`, lines.join("\n"));
+      setExportState("done");
+      window.setTimeout(() => setExportState("idle"), 1800);
+    } catch {
+      setExportState("error");
+      window.setTimeout(() => setExportState("idle"), 2200);
+    }
+  }
+
+  function renderEvidenceCard(
+    item: { chunk_id: string; page_numbers: number[]; snippet: string },
+    index: number
+  ) {
+    const copyLabel =
+      evidenceCopyState === item.chunk_id
+        ? "已复制"
+        : evidenceCopyState === `error:${item.chunk_id}`
+          ? "复制失败"
+          : "复制";
+
+    return (
+      <motion.article
+        key={item.chunk_id}
+        className="citation-card"
+        {...revealMotion(index * 0.04)}
+      >
+        <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
+        <p>{item.snippet}</p>
+        <div className="citation-actions">
+          {canOpenPdfPreview && onOpenPdfPage ? (
+            <button
+              className="mini-action-button"
+              type="button"
+              onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
+            >
+              打开定位
+            </button>
+          ) : null}
+          <button
+            className="mini-action-button"
+            type="button"
+            onClick={() => handleCopyEvidence(item.chunk_id, item.snippet)}
+          >
+            {copyLabel}
+          </button>
+        </div>
+      </motion.article>
+    );
+  }
+
+  function renderEvidenceQuote(
+    quote: { chunk_id: string; quote: string },
+    index: number,
+    requestId: string
+  ) {
+    const copyId = `${quote.chunk_id}-${index}`;
+    const copyLabel =
+      evidenceCopyState === copyId
+        ? "已复制"
+        : evidenceCopyState === `error:${copyId}`
+          ? "复制失败"
+          : "复制";
+
+    return (
+      <motion.article
+        key={`${requestId}-${quote.chunk_id}-${index}`}
+        className="citation-card"
+        {...revealMotion(index * 0.04)}
+      >
+        <p className="citation-meta">证据块：{quote.chunk_id}</p>
+        <p>{quote.quote}</p>
+        <div className="citation-actions">
+          <button
+            className="mini-action-button"
+            type="button"
+            onClick={() => handleCopyEvidence(copyId, quote.quote)}
+          >
+            {copyLabel}
+          </button>
+        </div>
+      </motion.article>
+    );
   }
 
   return (
@@ -200,33 +334,7 @@ export default function ResultPanel({
 
             {previewableItems.length > 0 ? (
               <div className="citation-list">
-                {previewableItems.map((item, index) => {
-                  const cardContent = (
-                    <>
-                      <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
-                      <p>{item.snippet}</p>
-                    </>
-                  );
-                  return canOpenPdfPreview && onOpenPdfPage ? (
-                    <motion.button
-                      key={item.chunk_id}
-                      className="citation-card citation-button"
-                      type="button"
-                      onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
-                      {...revealMotion(index * 0.04)}
-                    >
-                      {cardContent}
-                    </motion.button>
-                  ) : (
-                    <motion.article
-                      key={item.chunk_id}
-                      className="citation-card"
-                      {...revealMotion(index * 0.04)}
-                    >
-                      {cardContent}
-                    </motion.article>
-                  );
-                })}
+                {previewableItems.map((item, index) => renderEvidenceCard(item, index))}
               </div>
             ) : null}
 
@@ -234,16 +342,9 @@ export default function ResultPanel({
               <div className="evidence-quotes">
                 <h3>证据摘录</h3>
                 <div className="citation-list">
-                  {result.evidence_quotes.map((quote, index) => (
-                    <motion.article
-                      key={`${result.request_id}-${quote.chunk_id}-${index}`}
-                      className="citation-card"
-                      {...revealMotion(index * 0.04)}
-                    >
-                      <p className="citation-meta">证据块：{quote.chunk_id}</p>
-                      <p>{quote.quote}</p>
-                    </motion.article>
-                  ))}
+                  {result.evidence_quotes.map((quote, index) =>
+                    renderEvidenceQuote(quote, index, result.request_id)
+                  )}
                 </div>
               </div>
             ) : null}
@@ -268,6 +369,13 @@ export default function ResultPanel({
                       : copyState === "error"
                         ? "复制失败"
                         : "复制结果"}
+                  </button>
+                  <button className="copy-button" type="button" onClick={handleExportResult}>
+                    {exportState === "done"
+                      ? "已导出"
+                      : exportState === "error"
+                        ? "导出失败"
+                        : "导出 Markdown"}
                   </button>
                 </div>
               </div>

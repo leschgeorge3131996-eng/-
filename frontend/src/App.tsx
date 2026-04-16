@@ -19,11 +19,43 @@ import type {
   UploadMetadata
 } from "./types";
 
-const TASK_OPTIONS: Array<{ value: TaskType; label: string; placeholder: string }> = [
-  { value: "summary", label: "摘要", placeholder: "例如：请突出研究背景、方法和创新点。" },
-  { value: "ask", label: "问答", placeholder: "例如：这篇文档的核心方法是什么？" },
-  { value: "outline", label: "提纲生成", placeholder: "例如：请生成 6 页答辩提纲。" }
+const TASK_OPTIONS: Array<{
+  value: TaskType;
+  label: string;
+  description: string;
+  placeholder: string;
+}> = [
+  {
+    value: "summary",
+    label: "摘要",
+    description: "自动归纳背景、方法与结论",
+    placeholder: "例如：请突出研究背景、方法和创新点。"
+  },
+  {
+    value: "ask",
+    label: "问答",
+    description: "先检索证据，再回答问题",
+    placeholder: "例如：这篇文档的核心方法是什么？"
+  },
+  {
+    value: "outline",
+    label: "提纲生成",
+    description: "生成汇报或答辩结构",
+    placeholder: "例如：请生成 6 页答辩提纲。"
+  }
 ];
+
+const DETAIL_OPTIONS: Array<{
+  value: ResponseDetailLevel;
+  label: string;
+  description: string;
+}> = [
+  { value: "concise", label: "简洁", description: "只保留核心结论" },
+  { value: "balanced", label: "适中", description: "兼顾完整与可读性" },
+  { value: "detailed", label: "详细", description: "补充更多背景与展开" }
+];
+
+const HERO_PILLS = ["页级结构", "轻量检索", "证据回链", "样例复跑"];
 
 const DEMO_ACTIONS = [
   {
@@ -46,23 +78,12 @@ const DEMO_ACTIONS = [
   }
 ];
 
-const RESPONSE_DETAIL_OPTIONS: Array<{
-  value: ResponseDetailLevel;
-  label: string;
-  description: string;
-}> = [
-  { value: "concise", label: "简洁", description: "只保留核心结论" },
-  { value: "balanced", label: "适中", description: "兼顾完整与可读性" },
-  { value: "detailed", label: "详细", description: "补充更多背景与展开" }
-];
-
 const TASK_LABELS: Record<TaskType, string> = {
   summary: "摘要",
   ask: "问答",
   outline: "提纲生成"
 };
 
-const HERO_PILLS = ["页级结构", "轻量检索", "证据回链", "样例复跑"];
 const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
 const DEMO_DOCUMENT_NAME = "demo_research_brief.md";
@@ -113,23 +134,10 @@ function normalizeRecordErrorMessage(error: unknown): string {
   return "最近记录恢复失败。";
 }
 
-function toUploadMetadata(document: RecentDocument): UploadMetadata {
-  return {
-    file_id: document.file_id,
-    original_name: document.original_name,
-    file_type: document.file_type,
-    size_bytes: 0,
-    text_chars: document.text_chars,
-    page_count: document.page_count,
-    chunk_count: document.chunk_count,
-    document_fingerprint: document.document_fingerprint ?? null,
-    parse_status: document.parse_status
-  };
-}
-
 export default function App() {
   const [taskType, setTaskType] = useState<TaskType>("summary");
-  const [responseDetailLevel, setResponseDetailLevel] = useState<ResponseDetailLevel>("balanced");
+  const [responseDetailLevel, setResponseDetailLevel] =
+    useState<ResponseDetailLevel>("balanced");
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedMetadata, setUploadedMetadata] = useState<UploadMetadata | null>(null);
@@ -182,6 +190,20 @@ export default function App() {
     if (!metadata || metadata.file_type !== "pdf") {
       setPreviewSnippet(null);
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  function clearCurrentDocument() {
+    setUploadedMetadata(null);
+    setSelectedFile(null);
+    setResult(null);
+    setError(null);
+    setPreviewOpen(false);
+    setPreviewPage(1);
+    setPreviewPages([1]);
+    setPreviewSnippet(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -277,7 +299,9 @@ export default function App() {
         );
       }
 
-      if (!fileId) throw new Error("请先上传一个文档。");
+      if (!fileId) {
+        throw new Error("请先上传一个文档。");
+      }
 
       setLoadStage("model");
       const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
@@ -294,6 +318,7 @@ export default function App() {
         setPreviewSnippet(defaultSnippet);
         applyActiveDocument(metadata, defaultPages[0] ?? 1, defaultPages);
       }
+
       setRecentResults((current) =>
         [
           {
@@ -478,36 +503,43 @@ export default function App() {
                   </div>
                 </div>
               ) : null}
-              <label className="field">
+
+              <div className="field">
                 <span>任务类型</span>
-                <select
-                  value={taskType}
-                  disabled={loading}
-                  onChange={(event) => setTaskType(event.target.value as TaskType)}
-                >
+                <div className="control-option-grid">
                   {TASK_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
+                    <button
+                      key={option.value}
+                      className={`option-card${taskType === option.value ? " active" : ""}`}
+                      type="button"
+                      disabled={loading}
+                      onClick={() => setTaskType(option.value)}
+                    >
+                      <strong>{option.label}</strong>
+                      <small>{option.description}</small>
+                    </button>
                   ))}
-                </select>
-              </label>
-              <label className="field">
+                </div>
+              </div>
+
+              <div className="field">
                 <span>回答粒度</span>
-                <select
-                  value={responseDetailLevel}
-                  disabled={loading}
-                  onChange={(event) =>
-                    setResponseDetailLevel(event.target.value as ResponseDetailLevel)
-                  }
-                >
-                  {RESPONSE_DETAIL_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label} / {option.description}
-                    </option>
+                <div className="control-detail-grid">
+                  {DETAIL_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      className={`detail-card${responseDetailLevel === option.value ? " active" : ""}`}
+                      type="button"
+                      disabled={loading}
+                      onClick={() => setResponseDetailLevel(option.value)}
+                    >
+                      <strong>{option.label}</strong>
+                      <small>{option.description}</small>
+                    </button>
                   ))}
-                </select>
-              </label>
+                </div>
+              </div>
+
               <label className="field">
                 <span>问题或指令</span>
                 <textarea
@@ -518,6 +550,7 @@ export default function App() {
                   onChange={(event) => setInput(event.target.value)}
                 />
               </label>
+
               <div className="control-actions">
                 <button className="submit" type="submit" disabled={!canSubmit}>
                   {loading ? "处理中..." : "提交任务"}
@@ -568,9 +601,7 @@ export default function App() {
                   </div>
                   <div className="meta-chip">
                     <span>来源</span>
-                    <strong>
-                      {pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}
-                    </strong>
+                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}</strong>
                   </div>
                   <div className="meta-chip">
                     <span>下一步</span>
@@ -592,24 +623,7 @@ export default function App() {
                       打开 PDF 预览
                     </button>
                   ) : null}
-                  <button
-                    className="ghost-button"
-                    type="button"
-                    disabled={loading}
-                    onClick={() => {
-                      setUploadedMetadata(null);
-                      setSelectedFile(null);
-                      setResult(null);
-                      setError(null);
-                      setPreviewOpen(false);
-                      setPreviewPage(1);
-                      setPreviewPages([1]);
-                      setPreviewSnippet(null);
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = "";
-                      }
-                    }}
-                  >
+                  <button className="ghost-button" type="button" disabled={loading} onClick={clearCurrentDocument}>
                     清空当前文档
                   </button>
                 </div>
@@ -665,9 +679,7 @@ export default function App() {
                     onClick={() => restoreRecentDocument(item)}
                   >
                     <strong>{item.original_name}</strong>
-                    <span>
-                      {item.file_type} / {item.page_count} pages / {item.chunk_count} chunks
-                    </span>
+                    <span>{item.file_type} / {item.page_count} pages / {item.chunk_count} chunks</span>
                   </button>
                 ))}
               </div>
