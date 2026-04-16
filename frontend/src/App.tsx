@@ -622,6 +622,7 @@ export default function App() {
 
           <ResultPanel
             activeTaskType={taskType}
+            currentDocument={uploadedMetadata}
             error={error}
             loading={loading}
             loadMessage={describeLoadStage(loadStage)}
