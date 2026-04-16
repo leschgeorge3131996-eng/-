@@ -30,6 +30,8 @@ type ResultPanelProps = {
   loading: boolean;
   loadMessage: string;
   result: TaskResult | null;
+  canOpenPdfPreview?: boolean;
+  onOpenPdfPage?: (page: number) => void;
 };
 
 export default function ResultPanel({
@@ -37,9 +39,16 @@ export default function ResultPanel({
   error,
   loading,
   loadMessage,
-  result
+  result,
+  canOpenPdfPreview = false,
+  onOpenPdfPage
 }: ResultPanelProps) {
   const stateKey = error ? "error" : loading ? "loading" : result ? result.request_id : "idle";
+  const previewableItems = result
+    ? result.task_type === "ask"
+      ? result.citations
+      : result.source_chunks
+    : [];
 
   return (
     <article className="panel result-panel">
@@ -146,14 +155,39 @@ export default function ResultPanel({
               </p>
             ) : null}
 
-            <div className="citation-list">
-              {(result.task_type === "ask" ? result.citations : result.source_chunks).map((item, index) => (
-                <motion.article key={item.chunk_id} className="citation-card" {...revealMotion(index * 0.04)}>
-                  <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
-                  <p>{item.snippet}</p>
-                </motion.article>
-              ))}
-            </div>
+            {previewableItems.length > 0 ? (
+              <div className="citation-list">
+                {previewableItems.map((item, index) => {
+                  const cardContent = (
+                    <>
+                      <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
+                      <p>{item.snippet}</p>
+                    </>
+                  );
+                  const primaryPage = item.page_numbers[0] ?? 1;
+
+                  return canOpenPdfPreview && onOpenPdfPage ? (
+                    <motion.button
+                      key={item.chunk_id}
+                      className="citation-card citation-button"
+                      type="button"
+                      onClick={() => onOpenPdfPage(primaryPage)}
+                      {...revealMotion(index * 0.04)}
+                    >
+                      {cardContent}
+                    </motion.button>
+                  ) : (
+                    <motion.article
+                      key={item.chunk_id}
+                      className="citation-card"
+                      {...revealMotion(index * 0.04)}
+                    >
+                      {cardContent}
+                    </motion.article>
+                  );
+                })}
+              </div>
+            ) : null}
 
             {result.evidence_quotes.length > 0 ? (
               <div className="evidence-quotes">

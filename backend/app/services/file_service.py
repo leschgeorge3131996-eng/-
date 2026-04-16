@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import mimetypes
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -124,6 +125,18 @@ class FileService:
         if not chunk_path.exists():
             raise NotFoundError("未找到对应的文档分块结果。")
         return ChunkedDocument.model_validate_json(chunk_path.read_text(encoding="utf-8"))
+
+    def get_upload_path(self, file_id: str) -> Path:
+        metadata = self.get_document_metadata(file_id)
+        upload_path = Path(metadata.saved_path)
+        if not upload_path.exists():
+            raise NotFoundError("原始文件不存在，请重新上传文档。")
+        return upload_path
+
+    def get_upload_media_type(self, file_id: str) -> str:
+        metadata = self.get_document_metadata(file_id)
+        guessed_type, _ = mimetypes.guess_type(metadata.original_name or metadata.saved_path)
+        return guessed_type or "application/octet-stream"
 
     def _write_metadata(self, metadata_path: Path, metadata: DocumentMetadata) -> None:
         metadata_path.write_text(metadata.model_dump_json(indent=2), encoding="utf-8")

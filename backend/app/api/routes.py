@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, File, Query, UploadFile
+from fastapi.responses import FileResponse
 
 from ..core.config import get_settings
 from ..schemas.common import ApiResponse, success_response
@@ -34,6 +35,19 @@ async def upload_document(file: UploadFile = File(...)) -> ApiResponse:
     content = await file.read()
     result = file_service.save_upload(file.filename or "", content)
     return success_response({"metadata": result.model_dump()})
+
+
+@router.get("/files/{file_id}/content")
+def get_uploaded_file_content(file_id: str) -> FileResponse:
+    metadata = file_service.get_document_metadata(file_id)
+    file_path = file_service.get_upload_path(file_id)
+    media_type = file_service.get_upload_media_type(file_id)
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        filename=metadata.original_name,
+        content_disposition_type="inline",
+    )
 
 
 @router.post("/ask", response_model=ApiResponse)

@@ -1,6 +1,13 @@
 import { motion } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ApiRequestError, fetchLogSummary, runTask, uploadDocument } from "./api";
+import {
+  ApiRequestError,
+  buildFileContentUrl,
+  fetchLogSummary,
+  runTask,
+  uploadDocument
+} from "./api";
+import PdfPreviewPanel from "./components/PdfPreviewPanel";
 import ResultPanel from "./components/ResultPanel";
 import type {
   LogSummary,
@@ -84,6 +91,8 @@ export default function App() {
   const [loadStage, setLoadStage] = useState<"idle" | "uploading" | "model">("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewPage, setPreviewPage] = useState(1);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage(RECENT_DOCUMENTS_KEY, [])
   );
@@ -96,6 +105,7 @@ export default function App() {
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
   const canSubmit = !loading && Boolean(selectedFile || uploadedMetadata) && (taskType !== "ask" || Boolean(input.trim()));
+  const previewMetadata = uploadedMetadata?.file_type === "pdf" ? uploadedMetadata : null;
 
   useEffect(() => {
     writeStorage(RECENT_DOCUMENTS_KEY, recentDocuments);
@@ -148,6 +158,9 @@ export default function App() {
       setLoadStage("model");
       const taskResult = await runTask(taskType, fileId, input.trim(), responseDetailLevel);
       setResult(taskResult);
+      if (metadata?.file_type === "pdf") {
+        setPreviewOpen(true);
+      }
       setRecentResults((current) => [
         {
           id: taskResult.request_id,
@@ -348,8 +361,22 @@ export default function App() {
             loading={loading}
             loadMessage={describeLoadStage(loadStage)}
             result={result}
+            canOpenPdfPreview={Boolean(previewMetadata)}
+            onOpenPdfPage={(page) => {
+              setPreviewPage(page);
+              setPreviewOpen(true);
+            }}
           />
         </section>
+
+        {previewMetadata && previewOpen ? (
+          <PdfPreviewPanel
+            documentName={previewMetadata.original_name}
+            page={previewPage}
+            src={buildFileContentUrl(previewMetadata.file_id, previewPage)}
+            onClose={() => setPreviewOpen(false)}
+          />
+        ) : null}
 
         <section className="grid secondary-grid history-section">
           <article className="panel">

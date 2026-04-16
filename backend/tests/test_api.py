@@ -247,3 +247,22 @@ def test_summary_endpoint_returns_route_fields_when_tiered() -> None:
         assert payload["route_model"] == "lite-model"
     finally:
         cleanup_workspace(workspace)
+
+
+def test_file_content_endpoint_returns_inline_uploaded_file() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# title\n\nbody".encode("utf-8"), "text/markdown")},
+        )
+        file_id = response.json()["data"]["metadata"]["file_id"]
+
+        fetch_response = client.get(f"/api/files/{file_id}/content")
+
+        assert fetch_response.status_code == 200
+        assert fetch_response.content == b"# title\n\nbody"
+        assert "inline" in fetch_response.headers.get("content-disposition", "")
+    finally:
+        cleanup_workspace(workspace)

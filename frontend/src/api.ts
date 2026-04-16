@@ -10,6 +10,11 @@ import type {
 const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const API_BASE_URL = rawApiBaseUrl ? rawApiBaseUrl.replace(/\/+$/, "") : "/api";
 
+export function buildFileContentUrl(fileId: string, page?: number): string {
+  const baseUrl = `${API_BASE_URL}/files/${fileId}/content`;
+  return page && page > 0 ? `${baseUrl}#page=${page}` : baseUrl;
+}
+
 export class ApiRequestError extends Error {
   code?: string;
   details?: Record<string, unknown> | null;
