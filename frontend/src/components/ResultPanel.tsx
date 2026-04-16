@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import MarkdownResult from "./MarkdownResult";
 import type { ResponseDetailLevel, TaskResult, TaskType } from "../types";
 
@@ -24,6 +25,23 @@ function revealMotion(delay = 0) {
   };
 }
 
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
 type ResultPanelProps = {
   activeTaskType: TaskType;
   error: string | null;
@@ -31,7 +49,7 @@ type ResultPanelProps = {
   loadMessage: string;
   result: TaskResult | null;
   canOpenPdfPreview?: boolean;
-  onOpenPdfPage?: (page: number, snippet: string) => void;
+  onOpenPdfPage?: (pages: number[], snippet: string) => void;
 };
 
 export default function ResultPanel({
@@ -43,12 +61,32 @@ export default function ResultPanel({
   canOpenPdfPreview = false,
   onOpenPdfPage
 }: ResultPanelProps) {
+  const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
   const stateKey = error ? "error" : loading ? "loading" : result ? result.request_id : "idle";
   const previewableItems = result
     ? result.task_type === "ask"
       ? result.citations
       : result.source_chunks
     : [];
+
+  useEffect(() => {
+    setCopyState("idle");
+  }, [result?.request_id]);
+
+  async function handleCopyResult() {
+    if (!result?.result) {
+      return;
+    }
+
+    try {
+      await copyText(result.result);
+      setCopyState("done");
+      window.setTimeout(() => setCopyState("idle"), 1800);
+    } catch {
+      setCopyState("error");
+      window.setTimeout(() => setCopyState("idle"), 2200);
+    }
+  }
 
   return (
     <article className="panel result-panel">
@@ -164,14 +202,12 @@ export default function ResultPanel({
                       <p>{item.snippet}</p>
                     </>
                   );
-                  const primaryPage = item.page_numbers[0] ?? 1;
-
                   return canOpenPdfPreview && onOpenPdfPage ? (
                     <motion.button
                       key={item.chunk_id}
                       className="citation-card citation-button"
                       type="button"
-                      onClick={() => onOpenPdfPage(primaryPage, item.snippet)}
+                      onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
                       {...revealMotion(index * 0.04)}
                     >
                       {cardContent}
@@ -219,7 +255,16 @@ export default function ResultPanel({
                   <span />
                   <span />
                 </div>
-                <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
+                <div className="terminal-actions">
+                  <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
+                  <button className="copy-button" type="button" onClick={handleCopyResult}>
+                    {copyState === "done"
+                      ? "已复制"
+                      : copyState === "error"
+                        ? "复制失败"
+                        : "复制结果"}
+                  </button>
+                </div>
               </div>
               <div className="terminal-output markdown-stage">
                 <MarkdownResult content={result.result} />

@@ -5,14 +5,22 @@ type PdfPreviewPanelProps = {
   documentName: string;
   fileId: string;
   page: number;
+  availablePages?: number[];
   src: string;
   highlightText?: string | null;
+  onSelectPage?: (page: number) => void;
   onClose: () => void;
 };
 
 type HighlightRange = {
   start: number;
   end: number;
+};
+
+type SentenceView = {
+  focusBefore: string;
+  focus: string;
+  focusAfter: string;
 };
 
 function buildCollapsedTextMap(text: string) {
@@ -56,7 +64,7 @@ function locateHighlightRange(text: string, snippet: string | null | undefined):
   const fragmentCandidates = cleanSnippet
     .split(/[，。；：,.!?、\n]/)
     .map((item) => item.trim())
-    .filter((item) => item.length >= 10)
+    .filter((item) => item.length >= 8)
     .sort((left, right) => right.length - left.length);
 
   for (const fragment of fragmentCandidates) {
@@ -72,12 +80,96 @@ function locateHighlightRange(text: string, snippet: string | null | undefined):
   return null;
 }
 
+function looksLikeArtifactLine(line: string): boolean {
+  const normalized = line.replace(/\s+/g, "").toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+
+  if (/@mail|@gmail|@outlook|creativecommons|ccl24|eval/i.test(normalized)) {
+    return true;
+  }
+
+  if (/(大学|学院|实验室|研究所|通信作者|作者简介|基金项目)/.test(line) && /\d{5,}/.test(line)) {
+    return true;
+  }
+
+  if (/^(摘要|abstract)\s*[:：]?\s*$/i.test(line.trim())) {
+    return true;
+  }
+
+  if (/^(关键词|keywords?)\s*[:：]/i.test(line.trim())) {
+    return true;
+  }
+
+  if (/spatial semantics|large language model|prompt engineering/i.test(line)) {
+    return true;
+  }
+
+  const digitCount = Array.from(line).filter((char) => /\d/.test(char)).length;
+  const cjkCount = Array.from(line).filter((char) => /[\u4e00-\u9fff]/.test(char)).length;
+  if (digitCount >= 8 && cjkCount <= 6) {
+    return true;
+  }
+
+  return false;
+}
+
+function normalizeLine(line: string): string {
+  return line
+    .replace(/\x00/g, " ")
+    .replace(/(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])/g, "")
+    .replace(/([\u4e00-\u9fff])\1{2,}/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractDisplaySentences(text: string): string[] {
+  const cleanedLines = text
+    .split(/\r?\n/)
+    .map((line) => normalizeLine(line))
+    .filter((line) => line && !looksLikeArtifactLine(line));
+
+  const merged = cleanedLines.join(" ");
+  return merged
+    .split(/(?<=[。！？!?；;])\s+|\n+/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 4);
+}
+
+function buildSentenceView(sentences: string[], snippet: string | null | undefined): SentenceView | null {
+  if (sentences.length === 0) {
+    return null;
+  }
+
+  for (const sentence of sentences) {
+    const range = locateHighlightRange(sentence, snippet);
+    if (!range) {
+      continue;
+    }
+
+    return {
+      focusBefore: sentence.slice(0, range.start),
+      focus: sentence.slice(range.start, range.end),
+      focusAfter: sentence.slice(range.end)
+    };
+  }
+
+  return {
+    focusBefore: sentences[0] ?? "",
+    focus: "",
+    focusAfter: ""
+  };
+}
+
 export default function PdfPreviewPanel({
   documentName,
   fileId,
   page,
+  availablePages = [],
   src,
   highlightText,
+  onSelectPage,
   onClose
 }: PdfPreviewPanelProps) {
   const [pageText, setPageText] = useState("");
@@ -114,8 +206,8 @@ export default function PdfPreviewPanel({
     };
   }, [fileId, page]);
 
-  const highlightRange = useMemo(
-    () => locateHighlightRange(pageText, highlightText),
+  const sentenceView = useMemo(
+    () => buildSentenceView(extractDisplaySentences(pageText), highlightText),
     [pageText, highlightText]
   );
 
@@ -134,6 +226,21 @@ export default function PdfPreviewPanel({
         </div>
       </div>
 
+      {availablePages.length > 1 ? (
+        <div className="pdf-page-tabs" aria-label="证据页切换">
+          {availablePages.map((candidatePage) => (
+            <button
+              key={candidatePage}
+              className={`pdf-page-button${candidatePage === page ? " active" : ""}`}
+              type="button"
+              onClick={() => onSelectPage?.(candidatePage)}
+            >
+              第 {candidatePage} 页
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <div className="pdf-preview-body">
         <div className="pdf-frame-wrap">
           <iframe className="pdf-frame" src={src} title={`${documentName} PDF 预览`} />
@@ -141,24 +248,26 @@ export default function PdfPreviewPanel({
 
         <aside className="page-text-panel">
           <div className="page-text-head">
-            <strong>页面文本定位</strong>
-            <span>{highlightRange ? "已近似高亮匹配片段" : "未命中时显示整页文本"}</span>
+            <strong>文本定位</strong>
+            <span>{sentenceView?.focus ? "只显示命中的这一段" : "显示最接近的清洗后句子"}</span>
           </div>
 
           {textLoading ? <p className="status-card">正在加载第 {page} 页文本...</p> : null}
           {!textLoading && textError ? <p className="error status-card">{textError}</p> : null}
           {!textLoading && !textError ? (
             <div className="page-text-content">
-              {highlightRange ? (
+              {sentenceView ? (
                 <p className="page-text-block">
-                  {pageText.slice(0, highlightRange.start)}
-                  <mark className="page-text-highlight">
-                    {pageText.slice(highlightRange.start, highlightRange.end)}
-                  </mark>
-                  {pageText.slice(highlightRange.end)}
+                  <span className="page-text-sentence">
+                    {sentenceView.focusBefore}
+                    {sentenceView.focus ? (
+                      <mark className="page-text-highlight">{sentenceView.focus}</mark>
+                    ) : null}
+                    {sentenceView.focusAfter}
+                  </span>
                 </p>
               ) : (
-                <p className="page-text-block">{pageText || "当前页暂无可用文本。"}</p>
+                <p className="page-text-block">当前页暂无可用文本。</p>
               )}
             </div>
           ) : null}

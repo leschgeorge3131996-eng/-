@@ -122,6 +122,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPage, setPreviewPage] = useState(1);
+  const [previewPages, setPreviewPages] = useState<number[]>([1]);
   const [previewSnippet, setPreviewSnippet] = useState<string | null>(null);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage(RECENT_DOCUMENTS_KEY, [])
@@ -154,10 +155,11 @@ export default function App() {
     void fetchLogSummary().then(setLogSummary).catch(() => setLogSummary(null));
   }, [result]);
 
-  function applyActiveDocument(metadata: UploadMetadata | null, page = 1) {
+  function applyActiveDocument(metadata: UploadMetadata | null, page = 1, pages: number[] = [page]) {
     setUploadedMetadata(metadata);
     setSelectedFile(null);
     setPreviewPage(page);
+    setPreviewPages(pages.length > 0 ? pages : [page]);
     setPreviewOpen(Boolean(metadata && metadata.file_type === "pdf"));
     if (!metadata || metadata.file_type !== "pdf") {
       setPreviewSnippet(null);
@@ -169,7 +171,7 @@ export default function App() {
 
   function restoreRecentDocument(document: RecentDocument) {
     setPreviewSnippet(null);
-    applyActiveDocument(toUploadMetadata(document), 1);
+    applyActiveDocument(toUploadMetadata(document), 1, [1]);
     setResult(null);
     setError(null);
   }
@@ -188,6 +190,10 @@ export default function App() {
       (item.task_result.task_type === "ask"
         ? item.task_result.citations[0]?.snippet ?? item.task_result.evidence_quotes[0]?.quote
         : item.task_result.source_chunks[0]?.snippet) ?? null;
+    const candidatePages =
+      (item.task_result.task_type === "ask"
+        ? item.task_result.citations[0]?.page_numbers ?? item.task_result.retrieved_pages
+        : item.task_result.source_chunks[0]?.page_numbers) ?? [firstPage];
 
     setTaskType(item.task_type);
     if (item.task_result.response_detail_level) {
@@ -197,7 +203,8 @@ export default function App() {
     setResult(item.task_result);
     setError(null);
     setPreviewSnippet(firstSnippet);
-    applyActiveDocument(restoredMetadata, firstPage);
+    setPreviewPages(candidatePages.length > 0 ? candidatePages : [firstPage]);
+    applyActiveDocument(restoredMetadata, firstPage, candidatePages);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -246,7 +253,12 @@ export default function App() {
           taskResult.task_type === "ask"
             ? taskResult.citations[0]?.snippet ?? taskResult.evidence_quotes[0]?.quote ?? null
             : taskResult.source_chunks[0]?.snippet ?? null;
+        const defaultPages =
+          (taskResult.task_type === "ask"
+            ? taskResult.citations[0]?.page_numbers ?? taskResult.retrieved_pages
+            : taskResult.source_chunks[0]?.page_numbers) ?? [1];
         setPreviewSnippet(defaultSnippet);
+        setPreviewPages(defaultPages.length > 0 ? defaultPages : [1]);
         setPreviewOpen(true);
       }
       setRecentResults((current) =>
@@ -359,6 +371,7 @@ export default function App() {
                   setError(null);
                   setPreviewOpen(false);
                   setPreviewPage(1);
+                  setPreviewPages([1]);
                   setPreviewSnippet(null);
                 }}
               >
@@ -410,6 +423,7 @@ export default function App() {
                       setError(null);
                       setPreviewOpen(false);
                       setPreviewPage(1);
+                      setPreviewPages([1]);
                       setPreviewSnippet(null);
                     }
                   }}
@@ -531,6 +545,16 @@ export default function App() {
               )}
               {uploadedMetadata || pendingDocument ? (
                 <div className="inline-actions">
+                  {previewMetadata && !previewOpen ? (
+                    <button
+                      className="ghost-button"
+                      type="button"
+                      disabled={loading}
+                      onClick={() => setPreviewOpen(true)}
+                    >
+                      打开 PDF 预览
+                    </button>
+                  ) : null}
                   <button
                     className="ghost-button"
                     type="button"
@@ -542,6 +566,7 @@ export default function App() {
                       setError(null);
                       setPreviewOpen(false);
                       setPreviewPage(1);
+                      setPreviewPages([1]);
                       setPreviewSnippet(null);
                       if (fileInputRef.current) {
                         fileInputRef.current.value = "";
@@ -562,8 +587,10 @@ export default function App() {
             loadMessage={describeLoadStage(loadStage)}
             result={result}
             canOpenPdfPreview={Boolean(previewMetadata)}
-            onOpenPdfPage={(page, snippet) => {
-              setPreviewPage(page);
+            onOpenPdfPage={(pages, snippet) => {
+              const nextPages = pages.length > 0 ? pages : [1];
+              setPreviewPages(nextPages);
+              setPreviewPage(nextPages[0] ?? 1);
               setPreviewSnippet(snippet);
               setPreviewOpen(true);
             }}
@@ -575,8 +602,10 @@ export default function App() {
             documentName={previewMetadata.original_name}
             fileId={previewMetadata.file_id}
             page={previewPage}
+            availablePages={previewPages}
             src={buildFileContentUrl(previewMetadata.file_id, previewPage)}
             highlightText={previewSnippet}
+            onSelectPage={(page) => setPreviewPage(page)}
             onClose={() => setPreviewOpen(false)}
           />
         ) : null}
