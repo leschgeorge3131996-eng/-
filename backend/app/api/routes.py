@@ -50,6 +50,26 @@ def get_uploaded_file_content(file_id: str) -> FileResponse:
     )
 
 
+@router.get("/files/{file_id}/metadata", response_model=ApiResponse)
+def get_uploaded_file_metadata(file_id: str) -> ApiResponse:
+    metadata = file_service.get_document_metadata(file_id)
+    return success_response(
+        {
+            "metadata": {
+                "file_id": metadata.file_id,
+                "original_name": metadata.original_name,
+                "file_type": metadata.file_type,
+                "size_bytes": metadata.size_bytes,
+                "text_chars": metadata.text_chars,
+                "page_count": metadata.page_count,
+                "chunk_count": metadata.chunk_count,
+                "document_fingerprint": metadata.document_fingerprint,
+                "parse_status": metadata.parse_status,
+            }
+        }
+    )
+
+
 @router.get("/files/{file_id}/pages/{page_number}", response_model=ApiResponse)
 def get_uploaded_file_page(file_id: str, page_number: int) -> ApiResponse:
     page = file_service.get_document_page(file_id, page_number)

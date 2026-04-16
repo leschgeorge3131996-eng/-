@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ApiRequestError,
   buildFileContentUrl,
+  fetchDocumentMetadata,
   fetchLogSummary,
   runTask,
   uploadDocument
@@ -95,6 +96,22 @@ function normalizeErrorMessage(error: unknown): string {
   return "提交任务失败";
 }
 
+function normalizeRecordErrorMessage(error: unknown): string {
+  if (error instanceof ApiRequestError) {
+    if (error.code === "NOT_FOUND") {
+      return "对应文档已不存在，记录已从最近列表移除。";
+    }
+    if (error.code === "NON_JSON_RESPONSE") {
+      return "服务返回了异常页面，最近记录恢复失败，请刷新页面或重启本地服务。";
+    }
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "最近记录恢复失败。";
+}
+
 function toUploadMetadata(document: RecentDocument): UploadMetadata {
   return {
     file_id: document.file_id,
@@ -170,41 +187,58 @@ export default function App() {
   }
 
   function restoreRecentDocument(document: RecentDocument) {
-    setPreviewSnippet(null);
-    applyActiveDocument(toUploadMetadata(document), 1, [1]);
-    setResult(null);
-    setError(null);
+    void (async () => {
+      try {
+        const metadata = (await fetchDocumentMetadata(document.file_id)).metadata;
+        setPreviewSnippet(null);
+        applyActiveDocument(metadata, 1, [1]);
+        setResult(null);
+        setError(null);
+      } catch (restoreError) {
+        setRecentDocuments((current) => current.filter((item) => item.file_id !== document.file_id));
+        setRecentResults((current) =>
+          current.filter((item) => item.task_result.file_id !== document.file_id)
+        );
+        setError(normalizeRecordErrorMessage(restoreError));
+      }
+    })();
   }
 
   function restoreRecentResult(item: RecentResult) {
-    const fallbackDocument = recentDocuments.find(
-      (document) => document.file_id === item.task_result.file_id
-    );
-    const restoredMetadata =
-      item.document_snapshot ?? (fallbackDocument ? toUploadMetadata(fallbackDocument) : null);
-    const firstPage =
-      (item.task_result.task_type === "ask"
-        ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
-        : item.task_result.source_chunks[0]?.page_numbers[0]) ?? 1;
-    const firstSnippet =
-      (item.task_result.task_type === "ask"
-        ? item.task_result.citations[0]?.snippet ?? item.task_result.evidence_quotes[0]?.quote
-        : item.task_result.source_chunks[0]?.snippet) ?? null;
-    const candidatePages =
-      (item.task_result.task_type === "ask"
-        ? item.task_result.citations[0]?.page_numbers ?? item.task_result.retrieved_pages
-        : item.task_result.source_chunks[0]?.page_numbers) ?? [firstPage];
+    void (async () => {
+      try {
+        const metadata = (await fetchDocumentMetadata(item.task_result.file_id)).metadata;
+        const firstPage =
+          (item.task_result.task_type === "ask"
+            ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
+            : item.task_result.source_chunks[0]?.page_numbers[0]) ?? 1;
+        const firstSnippet =
+          (item.task_result.task_type === "ask"
+            ? item.task_result.citations[0]?.snippet ?? item.task_result.evidence_quotes[0]?.quote
+            : item.task_result.source_chunks[0]?.snippet) ?? null;
+        const candidatePages =
+          (item.task_result.task_type === "ask"
+            ? item.task_result.citations[0]?.page_numbers ?? item.task_result.retrieved_pages
+            : item.task_result.source_chunks[0]?.page_numbers) ?? [firstPage];
 
-    setTaskType(item.task_type);
-    if (item.task_result.response_detail_level) {
-      setResponseDetailLevel(item.task_result.response_detail_level);
-    }
-    setInput(item.input);
-    setResult(item.task_result);
-    setError(null);
-    setPreviewSnippet(firstSnippet);
-    setPreviewPages(candidatePages.length > 0 ? candidatePages : [firstPage]);
-    applyActiveDocument(restoredMetadata, firstPage, candidatePages);
+        setTaskType(item.task_type);
+        if (item.task_result.response_detail_level) {
+          setResponseDetailLevel(item.task_result.response_detail_level);
+        }
+        setInput(item.input);
+        setResult(item.task_result);
+        setError(null);
+        setPreviewSnippet(firstSnippet);
+        setPreviewPages(candidatePages.length > 0 ? candidatePages : [firstPage]);
+        applyActiveDocument(metadata, firstPage, candidatePages);
+      } catch (restoreError) {
+        setRecentResults((current) => current.filter((entry) => entry.id !== item.id));
+        setRecentDocuments((current) =>
+          current.filter((document) => document.file_id !== item.task_result.file_id)
+        );
+        setError(normalizeRecordErrorMessage(restoreError));
+      }
+    })();
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

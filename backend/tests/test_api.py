@@ -268,6 +268,28 @@ def test_file_content_endpoint_returns_inline_uploaded_file() -> None:
         cleanup_workspace(workspace)
 
 
+def test_file_metadata_endpoint_returns_upload_metadata() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        response = client.post(
+            "/api/upload",
+            files={"file": ("demo.md", "# title\n\nbody".encode("utf-8"), "text/markdown")},
+        )
+        file_id = response.json()["data"]["metadata"]["file_id"]
+
+        fetch_response = client.get(f"/api/files/{file_id}/metadata")
+
+        assert fetch_response.status_code == 200
+        payload = fetch_response.json()["data"]["metadata"]
+        assert payload["file_id"] == file_id
+        assert payload["original_name"] == "demo.md"
+        assert payload["file_type"] == "md"
+        assert payload["page_count"] == 1
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_file_page_endpoint_returns_page_text() -> None:
     workspace = make_workspace()
     try:

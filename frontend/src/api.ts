@@ -28,8 +28,35 @@ export class ApiRequestError extends Error {
   }
 }
 
+function looksLikeHtmlDocument(text: string): boolean {
+  return /^\s*<(?:!DOCTYPE|html|head|body)/i.test(text);
+}
+
+function buildNonJsonResponseError(status: number, text: string): ApiRequestError {
+  const preview = text.slice(0, 140).trim();
+  const message = looksLikeHtmlDocument(text)
+    ? "服务返回了页面而不是接口数据，请刷新页面或重启本地服务后重试。"
+    : "服务返回了无法识别的数据格式，请稍后重试。";
+
+  return new ApiRequestError(message, "NON_JSON_RESPONSE", {
+    status,
+    preview
+  });
+}
+
 async function parseResponse<T>(response: Response): Promise<T> {
-  const payload = (await response.json()) as ApiResponse<T>;
+  const text = await response.text();
+  if (!text.trim()) {
+    throw new ApiRequestError("服务未返回数据，请稍后重试。", "EMPTY_RESPONSE");
+  }
+
+  let payload: ApiResponse<T>;
+  try {
+    payload = JSON.parse(text) as ApiResponse<T>;
+  } catch {
+    throw buildNonJsonResponseError(response.status, text);
+  }
+
   if (!response.ok || !payload.success || !payload.data) {
     throw new ApiRequestError(
       payload.error?.message ?? "请求失败",
@@ -41,7 +68,13 @@ async function parseResponse<T>(response: Response): Promise<T> {
 }
 
 function parsePayloadText<T>(text: string, status: number): T {
-  const payload = JSON.parse(text) as ApiResponse<T>;
+  let payload: ApiResponse<T>;
+  try {
+    payload = JSON.parse(text) as ApiResponse<T>;
+  } catch {
+    throw buildNonJsonResponseError(status, text);
+  }
+
   if (status < 200 || status >= 300 || !payload.success || !payload.data) {
     throw new ApiRequestError(
       payload.error?.message ?? "请求失败",
@@ -119,4 +152,9 @@ export async function fetchLogSummary(): Promise<LogSummary> {
 export async function fetchDocumentPage(fileId: string, pageNumber: number): Promise<DocumentPageData> {
   const response = await fetch(`${API_BASE_URL}/files/${fileId}/pages/${pageNumber}`);
   return parseResponse<DocumentPageData>(response);
+}
+
+export async function fetchDocumentMetadata(fileId: string): Promise<UploadResponse> {
+  const response = await fetch(`${API_BASE_URL}/files/${fileId}/metadata`);
+  return parseResponse<UploadResponse>(response);
 }
