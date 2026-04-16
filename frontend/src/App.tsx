@@ -134,6 +134,10 @@ function normalizeRecordErrorMessage(error: unknown): string {
   return "最近记录恢复失败。";
 }
 
+function shouldRemoveMissingRecord(error: unknown): boolean {
+  return error instanceof ApiRequestError && error.code === "NOT_FOUND";
+}
+
 export default function App() {
   const [taskType, setTaskType] = useState<TaskType>("summary");
   const [responseDetailLevel, setResponseDetailLevel] =
@@ -218,10 +222,14 @@ export default function App() {
         setResult(null);
         setError(null);
       } catch (restoreError) {
-        setRecentDocuments((current) => current.filter((item) => item.file_id !== document.file_id));
-        setRecentResults((current) =>
-          current.filter((item) => item.task_result.file_id !== document.file_id)
-        );
+        if (shouldRemoveMissingRecord(restoreError)) {
+          setRecentDocuments((current) =>
+            current.filter((item) => item.file_id !== document.file_id)
+          );
+          setRecentResults((current) =>
+            current.filter((item) => item.task_result.file_id !== document.file_id)
+          );
+        }
         setError(normalizeRecordErrorMessage(restoreError));
       }
     })();
@@ -254,10 +262,12 @@ export default function App() {
         setPreviewSnippet(firstSnippet);
         applyActiveDocument(metadata, firstPage, candidatePages);
       } catch (restoreError) {
-        setRecentResults((current) => current.filter((entry) => entry.id !== item.id));
-        setRecentDocuments((current) =>
-          current.filter((document) => document.file_id !== item.task_result.file_id)
-        );
+        if (shouldRemoveMissingRecord(restoreError)) {
+          setRecentResults((current) => current.filter((entry) => entry.id !== item.id));
+          setRecentDocuments((current) =>
+            current.filter((document) => document.file_id !== item.task_result.file_id)
+          );
+        }
         setError(normalizeRecordErrorMessage(restoreError));
       }
     })();
