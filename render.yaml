@@ -1,0 +1,62 @@
+services:
+  - type: web
+    runtime: python
+    name: yandatong-api
+    region: singapore
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
+    disk:
+      name: yandatong-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        sync: false
+      - key: DATA_DIR
+        value: /var/data
+      - key: MAX_UPLOAD_MB
+        value: "20"
+      - key: MAX_DOCUMENT_CHARS
+        value: "30000"
+      - key: REQUEST_TIMEOUT_SECONDS
+        value: "60"
+      - key: MODEL_PROVIDER
+        value: volcengine_ark
+      - key: USE_MOCK_MODEL
+        value: "false"
+      - key: WUQIONG_BASE_URL
+        value: https://ark.cn-beijing.volces.com/api/v3
+      - key: WUQIONG_API_KEY
+        sync: false
+      - key: MODEL_QA
+        sync: false
+      - key: MODEL_SUMMARY
+        sync: false
+      - key: MODEL_OUTLINE
+        sync: false
+      - key: ROUTE_UPGRADE_CHARS
+        value: "12000"
+
+  - type: web
+    runtime: static
+    name: yandatong-web
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    buildFilter:
+      paths:
+        - frontend/**
+        - render.yaml
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false

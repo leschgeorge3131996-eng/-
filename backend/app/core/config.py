@@ -38,6 +38,16 @@ def _to_list(value: str | None, default: list[str]) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def _to_path(value: str | None, default: Path, base_dir: Path) -> Path:
+    if value is None or not value.strip():
+        return default
+
+    candidate = Path(value).expanduser()
+    if candidate.is_absolute():
+        return candidate
+    return (base_dir / candidate).resolve()
+
+
 @dataclass(slots=True)
 class Settings:
     project_root: Path
@@ -85,7 +95,7 @@ def get_settings() -> Settings:
     project_root = Path(__file__).resolve().parents[3]
     _load_env_file(project_root / ".env")
 
-    data_dir = project_root / "data"
+    data_dir = _to_path(os.getenv("DATA_DIR"), project_root / "data", project_root)
     settings = Settings(
         project_root=project_root,
         app_name=os.getenv("APP_NAME", "研答通"),

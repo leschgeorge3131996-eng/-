@@ -184,13 +184,29 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Start phase 2 in this order:
+1. Next session priority: formal online deployment
+   - target architecture:
+     - frontend: static site
+     - backend: web service
+     - backend data: persistent disk or equivalent persistent storage
+   - preferred domain split:
+     - main site: `yourdomain.com`
+     - api: `api.yourdomain.com`
+   - likely first deployment candidate: Render
+   - deployment prep checklist:
+     - verify frontend API base URL strategy
+     - verify backend CORS origins
+     - verify data directory persistence requirements for uploads / parsed / logs / cache
+     - prepare environment variables for production
+2. Preserve current product logic; do not start with large new feature work before deployment path is clear
+3. There are currently uncommitted UI-only experiments in:
+   - `frontend/src/App.tsx`
+   - `frontend/src/styles.css`
+   Tomorrow, decide first whether to keep, revise, or discard them before starting deployment changes
+4. After deployment path is clear:
    - route-tier comparison on the real sample set
    - summary/outline stricter reference semantics
-2. Finalize first version of competition materials:
-   - align wording with actual submission form
-   - refresh screenshots/log evidence from the successful real replay
-3. Prefer controlled demo sharing unless a more stable exposure path is prepared
+   - final submission-material polish
 
 ## Session Handoff Rule
 
@@ -199,5 +215,34 @@ At the start of the next session:
 1. Read `WORKLOG.md`
 2. Read `README.md`
 3. Check `.env` exists locally
-4. Check recent logs in `data/logs/call_logs.jsonl`
-5. Continue from the `Next Recommended Steps` section unless the user redirects
+4. Check `git status --short` first, because there may be uncommitted UI experiments
+5. Check recent logs in `data/logs/call_logs.jsonl`
+6. Continue from the `Next Recommended Steps` section unless the user redirects
+
+## 2026-04-16 Deployment Prep Update
+
+- Read `WORKLOG.md`, `README.md`, local `.env` presence, `git status --short`, and recent `data/logs/call_logs.jsonl` entries before resuming work
+- Confirmed there is no Git remote configured in this workspace and no local Render CLI available, so an actual cloud deploy cannot be triggered from this machine yet
+- Added Render Blueprint config in `render.yaml` for:
+  - static frontend service
+  - Python backend service
+  - persistent disk-backed backend data storage
+- Added backend `DATA_DIR` env support so production uploads / parsed outputs / logs / cache can live on a persistent mount instead of the ephemeral app filesystem
+- Added `frontend/.env.production.example` for `VITE_API_BASE_URL`
+- Added `docs/DEPLOY_RENDER.md` with the exact remaining manual Render steps
+- Normalized frontend `VITE_API_BASE_URL` handling so a trailing slash does not create malformed API URLs
+
+### Remaining Deployment Gate
+
+- Push repo to a Git provider that Render can access
+- Create the Blueprint from `render.yaml`
+- Fill the `sync: false` Render env vars:
+  - `CORS_ORIGINS`
+  - `WUQIONG_API_KEY`
+  - `MODEL_QA`
+  - `MODEL_SUMMARY`
+  - `MODEL_OUTLINE`
+  - `VITE_API_BASE_URL`
+- If using custom domains, point:
+  - frontend -> `yourdomain.com`
+  - backend -> `api.yourdomain.com`
