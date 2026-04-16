@@ -70,7 +70,6 @@ const DEMO_DOCUMENT_CONTENT = `# 项目简介
 
 研答通是一个面向科研与智能办公场景的个人智能文档助理。
 第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
-
 系统当前采用端云协同路线，优先保证能跑通、能演示、能扩展。`;
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -231,7 +230,6 @@ export default function App() {
         setResult(item.task_result);
         setError(null);
         setPreviewSnippet(firstSnippet);
-        setPreviewPages(candidatePages.length > 0 ? candidatePages : [firstPage]);
         applyActiveDocument(metadata, firstPage, candidatePages);
       } catch (restoreError) {
         setRecentResults((current) => current.filter((entry) => entry.id !== item.id));
@@ -294,8 +292,7 @@ export default function App() {
             ? taskResult.citations[0]?.page_numbers ?? taskResult.retrieved_pages
             : taskResult.source_chunks[0]?.page_numbers) ?? [1];
         setPreviewSnippet(defaultSnippet);
-        setPreviewPages(defaultPages.length > 0 ? defaultPages : [1]);
-        setPreviewOpen(true);
+        applyActiveDocument(metadata, defaultPages[0] ?? 1, defaultPages);
       }
       setRecentResults((current) =>
         [
