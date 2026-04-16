@@ -142,7 +142,8 @@ export default function ResultPanel({
               <span className="badge badge-outcome">{result.outcome}</span>
               {result.response_detail_level ? (
                 <span className="badge badge-detail">
-                  {RESPONSE_DETAIL_LABELS[result.response_detail_level] ?? result.response_detail_level}
+                  {RESPONSE_DETAIL_LABELS[result.response_detail_level] ??
+                    result.response_detail_level}
                 </span>
               ) : null}
             </div>
@@ -172,7 +173,10 @@ export default function ResultPanel({
             {result.retrieval_applied ? (
               <p className="status">
                 已从 {result.retrieved_chunk_count} 个片段构造上下文
-                {result.retrieved_pages.length > 0 ? `，涉及页码：${result.retrieved_pages.join(", ")}` : ""}。
+                {result.retrieved_pages.length > 0
+                  ? `，涉及页码：${result.retrieved_pages.join(", ")}`
+                  : ""}
+                。
               </p>
             ) : null}
             {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
@@ -189,7 +193,8 @@ export default function ResultPanel({
             {result.token_usage?.total_tokens ? (
               <p className="status token-usage">
                 Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
-                {result.token_usage.completion_tokens ?? 0} / 总计 {result.token_usage.total_tokens}
+                {result.token_usage.completion_tokens ?? 0} / 总计{" "}
+                {result.token_usage.total_tokens}
               </p>
             ) : null}
 

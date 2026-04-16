@@ -69,7 +69,9 @@ const DEMO_DOCUMENT_NAME = "demo_research_brief.md";
 const DEMO_DOCUMENT_CONTENT = `# 项目简介
 
 研答通是一个面向科研与智能办公场景的个人智能文档助理。
-第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。`;
+第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
+
+系统当前采用端云协同路线，优先保证能跑通、能演示、能扩展。`;
 
 function readStorage<T>(key: string, fallback: T): T {
   try {
@@ -337,7 +339,9 @@ export default function App() {
               <span className="flow-separator" aria-hidden="true" />
               <span className="flow-step">生成</span>
             </div>
-            <p className="subtitle">上传文档，完成摘要、问答和提纲生成，并把结果变成可解释的工作流。</p>
+            <p className="subtitle">
+              上传文档，完成摘要、问答和提纲生成，并把结果组织成可解释的工作流。
+            </p>
           </div>
           <div className="hero-pills">
             {HERO_PILLS.map((pill) => (
@@ -567,7 +571,9 @@ export default function App() {
                   </div>
                   <div className="meta-chip">
                     <span>来源</span>
-                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}</strong>
+                    <strong>
+                      {pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}
+                    </strong>
                   </div>
                   <div className="meta-chip">
                     <span>下一步</span>
@@ -662,7 +668,9 @@ export default function App() {
                     onClick={() => restoreRecentDocument(item)}
                   >
                     <strong>{item.original_name}</strong>
-                    <span>{item.file_type} / {item.page_count} pages / {item.chunk_count} chunks</span>
+                    <span>
+                      {item.file_type} / {item.page_count} pages / {item.chunk_count} chunks
+                    </span>
                   </button>
                 ))}
               </div>
