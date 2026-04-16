@@ -80,6 +80,20 @@ function normalizeErrorMessage(error: unknown): string {
   return "提交任务失败";
 }
 
+function toUploadMetadata(document: RecentDocument): UploadMetadata {
+  return {
+    file_id: document.file_id,
+    original_name: document.original_name,
+    file_type: document.file_type,
+    size_bytes: 0,
+    text_chars: document.text_chars,
+    page_count: document.page_count,
+    chunk_count: document.chunk_count,
+    document_fingerprint: document.document_fingerprint ?? null,
+    parse_status: document.parse_status
+  };
+}
+
 export default function App() {
   const [taskType, setTaskType] = useState<TaskType>("summary");
   const [responseDetailLevel, setResponseDetailLevel] = useState<ResponseDetailLevel>("balanced");
@@ -118,6 +132,42 @@ export default function App() {
   useEffect(() => {
     void fetchLogSummary().then(setLogSummary).catch(() => setLogSummary(null));
   }, [result]);
+
+  function applyActiveDocument(metadata: UploadMetadata | null, page = 1) {
+    setUploadedMetadata(metadata);
+    setSelectedFile(null);
+    setPreviewPage(page);
+    setPreviewOpen(Boolean(metadata && metadata.file_type === "pdf"));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  function restoreRecentDocument(document: RecentDocument) {
+    applyActiveDocument(toUploadMetadata(document), 1);
+    setResult(null);
+    setError(null);
+  }
+
+  function restoreRecentResult(item: RecentResult) {
+    const fallbackDocument = recentDocuments.find(
+      (document) => document.file_id === item.task_result.file_id
+    );
+    const restoredMetadata = item.document_snapshot ?? (fallbackDocument ? toUploadMetadata(fallbackDocument) : null);
+    const firstPage =
+      (item.task_result.task_type === "ask"
+        ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
+        : item.task_result.source_chunks[0]?.page_numbers[0]) ?? 1;
+
+    setTaskType(item.task_type);
+    if (item.task_result.response_detail_level) {
+      setResponseDetailLevel(item.task_result.response_detail_level);
+    }
+    setInput(item.input);
+    setResult(item.task_result);
+    setError(null);
+    applyActiveDocument(restoredMetadata, firstPage);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -259,6 +309,8 @@ export default function App() {
                 setUploadedMetadata(null);
                 setResult(null);
                 setError(null);
+                setPreviewOpen(false);
+                setPreviewPage(1);
               }}>
                 填充示例文档
               </button>
@@ -301,6 +353,8 @@ export default function App() {
                       setUploadedMetadata(null);
                       setResult(null);
                       setError(null);
+                      setPreviewOpen(false);
+                      setPreviewPage(1);
                     }
                   }}
                 />
@@ -388,7 +442,13 @@ export default function App() {
             ) : (
               <div className="history-list">
                 {recentDocuments.map((item) => (
-                  <button key={item.file_id} className="history-card" type="button" disabled={loading}>
+                  <button
+                    key={item.file_id}
+                    className="history-card"
+                    type="button"
+                    disabled={loading}
+                    onClick={() => restoreRecentDocument(item)}
+                  >
                     <strong>{item.original_name}</strong>
                     <span>{item.file_type} 路 {item.page_count} pages 路 {item.chunk_count} chunks</span>
                   </button>
@@ -405,7 +465,13 @@ export default function App() {
             ) : (
               <div className="history-list">
                 {recentResults.map((item) => (
-                  <button key={item.id} className="history-card" type="button" disabled={loading}>
+                  <button
+                    key={item.id}
+                    className="history-card"
+                    type="button"
+                    disabled={loading}
+                    onClick={() => restoreRecentResult(item)}
+                  >
                     <strong>{TASK_LABELS[item.task_type]}</strong>
                     <span>{item.task_result.document_name}</span>
                     <span>{item.input || "无附加输入"}</span>
