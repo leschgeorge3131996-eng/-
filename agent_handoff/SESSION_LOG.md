@@ -84,6 +84,29 @@ Entry format:
   - Ask user whether to also rewrite PROJECT_ONE_PAGER body + QA_BRIEF opening for full tonal consistency
   - TASK_BOARD #1 (demo-mode invite-code bypass) is still the largest remaining demo-friction lever
 
+## 2026-04-17 / Claude Code (UI polish round + end-of-day checkpoint)
+
+- Summary:
+  - User asked for visible UI polish, not a redesign. First pass was too subtle (gradient brandmark, citation-card left stripe, shimmer on primary button, layered panel shadows, global focus-visible) — user could not see a difference.
+  - Two suspected causes: (a) changes were mostly hover/focus states, not first-glance, (b) frontend dev server wasn't running, so the browser was serving stale pre-build CSS.
+  - Second pass added visible ambient layer: fixed-position blurred orbs on `.page::before` (warm terracotta, top-left) and `.page::after` (deep navy, bottom-right) with slow auroraDrift animation. First attempt was invisible because the `:root` background had competing radial-gradients at the same spots. Fix: stripped the `:root` radial-gradients down to a clean linear-gradient base, boosted orb opacity (0.78 / 0.62) and saturation. Orbs now dominate the ambient layer.
+  - User feedback on brandmark: `clamp(48px, 7.4vw, 82px)` with `letter-spacing: -0.055em` was too large and too tight. Dialed back to `clamp(36px, 5vw, 58px)` with positive `letter-spacing: 0.1em` — CJK characters need positive tracking, not negative.
+  - Also in this session: added new feedback memory "Proactive git commit + notify" per explicit user instruction — commit at natural break points without being asked, and tell the user; ask before pushing.
+- Files touched:
+  - `frontend/src/styles.css` (hero section, brandmark, page orbs, :root background, hero pills, eyebrow badge)
+  - `agent_handoff/SESSION_LOG.md` (this entry)
+- Verification:
+  - frontend: `npm run build` passed twice this round (598 modules, ~24KB gzipped CSS); smoke tests `7 passed` on the preceding demo-mode commit
+  - User has not yet visually confirmed the orbs/brandmark in the second pass — pending for next session
+- Open risks:
+  - Still no visual confirmation from the user that the second pass orbs are visible. If tomorrow they still don't see them, likely causes in order: (1) browser hard cache (Ctrl+F5 twice), (2) serving old dist/ via `start_yandatong.cmd`, (3) running on a different machine/deployment than expected.
+  - Brandmark shimmer animation may feel busy if the page is otherwise still; if user dislikes movement, remove the `brandShimmer` keyframe call (keep the static gradient).
+  - The eyebrow was restyled from a plain orange line of text into an uppercase pill with a pulsing dot; user has not confirmed they want that directional shift — it's more "SaaS landing page" than "paper reading tool".
+- Recommended next step for tomorrow:
+  - Confirm visually with the user that the orbs + brandmark look right on their screen before continuing. If yes, proceed to the next polish target: **result panel + answer rendering** (the second biggest demo eyeball magnet — currently still plain).
+  - Specific candidates for round 3: animated skeleton while awaiting model response; upgrade the evidence-quote rendering (currently uses system serif fallback chain — may land on SimSun on Windows which looks dated); more dramatic entrance animation when a new result appears.
+  - TASK_BOARD #3 (CSRF/origin validation) remains the outstanding security item; can be tackled between UI rounds.
+
 ## 2026-04-17 / Claude Code (demo mode: auto-session, no invite code)
 
 - Summary:
