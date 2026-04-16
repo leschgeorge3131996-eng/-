@@ -178,10 +178,17 @@ textarea {
 }
 
 .flow-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: rgba(122, 51, 23, 0.42);
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
+}
+
+.flow-separator::before {
+  content: "/";
 }
 
 .subtitle {

@@ -150,8 +150,8 @@ export default function ResultPanel({
             ) : null}
             {result.token_usage?.total_tokens ? (
               <p className="status token-usage">
-                Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} 路 输出{" "}
-                {result.token_usage.completion_tokens ?? 0} 路 总计 {result.token_usage.total_tokens}
+                Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
+                {result.token_usage.completion_tokens ?? 0} / 总计 {result.token_usage.total_tokens}
               </p>
             ) : null}
 

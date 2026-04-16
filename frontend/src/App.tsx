@@ -25,9 +25,24 @@ const TASK_OPTIONS: Array<{ value: TaskType; label: string; placeholder: string 
 ];
 
 const DEMO_ACTIONS = [
-  { label: "示例摘要", description: "快速验证摘要链路", taskType: "summary" as const, input: "请用 3 条要点总结这个文档。" },
-  { label: "示例问答", description: "验证检索与引用", taskType: "ask" as const, input: "这个项目第一阶段要做什么？" },
-  { label: "示例提纲", description: "验证结构化提纲生成", taskType: "outline" as const, input: "请生成一个 5 页汇报提纲。" }
+  {
+    label: "示例摘要",
+    description: "快速验证摘要链路",
+    taskType: "summary" as const,
+    input: "请用 3 条要点总结这个文档。"
+  },
+  {
+    label: "示例问答",
+    description: "验证检索与引用",
+    taskType: "ask" as const,
+    input: "这个项目第一阶段要做什么？"
+  },
+  {
+    label: "示例提纲",
+    description: "验证结构化提纲生成",
+    taskType: "outline" as const,
+    input: "请生成一个 5 页汇报提纲。"
+  }
 ];
 
 const RESPONSE_DETAIL_OPTIONS: Array<{
@@ -119,7 +134,12 @@ export default function App() {
 
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
   const pendingDocument = selectedFile && !uploadedMetadata ? selectedFile : null;
-  const canSubmit = !loading && Boolean(selectedFile || uploadedMetadata) && (taskType !== "ask" || Boolean(input.trim()));
+  const pendingDocumentType =
+    pendingDocument?.name.split(".").pop()?.toLowerCase() ?? pendingDocument?.type ?? "-";
+  const canSubmit =
+    !loading &&
+    Boolean(selectedFile || uploadedMetadata) &&
+    (taskType !== "ask" || Boolean(input.trim()));
   const previewMetadata = uploadedMetadata?.file_type === "pdf" ? uploadedMetadata : null;
 
   useEffect(() => {
@@ -158,7 +178,8 @@ export default function App() {
     const fallbackDocument = recentDocuments.find(
       (document) => document.file_id === item.task_result.file_id
     );
-    const restoredMetadata = item.document_snapshot ?? (fallbackDocument ? toUploadMetadata(fallbackDocument) : null);
+    const restoredMetadata =
+      item.document_snapshot ?? (fallbackDocument ? toUploadMetadata(fallbackDocument) : null);
     const firstPage =
       (item.task_result.task_type === "ask"
         ? item.task_result.citations[0]?.page_numbers[0] ?? item.task_result.retrieved_pages[0]
@@ -197,20 +218,22 @@ export default function App() {
         fileId = nextMetadata.file_id;
         setUploadedMetadata(nextMetadata);
         setSelectedFile(null);
-        setRecentDocuments((current) => [
-          {
-            file_id: nextMetadata.file_id,
-            original_name: nextMetadata.original_name,
-            document_fingerprint: nextMetadata.document_fingerprint,
-            file_type: nextMetadata.file_type,
-            text_chars: nextMetadata.text_chars,
-            page_count: nextMetadata.page_count,
-            chunk_count: nextMetadata.chunk_count,
-            parse_status: nextMetadata.parse_status,
-            saved_at: new Date().toISOString()
-          },
-          ...current.filter((item) => item.file_id !== nextMetadata.file_id)
-        ].slice(0, 5));
+        setRecentDocuments((current) =>
+          [
+            {
+              file_id: nextMetadata.file_id,
+              original_name: nextMetadata.original_name,
+              document_fingerprint: nextMetadata.document_fingerprint,
+              file_type: nextMetadata.file_type,
+              text_chars: nextMetadata.text_chars,
+              page_count: nextMetadata.page_count,
+              chunk_count: nextMetadata.chunk_count,
+              parse_status: nextMetadata.parse_status,
+              saved_at: new Date().toISOString()
+            },
+            ...current.filter((item) => item.file_id !== nextMetadata.file_id)
+          ].slice(0, 5)
+        );
       }
 
       if (!fileId) throw new Error("请先上传一个文档。");
@@ -226,17 +249,19 @@ export default function App() {
         setPreviewSnippet(defaultSnippet);
         setPreviewOpen(true);
       }
-      setRecentResults((current) => [
-        {
-          id: taskResult.request_id,
-          task_type: taskResult.task_type,
-          input: input.trim(),
-          created_at: new Date().toISOString(),
-          document_snapshot: metadata,
-          task_result: taskResult
-        },
-        ...current
-      ].slice(0, 5));
+      setRecentResults((current) =>
+        [
+          {
+            id: taskResult.request_id,
+            task_type: taskResult.task_type,
+            input: input.trim(),
+            created_at: new Date().toISOString(),
+            document_snapshot: metadata,
+            task_result: taskResult
+          },
+          ...current
+        ].slice(0, 5)
+      );
     } catch (submitError) {
       setError(normalizeErrorMessage(submitError));
       setResult(null);
@@ -244,7 +269,9 @@ export default function App() {
       setLoading(false);
       setLoadStage("idle");
       setUploadProgress(0);
-      if (fileInputRef.current && !selectedFile) fileInputRef.current.value = "";
+      if (fileInputRef.current && !selectedFile) {
+        fileInputRef.current.value = "";
+      }
     }
   }
 
@@ -257,11 +284,11 @@ export default function App() {
             <h1 className="brandmark">研答通</h1>
             <div className="hero-flow" aria-label="文档任务流程">
               <span className="flow-step">上传</span>
-              <span className="flow-separator">路</span>
+              <span className="flow-separator" aria-hidden="true" />
               <span className="flow-step">解析</span>
-              <span className="flow-separator">路</span>
+              <span className="flow-separator" aria-hidden="true" />
               <span className="flow-step">检索</span>
-              <span className="flow-separator">路</span>
+              <span className="flow-separator" aria-hidden="true" />
               <span className="flow-step">生成</span>
             </div>
             <p className="subtitle">上传文档，完成摘要、问答和提纲生成，并把结果变成可解释的工作流。</p>
@@ -318,16 +345,23 @@ export default function App() {
             </div>
             <p className="subtitle compact">先填入示例文档，再切换任务，快速演示完整链路。</p>
             <div className="demo-actions">
-              <button className="hero-button" type="button" disabled={loading} onClick={() => {
-                const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, { type: "text/markdown" });
-                setSelectedFile(file);
-                setUploadedMetadata(null);
-                setResult(null);
-                setError(null);
-                setPreviewOpen(false);
-                setPreviewPage(1);
-                setPreviewSnippet(null);
-              }}>
+              <button
+                className="hero-button"
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
+                    type: "text/markdown"
+                  });
+                  setSelectedFile(file);
+                  setUploadedMetadata(null);
+                  setResult(null);
+                  setError(null);
+                  setPreviewOpen(false);
+                  setPreviewPage(1);
+                  setPreviewSnippet(null);
+                }}
+              >
                 填充示例文档
               </button>
               {DEMO_ACTIONS.map((action) => (
@@ -346,6 +380,11 @@ export default function App() {
                 </button>
               ))}
             </div>
+            {pendingDocument ? (
+              <p className="demo-feedback">
+                已填入待处理文档：{pendingDocument.name}。点击“提交任务”后会自动上传并执行。
+              </p>
+            ) : null}
           </article>
         </section>
 
@@ -383,15 +422,24 @@ export default function App() {
                     <strong>{loadStage === "model" ? 100 : uploadProgress}%</strong>
                   </div>
                   <div className="upload-progress-track" aria-hidden="true">
-                    <div className="upload-progress-fill" style={{ width: `${loadStage === "model" ? 100 : uploadProgress}%` }} />
+                    <div
+                      className="upload-progress-fill"
+                      style={{ width: `${loadStage === "model" ? 100 : uploadProgress}%` }}
+                    />
                   </div>
                 </div>
               ) : null}
               <label className="field">
                 <span>任务类型</span>
-                <select value={taskType} disabled={loading} onChange={(event) => setTaskType(event.target.value as TaskType)}>
+                <select
+                  value={taskType}
+                  disabled={loading}
+                  onChange={(event) => setTaskType(event.target.value as TaskType)}
+                >
                   {TASK_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -400,10 +448,14 @@ export default function App() {
                 <select
                   value={responseDetailLevel}
                   disabled={loading}
-                  onChange={(event) => setResponseDetailLevel(event.target.value as ResponseDetailLevel)}
+                  onChange={(event) =>
+                    setResponseDetailLevel(event.target.value as ResponseDetailLevel)
+                  }
                 >
                   {RESPONSE_DETAIL_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label} 路 {option.description}</option>
+                    <option key={option.value} value={option.value}>
+                      {option.label} / {option.description}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -424,6 +476,83 @@ export default function App() {
                 <p className="control-hint">建议先用 Demo 模式体验完整链路，再换真实文档。</p>
               </div>
             </form>
+
+            <div className="document-brief">
+              <div className="section-head compact-head">
+                <p className="section-kicker">当前文档</p>
+                <h3>
+                  {uploadedMetadata
+                    ? uploadedMetadata.original_name
+                    : pendingDocument
+                      ? pendingDocument.name
+                      : "暂无文档"}
+                </h3>
+              </div>
+              {uploadedMetadata ? (
+                <div className="meta-grid">
+                  <div className="meta-chip">
+                    <span>类型</span>
+                    <strong>{uploadedMetadata.file_type}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>字符数</span>
+                    <strong>{uploadedMetadata.text_chars}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>页数</span>
+                    <strong>{uploadedMetadata.page_count}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>分块数</span>
+                    <strong>{uploadedMetadata.chunk_count}</strong>
+                  </div>
+                </div>
+              ) : pendingDocument ? (
+                <div className="meta-grid">
+                  <div className="meta-chip">
+                    <span>状态</span>
+                    <strong>待上传</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>类型</span>
+                    <strong>{pendingDocumentType}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>来源</span>
+                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}</strong>
+                  </div>
+                  <div className="meta-chip">
+                    <span>下一步</span>
+                    <strong>点击提交开始处理</strong>
+                  </div>
+                </div>
+              ) : (
+                <p className="empty">上传后这里会显示当前文档的规模与结构信息。</p>
+              )}
+              {uploadedMetadata || pendingDocument ? (
+                <div className="inline-actions">
+                  <button
+                    className="ghost-button"
+                    type="button"
+                    disabled={loading}
+                    onClick={() => {
+                      setUploadedMetadata(null);
+                      setSelectedFile(null);
+                      setResult(null);
+                      setError(null);
+                      setPreviewOpen(false);
+                      setPreviewPage(1);
+                      setPreviewSnippet(null);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                      }
+                    }}
+                  >
+                    清空当前文档
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </article>
 
           <ResultPanel
@@ -470,7 +599,7 @@ export default function App() {
                     onClick={() => restoreRecentDocument(item)}
                   >
                     <strong>{item.original_name}</strong>
-                    <span>{item.file_type} 路 {item.page_count} pages 路 {item.chunk_count} chunks</span>
+                    <span>{item.file_type} / {item.page_count} pages / {item.chunk_count} chunks</span>
                   </button>
                 ))}
               </div>
