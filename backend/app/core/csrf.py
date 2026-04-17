@@ -33,13 +33,65 @@ def _origin_from_url(value: str | None) -> str | None:
     return f"{parsed.scheme.lower()}://{netloc}"
 
 
+def _normalize_pattern(raw: str) -> str | None:
+    """Normalize either a plain origin or a wildcard pattern.
+
+    Wildcard pattern format: ``scheme://*.domain.tld`` — matches any subdomain
+    of ``domain.tld`` on the same scheme. Only a leading ``*.`` label is
+    supported; this is the common form (e.g. ``https://*.trycloudflare.com``)
+    and avoids the surprises of arbitrary-position glob matching.
+    """
+    if raw is None:
+        return None
+    candidate = raw.strip().rstrip("/")
+    if not candidate:
+        return None
+    if "://*." in candidate:
+        scheme, _, rest = candidate.partition("://")
+        scheme = scheme.strip().lower()
+        rest = rest.strip().lower()
+        if not scheme or not rest.startswith("*."):
+            return None
+        suffix = rest[2:]
+        if not suffix or "*" in suffix:
+            return None
+        return f"{scheme}://*.{suffix}"
+    return _origin_from_url(candidate)
+
+
 def normalize_allowed_origins(origins: Iterable[str]) -> frozenset[str]:
     normalized: set[str] = set()
     for origin in origins:
-        normalized_value = _origin_from_url(origin)
+        normalized_value = _normalize_pattern(origin)
         if normalized_value:
             normalized.add(normalized_value)
     return frozenset(normalized)
+
+
+def _origin_matches_allowlist(candidate: str, allowed: frozenset[str]) -> bool:
+    if not candidate:
+        return False
+    if candidate in allowed:
+        return True
+    for entry in allowed:
+        if "://*." not in entry:
+            continue
+        scheme, _, rest = entry.partition("://")
+        if not rest.startswith("*."):
+            continue
+        suffix = rest[2:]
+        prefix = f"{scheme}://"
+        if not candidate.startswith(prefix):
+            continue
+        host_and_port = candidate[len(prefix) :]
+        # Strip any port so the suffix match only compares hostnames. This
+        # means a wildcard entry matches any port on the subdomain, which is
+        # fine for demo tunnels and matches the intuition that the host is the
+        # trust anchor, not the port.
+        host_only = host_and_port.split(":", 1)[0]
+        if host_only.endswith("." + suffix) and host_only != suffix:
+            return True
+    return False
 
 
 class OriginValidationMiddleware(BaseHTTPMiddleware):
@@ -89,7 +141,7 @@ class OriginValidationMiddleware(BaseHTTPMiddleware):
         if claimed is None:
             return await call_next(request)
 
-        if claimed in self._allowed:
+        if _origin_matches_allowlist(claimed, self._allowed):
             return await call_next(request)
 
         payload = error_response(

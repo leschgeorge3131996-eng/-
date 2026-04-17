@@ -761,6 +761,39 @@ def test_csrf_null_origin_header_is_rejected() -> None:
         cleanup_workspace(workspace)
 
 
+def test_csrf_wildcard_pattern_matches_subdomain_but_not_apex_or_others() -> None:
+    """`https://*.trycloudflare.com` lets any ephemeral tunnel subdomain through
+    without re-editing .env on every cloudflared restart.
+
+    Tested at the matcher level (not via HTTP) because Starlette forbids
+    re-registering middleware on a running app, and we've already got a
+    separate HTTP-level test for the exact-match path."""
+    from backend.app.core.csrf import (  # noqa: PLC0415
+        _origin_matches_allowlist,
+        normalize_allowed_origins,
+    )
+
+    allowed = normalize_allowed_origins(
+        ["http://localhost:5173", "https://*.trycloudflare.com"]
+    )
+
+    assert _origin_matches_allowlist("http://localhost:5173", allowed)
+    assert _origin_matches_allowlist("https://abc-def-ghi.trycloudflare.com", allowed)
+    assert _origin_matches_allowlist(
+        "https://a.b.trycloudflare.com", allowed
+    )  # deeper subdomain also matches
+    assert not _origin_matches_allowlist(
+        "https://trycloudflare.com", allowed
+    )  # apex is not a subdomain
+    assert not _origin_matches_allowlist(
+        "http://abc.trycloudflare.com", allowed
+    )  # scheme mismatch
+    assert not _origin_matches_allowlist("https://abc.attacker.com", allowed)
+    assert not _origin_matches_allowlist(
+        "https://trycloudflare.com.attacker.com", allowed
+    )  # prefix-only attacks rejected
+
+
 def test_csrf_safe_methods_are_not_gated_by_origin() -> None:
     """GET requests should never be rejected by Origin validation — safe methods
     carry no CSRF risk for cookie-based auth and frontend observability tools
