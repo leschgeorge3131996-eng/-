@@ -154,3 +154,29 @@ Entry format:
 - Recommended next step:
   - If the user wants a fully clean commit history, next round do hunk-level staging on `App.tsx` / `styles.css` to carve out just the stats-panel + subtitle changes
   - Otherwise, TASK_BOARD #1 (demo-mode invite-code bypass) is still the biggest demo-friction lever left
+
+## 2026-04-17 / Claude Code (result panel polish: loading skeleton + empty state)
+
+- Summary:
+  - Followed yesterday's recommended next step. The longest dead-air moment in a demo is the 5-10s model wait; previously the UI was a single plain sentence "模型处理中，首次请求可能需要 10 到 40 秒。" in a white card.
+  - Replaced with a full shimmer skeleton that mimics the result layout: a status pill with a pulsing accent dot + the live load message, three badge-shaped shimmer pills, a 2x2 meta-card grid, and a dark terminal shell with six shimmering output lines. Judge sees motion + structural preview instead of waiting.
+  - Also upgraded the empty state (first-visit, no result yet): previously a bland sentence, now a centered glyph (layered radial + ring + glowing dot with a gentle 3.4s drift animation) + bold title "等待你的第一次提问" + hint line. Bordered dashed card with a soft accent radial wash at the top.
+  - Added `@media (prefers-reduced-motion: reduce)` guard to disable all four animations (skeleton shimmer, status-pill pulse, terminal-line shimmer, empty glyph drift).
+  - Committed as `99abfdd` — the only uncommitted items left are the two untracked review bundle files (`REVIEW_BUNDLE_INDEX.md`, `REVIEW_PROMPT.md`), which are external-review artifacts and belong separately.
+- Files touched:
+  - `frontend/src/components/ResultPanel.tsx` (replaced loading branch and empty branch in the AnimatePresence block)
+  - `frontend/src/styles.css` (new: `@keyframes skeletonShimmer/skeletonPulse/emptyGlyphDrift`, `.result-skeleton`, `.skeleton-status`, `.skeleton-pulse`, `.skeleton`, `.skeleton-badges/badge`, `.skeleton-meta-grid/card`, `.skeleton-terminal*`, `.empty-state*`, reduced-motion media query)
+  - `agent_handoff/SESSION_LOG.md` (this entry)
+- Verification:
+  - frontend smoke tests: `7 passed` (tests don't assert loading copy, so the redesign is safe)
+  - frontend build: passed (`tsc && vite build`, 598 modules, CSS 27.99 KB / 6.53 KB gzip — was ~24 KB, +~4 KB is the new skeleton/empty-state block)
+  - backend tests: not run (no backend-side change)
+  - User has not yet visually confirmed the skeleton/empty-state on their screen — pending. Dev server was not running when checked (`tmp_vite_public_*.log` empty, no vite/node processes). User will need to `cd frontend && npm run dev` and hard-reload (Ctrl+F5) to see the change; `start_yandatong.cmd` may serve `dist/` which is now rebuilt.
+- Open risks:
+  - The terminal-shell skeleton is dark and the surrounding page is warm beige — the visual jump from page to skeleton is deliberate (it previews the real terminal output) but may feel heavy for users who expect an all-light skeleton. If user wants it lighter, swap the `.skeleton-terminal` gradient to a light tone.
+  - The empty-state glyph is subtle; on small panels it may look decorative-only. If user wants it more explicit, replace the three-span glyph with an inline SVG of a page + magnifying glass or similar.
+  - Pulsing dot + drifting glyph + shimmer all run simultaneously; combined they may feel busy to motion-averse viewers, though each one individually is gentle and the reduced-motion media query disables them.
+  - TASK_BOARD #3 (CSRF/origin validation) still outstanding; not addressed this round.
+- Recommended next step:
+  - Wait for user visual confirmation before pushing further UI changes. If good, candidate round-4 targets in priority order: (a) entrance animation for new result cards (stagger badges → meta → terminal → citations), (b) result-complete "ding" micro-interaction (flash border, or single pulse on status dot transitioning green), (c) citation-card entrance stagger when many evidence items appear.
+  - If UI momentum stalls, pivot to TASK_BOARD #3 (CSRF/origin validation for cookie-backed routes) — security item that grows more important now that demo-mode session is unauthenticated.
