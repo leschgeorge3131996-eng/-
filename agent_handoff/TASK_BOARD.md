@@ -9,7 +9,7 @@
 
 1. ~~Demo-mode invite-code bypass~~ **DONE 2026-04-17** — `DEMO_MODE=true` env switch auto-creates sessions; invite form hidden in demo builds
 2. ~~Soften stats panel for demo~~ **DONE 2026-04-17** — collapsed by default, single-line summary
-3. Add CSRF / origin validation for cookie-backed state-changing routes (more important now that demo-session is unauthenticated)
+3. ~~Add CSRF / origin validation for cookie-backed state-changing routes~~ **DONE 2026-04-17** — `OriginValidationMiddleware` rejects unsafe-method API requests whose Origin/Referer isn't in `CORS_ORIGINS`; missing-both passes (server-to-server)
 4. Add expired-session cleanup script
 5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 

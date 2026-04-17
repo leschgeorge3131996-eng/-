@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from .api.routes import router
 from .core.config import get_settings
+from .core.csrf import OriginValidationMiddleware
 from .core.exceptions import AppError
 from .core.logging_config import setup_logging
 from .schemas.common import error_response
@@ -19,6 +20,11 @@ logger = logging.getLogger(__name__)
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, version="0.1.0")
+    app.add_middleware(
+        OriginValidationMiddleware,
+        allowed_origins=settings.cors_origins,
+        api_prefix=settings.api_prefix,
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

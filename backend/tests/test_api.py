@@ -639,3 +639,141 @@ def test_document_access_is_isolated_between_sessions() -> None:
         assert response.json()["error"]["code"] == "FORBIDDEN"
     finally:
         cleanup_workspace(workspace)
+
+
+# --- CSRF / Origin validation -------------------------------------------------
+
+
+def test_csrf_state_changing_request_without_origin_or_referer_is_allowed() -> None:
+    """Server-to-server / TestClient calls omit both Origin and Referer;
+    cookie-backed CSRF is only reachable from browsers, so missing-both must pass."""
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        response = client.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "alpha"},
+        )
+
+        assert response.status_code == 200
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_state_changing_request_from_allowed_origin_passes() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        response = client.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "alpha"},
+            headers={"Origin": "http://localhost:5173"},
+        )
+
+        assert response.status_code == 200
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_state_changing_request_from_foreign_origin_is_rejected() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        response = client.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "alpha"},
+            headers={"Origin": "https://attacker.example"},
+        )
+
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "FORBIDDEN_ORIGIN"
+        assert response.json()["error"]["details"]["origin"] == "https://attacker.example"
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_foreign_origin_is_rejected_before_session_check() -> None:
+    """Authenticated-looking requests (cookie present) from a foreign origin still
+    get blocked at the CSRF layer; origin check runs before session/auth logic."""
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+        login(client)
+
+        response = client.post(
+            "/api/auth/logout",
+            headers={"Origin": "https://attacker.example"},
+        )
+
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "FORBIDDEN_ORIGIN"
+
+        # Session is still usable — CSRF rejection must not revoke it.
+        confirm = client.get("/api/auth/session")
+        assert confirm.status_code == 200
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_referer_is_used_when_origin_is_missing() -> None:
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        allowed = client.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "alpha"},
+            headers={"Referer": "http://localhost:5173/some/path?x=1"},
+        )
+        assert allowed.status_code == 200
+
+        # Fresh client — previous cookie would clash with a second login call.
+        other = build_client(workspace)
+        rejected = other.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "beta"},
+            headers={"Referer": "https://attacker.example/post"},
+        )
+        assert rejected.status_code == 403
+        assert rejected.json()["error"]["code"] == "FORBIDDEN_ORIGIN"
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_null_origin_header_is_rejected() -> None:
+    """Sandboxed iframes and file:// contexts send Origin: null; never trust it."""
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        response = client.post(
+            "/api/auth/login",
+            json={"invite_code": "invite-123", "display_name": "alpha"},
+            headers={"Origin": "null", "Referer": "https://attacker.example/x"},
+        )
+
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "FORBIDDEN_ORIGIN"
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_csrf_safe_methods_are_not_gated_by_origin() -> None:
+    """GET requests should never be rejected by Origin validation — safe methods
+    carry no CSRF risk for cookie-based auth and frontend observability tools
+    (e.g. Grafana dashboards) may fetch /health with no Origin header."""
+    workspace = make_workspace()
+    try:
+        client = build_client(workspace)
+
+        response = client.get(
+            "/api/health",
+            headers={"Origin": "https://attacker.example"},
+        )
+
+        assert response.status_code == 200
+    finally:
+        cleanup_workspace(workspace)
