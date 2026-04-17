@@ -206,6 +206,25 @@ function normalizePreviewPages(pages: number[], fallbackPage = 1): number[] {
   return normalized.length > 0 ? normalized : [fallbackPage];
 }
 
+function scrollPreviewIntoView(): void {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
+  // Double RAF so React has committed and laid out the (possibly just-mounted)
+  // preview panel before we scroll to it.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const element = document.querySelector<HTMLElement>(
+        '[data-testid="pdf-preview-panel"]'
+      );
+      if (!element || typeof element.scrollIntoView !== "function") {
+        return;
+      }
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
 function buildPreviewReference(taskResult: TaskResult): PreviewReference {
   if (taskResult.task_type === "ask") {
     const primaryReference =
@@ -1090,7 +1109,10 @@ export default function App() {
                       data-testid="open-pdf-preview-button"
                       type="button"
                       disabled={loading}
-                      onClick={() => setPreviewOpen(true)}
+                      onClick={() => {
+                        setPreviewOpen(true);
+                        scrollPreviewIntoView();
+                      }}
                     >
                       打开 PDF 预览
                     </button>
@@ -1131,6 +1153,7 @@ export default function App() {
               setPreviewSnippet(snippet);
               setPreviewSnippetPage(snippet ? nextPrimaryPage : null);
               setPreviewOpen(true);
+              scrollPreviewIntoView();
             }}
           />
         </section>
