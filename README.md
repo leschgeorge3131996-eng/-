@@ -144,12 +144,15 @@ project/
 - PowerShell 启动脚本
 - 基础服务层测试
 
-## 未完成项
+## 当前范围
 
-- 真实无问芯穹 API 协议适配与联调
-- PDF 结构化解析和页码引用
-- 文本分块、检索、上下文压缩
-- 多轮会话、评测与 benchmark
+本仓库为受控内测版本，定位为论文与报告阅读、答辩准备的文档工作台原型。当前不做公开 SaaS，不提供多租户、多轮会话或 OCR。所列能力均已端到端跑通并被测试覆盖（后端 54 passed / 前端 7 passed）。
+
+## 下一阶段规划（非本次交付范围）
+
+- 摘要 / 提纲的逐结论级引用（当前为来源片段语义）
+- 检索打分与排序在边界样本上的进一步稳定化
+- 证据回链在呈现层的细节打磨（高亮框与原文片段的联动一致性）
 
 ## 环境准备
 
@@ -235,7 +238,7 @@ npm run dev
 .venv\Scripts\python.exe -m pytest backend/tests
 ```
 
-当前状态：`23 passed`
+当前状态：`54 passed`
 
 ## 日志汇总导出
 
@@ -261,9 +264,3 @@ python scripts\export_log_summary.py --format json
 powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1
 ```
 
-## 下一步建议
-
-1. 先用真实火山方舟 Endpoint 跑通摘要、问答、提纲三条链路，再决定是否分任务换模型。
-2. 在 `data/parsed/` 基础上加入 PDF 分页解析，为后续页码引用预留结构。
-3. 增加轻量分块和检索层，把“整篇直发”升级为“检索后发送”。
-4. 给日志加一个简单的统计面板，沉淀比赛证据。
