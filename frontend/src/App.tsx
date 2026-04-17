@@ -1167,7 +1167,8 @@ export default function App() {
             availablePages={previewPages}
             src={buildFileContentUrl(
               previewMetadata.file_id,
-              previewMetadata.access_token
+              previewMetadata.access_token,
+              previewPage
             )}
             highlightText={previewPage === previewSnippetPage ? previewSnippet : null}
             onSelectPage={(page) => setPreviewPage(page)}
