@@ -16,6 +16,11 @@ class ParsedBlock(BaseModel):
     bbox: tuple[float, float, float, float]
 
 
+class ParsedLine(BaseModel):
+    text: str
+    bbox: tuple[float, float, float, float]
+
+
 class ParsedPage(BaseModel):
     page_number: int
     text: str
@@ -23,6 +28,7 @@ class ParsedPage(BaseModel):
     width: float = 0.0
     height: float = 0.0
     blocks: list[ParsedBlock] = []
+    lines: list[ParsedLine] = []
 
 
 class ParsedDocument(BaseModel):

@@ -8,9 +8,10 @@ from time import perf_counter
 from uuid import uuid4
 
 from ..core.exceptions import AppError
-from ..schemas.document import ParsedChunk
+from ..schemas.document import ParsedChunk, ParsedLine
 from ..schemas.log import CallLogEntry
 from ..schemas.task import Citation, EvidenceQuote, ResponseDetailLevel, TaskResult, TaskType
+from .bbox_matcher import match_snippet_to_line_bboxes
 from .cache_service import CacheService
 from .context_planner import ContextPlannerService
 from .file_service import FileService
@@ -74,6 +75,11 @@ class TaskService:
                 access_token=document_access_token,
                 session_id=session_id,
             )
+            pages_index = self._build_pages_index(
+                file_id,
+                access_token=document_access_token,
+                session_id=session_id,
+            )
             raw_document_text = self.file_service.get_document_text(
                 file_id,
                 access_token=document_access_token,
@@ -109,9 +115,11 @@ class TaskService:
                         self._build_chunk_ref(chunk)
                         for chunk in self._select_display_chunks(selected_chunks, limit=3)
                     ]
+                    self._attach_line_bboxes(candidate_chunks, pages_index)
                 else:
                     display_chunks = self._select_display_chunks(selected_chunks, limit=3)
                     source_chunks = [self._build_chunk_ref(chunk) for chunk in display_chunks]
+                    self._attach_line_bboxes(source_chunks, pages_index)
             if task_type == "ask" and selected_chunks:
                 retrieval_applied = True
 
@@ -204,6 +212,30 @@ class TaskService:
             cached_result = self.cache_service.get(cache_key)
             if cached_result is not None:
                 latency_ms = int((perf_counter() - started_timer) * 1000)
+                cached_evidence_quotes = [
+                    EvidenceQuote.model_validate(item)
+                    for item in cached_result.get("evidence_quotes", [])
+                ]
+                cached_citations = [
+                    Citation.model_validate(item)
+                    for item in cached_result.get("citations", [])
+                ]
+                cached_candidate_chunks = [
+                    Citation.model_validate(item)
+                    for item in cached_result.get("candidate_chunks", [])
+                ]
+                cached_source_chunks = [
+                    Citation.model_validate(item)
+                    for item in cached_result.get("source_chunks", [])
+                ]
+                cached_quote_by_chunk = {
+                    quote.chunk_id: quote.quote for quote in cached_evidence_quotes
+                }
+                self._attach_line_bboxes(
+                    cached_citations, pages_index, quote_by_chunk=cached_quote_by_chunk
+                )
+                self._attach_line_bboxes(cached_candidate_chunks, pages_index)
+                self._attach_line_bboxes(cached_source_chunks, pages_index)
                 task_result = TaskResult(
                     request_id=request_id,
                     task_type=task_type,
@@ -229,22 +261,10 @@ class TaskService:
                     ),
                     retrieved_pages=cached_result.get("retrieved_pages", retrieved_pages),
                     used_chunk_ids=cached_result.get("used_chunk_ids", []),
-                    evidence_quotes=[
-                        EvidenceQuote.model_validate(item)
-                        for item in cached_result.get("evidence_quotes", [])
-                    ],
-                    citations=[
-                        Citation.model_validate(item)
-                        for item in cached_result.get("citations", [])
-                    ],
-                    candidate_chunks=[
-                        Citation.model_validate(item)
-                        for item in cached_result.get("candidate_chunks", [])
-                    ],
-                    source_chunks=[
-                        Citation.model_validate(item)
-                        for item in cached_result.get("source_chunks", [])
-                    ],
+                    evidence_quotes=cached_evidence_quotes,
+                    citations=cached_citations,
+                    candidate_chunks=cached_candidate_chunks,
+                    source_chunks=cached_source_chunks,
                     source_document_chars=cached_result.get("source_document_chars", 0),
                     used_document_chars=cached_result.get("used_document_chars", 0),
                     truncation_message=cached_result.get("truncation_message"),
@@ -328,6 +348,12 @@ class TaskService:
                         for chunk_id in used_chunk_ids
                         if chunk_id in selected_by_id
                     ]
+                    quote_by_chunk = {
+                        quote.chunk_id: quote.quote for quote in evidence_quotes
+                    }
+                    self._attach_line_bboxes(
+                        citations, pages_index, quote_by_chunk=quote_by_chunk
+                    )
                     candidate_chunks = []
             latency_ms = int((perf_counter() - started_timer) * 1000)
             self.cache_service.set(
@@ -509,6 +535,53 @@ class TaskService:
             snippet=self._build_display_snippet(chunk.text),
             bbox_regions=list(getattr(chunk, "bbox_regions", []) or []),
         )
+
+    def _build_pages_index(
+        self,
+        file_id: str,
+        *,
+        access_token: str | None,
+        session_id: str | None,
+    ) -> dict[int, list[ParsedLine]]:
+        try:
+            structure = self.file_service.get_document_structure(
+                file_id,
+                access_token=access_token,
+                session_id=session_id,
+            )
+        except Exception:
+            return {}
+        return {page.page_number: list(page.lines) for page in structure.pages}
+
+    def _attach_line_bboxes(
+        self,
+        citations: list[Citation],
+        pages_index: dict[int, list[ParsedLine]],
+        *,
+        quote_by_chunk: dict[str, str] | None = None,
+    ) -> None:
+        if not citations or not pages_index:
+            return
+        for citation in citations:
+            text_candidates: list[str] = []
+            if quote_by_chunk:
+                quote = quote_by_chunk.get(citation.chunk_id)
+                if quote:
+                    text_candidates.append(quote)
+            if citation.snippet:
+                text_candidates.append(citation.snippet)
+
+            matched: list = []
+            for page_number in citation.page_numbers:
+                lines = pages_index.get(page_number)
+                if not lines:
+                    continue
+                for text in text_candidates:
+                    result = match_snippet_to_line_bboxes(page_number, lines, text)
+                    if result:
+                        matched.extend(result)
+                        break
+            citation.bbox_regions = matched
 
     def _extract_ask_evidence(
         self,

@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 from ..core.exceptions import ParseError
-from ..schemas.document import ParsedBlock, ParsedDocument, ParsedPage
+from ..schemas.document import ParsedBlock, ParsedDocument, ParsedLine, ParsedPage
 
 try:
     import pymupdf
@@ -80,6 +80,8 @@ class DocumentParser:
 
                     blocks.sort(key=lambda block: (round(block.bbox[1], 1), round(block.bbox[0], 1)))
 
+                    lines = self._extract_lines(page)
+
                     page_text = self._normalize_text(
                         "\n\n".join(block.text for block in blocks)
                     )
@@ -94,6 +96,7 @@ class DocumentParser:
                             width=width,
                             height=height,
                             blocks=blocks,
+                            lines=lines,
                         )
                     )
         except ParseError:
@@ -113,6 +116,40 @@ class DocumentParser:
             page_count=len(pages),
             pages=pages,
         )
+
+    def _extract_lines(self, page) -> list[ParsedLine]:
+        lines: list[ParsedLine] = []
+        try:
+            raw_dict = page.get_text("dict") or {}
+        except Exception:
+            return lines
+
+        for block in raw_dict.get("blocks", []) or []:
+            if block.get("type", 0) != 0:
+                continue
+            for line in block.get("lines", []) or []:
+                bbox_raw = line.get("bbox")
+                if not bbox_raw or len(bbox_raw) < 4:
+                    continue
+                spans = line.get("spans", []) or []
+                text = "".join(str(span.get("text", "")) for span in spans)
+                normalized = self._normalize_text(text)
+                if not normalized:
+                    continue
+                lines.append(
+                    ParsedLine(
+                        text=normalized,
+                        bbox=(
+                            float(bbox_raw[0]),
+                            float(bbox_raw[1]),
+                            float(bbox_raw[2]),
+                            float(bbox_raw[3]),
+                        ),
+                    )
+                )
+
+        lines.sort(key=lambda item: (round(item.bbox[1], 1), round(item.bbox[0], 1)))
+        return lines
 
     def _normalize_text(self, text: str) -> str:
         text = re.sub(r"[\ud800-\udfff]", "", text)
