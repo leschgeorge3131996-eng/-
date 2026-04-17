@@ -180,3 +180,28 @@ Entry format:
 - Recommended next step:
   - Wait for user visual confirmation before pushing further UI changes. If good, candidate round-4 targets in priority order: (a) entrance animation for new result cards (stagger badges → meta → terminal → citations), (b) result-complete "ding" micro-interaction (flash border, or single pulse on status dot transitioning green), (c) citation-card entrance stagger when many evidence items appear.
   - If UI momentum stalls, pivot to TASK_BOARD #3 (CSRF/origin validation for cookie-backed routes) — security item that grows more important now that demo-mode session is unauthenticated.
+
+## 2026-04-17 / Claude Code (result panel: staggered reveal + terminal sweep)
+
+- Summary:
+  - User confirmed previous round OK ("效果还可以"), so kept UI momentum. Problem: previous round fixed the wait (skeleton) but the payoff moment — when the real result appears — was still "everything pops simultaneously", wasting the narrative high point of the demo.
+  - Rebuilt the result branch of `ResultPanel.tsx` so each section animates in on a timeline: badges 40ms → meta grid 120ms → evidence-state card 200ms → status/warning/token lines 240–300ms → citations container 340ms → first citation card 400ms (each subsequent +50ms) → evidence-quotes container 420ms → terminal shell 500ms. Each section uses the existing `revealMotion(delay)` helper (opacity 0→1, y 14→0, 280ms cubic-bezier(0.22,1,0.36,1)).
+  - Changed `renderEvidenceCard` / `renderEvidenceQuote` signatures to accept a `baseDelay` param. Citation cards previously started their per-index stagger from 0ms regardless of container state — they were flashing in before badges. Now they inherit 0.4/0.48 base so they arrive after their container reveal.
+  - Terminal shell gets a new `.terminal-shell-sweep` modifier class that adds a `::before` pseudo-element: a 2px-tall warm-accent horizontal gradient that sweeps left-to-right once (1.1s after a 0.55s delay) — the "model has answered" visual cue. Uses `animation: ... 1 both` so it decays to transparent and doesn't loop.
+  - Reduced-motion media query disables the sweep; base reveal motion uses small distances (14px y) so it's tolerable even without motion, but `revealMotion` itself doesn't honor reduced-motion — candidate follow-up if anyone flags it.
+- Files touched:
+  - `frontend/src/components/ResultPanel.tsx` (wrapped each result section in `motion.div` with `revealMotion(delay)`; added `baseDelay` param to card/quote renderers)
+  - `frontend/src/styles.css` (added `.terminal-shell-sweep::before`, `@keyframes terminalSweep`, and reduced-motion guard; made `.terminal-shell` position:relative)
+  - `agent_handoff/SESSION_LOG.md` (this entry)
+- Verification:
+  - frontend smoke tests: `7 passed`
+  - frontend build: passed (`tsc && vite build`, 598 modules, CSS 28.60 KB / 6.67 KB gzip — was 27.99 KB, +~0.6 KB is the sweep block)
+  - backend tests: not run (no backend-side change)
+  - User has not yet visually confirmed; dev server still not observed running. Hard-reload (Ctrl+F5) after `npm run dev` to see it.
+- Open risks:
+  - Total reveal takes ~780ms end-to-end (last card around 500ms + its own 280ms fade). For short answers with 1 citation this feels cinematic; for long answers with 8+ citations the tail is ~900ms which may feel slow if a judge is scanning fast. If flagged, tighten `renderEvidenceCard` per-index delta from 0.05 to 0.03.
+  - The terminal sweep fires once on mount of `.terminal-shell-sweep`; if React re-renders the shell (e.g. copy button state change triggers a re-render that doesn't remount), the sweep won't replay — that's actually the intended behavior (one-time "done" flourish) but means the sweep only plays on fresh result arrival.
+  - The sweep color is warm terracotta to match brand accent. On the dark terminal background it reads as "here's your answer" energy; if user wants a cooler/greener "success" feel, swap the gradient stops to `var(--success)` (#1f6a4e-ish range).
+- Recommended next step:
+  - Pause for user visual check. If the reveal feels too slow, tighten deltas. If it feels right, remaining UI lever is **markdown rendering inside the terminal** — currently plain; candidates: code-block syntax color, blockquote styling for quoted evidence, table polish. But that only matters if real demo answers use markdown, which should be verified against actual task outputs before spending effort.
+  - Non-UI backlog unchanged: TASK_BOARD #3 (CSRF/origin validation), #4 (expired-session cleanup script), #5 (pre-demo DEMO_MODE verification on staging).
