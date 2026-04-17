@@ -367,3 +367,46 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 ### Next round suggestions
 - Run dev server + smoke the end-to-end flow visually on one PDF; screenshot for TASK_BOARD.
 - If highlight rectangles look too-paragraph-big on pedagogical demos, upgrade to span-level bbox via `get_text("dict")`.
+
+---
+
+## 2026-04-17 — line-level bbox 精细化
+
+### 背景
+上一轮 (ead90ac) 发布的 PDF 高亮基于 PyMuPDF **block 级** bbox，而 block 通常是整段。chunk 合并多个 block 后，overlay 覆盖了整节（用户截图显示 5.1 节被一整块橙色覆盖）。用户反馈："高量做的很不好"。
+
+### 方案
+换到 **line 级**，并在返回 citation 时用 snippet 原句对 line 序列做子串匹配，只高亮匹配到的那几行。粒度从"段"缩到"句/行"。
+
+### 改动
+- `document.py`: 新增 `ParsedLine`; `ParsedPage.lines: list[ParsedLine] = []`（默认空，保持旧 JSON 兼容）
+- `document_parser.py`: 新 `_extract_lines(page)` 用 `page.get_text("dict")` 拆 blocks→lines→spans，拿每行 bbox
+- `bbox_matcher.py`（新）: `match_snippet_to_line_bboxes(page_number, page_lines, snippet)`。思路：
+  - 把所有行文本拼起来做一个"源串"，记下每个 non-whitespace 字符到原 index 的映射
+  - snippet 也压缩掉空白再做子串查找；找到范围后反查覆盖到哪些行
+  - 找不到就按标点切成 fragment，挑最长的再试一轮
+- `task_service.py`:
+  - `_build_pages_index`：开头调一次，拿 `{page_number: [ParsedLine]}`
+  - `_attach_line_bboxes(citations, pages_index, *, quote_by_chunk=None)`：就地替换 `citation.bbox_regions`
+  - ask 路径：优先用 `evidence_quotes`（模型抽取的原文）匹配，fallback snippet
+  - 三个 TaskResult 构造点（refusal 空跳过、cached、fresh）都接上
+
+### 策略选择
+找不到匹配时 **清空** bbox_regions 而不是 fallback 到 block 级。理由：用户已明确表态"大片橙色"是负面观感，宁可没高亮也不要错高亮。如果后续反馈"经常没高亮"，再考虑 fallback。
+
+### 验证
+- 后端 54/54 pytest 绿
+- 真 PDF roundtrip：7 页文档重新解析，7/7 页都有 lines；中间一页 56 lines vs 26 blocks（2× 粒度提升）。单行/多行/部分匹配都精确命中
+- 前端 7/7 vitest 绿，`tsc --noEmit` 净
+- **未做**：live 视觉验收。旧 `.pages.json` 没有 lines，要重新上传 PDF 才能看到效果
+
+### Migration
+- 旧 JSON 有默认 `lines: []`，load 不报错，但 `_attach_line_bboxes` 会给空 bbox_regions，结果就是"没高亮"
+- 用户重新上传一次就自动走新 parser
+
+### Commit
+`f1feaf1 feat(pdf): line-level bbox matching for precise highlighting`
+
+### 下一轮建议
+- 跑 dev server，重新上传用户截图那个 PDF，再问一次同样的问题，看高亮是否缩到一两句
+- 如果"没高亮"的 citation 比例偏高，放开 fallback：snippet 匹配失败时保留原 chunk block bbox
