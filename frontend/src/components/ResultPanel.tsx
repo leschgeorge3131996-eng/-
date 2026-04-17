@@ -181,7 +181,7 @@ type ResultPanelProps = {
   loadMessage: string;
   result: TaskResult | null;
   canOpenPdfPreview?: boolean;
-  onOpenPdfPage?: (pages: number[], snippet: string) => void;
+  onOpenPdfPage?: (citation: Citation) => void;
 };
 
 export default function ResultPanel({
@@ -273,7 +273,7 @@ export default function ResultPanel({
               data-testid={`open-pdf-${item.chunk_id}-${index}`}
               className="mini-action-button"
               type="button"
-              onClick={() => onOpenPdfPage(item.page_numbers, item.snippet)}
+              onClick={() => onOpenPdfPage(item)}
             >
               打开定位
             </button>

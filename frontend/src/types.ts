@@ -1,11 +1,6 @@
 export type TaskType = "summary" | "ask" | "outline";
 export type ResponseDetailLevel = "concise" | "balanced" | "detailed";
 export type EvidenceMode = "declared" | "candidate" | "none";
-export type PdfPreviewMatchState =
-  | "exact_match"
-  | "fragment_match"
-  | "not_found"
-  | "no_snippet";
 
 export interface ApiError {
   code: string;
@@ -51,6 +46,16 @@ export interface DocumentPageData {
   page_number: number;
   char_count: number;
   text: string;
+  width?: number;
+  height?: number;
+}
+
+export interface BBoxRegion {
+  page: number;
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
 }
 
 export interface TokenUsage {
@@ -63,6 +68,7 @@ export interface Citation {
   chunk_id: string;
   page_numbers: number[];
   snippet: string;
+  bbox_regions?: BBoxRegion[];
 }
 
 export interface EvidenceQuote {

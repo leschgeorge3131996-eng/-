@@ -59,6 +59,22 @@ export function buildFileContentUrl(
   return page && page > 0 ? `${baseUrl}#page=${page}` : baseUrl;
 }
 
+export const PDF_PAGE_RENDER_DPI = 144;
+
+export function buildPdfPageRenderUrl(
+  fileId: string,
+  pageNumber: number,
+  accessToken?: string | null,
+  dpi: number = PDF_PAGE_RENDER_DPI
+): string {
+  const query = new URLSearchParams();
+  query.set("dpi", String(dpi));
+  if (accessToken) {
+    query.set("access_token", accessToken);
+  }
+  return `${API_BASE_URL}/files/${fileId}/pages/${pageNumber}/render?${query.toString()}`;
+}
+
 export class ApiRequestError extends Error {
   code?: string;
   details?: Record<string, unknown> | null;

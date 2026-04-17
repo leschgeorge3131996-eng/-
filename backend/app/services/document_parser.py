@@ -4,12 +4,12 @@ import re
 from pathlib import Path
 
 from ..core.exceptions import ParseError
-from ..schemas.document import ParsedDocument, ParsedPage
+from ..schemas.document import ParsedBlock, ParsedDocument, ParsedPage
 
 try:
-    from pypdf import PdfReader
+    import pymupdf
 except ImportError:  # pragma: no cover
-    PdfReader = None
+    pymupdf = None
 
 
 class DocumentParser:
@@ -51,20 +51,49 @@ class DocumentParser:
         raise ParseError("文本文件编码无法识别，请使用 UTF-8 或 GBK 编码。")
 
     def _read_pdf(self, file_path: Path) -> ParsedDocument:
-        if PdfReader is None:
-            raise ParseError("缺少 pypdf 依赖，无法解析 PDF。")
+        if pymupdf is None:
+            raise ParseError("缺少 pymupdf 依赖，无法解析 PDF。")
 
+        pages: list[ParsedPage] = []
         try:
-            reader = PdfReader(str(file_path))
-            pages: list[ParsedPage] = []
-            for index, page in enumerate(reader.pages, start=1):
-                extracted = self._normalize_text(page.extract_text() or "")
-                if extracted:
+            with pymupdf.open(str(file_path)) as doc:
+                for index in range(doc.page_count):
+                    page = doc[index]
+                    page_number = index + 1
+                    width = float(page.rect.width)
+                    height = float(page.rect.height)
+                    raw_blocks = page.get_text("blocks") or []
+                    blocks: list[ParsedBlock] = []
+                    for raw in raw_blocks:
+                        if len(raw) < 5:
+                            continue
+                        block_type = raw[6] if len(raw) >= 7 else 0
+                        if block_type != 0:
+                            continue
+                        x0, y0, x1, y1 = float(raw[0]), float(raw[1]), float(raw[2]), float(raw[3])
+                        block_text = self._normalize_text(str(raw[4]))
+                        if not block_text:
+                            continue
+                        blocks.append(
+                            ParsedBlock(text=block_text, bbox=(x0, y0, x1, y1))
+                        )
+
+                    blocks.sort(key=lambda block: (round(block.bbox[1], 1), round(block.bbox[0], 1)))
+
+                    page_text = self._normalize_text(
+                        "\n\n".join(block.text for block in blocks)
+                    )
+                    if not page_text and not blocks:
+                        continue
+
                     pages.append(
                         ParsedPage(
-                            page_number=index,
-                            text=extracted,
-                            char_count=len(extracted),
+                            page_number=page_number,
+                            text=page_text,
+                            char_count=len(page_text),
+                            width=width,
+                            height=height,
+                            blocks=blocks,
                         )
                     )
         except ParseError:

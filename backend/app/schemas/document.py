@@ -3,10 +3,26 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
+class BBoxRegion(BaseModel):
+    page: int
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+
+
+class ParsedBlock(BaseModel):
+    text: str
+    bbox: tuple[float, float, float, float]
+
+
 class ParsedPage(BaseModel):
     page_number: int
     text: str
     char_count: int
+    width: float = 0.0
+    height: float = 0.0
+    blocks: list[ParsedBlock] = []
 
 
 class ParsedDocument(BaseModel):
@@ -22,6 +38,7 @@ class ParsedChunk(BaseModel):
     page_numbers: list[int]
     text: str
     char_count: int
+    bbox_regions: list[BBoxRegion] = []
 
 
 class ChunkedDocument(BaseModel):

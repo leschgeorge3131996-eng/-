@@ -197,8 +197,28 @@ def get_uploaded_file_page(
             "page_number": page.page_number,
             "char_count": page.char_count,
             "text": page.text,
+            "width": page.width,
+            "height": page.height,
         }
     )
+
+
+@router.get("/files/{file_id}/pages/{page_number}/render")
+def render_uploaded_file_page(
+    file_id: str,
+    page_number: int,
+    access_token: str | None = Query(default=None),
+    dpi: int = Query(default=144, ge=72, le=288),
+    session: SessionData = Depends(require_session),
+) -> Response:
+    png_bytes = file_service.render_document_page(
+        file_id,
+        page_number,
+        access_token=access_token,
+        session_id=session.session_id,
+        dpi=dpi,
+    )
+    return Response(content=png_bytes, media_type="image/png")
 
 
 @router.delete("/files/{file_id}", response_model=ApiResponse)

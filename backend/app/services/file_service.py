@@ -194,6 +194,44 @@ class FileService:
                 return page
         raise NotFoundError("未找到对应的页面内容。")
 
+    def render_document_page(
+        self,
+        file_id: str,
+        page_number: int,
+        *,
+        access_token: str | None = None,
+        session_id: str | None = None,
+        dpi: int = 144,
+    ) -> bytes:
+        metadata = self.get_document_metadata(
+            file_id,
+            access_token=access_token,
+            session_id=session_id,
+        )
+        if metadata.file_type != "pdf":
+            raise ValidationError("仅支持 PDF 文档的页面渲染。")
+
+        upload_path = Path(metadata.saved_path)
+        if not upload_path.exists():
+            raise NotFoundError("原始文件不存在，请重新上传文档。")
+
+        try:
+            import pymupdf
+        except ImportError as exc:  # pragma: no cover
+            raise ParseError("缺少 pymupdf 依赖，无法渲染 PDF。") from exc
+
+        try:
+            with pymupdf.open(str(upload_path)) as doc:
+                if page_number < 1 or page_number > doc.page_count:
+                    raise NotFoundError("未找到对应的页面内容。")
+                page = doc[page_number - 1]
+                pix = page.get_pixmap(dpi=dpi, alpha=False)
+                return pix.tobytes("png")
+        except NotFoundError:
+            raise
+        except Exception as exc:
+            raise ParseError(f"PDF 页面渲染失败：{exc}") from exc
+
     def get_upload_path(
         self,
         file_id: str,

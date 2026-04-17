@@ -507,6 +507,7 @@ class TaskService:
             chunk_id=chunk.chunk_id,
             page_numbers=chunk.page_numbers,
             snippet=self._build_display_snippet(chunk.text),
+            bbox_regions=list(getattr(chunk, "bbox_regions", []) or []),
         )
 
     def _extract_ask_evidence(

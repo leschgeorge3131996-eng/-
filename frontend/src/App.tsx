@@ -2,7 +2,6 @@ import { motion } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ApiRequestError,
-  buildFileContentUrl,
   clearStoredSession,
   deleteDocument,
   ensureDemoSession,
@@ -20,6 +19,7 @@ import PdfPreviewPanel from "./components/PdfPreviewPanel";
 import ResultPanel from "./components/ResultPanel";
 import type {
   AuthSession,
+  BBoxRegion,
   LogSummary,
   RecentDocument,
   RecentResult,
@@ -309,6 +309,7 @@ export default function App() {
   const [previewPages, setPreviewPages] = useState<number[]>([1]);
   const [previewSnippet, setPreviewSnippet] = useState<string | null>(null);
   const [previewSnippetPage, setPreviewSnippetPage] = useState<number | null>(null);
+  const [previewBboxes, setPreviewBboxes] = useState<BBoxRegion[]>([]);
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>(() =>
     readStorage(RECENT_DOCUMENTS_KEY, [])
   );
@@ -394,6 +395,7 @@ export default function App() {
         setPreviewPages([1]);
         setPreviewSnippet(null);
         setPreviewSnippetPage(null);
+        setPreviewBboxes([]);
         setAuthError(
           hadStoredSessionRef.current ? normalizeAuthErrorMessage(sessionError) : null
         );
@@ -417,9 +419,11 @@ export default function App() {
     if (!metadata || metadata.file_type !== "pdf") {
       setPreviewSnippet(null);
       setPreviewSnippetPage(null);
+      setPreviewBboxes([]);
     } else {
       setPreviewSnippet(preview?.snippet ?? null);
       setPreviewSnippetPage(preview?.snippetPage ?? null);
+      setPreviewBboxes([]);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -437,6 +441,7 @@ export default function App() {
     setPreviewPages([1]);
     setPreviewSnippet(null);
     setPreviewSnippetPage(null);
+    setPreviewBboxes([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -793,6 +798,7 @@ export default function App() {
                   setPreviewPages([1]);
                   setPreviewSnippet(null);
                   setPreviewSnippetPage(null);
+                  setPreviewBboxes([]);
                 }}
               >
                 填充示例文档
@@ -953,6 +959,7 @@ export default function App() {
                       setPreviewPages([1]);
                       setPreviewSnippet(null);
                       setPreviewSnippetPage(null);
+                      setPreviewBboxes([]);
                     }
                   }}
                 />
@@ -1145,13 +1152,14 @@ export default function App() {
             loadMessage={describeLoadStage(loadStage)}
             result={result}
             canOpenPdfPreview={Boolean(previewMetadata)}
-            onOpenPdfPage={(pages, snippet) => {
-              const nextPages = normalizePreviewPages(pages);
+            onOpenPdfPage={(citation) => {
+              const nextPages = normalizePreviewPages(citation.page_numbers);
               const nextPrimaryPage = nextPages[0] ?? 1;
               setPreviewPages(nextPages);
               setPreviewPage(nextPrimaryPage);
-              setPreviewSnippet(snippet);
-              setPreviewSnippetPage(snippet ? nextPrimaryPage : null);
+              setPreviewSnippet(citation.snippet);
+              setPreviewSnippetPage(citation.snippet ? nextPrimaryPage : null);
+              setPreviewBboxes(citation.bbox_regions ?? []);
               setPreviewOpen(true);
               scrollPreviewIntoView();
             }}
@@ -1165,12 +1173,8 @@ export default function App() {
             accessToken={previewMetadata.access_token}
             page={previewPage}
             availablePages={previewPages}
-            src={buildFileContentUrl(
-              previewMetadata.file_id,
-              previewMetadata.access_token,
-              previewPage
-            )}
             highlightText={previewPage === previewSnippetPage ? previewSnippet : null}
+            bboxRegions={previewBboxes.filter((region) => region.page === previewPage)}
             onSelectPage={(page) => setPreviewPage(page)}
             onClose={() => setPreviewOpen(false)}
           />

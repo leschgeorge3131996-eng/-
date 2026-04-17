@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { fetchDocumentPage } from "../api";
-import type { PdfPreviewMatchState } from "../types";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { PDF_PAGE_RENDER_DPI, buildPdfPageRenderUrl, fetchDocumentPage } from "../api";
+import type { BBoxRegion } from "../types";
 
 type PdfPreviewPanelProps = {
   documentName: string;
@@ -8,193 +8,33 @@ type PdfPreviewPanelProps = {
   accessToken?: string | null;
   page: number;
   availablePages?: number[];
-  src: string;
   highlightText?: string | null;
+  bboxRegions?: BBoxRegion[];
   onSelectPage?: (page: number) => void;
   onClose: () => void;
 };
 
-type HighlightRange = {
-  start: number;
-  end: number;
-  matchState: Extract<PdfPreviewMatchState, "exact_match" | "fragment_match">;
+type PageDimensions = {
+  width: number;
+  height: number;
 };
 
-type SentenceView = {
-  focusBefore: string;
-  focus: string;
-  focusAfter: string;
-  matchState: PdfPreviewMatchState;
-};
-
-function buildCollapsedTextMap(text: string) {
-  const chars: string[] = [];
-  const map: number[] = [];
-
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-    if (/\s/.test(char)) {
-      continue;
-    }
-    chars.push(char.toLowerCase());
-    map.push(index);
+function resolveDimensions(
+  fromApi: PageDimensions | null,
+  naturalWidth: number,
+  naturalHeight: number
+): PageDimensions | null {
+  if (fromApi && fromApi.width > 0 && fromApi.height > 0) {
+    return fromApi;
   }
-
-  return {
-    collapsed: chars.join(""),
-    map
-  };
-}
-
-function locateHighlightRange(text: string, snippet: string | null | undefined): HighlightRange | null {
-  if (!snippet) {
-    return null;
+  if (naturalWidth > 0 && naturalHeight > 0) {
+    const scale = 72 / PDF_PAGE_RENDER_DPI;
+    return {
+      width: naturalWidth * scale,
+      height: naturalHeight * scale
+    };
   }
-
-  const cleanSnippet = snippet.replace(/\.\.\./g, " ").trim();
-  if (!cleanSnippet) {
-    return null;
-  }
-
-  const source = buildCollapsedTextMap(text);
-  const snippetMap = buildCollapsedTextMap(cleanSnippet);
-  if (!snippetMap.collapsed) {
-    return null;
-  }
-  const exactIndex = source.collapsed.indexOf(snippetMap.collapsed);
-  if (exactIndex !== -1) {
-    const start = source.map[exactIndex];
-    const end = source.map[exactIndex + snippetMap.collapsed.length - 1] + 1;
-    return { start, end, matchState: "exact_match" };
-  }
-
-  const fragmentCandidates = cleanSnippet
-    .split(/[，。；：,.!?\n]/)
-    .map((item) => item.trim())
-    .filter((item) => item.length >= 8)
-    .sort((left, right) => right.length - left.length);
-
-  for (const fragment of fragmentCandidates) {
-    const collapsedFragment = buildCollapsedTextMap(fragment).collapsed;
-    const fragmentIndex = source.collapsed.indexOf(collapsedFragment);
-    if (fragmentIndex !== -1) {
-      const start = source.map[fragmentIndex];
-      const end = source.map[fragmentIndex + collapsedFragment.length - 1] + 1;
-      return { start, end, matchState: "fragment_match" };
-    }
-  }
-
   return null;
-}
-
-function looksLikeArtifactLine(line: string): boolean {
-  const normalized = line.replace(/\s+/g, "").toLowerCase();
-  if (!normalized) {
-    return true;
-  }
-
-  if (/@mail|@gmail|@outlook|creativecommons|ccl24|eval/i.test(normalized)) {
-    return true;
-  }
-
-  if (/(大学|学院|实验室|研究所|通讯作者|作者简介|基金项目)/.test(line) && /\d{5,}/.test(line)) {
-    return true;
-  }
-
-  if (/^(摘要|abstract)\s*[:：]?\s*$/i.test(line.trim())) {
-    return true;
-  }
-
-  if (/^(关键词|keywords?)\s*[:：]/i.test(line.trim())) {
-    return true;
-  }
-
-  if (/spatial semantics|large language model|prompt engineering/i.test(line)) {
-    return true;
-  }
-
-  const digitCount = Array.from(line).filter((char) => /\d/.test(char)).length;
-  const cjkCount = Array.from(line).filter((char) => /[\u4e00-\u9fff]/.test(char)).length;
-  if (digitCount >= 8 && cjkCount <= 6) {
-    return true;
-  }
-
-  return false;
-}
-
-function normalizeLine(line: string): string {
-  return line
-    .replace(/\x00/g, " ")
-    .replace(/(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])/g, "")
-    .replace(/([\u4e00-\u9fff])\1{2,}/g, "$1")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractDisplaySentences(text: string): string[] {
-  const cleanedLines = text
-    .split(/\r?\n/)
-    .map((line) => normalizeLine(line))
-    .filter((line) => line && !looksLikeArtifactLine(line));
-
-  const merged = cleanedLines.join(" ");
-  return merged
-    .split(/(?<=[。！？!?])\s+|\n+/)
-    .map((item) => item.trim())
-    .filter((item) => item.length >= 4);
-}
-
-function buildFallbackText(sentences: string[]): string {
-  return sentences.slice(0, 3).join(" ").trim();
-}
-
-function buildSentenceView(sentences: string[], snippet: string | null | undefined): SentenceView | null {
-  if (sentences.length === 0) {
-    return null;
-  }
-
-  if (!snippet) {
-    return {
-      focusBefore: buildFallbackText(sentences),
-      focus: "",
-      focusAfter: "",
-      matchState: "no_snippet"
-    };
-  }
-
-  for (const sentence of sentences) {
-    const range = locateHighlightRange(sentence, snippet);
-    if (!range) {
-      continue;
-    }
-
-    return {
-      focusBefore: sentence.slice(0, range.start),
-      focus: sentence.slice(range.start, range.end),
-      focusAfter: sentence.slice(range.end),
-      matchState: range.matchState
-    };
-  }
-
-  return {
-    focusBefore: buildFallbackText(sentences),
-    focus: "",
-    focusAfter: "",
-    matchState: "not_found"
-  };
-}
-
-function describeMatchState(matchState: PdfPreviewMatchState): string {
-  if (matchState === "exact_match") {
-    return "已在当前页定位到证据原句";
-  }
-  if (matchState === "fragment_match") {
-    return "已在当前页定位到证据片段";
-  }
-  if (matchState === "not_found") {
-    return "未在当前页精确定位到该片段，仅展示本页清洗文本";
-  }
-  return "当前页未提供独立定位片段，仅展示本页清洗文本";
 }
 
 export default function PdfPreviewPanel({
@@ -203,38 +43,45 @@ export default function PdfPreviewPanel({
   accessToken,
   page,
   availablePages = [],
-  src,
   highlightText,
+  bboxRegions = [],
   onSelectPage,
   onClose
 }: PdfPreviewPanelProps) {
-  const [pageText, setPageText] = useState("");
-  const [textLoading, setTextLoading] = useState(false);
-  const [textError, setTextError] = useState<string | null>(null);
+  const [pageDimensions, setPageDimensions] = useState<PageDimensions | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [renderedSize, setRenderedSize] = useState<{ width: number; height: number } | null>(null);
+  const [naturalSize, setNaturalSize] = useState<{ width: number; height: number } | null>(null);
+  const imageWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const imageUrl = useMemo(
+    () => buildPdfPageRenderUrl(fileId, page, accessToken),
+    [fileId, page, accessToken]
+  );
 
   useEffect(() => {
     let active = true;
-    setTextLoading(true);
-    setTextError(null);
+    setPageError(null);
+    setPageDimensions(null);
 
     void fetchDocumentPage(fileId, page, accessToken)
       .then((payload) => {
         if (!active) {
           return;
         }
-        setPageText(payload.text);
+        if (payload.width && payload.height) {
+          setPageDimensions({ width: payload.width, height: payload.height });
+        } else {
+          setPageDimensions(null);
+        }
       })
       .catch((error) => {
         if (!active) {
           return;
         }
-        setTextError(error instanceof Error ? error.message : "页面文本加载失败");
-        setPageText("");
-      })
-      .finally(() => {
-        if (active) {
-          setTextLoading(false);
-        }
+        setPageError(error instanceof Error ? error.message : "页面元数据加载失败");
       });
 
     return () => {
@@ -242,11 +89,64 @@ export default function PdfPreviewPanel({
     };
   }, [accessToken, fileId, page]);
 
-  const sentenceView = useMemo(
-    () => buildSentenceView(extractDisplaySentences(pageText), highlightText),
-    [pageText, highlightText]
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageError(null);
+  }, [imageUrl]);
+
+  useLayoutEffect(() => {
+    if (!imageLoaded || !imageWrapRef.current) {
+      return undefined;
+    }
+
+    const element = imageWrapRef.current;
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect();
+      setRenderedSize({ width: rect.width, height: rect.height });
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [imageLoaded]);
+
+  const nativeDimensions = resolveDimensions(
+    pageDimensions,
+    naturalSize?.width ?? 0,
+    naturalSize?.height ?? 0
   );
-  const matchState = sentenceView?.matchState ?? "no_snippet";
+
+  const overlayRects = useMemo(() => {
+    if (!nativeDimensions || !renderedSize || renderedSize.width === 0) {
+      return [];
+    }
+    const scaleX = renderedSize.width / nativeDimensions.width;
+    const scaleY = renderedSize.height / nativeDimensions.height;
+    return bboxRegions
+      .filter((region) => region.page === page)
+      .map((region, index) => ({
+        key: `${region.x0}-${region.y0}-${index}`,
+        left: region.x0 * scaleX,
+        top: region.y0 * scaleY,
+        width: Math.max(0, (region.x1 - region.x0) * scaleX),
+        height: Math.max(0, (region.y1 - region.y0) * scaleY)
+      }));
+  }, [bboxRegions, nativeDimensions, page, renderedSize]);
+
+  const hasBboxHighlights = overlayRects.length > 0;
+  const hasBboxData = bboxRegions.some((region) => region.page === page);
+  const statusLabel = imageError
+    ? imageError
+    : !imageLoaded
+      ? "正在加载 PDF 页面..."
+      : hasBboxHighlights
+        ? "已在 PDF 中高亮证据"
+        : hasBboxData
+          ? "证据 bbox 正在对齐..."
+          : highlightText
+            ? "当前文档缺少 bbox（旧版解析），请重新上传以启用高亮"
+            : "当前页未提供证据定位";
 
   return (
     <section className="panel pdf-preview-panel" data-testid="pdf-preview-panel">
@@ -279,48 +179,51 @@ export default function PdfPreviewPanel({
         </div>
       ) : null}
 
-      <div className="pdf-preview-body">
-        <div className="pdf-frame-wrap">
-          <iframe
-            key={`${fileId}-${page}`}
-            className="pdf-frame"
+      <div className="pdf-preview-status" data-testid="pdf-preview-status">
+        {statusLabel}
+        {pageError ? <span className="warning"> · {pageError}</span> : null}
+      </div>
+
+      <div className="pdf-render-wrap">
+        <div className="pdf-render-inner" ref={imageWrapRef}>
+          <img
+            key={imageUrl}
+            className="pdf-render-image"
             data-testid="pdf-preview-frame"
-            src={src}
-            title={`${documentName} PDF 预览`}
+            src={imageUrl}
+            alt={`${documentName} 第 ${page} 页`}
+            onLoad={(event) => {
+              const img = event.currentTarget;
+              setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+              setImageLoaded(true);
+              setImageError(null);
+            }}
+            onError={() => {
+              setImageError("PDF 页面图像加载失败，请检查网络或登录状态。");
+              setImageLoaded(false);
+            }}
           />
-        </div>
-
-        <aside className="page-text-panel">
-          <div className="page-text-head">
-            <strong>文本定位</strong>
-            <span>{describeMatchState(matchState)}</span>
-          </div>
-
-          {textLoading ? <p className="status-card">正在加载第 {page} 页文本...</p> : null}
-          {!textLoading && textError ? <p className="error status-card">{textError}</p> : null}
-          {!textLoading && !textError && matchState === "not_found" ? (
-            <p className="warning status-card preview-state-note">
-              未在当前页精确定位到该片段，仅展示本页清洗文本。
-            </p>
-          ) : null}
-          {!textLoading && !textError ? (
-            <div className="page-text-content" data-testid="pdf-page-text">
-              {sentenceView ? (
-                <p className="page-text-block">
-                  <span className="page-text-sentence">
-                    {sentenceView.focusBefore}
-                    {sentenceView.focus ? (
-                      <mark className="page-text-highlight">{sentenceView.focus}</mark>
-                    ) : null}
-                    {sentenceView.focusAfter}
-                  </span>
-                </p>
-              ) : (
-                <p className="page-text-block">当前页暂无可用文本。</p>
-              )}
+          {hasBboxHighlights ? (
+            <div
+              className="pdf-highlight-layer"
+              data-testid="pdf-highlight-layer"
+              aria-hidden="true"
+            >
+              {overlayRects.map((rect) => (
+                <span
+                  key={rect.key}
+                  className="pdf-highlight-rect"
+                  style={{
+                    left: `${rect.left}px`,
+                    top: `${rect.top}px`,
+                    width: `${rect.width}px`,
+                    height: `${rect.height}px`
+                  }}
+                />
+              ))}
             </div>
           ) : null}
-        </aside>
+        </div>
       </div>
     </section>
   );

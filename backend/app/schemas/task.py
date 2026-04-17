@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from .document import BBoxRegion
+
 
 TaskType = Literal["ask", "summary", "outline"]
 ResponseDetailLevel = Literal["concise", "balanced", "detailed"]
@@ -34,6 +36,7 @@ class Citation(BaseModel):
     chunk_id: str
     page_numbers: list[int]
     snippet: str
+    bbox_regions: list[BBoxRegion] = []
 
 
 class EvidenceQuote(BaseModel):

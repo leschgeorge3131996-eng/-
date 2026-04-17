@@ -299,3 +299,71 @@ Skip 档 1. Go straight to **档 2 (precise bbox)**:
 
 ### Lesson for future rounds
 Search-based highlighting is a dead-end for CJK academic PDFs. Don't revisit it. If the user asks for in-PDF highlight again, go straight to bbox overlays.
+
+---
+
+## 2026-04-17 — PDF bbox-based in-PDF highlight (档 2) shipped
+
+**Author:** Claude (Opus 4.7)
+
+Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to-end.
+
+### Backend
+- `backend/requirements.txt`: added `pymupdf==1.27.2.2`. Kept `pypdf==5.9.0` (other code paths may still import it, and removal is out of scope).
+- `backend/app/schemas/document.py`: new `BBoxRegion { page, x0, y0, x1, y1 }`, new `ParsedBlock { text, bbox }`, `ParsedPage` gains `width/height/blocks` (defaults 0/0/[] → old `.pages.json` still loads), `ParsedChunk` gains `bbox_regions` (default []).
+- `backend/app/schemas/task.py`: `Citation` gains `bbox_regions: list[BBoxRegion] = []`.
+- `backend/app/services/document_parser.py`: replaced pypdf-based `_read_pdf` with PyMuPDF. For each page, iterates `page.get_text("blocks")`, keeps text blocks only (`block_type == 0`), normalizes text, sorts by `(y, x)`, stores per-block bbox. Falls back gracefully if pymupdf is missing (ParseError).
+- `backend/app/services/chunk_service.py`: new `_chunk_from_blocks(page)` path that merges blocks into chunks while accumulating their bboxes. Non-PDF (`page.blocks == []`) keeps the old text-based flow with `bbox_regions=[]`. `_merge_small_chunks` concatenates bbox lists when merging.
+- `backend/app/services/task_service.py` `_build_chunk_ref`: threads `chunk.bbox_regions` into Citation.
+- `backend/app/services/file_service.py`: new `render_document_page(file_id, page_number, dpi=144)` returns PNG bytes via `pymupdf.open(...).get_pixmap(dpi=...).tobytes("png")`.
+- `backend/app/api/routes.py`: new endpoint `GET /api/files/{file_id}/pages/{page_number}/render?dpi=144` → `image/png`. Existing `/pages/{n}` now also returns `width` and `height`.
+
+### Frontend
+- `frontend/src/types.ts`: added `BBoxRegion`; `Citation.bbox_regions?`; `DocumentPageData.width/height?`. Removed now-unused `PdfPreviewMatchState`.
+- `frontend/src/api.ts`: added `buildPdfPageRenderUrl(fileId, page, token, dpi=144)` + exported `PDF_PAGE_RENDER_DPI`.
+- `frontend/src/components/ResultPanel.tsx`: `onOpenPdfPage` signature now takes the full `Citation` instead of `(pages, snippet)`.
+- `frontend/src/App.tsx`: new `previewBboxes` state (reset alongside `previewSnippet` in all 5 reset sites); on "打开定位" click, stores citation.bbox_regions; passes `bboxRegions={previewBboxes.filter(r => r.page === previewPage)}` to the panel. Dropped the `src` prop (panel builds its own render URL). Removed unused `buildFileContentUrl` import.
+- `frontend/src/components/PdfPreviewPanel.tsx`: full rewrite. Gone: iframe + text aside + sentence highlight. In: `<img src={renderUrl}>` wrapped in `.pdf-render-wrap > .pdf-render-inner` (relative) with an absolute `.pdf-highlight-layer` of transparent bbox rectangles scaled by `renderedSize / nativeDimensions`. `nativeDimensions` comes from `fetchDocumentPage` (`page.width/height`) with a fallback of `imgNaturalSize * 72/144` for old docs that predate the width/height fields. `fetchDocumentPage` is still called so the existing smoke test (`toHaveBeenCalledWith("file-pdf", 2, "token-pdf")`) still holds.
+- `frontend/src/styles.css`: removed `.pdf-preview-body`, `.pdf-frame-wrap`, `.pdf-frame`, `.page-text-*`, `.page-text-highlight`, and their `@media` overrides. Added `.pdf-preview-status`, `.pdf-render-wrap` (flex centering, 82vh max-height, scroll), `.pdf-render-inner` (relative, shrink-to-image), `.pdf-render-image`, `.pdf-highlight-layer` (absolute inset:0), `.pdf-highlight-rect` (translucent accent-deep fill + border, `mix-blend-mode: multiply`).
+- `frontend/src/App.smoke.test.tsx`: updated the preview-frame src assertion from `#page=5` (iframe hash) to `/pages/5/render` (new render endpoint). Test cast changed from `HTMLIFrameElement` to `HTMLImageElement`.
+
+### How the coordinate math works
+- Render endpoint returns PNG at `dpi=144`; `PyMuPDF page.rect` is in PDF native units (points, 72/inch).
+- Panel fetches `/pages/{n}` to get native `width`/`height`.
+- For each bbox `{x0, y0, x1, y1}` in native units: `left = x0 * (renderedWidth / nativeWidth)`, analogous for y. `ResizeObserver` on `.pdf-render-inner` keeps `renderedSize` current on viewport changes. No DPI assumption in the hot path.
+- Fallback when `width/height` is missing (old `.pages.json` persisted before this change): derives native size from `img.naturalWidth * 72/144`. Math still works since render DPI is fixed.
+
+### Migration for existing uploads
+- Existing `.pages.json` / `.chunks.json` load fine (all new fields have defaults). They just carry zero-size `width/height` and empty `bbox_regions`, so the panel shows the status hint "当前文档缺少 bbox（旧版解析），请重新上传以启用高亮" instead of overlays.
+- New uploads go through the PyMuPDF parser and get full bbox metadata automatically.
+- No DB/schema migration: everything is file-based JSON under `data/parsed/`.
+
+### Verification
+- Backend: 54/54 pytest green. Roundtrip test on a real CJK academic PDF from `data/uploads/` — 35 chunks, each with populated `bbox_regions`, native page 595×842, block count 18 on page 1. Render endpoint produces ~320KB PNG per A4 page at 144 dpi.
+- Frontend: 7/7 smoke tests green, `tsc --noEmit` clean.
+- Not yet verified: live visual inspection in dev server. The golden path (upload PDF → ask → click 打开定位 → see yellow rectangle on the page text) was not run interactively in this session.
+
+### Known trade-offs
+- **Bbox granularity = PyMuPDF blocks.** A block is typically a paragraph. So the highlight covers the whole paragraph that contains the evidence, not just the sentence. For a demo this is usually fine (still unambiguous), and for dense CJK it's actually more robust than sentence-level. If the judges want sentence-level precision, the path is `page.get_text("dict")` → span-level bboxes and merging spans that share a snippet match — extra ~1 day of work.
+- **One render endpoint hit per page switch.** No cache. Acceptable at 200–400KB/page; if demo machine is slow, add `Cache-Control: private, max-age=3600` on the render response.
+
+### Files touched
+- `backend/requirements.txt`
+- `backend/app/schemas/document.py`
+- `backend/app/schemas/task.py`
+- `backend/app/services/document_parser.py`
+- `backend/app/services/chunk_service.py`
+- `backend/app/services/task_service.py`
+- `backend/app/services/file_service.py`
+- `backend/app/api/routes.py`
+- `frontend/src/types.ts`
+- `frontend/src/api.ts`
+- `frontend/src/App.tsx`
+- `frontend/src/components/ResultPanel.tsx`
+- `frontend/src/components/PdfPreviewPanel.tsx`
+- `frontend/src/styles.css`
+- `frontend/src/App.smoke.test.tsx`
+
+### Next round suggestions
+- Run dev server + smoke the end-to-end flow visually on one PDF; screenshot for TASK_BOARD.
+- If highlight rectangles look too-paragraph-big on pedagogical demos, upgrade to span-level bbox via `get_text("dict")`.

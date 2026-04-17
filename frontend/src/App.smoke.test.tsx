@@ -413,7 +413,7 @@ describe("App smoke flows", () => {
       expect(fetchDocumentPageMock).toHaveBeenCalledWith("file-pdf", 5, "token-pdf")
     );
     await waitFor(() =>
-      expect((screen.getByTestId("pdf-preview-frame") as HTMLIFrameElement).src).toContain("#page=5")
+      expect((screen.getByTestId("pdf-preview-frame") as HTMLImageElement).src).toContain("/pages/5/render")
     );
   });
 
