@@ -342,27 +342,64 @@ export default function ResultPanel({
             {error}
           </motion.p>
         ) : loading ? (
-          <motion.p
+          <motion.div
             key={stateKey}
-            className="status status-card"
+            className="result-skeleton"
             exit={{ opacity: 0, y: -10 }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, ease: MOTION_EASE }}
+            transition={{ duration: 0.26, ease: MOTION_EASE }}
           >
-            {loadMessage}
-          </motion.p>
+            <div className="skeleton-status">
+              <span className="skeleton-pulse" aria-hidden="true" />
+              <span className="skeleton-status-text">{loadMessage || "正在处理..."}</span>
+            </div>
+            <div className="skeleton-badges">
+              <span className="skeleton skeleton-badge" style={{ width: 64 }} />
+              <span className="skeleton skeleton-badge" style={{ width: 52 }} />
+              <span className="skeleton skeleton-badge" style={{ width: 72 }} />
+            </div>
+            <div className="skeleton-meta-grid">
+              <div className="skeleton skeleton-meta-card" />
+              <div className="skeleton skeleton-meta-card" />
+              <div className="skeleton skeleton-meta-card" />
+              <div className="skeleton skeleton-meta-card" />
+            </div>
+            <div className="skeleton-terminal">
+              <div className="skeleton-terminal-head" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="skeleton-terminal-body">
+                <span className="skeleton skeleton-line" style={{ width: "92%" }} />
+                <span className="skeleton skeleton-line" style={{ width: "78%" }} />
+                <span className="skeleton skeleton-line" style={{ width: "88%" }} />
+                <span className="skeleton skeleton-line" style={{ width: "64%" }} />
+                <span className="skeleton skeleton-line" style={{ width: "84%" }} />
+                <span className="skeleton skeleton-line" style={{ width: "42%" }} />
+              </div>
+            </div>
+          </motion.div>
         ) : !result ? (
-          <motion.p
+          <motion.div
             key={stateKey}
-            className="empty status-card"
+            className="empty-state"
             exit={{ opacity: 0, y: -10 }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: MOTION_EASE }}
           >
-            提交任务后，这里会展示完整结果、来源信息和路由详情。
-          </motion.p>
+            <div className="empty-state-glyph" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <p className="empty-state-title">等待你的第一次提问</p>
+            <p className="empty-state-hint">
+              提交任务后，这里会展示完整结果、模型路由、以及可回跳 PDF 的证据片段。
+            </p>
+          </motion.div>
         ) : (
           <motion.div
             key={stateKey}
