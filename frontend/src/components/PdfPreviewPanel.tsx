@@ -282,6 +282,7 @@ export default function PdfPreviewPanel({
       <div className="pdf-preview-body">
         <div className="pdf-frame-wrap">
           <iframe
+            key={`${fileId}-${page}`}
             className="pdf-frame"
             data-testid="pdf-preview-frame"
             src={src}
