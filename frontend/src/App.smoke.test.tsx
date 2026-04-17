@@ -25,6 +25,31 @@ import {
   uploadDocument
 } from "./api";
 
+vi.mock("./components/PdfViewer", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({
+      src,
+      page,
+      highlightText
+    }: {
+      src: string;
+      page: number;
+      highlightText?: string | null;
+    }) =>
+      ReactModule.createElement(
+        "div",
+        {
+          "data-testid": "pdf-viewer-mock",
+          "data-src": src,
+          "data-page": String(page),
+          "data-highlight": highlightText ?? ""
+        },
+        `viewer page=${page}`
+      )
+  };
+});
+
 vi.mock("motion/react", async () => {
   const ReactModule = await import("react");
 
@@ -202,7 +227,6 @@ describe("App smoke flows", () => {
     uploadDocumentMock.mockReset();
     runTaskMock.mockReset();
     fetchDocumentMetadataMock.mockReset();
-    fetchDocumentPageMock.mockReset();
     fetchCurrentSessionMock.mockRejectedValue(
       new ApiRequestError("trial session expired", "UNAUTHORIZED")
     );
@@ -369,14 +393,6 @@ describe("App smoke flows", () => {
       return { metadata };
     });
     runTaskMock.mockResolvedValue(taskResult);
-    fetchDocumentPageMock.mockImplementation(async (_fileId, pageNumber) => ({
-      page_number: pageNumber,
-      char_count: 32,
-      text:
-        pageNumber === 5
-          ? "Method sentence appears on page five."
-          : "Goal sentence appears on page two."
-    }));
 
     render(<App />);
 
@@ -402,18 +418,18 @@ describe("App smoke flows", () => {
         "token-pdf"
       )
     );
+    await waitFor(() => expect(screen.getByTestId("pdf-preview-panel")).toBeTruthy());
     await waitFor(() =>
-      expect(fetchDocumentPageMock).toHaveBeenCalledWith("file-pdf", 2, "token-pdf")
+      expect(screen.getByTestId("pdf-viewer-mock").getAttribute("data-page")).toBe("2")
     );
-    expect(screen.getByTestId("pdf-preview-panel")).toBeTruthy();
 
     fireEvent.click(screen.getByTestId("open-pdf-chunk-b-1"));
 
     await waitFor(() =>
-      expect(fetchDocumentPageMock).toHaveBeenCalledWith("file-pdf", 5, "token-pdf")
+      expect(screen.getByTestId("pdf-viewer-mock").getAttribute("data-page")).toBe("5")
     );
-    await waitFor(() =>
-      expect((screen.getByTestId("pdf-preview-frame") as HTMLIFrameElement).src).toContain("#page=5")
+    expect(screen.getByTestId("pdf-viewer-mock").getAttribute("data-highlight")).toContain(
+      "method sentence"
     );
   });
 
