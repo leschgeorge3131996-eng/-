@@ -1886,6 +1886,36 @@ textarea {
   color: var(--accent-deep);
 }
 
+.pdf-evidence-snippet {
+  margin: 0;
+  padding: 12px 16px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(173, 76, 35, 0.18);
+  background: rgba(173, 76, 35, 0.06);
+  border-left: 3px solid var(--accent-deep);
+}
+
+.pdf-evidence-snippet .snippet-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 6px;
+}
+
+.pdf-evidence-snippet blockquote {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-strong);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .pdf-render-wrap {
   width: 100%;
   max-height: 82vh;

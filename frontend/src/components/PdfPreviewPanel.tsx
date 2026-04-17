@@ -135,18 +135,13 @@ export default function PdfPreviewPanel({
   }, [bboxRegions, nativeDimensions, page, renderedSize]);
 
   const hasBboxHighlights = overlayRects.length > 0;
-  const hasBboxData = bboxRegions.some((region) => region.page === page);
   const statusLabel = imageError
     ? imageError
     : !imageLoaded
       ? "正在加载 PDF 页面..."
       : hasBboxHighlights
-        ? "已在 PDF 中高亮证据"
-        : hasBboxData
-          ? "证据 bbox 正在对齐..."
-          : highlightText
-            ? "当前文档缺少 bbox（旧版解析），请重新上传以启用高亮"
-            : "当前页未提供证据定位";
+        ? `已定位到第 ${page} 页 · 段落已高亮`
+        : `已定位到第 ${page} 页`;
 
   return (
     <section className="panel pdf-preview-panel" data-testid="pdf-preview-panel">
@@ -183,6 +178,13 @@ export default function PdfPreviewPanel({
         {statusLabel}
         {pageError ? <span className="warning"> · {pageError}</span> : null}
       </div>
+
+      {highlightText ? (
+        <div className="pdf-evidence-snippet" data-testid="pdf-evidence-snippet">
+          <span className="snippet-kicker">证据片段</span>
+          <blockquote>{highlightText}</blockquote>
+        </div>
+      ) : null}
 
       <div className="pdf-render-wrap">
         <div className="pdf-render-inner" ref={imageWrapRef}>
