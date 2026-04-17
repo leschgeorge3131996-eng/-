@@ -1325,6 +1325,94 @@ textarea {
   background: transparent;
 }
 
+.rendered-markdown :where(h2, h3)::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 0.85em;
+  margin-right: 0.5em;
+  vertical-align: -0.08em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  opacity: 0.85;
+}
+
+.rendered-markdown ul li::marker {
+  color: var(--accent-deep);
+}
+
+.rendered-markdown ol li::marker {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.rendered-markdown li input[type="checkbox"] {
+  margin: 0 0.45em 0.12em -1.15em;
+  accent-color: var(--accent-deep);
+  transform: translateY(1px);
+}
+
+.rendered-markdown hr {
+  height: 1px;
+  margin: 1.2em 0;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(19, 34, 56, 0.18),
+    transparent
+  );
+}
+
+.rendered-markdown :where(strong, b) {
+  color: var(--navy);
+  font-weight: 650;
+}
+
+.markdown-table-wrap {
+  margin: 0 0 1em;
+  overflow-x: auto;
+  border: 1px solid rgba(19, 34, 56, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.rendered-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.94em;
+}
+
+.rendered-markdown thead {
+  background: rgba(19, 34, 56, 0.06);
+}
+
+.rendered-markdown :where(th, td) {
+  padding: 0.5em 0.8em;
+  border-bottom: 1px solid rgba(19, 34, 56, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.rendered-markdown th {
+  color: var(--navy);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.rendered-markdown tbody tr:last-child :where(th, td) {
+  border-bottom: 0;
+}
+
+.rendered-markdown tbody tr:hover {
+  background: rgba(173, 76, 35, 0.04);
+}
+
+.rendered-markdown del {
+  color: var(--ink-muted);
+  text-decoration-color: rgba(19, 34, 56, 0.45);
+}
+
 .citations {
   margin-top: 4px;
 }

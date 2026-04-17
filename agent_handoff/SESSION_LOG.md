@@ -205,3 +205,30 @@ Entry format:
 - Recommended next step:
   - Pause for user visual check. If the reveal feels too slow, tighten deltas. If it feels right, remaining UI lever is **markdown rendering inside the terminal** — currently plain; candidates: code-block syntax color, blockquote styling for quoted evidence, table polish. But that only matters if real demo answers use markdown, which should be verified against actual task outputs before spending effort.
   - Non-UI backlog unchanged: TASK_BOARD #3 (CSRF/origin validation), #4 (expired-session cleanup script), #5 (pre-demo DEMO_MODE verification on staging).
+
+## 2026-04-17 / Claude Code (markdown polish: GFM + table/heading/task-list styling)
+
+- Summary:
+  - Executed the previous round's recommended next step after verifying the demo actually produces markdown: `outline` task's system prompt explicitly asks for "层级提纲"; `summary` asks for "结构化摘要". Both land inside the `.terminal-shell` via `MarkdownResult`, which until now only shipped `react-markdown` + `rehype-sanitize` — no GFM, so any `|` table the model emitted rendered as raw pipes and any `- [ ]` checklist rendered as literal brackets.
+  - Added `remark-gfm` (18 packages) and wired it into `MarkdownResult` alongside a `table` component wrapper that scopes horizontal overflow to a `.markdown-table-wrap` container (prevents the table from blowing out the terminal shell on narrow viewports).
+  - Added styling for six previously-bare surfaces inside `.rendered-markdown`: (1) small vertical accent bar before `h2`/`h3` (brand gradient, 3×0.85em), (2) list markers tinted — `ul` uses terracotta accent-deep, `ol` uses navy bold, (3) task-list checkboxes use `accent-color: var(--accent-deep)` and are negative-margin aligned with the text, (4) `hr` becomes a soft center-fade line instead of a hard border, (5) `strong` becomes navy 650 weight so bolded key terms stand out against ink-strong body text, (6) `del` (GFM strikethrough) becomes muted with a soft underline.
+  - Tables: rounded 12px card wrap, subtle 1px borders, light header row, 0.5×0.8em cell padding, last-row border removed, terracotta-tinted row hover. The hover is 4% alpha so it doesn't scream; it's a "this row is live" hint, not a selection state.
+- Files touched:
+  - `frontend/package.json` + `frontend/package-lock.json` (added `remark-gfm`, 18 transitive packages)
+  - `frontend/src/components/MarkdownResult.tsx` (`remarkPlugins={[remarkGfm]}`; `table` component override for overflow wrapping)
+  - `frontend/src/styles.css` (new block appended after `.rendered-markdown pre code` — ~80 lines of heading/list/task/hr/strong/del/table rules)
+  - `agent_handoff/SESSION_LOG.md` (this entry)
+- Verification:
+  - frontend smoke tests: `7 passed`
+  - frontend build: passed (`tsc && vite build`, 689 modules — was 598, +91 from remark-gfm tree; CSS 29.95 KB / 6.94 KB gzip — was 28.60 KB, +1.35 KB from the new block)
+  - backend tests: not run (no backend-side change)
+  - Not yet visually confirmed by user; to see table/checklist styling they need a task output that actually contains a markdown table or a task list, which depends on the model's choice that run.
+- Open risks:
+  - `rehype-sanitize` default schema may strip some GFM-emitted HTML; quick spot-check says tables and task lists survive, but if a model emits HTML inside a table cell it may get cleaned. Trade-off is acceptable — prefer XSS safety over HTML passthrough.
+  - Bundle jumped 598 → 689 modules because of GFM's micromark extensions. CSS +1.35 KB, JS bundle likely +~20 KB gzipped (not separately measured). For an alpha/demo build this is fine; if future bundle budgets tighten, consider dynamic-importing `MarkdownResult`.
+  - The `h2`/`h3` accent bar is inline-block before the heading text — if a heading wraps to two lines, the bar stays next to the first character of the first line (that's the expected visual). On the off chance a model emits an `h1`, it won't get the bar — by design, h1 should feel like a title, not a section marker.
+  - Task-list checkbox negative margin (`-1.15em`) assumes the default `react-markdown` GFM output wraps the checkbox inside the `li`. If GFM output format changes in a future `remark-gfm` major, the alignment may drift — low probability.
+- Recommended next step:
+  - Pause for user to run a live outline/summary task and confirm tables + checklists + headings look right. If they do, UI polish momentum can stop here (returns are diminishing — first-screen, result panel skeleton, staggered reveal, markdown all covered).
+  - Next highest-value lever is **TASK_BOARD #3 (CSRF / origin validation)** — cookie-backed state-changing routes are the one remaining security debt that matters under `DEMO_MODE=true`.
+  - TASK_BOARD #5 (deploy `DEMO_MODE=true` on staging and verify opening flow) is still the pre-demo must-do — no code work, but the checklist item belongs to whoever owns the deploy environment.
