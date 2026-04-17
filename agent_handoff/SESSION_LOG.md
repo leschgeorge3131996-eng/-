@@ -262,3 +262,40 @@ Entry format:
   - Pre-demo verification (TASK_BOARD #5): on the staging URL, set `DEMO_MODE=true` AND set `CORS_ORIGINS` to the deployed frontend host; confirm (a) a fresh visit can auto-create a session and upload, (b) any state-changing POST from a non-allowed origin returns 403. Lightweight smoke: open browser devtools and run `fetch('/api/upload', {method: 'POST', credentials: 'include'})` from a different-origin tab — should 403.
   - Remaining TASK_BOARD backlog: #4 (expired-session cleanup script) is the lowest-risk cleanup item; useful but not demo-critical.
   - Non-backlog candidate: revisit rate-limiting on `/api/ask` and `/api/upload` now that demo-mode makes unauthenticated session creation trivial — someone who figures out the URL can burn model tokens. Not blocking demo (shared IP + small audience) but worth noting.
+
+---
+
+## 2026-04-17 — PDF.js inline viewer attempt → reverted
+
+### Motivation
+Tester feedback: the side 文本定位 aside duplicates effort; the highlight should live inside the PDF itself. Agreed to try 档 1 (search-based highlight via PDF.js find controller) before the heavier 档 2 (bbox rectangles).
+
+### What was built (commits f369743 + 19fcef2)
+- New `frontend/src/components/PdfViewer.tsx`: wraps pdfjs-dist `PDFViewer + PDFFindController + EventBus`; load document once per src; page switch via `currentPageNumber`; highlight via `find` event on `textlayerrendered`.
+- `PdfPreviewPanel.tsx`: dropped aside + `fetchDocumentPage` plumbing; header "已在 PDF 中高亮证据" chip.
+- `App.tsx`: removed `page` from `buildFileContentUrl(...)` call so src is stable (avoids full document reload on page switch).
+- `styles.css`: single-column `.pdf-preview-body`; `.pdf-frame-wrap` 78vh scroll container; `.pdfjs-host .textLayer .highlight` overlay; later added `color-scheme: only light !important` to `:root` to fight pdf_viewer.css globals.
+- `App.smoke.test.tsx`: `vi.mock("./components/PdfViewer")` stub exposing `data-page`/`data-highlight`; removed `fetchDocumentPage` assertions; removed iframe-src assertion.
+
+### Why it was reverted (commits 6e9c9e0 + 433535b)
+Tested against a real Chinese academic PDF (tables + mixed layout):
+1. **Highlight hit rate was poor.** Find controller searches the text-layer substring; on CJK text with column/line-break artifacts, the 40-char query rarely matched. User saw "已在 PDF 中高亮证据" chip but zero yellow on the page. This was the exact limitation I flagged when proposing 档 1, but the miss rate in practice was worse than estimated — the feature was effectively nonfunctional on the target corpus.
+2. **Visual clash with ambient orbs.** The previous iframe was opaque; the pdfjs scroll container let the `.page::before / .page::after` radial gradients bleed through the preview area. Reported as "一坨莫名其妙的球".
+3. **Globals pollution.** `pdf_viewer.css` sets `color-scheme: light dark` at `:root`; on a dark-mode-preferring OS that made native form controls render dark (invisible input text, grey upload button). Patched with `!important` override, but the fact that a viewer CSS file needed `!important` to neutralize is itself a smell.
+4. **Ratio of cost to payoff.** 1.2MB worker bundle + CSS variable pollution + new dep + test-mocking indirection, for a feature that doesn't reliably deliver on this corpus. Reverting is cheaper than patching.
+
+### End state
+- Two git reverts on master (`6e9c9e0`, `433535b`).
+- `pdfjs-dist` uninstalled (`npm uninstall` — package.json/lock already matched post-revert state, so no tracked diff).
+- Tests: 7/7 frontend smoke tests passing; typecheck clean.
+- UX restored to the prior iframe + side 文本定位 panel, which the user already accepted as a working baseline.
+
+### If we want to retry later
+Skip 档 1. Go straight to **档 2 (precise bbox)**:
+- Backend: during chunking, store each chunk's bbox per page using PyMuPDF's `page.get_text("dict")` or `search_for(snippet)`.
+- API: include `[{page, bbox}]` in the citation payload.
+- Frontend: keep the iframe viewer, overlay an absolutely-positioned transparent div per citation page scaled to the rendered PDF's dimensions, draw highlight rectangles at the stored bbox coordinates.
+- Cost: ~1–2 days, but it's 100% reliable and doesn't need pdf.js integration.
+
+### Lesson for future rounds
+Search-based highlighting is a dead-end for CJK academic PDFs. Don't revisit it. If the user asks for in-PDF highlight again, go straight to bbox overlays.
