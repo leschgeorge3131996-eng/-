@@ -1112,6 +1112,7 @@ textarea {
 }
 
 .terminal-shell {
+  position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
@@ -1120,6 +1121,42 @@ textarea {
     0 18px 36px rgba(15, 23, 42, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes terminalSweep {
+  0% { transform: translateX(-110%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(110%); opacity: 0; }
+}
+
+.terminal-shell-sweep::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(182, 84, 31, 0.1) 20%,
+    rgba(239, 172, 116, 0.85) 48%,
+    rgba(246, 224, 196, 1) 50%,
+    rgba(239, 172, 116, 0.85) 52%,
+    rgba(182, 84, 31, 0.1) 80%,
+    transparent
+  );
+  animation: terminalSweep 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.55s 1 both;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-shell-sweep::before {
+    animation: none;
+    display: none;
+  }
 }
 
 .terminal-head {

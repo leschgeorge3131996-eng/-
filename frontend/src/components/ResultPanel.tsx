@@ -250,7 +250,7 @@ export default function ResultPanel({
     }
   }
 
-  function renderEvidenceCard(item: Citation, index: number) {
+  function renderEvidenceCard(item: Citation, index: number, baseDelay = 0) {
     const copyId = `${item.chunk_id}-${index}`;
     const copyLabel =
       evidenceCopyState === copyId
@@ -263,7 +263,7 @@ export default function ResultPanel({
       <motion.article
         key={`${item.chunk_id}-${index}`}
         className="citation-card"
-        {...revealMotion(index * 0.04)}
+        {...revealMotion(baseDelay + index * 0.05)}
       >
         <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
         <p>{item.snippet}</p>
@@ -293,7 +293,8 @@ export default function ResultPanel({
   function renderEvidenceQuote(
     quote: { chunk_id: string; quote: string },
     index: number,
-    requestId: string
+    requestId: string,
+    baseDelay = 0
   ) {
     const copyId = `${quote.chunk_id}-${index}`;
     const copyLabel =
@@ -307,7 +308,7 @@ export default function ResultPanel({
       <motion.article
         key={`${requestId}-${quote.chunk_id}-${index}`}
         className="citation-card"
-        {...revealMotion(index * 0.04)}
+        {...revealMotion(baseDelay + index * 0.05)}
       >
         <p className="citation-meta">证据块：{quote.chunk_id}</p>
         <p>{quote.quote}</p>
@@ -409,7 +410,7 @@ export default function ResultPanel({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: MOTION_EASE }}
           >
-            <div className="result-badges">
+            <motion.div className="result-badges" {...revealMotion(0.04)}>
               <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
               <span className="badge badge-route">{result.route_tier ?? "default"}</span>
               <span className="badge badge-outcome">{result.outcome}</span>
@@ -422,9 +423,9 @@ export default function ResultPanel({
               {result.task_type === "ask" ? (
                 <span className="badge badge-evidence">{EVIDENCE_MODE_LABELS[evidenceMode]}</span>
               ) : null}
-            </div>
+            </motion.div>
 
-            <div className="result-meta-grid">
+            <motion.div className="result-meta-grid" {...revealMotion(0.12)}>
               <div className="result-meta-card">
                 <span>模型</span>
                 <strong>{result.model_name}</strong>
@@ -443,70 +444,77 @@ export default function ResultPanel({
                 <span>请求 ID</span>
                 <strong>{result.request_id}</strong>
               </div>
-            </div>
+            </motion.div>
 
             {evidenceSummary ? (
-              <div className={`evidence-mode-card evidence-mode-${evidenceSummary.tone}`}>
+              <motion.div
+                className={`evidence-mode-card evidence-mode-${evidenceSummary.tone}`}
+                {...revealMotion(0.2)}
+              >
                 <strong>{evidenceSummary.title}</strong>
                 <span>{evidenceSummary.description}</span>
-              </div>
+              </motion.div>
             ) : null}
 
-            {result.cache_hit ? <p className="cache-hit">本次结果命中本地缓存。</p> : null}
+            {result.cache_hit ? (
+              <motion.p className="cache-hit" {...revealMotion(0.24)}>
+                本次结果命中本地缓存。
+              </motion.p>
+            ) : null}
             {result.retrieval_applied ? (
-              <p className="status">
+              <motion.p className="status" {...revealMotion(0.26)}>
                 已从 {result.retrieved_chunk_count} 个片段构造上下文
                 {retrievedPages.length > 0
                   ? `，涉及页码：${retrievedPages.join(", ")}`
                   : ""}
                 。
-              </p>
+              </motion.p>
             ) : null}
             {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
-              <p className="warning">
+              <motion.p className="warning" {...revealMotion(0.26)}>
                 {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
-              </p>
+              </motion.p>
             ) : null}
             {result.context_truncated ? (
-              <p className="warning">
+              <motion.p className="warning" {...revealMotion(0.28)}>
                 {result.truncation_message ??
                   `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
-              </p>
+              </motion.p>
             ) : null}
             {result.token_usage?.total_tokens !== null &&
             result.token_usage?.total_tokens !== undefined ? (
-              <p className="status token-usage">
+              <motion.p className="status token-usage" {...revealMotion(0.3)}>
                 Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
                 {result.token_usage.completion_tokens ?? 0} / 总计 {result.token_usage.total_tokens}
-              </p>
+              </motion.p>
             ) : null}
 
             {evidenceItems.length > 0 ? (
-              <div className="citations">
+              <motion.div className="citations" {...revealMotion(0.34)}>
                 <h3>{getEvidenceSectionTitle(result, evidenceMode)}</h3>
                 <p className="citation-helper">{evidenceSummary?.description}</p>
                 <div className="citation-list">
-                  {evidenceItems.map((item, index) => renderEvidenceCard(item, index))}
+                  {evidenceItems.map((item, index) => renderEvidenceCard(item, index, 0.4))}
                 </div>
-              </div>
+              </motion.div>
             ) : null}
 
             {(result.evidence_quotes ?? []).length > 0 ? (
-              <div className="evidence-quotes">
+              <motion.div className="evidence-quotes" {...revealMotion(0.42)}>
                 <h3>证据摘录</h3>
                 <div className="citation-list">
                   {(result.evidence_quotes ?? []).map((quote, index) =>
-                    renderEvidenceQuote(quote, index, result.request_id)
+                    renderEvidenceQuote(quote, index, result.request_id, 0.48)
                   )}
                 </div>
-              </div>
+              </motion.div>
             ) : null}
 
             <motion.div
-              className="terminal-shell"
+              className="terminal-shell terminal-shell-sweep"
               initial={{ opacity: 0, scale: 0.985 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.28, delay: 0.08, ease: MOTION_EASE }}
+              transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
             >
               <div className="terminal-head">
                 <div className="terminal-lights" aria-hidden="true">
