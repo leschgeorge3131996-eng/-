@@ -902,3 +902,35 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - final recorded video still needs actual editing/rendering outside repo
 - Recommended next step:
   - keep the current subtitle file as the canonical baseline and adjust only if the final cut changes shot timing
+
+---
+
+## 2026-04-19 / Codex (external AI review bundle prepared)
+
+- Summary:
+  - Created a curated external-review bundle for third-party AI review of the current competition state
+  - Added a dedicated `REVIEW_PROMPT.md` that asks the reviewer to judge strategy, evidence, materials, technical risks, and gate completion
+  - Bundled goal/background docs, key evidence, current deliverables, and core code files without including secrets
+- Local artifact paths:
+  - directory: `review_bundle_stage_20260419_003447/`
+  - zip: `review_bundle_20260419_003447_competition_ai_review.zip`
+- Bundle highlights:
+  - includes:
+    - `agent_handoff/COMPETITION_PLAN_V2.md`
+    - `agent_handoff/CURRENT_STATUS_20260418.md`
+    - `evidence/materials/COMPETITION_ASSET_PACK.md`
+    - `evidence/reports/gold_sample_replay_real_summary_latest.md`
+    - current screenshots / PDFs / subtitle baseline
+    - selected backend/frontend/script files for code-level review
+  - excludes:
+    - `.env`
+    - unrelated external-strategy files
+    - cache/temp/runtime noise
+- Verification:
+  - copied `52` curated project files into the bundle
+  - zip created successfully:
+    - `review_bundle_20260419_003447_competition_ai_review.zip`
+- Open risks:
+  - this is a local review artifact and is not intended as a canonical long-term repo deliverable by default
+- Recommended next step:
+  - hand the zip plus `REVIEW_PROMPT.md` to external AI reviewers and compare their gate/completion judgments against the current internal plan

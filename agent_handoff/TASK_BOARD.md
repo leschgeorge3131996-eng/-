@@ -12,6 +12,7 @@
 - Current deck/poster PDF baselines now exist in-repo
 - Asset-pack export now includes the deliverables folder and PDF export script
 - Timed video subtitle baseline now exists in-repo
+- External AI review bundle and review prompt now exist locally
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -40,6 +41,7 @@
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were exported successfully
 - `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now includes the deliverables folder and PDF export script
 - `2026-04-19`: `deliverables/competition_kit/video_subtitles.srt` was added as the 2-minute demo subtitle baseline
+- `2026-04-19`: external AI review bundle prepared at `review_bundle_stage_20260419_003447/` and zipped as `review_bundle_20260419_003447_competition_ai_review.zip`
 
 ## Useful But Not Urgent
 
