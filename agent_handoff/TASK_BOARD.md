@@ -20,7 +20,7 @@
 
 ## Next Best Tasks
 
-1. Run a formal `G3` rehearsal with a second operator and record `3` consecutive timed runs plus fallback handling
+1. Run a formal `G3` rehearsal with a second operator and record `3` consecutive timed runs plus fallback handling, using `evidence/experiments/20260419_g3_rehearsal_template.md`
 2. Use `evidence/exports/competition_asset_pack_20260419_012336/` as the current handoff bundle for PPT/video/poster polishing
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL

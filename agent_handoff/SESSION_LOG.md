@@ -982,3 +982,17 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - final deck/poster/video still need human polish outside repo
 - Recommended next step:
   - perform the formal `G3` rehearsal and record it as the next gate-closing artifact
+
+---
+
+## 2026-04-19 / Codex (G3 rehearsal prep hardened)
+
+- Summary:
+  - Added pre-demo warmup, fallback rules, and explicit `G3` recording requirements to `GOLD_SAMPLE_RUNBOOK.md`
+  - Added a reusable rehearsal log template for the second operator
+- Files touched:
+  - `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
+  - `evidence/experiments/20260419_g3_rehearsal_template.md`
+- Practical meaning:
+  - the next operator no longer needs to invent a `G3` logging format
+  - fallback behavior is now written down before the rehearsal rather than improvised during it
