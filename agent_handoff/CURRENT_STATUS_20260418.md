@@ -107,6 +107,27 @@
   - keep `qwen3-235b-a22b-instruct-2507` as the primary `MODEL_QA`
   - keep `qwen3-32b` as the validated fallback option
 
+## Replay Workflow Refresh (`2026-04-18`)
+
+- `scripts/replay_sample_set.py` has been updated to match the current runtime boundary:
+  - creates a controlled-alpha session internally
+  - uploads documents under the current session owner
+  - passes `session_id` + `document_access_token` into task execution
+  - can now read both:
+    - the old broad sample-set manifest format
+    - the new gold-sample candidate manifest format
+- `scripts/run_real_replay.ps1` now accepts:
+  - `-Manifest`
+  - `-NamePrefix`
+- Real gold-sample replay refreshed successfully:
+  - latest report: `evidence/reports/gold_sample_replay_real_latest.md`
+  - latest summary: `evidence/reports/gold_sample_replay_real_summary_latest.md`
+- Real gold-sample replay result under current primary `MODEL_QA`:
+  - `2 answered + 1 refused`
+  - `0 errors`
+  - answerable citations present
+  - refusal remained `retrieval_no_match`
+
 ## Current Meaning
 
 - Wuwen Xinqiong integration itself is no longer the blocker
@@ -114,6 +135,7 @@
 - The main demo chain `ask -> citation -> PDF` has now been verified in-project under the current Wuwen Xinqiong `.env`
 - A Chinese gold-sample candidate and candidate question set are now locked for the current stage
 - The current `MODEL_QA` decision can remain on `qwen3-235b-a22b-instruct-2507` without blocking `G2`
+- The replay/evidence tooling is now aligned with the current session/access-token runtime posture
 
 ## Recommended Next Step
 
@@ -121,6 +143,6 @@
    - answerable ask screenshot with citations
    - cited PDF render screenshot
    - refusal screenshot
-2. Decide whether to regenerate replay/evidence artifacts using the locked candidate set instead of the older broad sample set
+2. Decide whether to retire the older broad sample-set replay as the default “latest” evidence path and replace it with the locked gold-sample path
 3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 4. Start turning the locked candidate set into paper/PPT/video/poster source material after screenshot evidence is refreshed

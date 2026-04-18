@@ -33,6 +33,8 @@
     - `木星有几颗卫星？`
 - Current QA comparison artifact:
   - `evidence/reports/gold_sample_qa_compare_latest.md`
+- Current gold-sample replay artifact:
+  - `evidence/reports/gold_sample_replay_real_latest.md`
 - Current QA decision:
   - keep `qwen3-235b-a22b-instruct-2507` as primary
   - keep `qwen3-32b` as validated fallback
@@ -51,6 +53,10 @@ As of `2026-04-18`:
 - gold-sample candidate QA comparison:
   - `qwen3-235b-a22b-instruct-2507`: `3/3` passed
   - `qwen3-32b`: `3/3` passed
+- gold-sample real replay:
+  - `2 answered + 1 refused`
+  - `0 errors`
+  - current replay tooling now reflects the cookie/session + document-token runtime posture
 
 Main verification commands:
 

@@ -511,3 +511,50 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 ### 后续建议
 - 现在更值得做的是刷新真实证据与截图，而不是继续横向加功能
 - 如果后面部署环境出现更紧的延迟压力，再用同一个脚本重跑一次，确认是否要把默认 QA 切到 `qwen3-32b`
+
+---
+
+## 2026-04-18 — Replay workflow updated to current auth boundary
+
+### 背景
+虽然 `compare_qa_models.py` 已经能验证锁定候选题集，但 repo 里的旧 `replay_sample_set.py` 仍然停留在无 session / 无 document token 的旧执行姿态。继续沿用它会让“latest replay”工具链和现在真实运行态脱节。
+
+### 本轮改动
+- `scripts/replay_sample_set.py`
+  - 新增 `AuthService`
+  - 内部自动创建 controlled-alpha session
+  - 上传时写入 `owner_session_id`
+  - 执行任务时传入：
+    - `session_id`
+    - `document_access_token`
+    - `response_detail_level`
+  - 新增对两类 manifest 的兼容：
+    - 旧版 list + `tasks`
+    - 新版 dict + `prompts`（gold-sample candidate ask-only）
+  - 新增 `--invite-code`
+- `scripts/run_real_replay.ps1`
+  - 新增 `-Manifest`
+  - 新增 `-NamePrefix`
+  - 因此现在可以一键刷新 broad sample set，也可以一键刷新 locked gold-sample candidate
+- `evidence/materials/REAL_REPLAY_GUIDE.md`
+  - 已同步更新说明
+
+### 验证
+- `py_compile` 通过
+- mock 下用 `GOLD_SAMPLE_CANDIDATE_20260418.json` 跑通
+- 真实环境下用：
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1 -Manifest evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json -NamePrefix gold_sample_replay_real`
+  - 成功刷新：
+    - `evidence/reports/gold_sample_replay_real_latest.md`
+    - `evidence/reports/gold_sample_replay_real_summary_latest.md`
+    - `evidence/reports/latest_log_summary.md`
+
+### 结果
+- 当前主模型 `qwen3-235b-a22b-instruct-2507` 下：
+  - answerable 1：通过，有 citations
+  - answerable 2：通过，有 citations
+  - refusal：通过，`retrieval_status=no_match`
+- 这意味着：
+  - compare 脚本可用于“模型决策”
+  - replay 脚本可用于“权威 latest evidence 输出”
+  - 两条链现在都已经对齐到当前真实运行边界

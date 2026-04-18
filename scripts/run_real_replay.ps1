@@ -1,3 +1,8 @@
+param(
+    [string]$Manifest = "evidence\materials\SAMPLE_MANIFEST.json",
+    [string]$NamePrefix = "sample_replay_real"
+)
+
 $ErrorActionPreference = "Stop"
 
 $root = Resolve-Path (Join-Path $PSScriptRoot "..")
@@ -10,17 +15,18 @@ if (-not (Test-Path $pythonPath)) {
 Set-Location $root
 
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$reportTimestamped = "evidence\\reports\\sample_replay_real_$timestamp.md"
-$summaryTimestamped = "evidence\\reports\\sample_replay_real_summary_$timestamp.md"
-$reportLatest = "evidence\\reports\\sample_replay_real_latest.md"
-$summaryLatest = "evidence\\reports\\sample_replay_real_summary_latest.md"
+$reportTimestamped = "evidence\\reports\\${NamePrefix}_$timestamp.md"
+$summaryTimestamped = "evidence\\reports\\${NamePrefix}_summary_$timestamp.md"
+$reportLatest = "evidence\\reports\\${NamePrefix}_latest.md"
+$summaryLatest = "evidence\\reports\\${NamePrefix}_summary_latest.md"
 
-& $pythonPath .\scripts\replay_sample_set.py --clear-cache --format md --output $reportTimestamped --summary-output $summaryTimestamped
+& $pythonPath .\scripts\replay_sample_set.py --manifest $Manifest --clear-cache --format md --output $reportTimestamped --summary-output $summaryTimestamped
 Copy-Item -LiteralPath $reportTimestamped -Destination $reportLatest -Force
 Copy-Item -LiteralPath $summaryTimestamped -Destination $summaryLatest -Force
 & $pythonPath .\scripts\export_log_summary.py --format md --output evidence\reports\latest_log_summary.md
 
 Write-Host "Real replay finished."
+Write-Host "Manifest: $Manifest"
 Write-Host "Authoritative latest replay report: $reportLatest"
 Write-Host "Authoritative latest replay summary: $summaryLatest"
 Write-Host "Timestamped replay report: $reportTimestamped"

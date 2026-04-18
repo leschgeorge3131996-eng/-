@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from backend.app.core.config import get_settings
+from backend.app.services.auth_service import AuthService
 from backend.app.services.file_service import FileService
 from backend.app.services.log_service import LogService
 from backend.app.services.model_client import ModelClient
@@ -43,6 +44,16 @@ class ReplayRecord:
     citation_count: int | None
     source_chunk_count: int | None
     error: str | None
+
+
+@dataclass
+class ReplayTask:
+    sample_id: str
+    scenario: str
+    file_path: str
+    task_type: str
+    input_text: str
+    response_detail_level: str
 
 
 def render_markdown(records: list[ReplayRecord]) -> str:
@@ -172,6 +183,53 @@ def render_summary_markdown(summary: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def normalize_manifest(raw_manifest: object) -> list[ReplayTask]:
+    tasks: list[ReplayTask] = []
+
+    if isinstance(raw_manifest, list):
+        for item in raw_manifest:
+            if not isinstance(item, dict):
+                continue
+            response_detail_level = str(item.get("response_detail_level") or "balanced")
+            item_id = str(item["id"])
+            scenario = str(item.get("scenario") or item_id)
+            file_path = str(item["path"])
+            for task_type, prompt in (item.get("tasks") or {}).items():
+                tasks.append(
+                    ReplayTask(
+                        sample_id=item_id,
+                        scenario=scenario,
+                        file_path=file_path,
+                        task_type=str(task_type),
+                        input_text=str(prompt),
+                        response_detail_level=response_detail_level,
+                    )
+                )
+        return tasks
+
+    if isinstance(raw_manifest, dict) and "prompts" in raw_manifest:
+        response_detail_level = str(raw_manifest.get("response_detail_level") or "balanced")
+        item_id = str(raw_manifest.get("id") or "manifest")
+        scenario = str(raw_manifest.get("scenario") or item_id)
+        file_path = str(raw_manifest["document_path"])
+        for prompt in raw_manifest.get("prompts") or []:
+            if not isinstance(prompt, dict):
+                continue
+            tasks.append(
+                ReplayTask(
+                    sample_id=f"{item_id}:{prompt['id']}",
+                    scenario=scenario,
+                    file_path=file_path,
+                    task_type="ask",
+                    input_text=str(prompt["text"]),
+                    response_detail_level=response_detail_level,
+                )
+            )
+        return tasks
+
+    raise ValueError("Unsupported manifest format.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Replay fixed sample set against current services.")
     parser.add_argument(
@@ -213,6 +271,12 @@ def main() -> None:
         default=None,
         help="Optional output file path for the aggregated replay summary.",
     )
+    parser.add_argument(
+        "--invite-code",
+        type=str,
+        default="alpha-demo",
+        help="Invite code used to create the controlled-alpha replay session.",
+    )
     args = parser.parse_args()
 
     if args.mock:
@@ -221,6 +285,7 @@ def main() -> None:
         get_settings.cache_clear()
 
     settings = get_settings()
+    auth_service = AuthService(settings=settings)
     file_service = FileService(settings=settings)
     log_service = LogService(settings=settings)
     model_client = ModelClient(settings=settings)
@@ -231,75 +296,90 @@ def main() -> None:
     )
 
     manifest_path = PROJECT_ROOT / args.manifest
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    raw_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    replay_tasks = normalize_manifest(raw_manifest)
+
+    session = auth_service.create_session(args.invite_code)
+    session_id = session.session.session_id
 
     records: list[ReplayRecord] = []
-    for item in manifest:
-        sample_path = PROJECT_ROOT / item["path"]
-        content = sample_path.read_bytes()
-        upload = file_service.save_upload(sample_path.name, content)
+    uploads_by_path: dict[str, object] = {}
 
-        for task_type, prompt in item["tasks"].items():
-            try:
-                if args.clear_cache and settings.cache_dir.exists():
-                    shutil.rmtree(settings.cache_dir, ignore_errors=True)
-                    settings.cache_dir.mkdir(parents=True, exist_ok=True)
-                    (settings.cache_dir / ".gitkeep").write_text("", encoding="utf-8")
-                result = task_service.run_task(
-                    task_type=task_type,
-                    endpoint=f"/api/{task_type}",
-                    file_id=upload.file_id,
-                    user_input=prompt,
+    for replay_task in replay_tasks:
+        sample_path = PROJECT_ROOT / replay_task.file_path
+        content = sample_path.read_bytes()
+        upload = uploads_by_path.get(replay_task.file_path)
+        if upload is None:
+            upload = file_service.save_upload(
+                sample_path.name,
+                content,
+                owner_session_id=session_id,
+            )
+            uploads_by_path[replay_task.file_path] = upload
+
+        try:
+            if args.clear_cache and settings.cache_dir.exists():
+                shutil.rmtree(settings.cache_dir, ignore_errors=True)
+                settings.cache_dir.mkdir(parents=True, exist_ok=True)
+                (settings.cache_dir / ".gitkeep").write_text("", encoding="utf-8")
+            result = task_service.run_task(
+                task_type=replay_task.task_type,
+                endpoint=f"/api/{replay_task.task_type}",
+                file_id=upload.file_id,
+                session_id=session_id,
+                document_access_token=upload.access_token,
+                user_input=replay_task.input_text,
+                response_detail_level=replay_task.response_detail_level,
+            )
+            records.append(
+                ReplayRecord(
+                    sample_id=replay_task.sample_id,
+                    scenario=replay_task.scenario,
+                    file_path=replay_task.file_path,
+                    task_type=replay_task.task_type,
+                    input_text=replay_task.input_text,
+                    response_detail_level=result.response_detail_level,
+                    success=True,
+                    outcome=result.outcome,
+                    latency_ms=result.latency_ms,
+                    model_name=result.model_name,
+                    route_tier=result.route_tier,
+                    route_model=result.route_model,
+                    route_reason=result.route_reason,
+                    cache_hit=result.cache_hit,
+                    retrieval_status=result.retrieval_status,
+                    used_chunk_count=len(result.used_chunk_ids),
+                    evidence_quote_count=len(result.evidence_quotes),
+                    citation_count=len(result.citations),
+                    source_chunk_count=len(result.source_chunks),
+                    error=None,
                 )
-                records.append(
-                    ReplayRecord(
-                        sample_id=item["id"],
-                        scenario=item["scenario"],
-                        file_path=item["path"],
-                        task_type=task_type,
-                        input_text=prompt,
-                        response_detail_level=result.response_detail_level,
-                        success=True,
-                        outcome=result.outcome,
-                        latency_ms=result.latency_ms,
-                        model_name=result.model_name,
-                        route_tier=result.route_tier,
-                        route_model=result.route_model,
-                        route_reason=result.route_reason,
-                        cache_hit=result.cache_hit,
-                        retrieval_status=result.retrieval_status,
-                        used_chunk_count=len(result.used_chunk_ids),
-                        evidence_quote_count=len(result.evidence_quotes),
-                        citation_count=len(result.citations),
-                        source_chunk_count=len(result.source_chunks),
-                        error=None,
-                    )
+            )
+        except Exception as exc:  # pragma: no cover
+            records.append(
+                ReplayRecord(
+                    sample_id=replay_task.sample_id,
+                    scenario=replay_task.scenario,
+                    file_path=replay_task.file_path,
+                    task_type=replay_task.task_type,
+                    input_text=replay_task.input_text,
+                    response_detail_level=replay_task.response_detail_level,
+                    success=False,
+                    outcome="error",
+                    latency_ms=None,
+                    model_name=None,
+                    route_tier=None,
+                    route_model=None,
+                    route_reason=None,
+                    cache_hit=None,
+                    retrieval_status=None,
+                    used_chunk_count=None,
+                    evidence_quote_count=None,
+                    citation_count=None,
+                    source_chunk_count=None,
+                    error=str(exc),
                 )
-            except Exception as exc:  # pragma: no cover
-                records.append(
-                    ReplayRecord(
-                        sample_id=item["id"],
-                        scenario=item["scenario"],
-                        file_path=item["path"],
-                        task_type=task_type,
-                        input_text=prompt,
-                        response_detail_level=None,
-                        success=False,
-                        outcome="error",
-                        latency_ms=None,
-                        model_name=None,
-                        route_tier=None,
-                        route_model=None,
-                        route_reason=None,
-                        cache_hit=None,
-                        retrieval_status=None,
-                        used_chunk_count=None,
-                        evidence_quote_count=None,
-                        citation_count=None,
-                        source_chunk_count=None,
-                        error=str(exc),
-                    )
-                )
+            )
 
     rendered = (
         json.dumps([asdict(record) for record in records], ensure_ascii=False, indent=2)
