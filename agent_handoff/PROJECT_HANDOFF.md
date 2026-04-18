@@ -77,6 +77,9 @@ As of `2026-04-18`:
 - current exported PDFs:
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
+- asset-bundle export now includes:
+  - `deliverables/competition_kit/*`
+  - `scripts/export_competition_pdfs.js`
 
 Main verification commands:
 
@@ -242,7 +245,7 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Start from `deliverables/competition_kit/deck.pdf` and `poster.pdf`; if polish is needed, edit the HTML prototypes and rerun `scripts/export_competition_pdfs.js`
+1. Start from the bundle exported by `scripts/export_competition_asset_pack.ps1`; it now includes the current HTML/PDF deliverables and the PDF re-export script
 2. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 3. Keep the broader sample-set replay in a clearly secondary role
 

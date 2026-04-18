@@ -44,8 +44,16 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
 - Poster copy:
   - `evidence/materials/POSTER_COPY.md`
+- Printable deck/poster prototypes:
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+- Current printable PDF baselines:
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
 - One-click export script:
   - `scripts/export_competition_asset_pack.ps1`
+- PDF export script:
+  - `scripts/export_competition_pdfs.js`
 
 ## Fixed Demo Facts
 
@@ -185,6 +193,10 @@ Recommended blocks:
 - [ ] `PPT_DECK_6SLIDES.md`
 - [ ] `VIDEO_SHOTLIST_2MIN.md`
 - [ ] `POSTER_COPY.md`
+- [ ] `deliverables/competition_kit/deck.html`
+- [ ] `deliverables/competition_kit/poster.html`
+- [ ] `deliverables/competition_kit/deck.pdf`
+- [ ] `deliverables/competition_kit/poster.pdf`
 - [ ] `gold_sample_qa_compare_latest.md`
 - [ ] `gold_sample_replay_real_summary_latest.md`
 - [ ] `20260418_gold_ask_research_focus.png`
@@ -194,6 +206,7 @@ Recommended blocks:
 - [ ] `20260418_stats_panel.png` if a metrics/supporting slide is needed
 - [ ] `20260418_api_docs.png` if an engineering/supporting slide is needed
 - [ ] export a handoff bundle with `scripts/export_competition_asset_pack.ps1`
+- [ ] keep `scripts/export_competition_pdfs.js` available for re-export after any visual edits
 
 ## Do Not Improvise
 

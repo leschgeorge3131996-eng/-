@@ -44,6 +44,7 @@ What it does:
 
 - copies the locked gold-sample documents, reports, screenshots, and sample PDF
 - includes the ready-to-use PPT/video/poster drafting docs
+- includes the current HTML/PDF deliverables under `deliverables/competition_kit/`
 - writes `PACK_CONTENTS.md` into a timestamped export directory under
   `evidence/exports/`
 

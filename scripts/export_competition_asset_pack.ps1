@@ -56,7 +56,15 @@ $requiredFiles = @(
     "evidence\screenshots\20260418_gold_pdf_render.png",
     "evidence\screenshots\20260418_gold_ask_rank_accuracy.png",
     "evidence\screenshots\20260418_gold_refusal.png",
-    "evidence\samples\chinese_llm_spatial_eval.pdf"
+    "evidence\samples\chinese_llm_spatial_eval.pdf",
+    "deliverables\competition_kit\README.md",
+    "deliverables\competition_kit\deck.html",
+    "deliverables\competition_kit\poster.html",
+    "deliverables\competition_kit\styles.css",
+    "deliverables\competition_kit\deck.pdf",
+    "deliverables\competition_kit\poster.pdf",
+    "scripts\export_competition_asset_pack.ps1",
+    "scripts\export_competition_pdfs.js"
 )
 
 $optionalFiles = @(
@@ -118,9 +126,10 @@ $indexLines.Add("")
 $indexLines.Add("## Recommended Build Order")
 $indexLines.Add("1. Read evidence/materials/COMPETITION_ASSET_PACK.md")
 $indexLines.Add("2. Draft slides from evidence/materials/PPT_DECK_6SLIDES.md")
-$indexLines.Add("3. Record or edit video using evidence/materials/VIDEO_SHOTLIST_2MIN.md")
-$indexLines.Add("4. Lay out the poster using evidence/materials/POSTER_COPY.md")
-$indexLines.Add("5. Keep wording aligned with PROJECT_ONE_PAGER.md and QA_BRIEF.md")
+$indexLines.Add("3. Use deliverables/competition_kit/deck.pdf and poster.pdf as the current printable baselines")
+$indexLines.Add("4. If visual polish is needed, edit deliverables/competition_kit/*.html and rerun scripts/export_competition_pdfs.js")
+$indexLines.Add("5. Record or edit video using evidence/materials/VIDEO_SHOTLIST_2MIN.md")
+$indexLines.Add("6. Keep wording aligned with PROJECT_ONE_PAGER.md and QA_BRIEF.md")
 
 Set-Content -LiteralPath $indexPath -Value $indexLines -Encoding UTF8
 

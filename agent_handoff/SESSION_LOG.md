@@ -846,3 +846,32 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - final video output still needs timeline editing outside repo
 - Recommended next step:
   - use the exported PDFs as the current baseline deliverables and only iterate if visual polish is still required
+
+---
+
+## 2026-04-19 / Codex (asset bundle upgraded to carry deliverables)
+
+- Summary:
+  - Updated `scripts/export_competition_asset_pack.ps1` so the exported bundle now includes the HTML/PDF deliverables and the PDF re-export script
+  - Material indexes and handoff docs now point to the full bundle as the default external handoff artifact
+- Files touched:
+  - `scripts/export_competition_asset_pack.ps1`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - required export list now also includes:
+    - `deliverables/competition_kit/deck.html`
+    - `deliverables/competition_kit/poster.html`
+    - `deliverables/competition_kit/deck.pdf`
+    - `deliverables/competition_kit/poster.pdf`
+    - `scripts/export_competition_pdfs.js`
+- Open risks:
+  - full bundle should still be regenerated once after any future visual polish
+- Recommended next step:
+  - run the upgraded asset-pack export once and use that directory as the canonical handoff bundle

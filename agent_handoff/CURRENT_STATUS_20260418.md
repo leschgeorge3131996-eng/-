@@ -192,6 +192,8 @@
 - Current exported PDFs:
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
+- Updated asset-bundle export:
+  - `scripts/export_competition_asset_pack.ps1` now includes the current HTML/PDF deliverables and `scripts/export_competition_pdfs.js`
 - Practical meaning:
   - the repo no longer stops at “asset collection”
   - the next operator can draft PPT / video / poster directly from repo-native materials
@@ -214,10 +216,11 @@
 - The repo now contains printable HTML deck/poster prototypes, so the next operator can move straight into final PDF / slide production
 - The repo now has a direct script path for exporting deck/poster PDFs from those HTML prototypes
 - The repo now already contains one generated deck PDF and one generated poster PDF as the current baseline outputs
+- The handoff/export bundle can now carry those HTML/PDF deliverables forward without manual file picking
 
 ## Recommended Next Step
 
-1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf` for last-mile polish; if needed, adjust the HTML prototypes and rerun `node scripts/export_competition_pdfs.js`
+1. Run `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1` and use the exported full bundle as the source for any last-mile polish or external handoff
 2. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 3. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
 4. Do not expand product scope while final materials are being assembled

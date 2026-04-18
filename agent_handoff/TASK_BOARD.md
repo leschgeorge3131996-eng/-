@@ -10,11 +10,12 @@
 - Printable deck / poster HTML prototypes now exist in-repo
 - Repo-native deck / poster PDF export script now exists
 - Current deck/poster PDF baselines now exist in-repo
+- Asset-pack export now includes the deliverables folder and PDF export script
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
-1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf` and decide whether only cosmetic polish is still needed
+1. Run `scripts/export_competition_asset_pack.ps1` and use the exported full bundle for any last-mile polish or external handoff
 2. Use `scripts/export_competition_asset_pack.ps1` whenever a clean handoff bundle is needed for PPT/video/poster production
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
@@ -36,6 +37,7 @@
 - `2026-04-18`: printable HTML prototypes were added under `deliverables/competition_kit/` for deck/poster production
 - `2026-04-19`: `scripts/export_competition_pdfs.js` can now export deck/poster PDFs directly from the HTML prototypes
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were exported successfully
+- `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now includes the deliverables folder and PDF export script
 
 ## Useful But Not Urgent
 

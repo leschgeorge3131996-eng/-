@@ -61,6 +61,7 @@
 - Printable HTML deck / poster prototypes have been added
 - Competition PDF export script has been added
 - Repo-generated deck/poster PDFs have been exported once successfully
+- Competition asset bundle export now includes the HTML/PDF deliverables
 - Minimal model tier routing is implemented and test-covered
 - Fixed sample set replay script is available
 - Sample replay report can now be exported with route and evidence stats
@@ -104,6 +105,7 @@
 - Printable deck/poster prototypes are available under `deliverables/competition_kit/`
 - Competition PDF export script is available at `scripts/export_competition_pdfs.js`
 - Current generated PDFs are available at `deliverables/competition_kit/deck.pdf` and `deliverables/competition_kit/poster.pdf`
+- Competition asset export now includes the `deliverables/competition_kit/` folder and `scripts/export_competition_pdfs.js`
 
 ## Current Runtime Configuration
 
@@ -223,7 +225,7 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf`, then decide whether only cosmetic polish remains
+1. Use `scripts/export_competition_asset_pack.ps1` to export a full handoff bundle that now includes the current HTML/PDF deliverables, then decide whether only cosmetic polish remains
 2. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 3. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
