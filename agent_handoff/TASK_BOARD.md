@@ -5,16 +5,16 @@
 - No hard engineering blocker is currently open
 - Real Wuwen Xinqiong minimal-path validation is now done in-project
 - A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked
-- Core gold-sample screenshots are now refreshed under the current real runtime
-- If preparing for judging/demo, prioritize material production rather than feature work
+- Full gold-sample screenshot pack is now refreshed under the current real runtime
+- Ready-to-use PPT / video / poster drafting docs now exist in-repo
+- If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
-1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
-2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
+1. Turn the drafted repo-native materials into the final PPT / video / poster files
+2. Use `scripts/export_competition_asset_pack.ps1` whenever a clean handoff bundle is needed for PPT/video/poster production
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
-4. Add expired-session cleanup script
-5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
+4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 
 ## Recently Verified
 
@@ -27,12 +27,16 @@
 - `2026-04-18`: runtime/deploy/material docs were aligned to the current Wuwen Xinqiong baseline and gold-sample-primary evidence path
 - `2026-04-18`: automated browser capture refreshed the four core gold-sample screenshots in `evidence/screenshots/`
 - `2026-04-18`: `evidence/materials/COMPETITION_ASSET_PACK.md` was added to map screenshots/reports into final PPT/video/poster assets
+- `2026-04-18`: automated browser capture also refreshed `20260418_stats_panel.png` and `20260418_api_docs.png`
+- `2026-04-18`: ready-to-use drafting docs were added for PPT (`PPT_DECK_6SLIDES.md`), video (`VIDEO_SHOTLIST_2MIN.md`), and poster (`POSTER_COPY.md`)
+- `2026-04-18`: `scripts/export_competition_asset_pack.ps1` can now export a timestamped production bundle for another operator
 
 ## Useful But Not Urgent
 
 1. Detail-level replay comparison and report
 2. Stronger grounding semantics for `summary` / `outline`
 3. More polished competition materials
+4. Add expired-session cleanup script
 
 ## Do Not Start By Default
 

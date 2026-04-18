@@ -62,6 +62,13 @@ As of `2026-04-18`:
   - `evidence/screenshots/20260418_gold_pdf_render.png`
   - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
   - `evidence/screenshots/20260418_gold_refusal.png`
+  - `evidence/screenshots/20260418_stats_panel.png`
+  - `evidence/screenshots/20260418_api_docs.png`
+- competition drafting assets:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `scripts/export_competition_asset_pack.ps1`
 
 Main verification commands:
 
@@ -227,9 +234,9 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster assets
-2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
-3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
+1. Turn the drafted repo-native materials into final PPT / video / poster files; use `scripts/export_competition_asset_pack.ps1` when handing the asset pack to another operator
+2. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
+3. Keep the broader sample-set replay in a clearly secondary role
 
 ### Highest value for broader external testing
 

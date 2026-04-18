@@ -157,11 +157,10 @@
   - `evidence/screenshots/20260418_gold_pdf_render.png`
   - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
   - `evidence/screenshots/20260418_gold_refusal.png`
+  - `evidence/screenshots/20260418_stats_panel.png`
+  - `evidence/screenshots/20260418_api_docs.png`
 - Practical meaning:
-  - the core screenshot-evidence gap for the locked gold-sample path is now closed
-- remaining optional screenshot work is mostly:
-  - stats panel
-  - backend API docs
+  - the screenshot-evidence gap for the locked judging/demo pack is now closed
 
 ## Competition Asset Pack (`2026-04-18`)
 
@@ -177,6 +176,19 @@
   - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
   - `evidence/materials/MATERIALS_INDEX.md`
 
+## Submission Deliverables (`2026-04-18`)
+
+- Ready-to-use drafting docs added:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+- Export helper added:
+  - `scripts/export_competition_asset_pack.ps1`
+- Practical meaning:
+  - the repo no longer stops at “asset collection”
+  - the next operator can draft PPT / video / poster directly from repo-native materials
+  - a timestamped bundle can be exported for handoff without manually re-picking files
+
 ## Current Meaning
 
 - Wuwen Xinqiong integration itself is no longer the blocker
@@ -188,10 +200,11 @@
 - The repo docs/materials are now aligned around that locked gold-sample path instead of the older broader replay path
 - The locked gold-sample screenshot set is now refreshed under the current real runtime
 - The repo now has a single asset-pack document for assembling final competition materials without re-deciding facts
+- The repo now also contains first-pass PPT / video / poster drafting docs plus a one-click export path for handoff packaging
 
 ## Recommended Next Step
 
-1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
-2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
-3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
-4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
+1. Turn `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` into final submission-format files; use `scripts/export_competition_asset_pack.ps1` when handing material production to another operator
+2. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
+3. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
+4. Do not expand product scope while final materials are being assembled

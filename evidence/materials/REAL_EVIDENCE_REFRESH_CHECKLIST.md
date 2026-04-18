@@ -53,6 +53,8 @@ Latest automated gold-sample capture on `2026-04-18` produced:
 - `20260418_gold_pdf_render.png`
 - `20260418_gold_ask_rank_accuracy.png`
 - `20260418_gold_refusal.png`
+- `20260418_stats_panel.png`
+- `20260418_api_docs.png`
 
 Recommended naming:
 

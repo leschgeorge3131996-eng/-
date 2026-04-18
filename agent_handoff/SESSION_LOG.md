@@ -683,3 +683,78 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - optional stats-panel and backend API-docs screenshots remain uncaptured
 - Recommended next step:
   - turn `COMPETITION_ASSET_PACK.md` into the actual submission deliverables
+
+---
+
+## 2026-04-18 / Codex (full screenshot pack completed)
+
+- Summary:
+  - Extended the browser screenshot script to also capture the stats panel and backend API-docs page
+  - Refreshed the final six-file screenshot pack under the locked `20260418_*` naming
+  - Updated evidence/handoff docs so screenshot refresh is now fully closed, not partially complete
+- Files touched:
+  - `scripts/capture_gold_sample_screenshots.js`
+  - `evidence/README.md`
+  - `evidence/experiments/20260418_gold_sample_validation.md`
+  - `evidence/materials/REAL_EVIDENCE_REFRESH_CHECKLIST.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `evidence/screenshots/20260418_stats_panel.png`
+  - `evidence/screenshots/20260418_api_docs.png`
+- Verification:
+  - real run succeeded via:
+    - `$env:SCREENSHOT_DATE_OVERRIDE='20260418'; node scripts/capture_gold_sample_screenshots.js`
+  - final screenshot set now includes:
+    - `20260418_gold_ask_research_focus.png`
+    - `20260418_gold_pdf_render.png`
+    - `20260418_gold_ask_rank_accuracy.png`
+    - `20260418_gold_refusal.png`
+    - `20260418_stats_panel.png`
+    - `20260418_api_docs.png`
+- Open risks:
+  - only the raw screenshot assets are complete; the actual PPT / video / poster files still need assembly
+- Recommended next step:
+  - use `COMPETITION_ASSET_PACK.md` to assemble the final submission deliverables
+
+---
+
+## 2026-04-18 / Codex (deliverable drafting pack added)
+
+- Summary:
+  - Added ready-to-use PPT, video, and poster drafting docs bound to the locked gold-sample story
+  - Added a PowerShell export script so the full competition material set can be copied into a timestamped handoff bundle
+  - Updated shared status docs so “next work” now means final asset production rather than ad hoc material picking
+- Files touched:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `.gitignore`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/README.md`
+  - `evidence/experiments/20260418_gold_sample_validation.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - deliverable docs all point to the locked gold-sample candidate and current authoritative screenshots/reports
+  - export script is intended to package:
+    - `PROJECT_ONE_PAGER.md`
+    - `DEMO_SCRIPT_3MIN.md`
+    - `COMPETITION_ASSET_PACK.md`
+    - the three new drafting docs
+    - current authoritative reports
+    - the locked screenshot set
+    - the locked sample PDF
+- Open risks:
+  - final `.pptx`, edited video, and laid-out poster files still need to be produced outside markdown
+  - staging/demo environment should still be smoke-checked before formal judging
+- Recommended next step:
+  - generate one export bundle and use it as the single source for final slide/video/poster file production

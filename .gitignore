@@ -11,6 +11,7 @@ review_bundle*.zip
 review_bundle_stage_*/
 .claude/
 tmp_*.log
+evidence/exports/
 evidence/reports/sample_replay_latest_*.md
 evidence/reports/sample_replay_real_*.md
 evidence/reports/sample_replay_real_summary_*.md

@@ -56,6 +56,8 @@
 - Frontend now distinguishes citations vs source chunks by task type
 - Retrieval now includes query normalization, stopword filtering, title bonus, and stable chunk ids
 - Competition materials have been refined into reusable review/demo docs
+- Ready-to-use PPT / video / poster drafting docs have been added
+- Competition asset export script has been added
 - Minimal model tier routing is implemented and test-covered
 - Fixed sample set replay script is available
 - Sample replay report can now be exported with route and evidence stats
@@ -92,6 +94,10 @@
 - Gold-sample screenshot automation script is available at `scripts/capture_gold_sample_screenshots.js`
 - Gold-sample screenshots are refreshed under `evidence/screenshots/`
 - Competition asset-pack doc is available at `evidence/materials/COMPETITION_ASSET_PACK.md`
+- PPT deck draft is available at `evidence/materials/PPT_DECK_6SLIDES.md`
+- Video shotlist is available at `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+- Poster copy is available at `evidence/materials/POSTER_COPY.md`
+- Competition export script is available at `scripts/export_competition_asset_pack.ps1`
 
 ## Current Runtime Configuration
 
@@ -121,8 +127,13 @@ Notes:
 - Gold-sample PDF render screenshot exists
 - Gold-sample second-answerable screenshot exists
 - Gold-sample refusal screenshot exists
+- Stats-panel screenshot exists
+- Backend API-docs screenshot exists
 - One-page project summary exists
 - Demo script exists
+- PPT deck draft exists
+- Video shotlist exists
+- Poster copy exists
 - Sample set exists
 - Gold-sample runbook exists
 - Architecture note exists
@@ -201,10 +212,9 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
-2. Optionally capture stats-panel and backend API-docs screenshots if the submission format needs them
-3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
-4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
+1. Turn the drafted PPT / video / poster docs into the final submission-format files using `scripts/export_competition_asset_pack.ps1` as the handoff bundle source
+2. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
+3. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
 ## Session Handoff Rule
 

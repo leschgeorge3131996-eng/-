@@ -32,6 +32,20 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/screenshots/20260418_gold_pdf_render.png`
   - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
   - `evidence/screenshots/20260418_gold_refusal.png`
+- Optional supporting screenshots already available:
+  - `evidence/screenshots/20260418_stats_panel.png`
+  - `evidence/screenshots/20260418_api_docs.png`
+
+## Ready-To-Use Deliverables
+
+- PPT page copy:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+- Video shotlist:
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+- Poster copy:
+  - `evidence/materials/POSTER_COPY.md`
+- One-click export script:
+  - `scripts/export_competition_asset_pack.ps1`
 
 ## Fixed Demo Facts
 
@@ -168,12 +182,18 @@ Recommended blocks:
 - [ ] `DEMO_SCRIPT_3MIN.md`
 - [ ] `ARCHITECTURE.md`
 - [ ] `QA_BRIEF.md`
+- [ ] `PPT_DECK_6SLIDES.md`
+- [ ] `VIDEO_SHOTLIST_2MIN.md`
+- [ ] `POSTER_COPY.md`
 - [ ] `gold_sample_qa_compare_latest.md`
 - [ ] `gold_sample_replay_real_summary_latest.md`
 - [ ] `20260418_gold_ask_research_focus.png`
 - [ ] `20260418_gold_pdf_render.png`
 - [ ] `20260418_gold_ask_rank_accuracy.png`
 - [ ] `20260418_gold_refusal.png`
+- [ ] `20260418_stats_panel.png` if a metrics/supporting slide is needed
+- [ ] `20260418_api_docs.png` if an engineering/supporting slide is needed
+- [ ] export a handoff bundle with `scripts/export_competition_asset_pack.ps1`
 
 ## Do Not Improvise
 

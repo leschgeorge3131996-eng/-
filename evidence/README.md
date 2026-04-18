@@ -22,6 +22,9 @@ Use this directory to store reproducible project evidence for demos, reviews, an
 - `materials/`
   - one-page project summary
   - demo script
+  - PPT deck outline
+  - video shotlist
+  - poster copy
   - sample set
   - architecture description
   - evidence refresh checklist
@@ -39,3 +42,5 @@ Examples:
 - `20260415_api_docs.png`
 - `20260415_log_summary.md`
 - `20260418_gold_ask_research_focus.png`
+- `20260418_stats_panel.png`
+- `20260418_api_docs.png`

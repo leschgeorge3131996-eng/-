@@ -27,6 +27,10 @@ function sleep(ms) {
 }
 
 function timestampDate() {
+  const override = process.env.SCREENSHOT_DATE_OVERRIDE?.trim();
+  if (override && /^\d{8}$/.test(override)) {
+    return override;
+  }
   const now = new Date();
   const year = String(now.getFullYear());
   const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -594,6 +598,42 @@ async function captureElementScreenshot(cdp, selector, outputPath, padding = 16)
   await fsp.writeFile(outputPath, Buffer.from(screenshot.data, "base64"));
 }
 
+async function captureClosestPanelScreenshot(cdp, childSelector, outputPath, padding = 16) {
+  const rect = await evaluate(
+    cdp,
+    `(() => {
+      const child = document.querySelector(${jsString(childSelector)});
+      const panel = child ? child.closest('.panel') : null;
+      if (!panel) return null;
+      panel.scrollIntoView({ block: 'start', inline: 'nearest' });
+      const r = panel.getBoundingClientRect();
+      return {
+        x: r.left + window.scrollX,
+        y: r.top + window.scrollY,
+        width: r.width,
+        height: r.height
+      };
+    })()`
+  );
+  if (!rect || !rect.width || !rect.height) {
+    throw new Error(`Failed to get closest panel rect for selector: ${childSelector}`);
+  }
+  const clip = {
+    x: Math.max(0, rect.x - padding),
+    y: Math.max(0, rect.y - padding),
+    width: rect.width + padding * 2,
+    height: rect.height + padding * 2,
+    scale: 1,
+  };
+  const screenshot = await cdp.send("Page.captureScreenshot", {
+    format: "png",
+    fromSurface: true,
+    captureBeyondViewport: true,
+    clip,
+  });
+  await fsp.writeFile(outputPath, Buffer.from(screenshot.data, "base64"));
+}
+
 async function ensureAuthenticated(cdp, inviteCode, demoMode) {
   const initialState = await waitFor(async () => {
     const state = await describePageState(cdp);
@@ -674,6 +714,25 @@ async function waitForPdfPreviewLoaded(cdp) {
   );
 }
 
+async function captureStatsPanelIfAvailable(cdp, outputPath) {
+  const hasToggle = await evaluate(
+    cdp,
+    "Boolean(document.querySelector('[data-testid=\"stats-toggle\"]'))"
+  );
+  if (hasToggle) {
+    await clickSelector(cdp, '[data-testid="stats-toggle"]');
+    await waitForSelector(cdp, '[data-testid="stats-grid"]', 10_000);
+  }
+  await captureClosestPanelScreenshot(cdp, '[data-testid="stats-summary"]', outputPath);
+}
+
+async function captureApiDocsScreenshot(cdp, outputPath) {
+  await cdp.send("Page.navigate", { url: "http://127.0.0.1:8000/docs" });
+  await waitForSelector(cdp, "#swagger-ui", 20_000);
+  await sleep(1000);
+  await captureElementScreenshot(cdp, "#swagger-ui", outputPath, 8);
+}
+
 async function main() {
   await ensureDir(TMP_DIR);
   await ensureDir(SCREENSHOT_DIR);
@@ -739,6 +798,14 @@ async function main() {
       requirePdfButton: false,
     });
     createdPaths.push(refusalPath);
+
+    const statsPath = path.join(SCREENSHOT_DIR, `${datePrefix}_stats_panel.png`);
+    await captureStatsPanelIfAvailable(browser.cdp, statsPath);
+    createdPaths.push(statsPath);
+
+    const apiDocsPath = path.join(SCREENSHOT_DIR, `${datePrefix}_api_docs.png`);
+    await captureApiDocsScreenshot(browser.cdp, apiDocsPath);
+    createdPaths.push(apiDocsPath);
 
     console.log("Created screenshots:");
     for (const screenshotPath of createdPaths) {

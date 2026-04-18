@@ -106,17 +106,19 @@ Automation artifact:
 Result:
 
 - automated browser path succeeded against the current real `Wuwen Xinqiong` runtime
-- the core four gold-sample screenshots were refreshed under `evidence/screenshots/`:
+- the full screenshot pack was refreshed under `evidence/screenshots/`:
   - `20260418_gold_ask_research_focus.png`
   - `20260418_gold_pdf_render.png`
   - `20260418_gold_ask_rank_accuracy.png`
   - `20260418_gold_refusal.png`
+  - `20260418_stats_panel.png`
+  - `20260418_api_docs.png`
 
 Notes:
 
 - the script serves `frontend/dist` locally with `/api` proxying to the backend, so it does not depend on the Vite dev server
 - the script uses the current local `.env`, logs in through the real session boundary, uploads the locked gold-sample PDF, runs the locked prompt set, and captures the result/panel screenshots directly
-- this closes the core screenshot refresh gap for the locked gold-sample path; stats-panel and API-docs screenshots are still optional follow-ups if the submission format needs them
+- this closes the screenshot refresh gap for the current judging/demo pack around the locked gold-sample path
 
 ## Operator Notes
 
@@ -124,3 +126,8 @@ Notes:
 - Do not mention in-document entities such as `作者` in the refusal prompt.
 - Prefer `evidence/materials/GOLD_SAMPLE_RUNBOOK.md` for live demo execution and
   screenshot refresh.
+- Competition drafting artifacts are now also available:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `scripts/export_competition_asset_pack.ps1`
