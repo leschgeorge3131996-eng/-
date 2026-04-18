@@ -29,10 +29,22 @@
 9. [QA_BRIEF.md](./QA_BRIEF.md)
 - 常见答辩问答提纲
 
-10. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
+10. [GOLD_SAMPLE_RUNBOOK.md](./GOLD_SAMPLE_RUNBOOK.md)
+- 当前锁定 gold-sample candidate 的演示/截图 runbook
+
+11. [../reports/gold_sample_qa_compare_latest.md](../reports/gold_sample_qa_compare_latest.md)
+- 当前锁定 gold-sample candidate 的双模型比较结论
+
+12. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
+- 当前锁定 gold-sample candidate 的真实 replay 汇总（权威最新版本）
+
+13. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
+- 当前锁定 gold-sample candidate 的真实 replay 明细（权威最新版本）
+
+14. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
 - 真实模型固定样例集复跑汇总（权威最新版本）
 
-11. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
+15. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
 - 真实模型固定样例集逐条复跑明细（权威最新版本）
 
 ## 使用建议
@@ -44,7 +56,10 @@
 - 批量复跑与证据刷新：优先参考 `SAMPLE_MANIFEST.json` 与 `scripts/replay_sample_set.py`
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`
+- gold-sample 演示执行：优先参考 `GOLD_SAMPLE_RUNBOOK.md`
 - 真实模型复跑：优先参考 `REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
+- QA 模型决策：优先参考 `evidence/reports/gold_sample_qa_compare_latest.md`
+- 当前锁定 gold-sample 证据：优先参考 `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - route-tier / outcome / response-detail / grounding 对比：优先参考 `evidence/reports/sample_replay_summary.md`
 - 答辩准备：优先参考 `QA_BRIEF.md`
 - 真实模型结果总览：优先参考 `evidence/reports/sample_replay_real_summary_latest.md`

@@ -558,3 +558,30 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - compare 脚本可用于“模型决策”
   - replay 脚本可用于“权威 latest evidence 输出”
   - 两条链现在都已经对齐到当前真实运行边界
+
+---
+
+## 2026-04-18 — Gold-sample materials aligned
+
+### 背景
+在锁定 gold-sample candidate、完成 QA 模型比较、修好 replay 工具链之后，下一步不该继续泛化功能，而是把这组固定题和固定文档沉到“可直接照着演示/截图”的材料层。
+
+### 本轮改动
+- 新增：
+  - `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
+- 更新：
+  - `evidence/materials/DEMO_SCRIPT_3MIN.md`
+  - `evidence/materials/QA_BRIEF.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/REAL_EVIDENCE_REFRESH_CHECKLIST.md`
+
+### 作用
+- 演示脚本不再停留在“问一个典型问题”，而是明确绑定到当前锁定题集
+- QA 提纲不再泛泛而谈“下一步做真实复跑”，而是转成“用 gold-sample candidate 刷新真实证据并产出比赛材料”
+- 证据刷新清单不再优先 broad sample set，而是优先当前锁定候选题
+- 后续无论是 Codex、Claude 还是人工操作，都能直接按 `GOLD_SAMPLE_RUNBOOK.md` 执行，不必现场重选题
+
+### 当前更清晰的顺序
+1. 按 `GOLD_SAMPLE_RUNBOOK.md` 跑现场演示
+2. 刷新截图
+3. 用已有 compare/replay 报告做 paper/PPT/video/poster 的事实底稿
