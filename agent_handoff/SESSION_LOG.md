@@ -654,3 +654,32 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - the script depends on `frontend/dist` being available locally
 - Recommended next step:
   - use the refreshed screenshots plus the existing compare/replay reports to build the final PPT / video / poster asset pack
+
+---
+
+## 2026-04-18 / Codex (competition asset-pack consolidation)
+
+- Summary:
+  - Added a dedicated competition asset-pack doc so PPT / video / poster assembly now follows one locked source instead of ad hoc file picking
+  - Rewrote the submission-prep guide onto the current gold-sample-primary story
+  - Updated handoff/task docs so the next operator moves from “collect assets” to “assemble final deliverables”
+- Files touched:
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - doc-only material-consolidation round
+  - checked the asset pack points only to current locked assets:
+    - `GOLD_SAMPLE_CANDIDATE_20260418.json`
+    - `gold_sample_qa_compare_latest.md`
+    - `gold_sample_replay_real_summary_latest.md`
+    - the four `20260418_gold_*.png` screenshots
+- Open risks:
+  - final PPT / video / poster files themselves are still not authored in-repo
+  - optional stats-panel and backend API-docs screenshots remain uncaptured
+- Recommended next step:
+  - turn `COMPETITION_ASSET_PACK.md` into the actual submission deliverables

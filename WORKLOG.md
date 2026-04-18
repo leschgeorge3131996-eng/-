@@ -91,6 +91,7 @@
 - Gold-sample runbook is available at `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
 - Gold-sample screenshot automation script is available at `scripts/capture_gold_sample_screenshots.js`
 - Gold-sample screenshots are refreshed under `evidence/screenshots/`
+- Competition asset-pack doc is available at `evidence/materials/COMPETITION_ASSET_PACK.md`
 
 ## Current Runtime Configuration
 
@@ -200,7 +201,7 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Use the locked candidate set plus refreshed screenshots/compare/replay reports as the factual source for PPT / video / poster
+1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
 2. Optionally capture stats-panel and backend API-docs screenshots if the submission format needs them
 3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock

@@ -159,9 +159,23 @@
   - `evidence/screenshots/20260418_gold_refusal.png`
 - Practical meaning:
   - the core screenshot-evidence gap for the locked gold-sample path is now closed
-  - remaining optional screenshot work is mostly:
-    - stats panel
-    - backend API docs
+- remaining optional screenshot work is mostly:
+  - stats panel
+  - backend API docs
+
+## Competition Asset Pack (`2026-04-18`)
+
+- New asset-pack doc added:
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+- Purpose:
+  - map the locked gold-sample screenshots, reports, and fixed wording into a single source for:
+    - PPT
+    - demo video
+    - poster
+    - spoken defense wording
+- Related materials now aligned around the same gold-sample-primary story:
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
 
 ## Current Meaning
 
@@ -173,10 +187,11 @@
 - The replay/evidence tooling is now aligned with the current session/access-token runtime posture
 - The repo docs/materials are now aligned around that locked gold-sample path instead of the older broader replay path
 - The locked gold-sample screenshot set is now refreshed under the current real runtime
+- The repo now has a single asset-pack document for assembling final competition materials without re-deciding facts
 
 ## Recommended Next Step
 
-1. Turn the locked candidate set plus refreshed screenshots/compare/replay reports into PPT/video/poster source material
+1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
 2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed

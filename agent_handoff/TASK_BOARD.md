@@ -10,7 +10,7 @@
 
 ## Next Best Tasks
 
-1. Turn the locked candidate set plus refreshed screenshots into PPT / video / poster wording and asset checklist
+1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster deliverables
 2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Add expired-session cleanup script
@@ -26,6 +26,7 @@
 - `2026-04-18`: demo/material docs were aligned to the locked gold-sample candidate, including `GOLD_SAMPLE_RUNBOOK.md`
 - `2026-04-18`: runtime/deploy/material docs were aligned to the current Wuwen Xinqiong baseline and gold-sample-primary evidence path
 - `2026-04-18`: automated browser capture refreshed the four core gold-sample screenshots in `evidence/screenshots/`
+- `2026-04-18`: `evidence/materials/COMPETITION_ASSET_PACK.md` was added to map screenshots/reports into final PPT/video/poster assets
 
 ## Useful But Not Urgent
 

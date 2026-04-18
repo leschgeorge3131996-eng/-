@@ -23,28 +23,31 @@
 7. [SUBMISSION_PREP_GUIDE.md](./SUBMISSION_PREP_GUIDE.md)
 - 参赛提交准备说明
 
-8. [REAL_REPLAY_GUIDE.md](./REAL_REPLAY_GUIDE.md)
+8. [COMPETITION_ASSET_PACK.md](./COMPETITION_ASSET_PACK.md)
+- 把 gold-sample 截图、报告和口径收成 PPT / 视频 / 海报统一资产包
+
+9. [REAL_REPLAY_GUIDE.md](./REAL_REPLAY_GUIDE.md)
 - 真实模型复跑说明
 
-9. [QA_BRIEF.md](./QA_BRIEF.md)
+10. [QA_BRIEF.md](./QA_BRIEF.md)
 - 常见答辩问答提纲
 
-10. [GOLD_SAMPLE_RUNBOOK.md](./GOLD_SAMPLE_RUNBOOK.md)
+11. [GOLD_SAMPLE_RUNBOOK.md](./GOLD_SAMPLE_RUNBOOK.md)
 - 当前锁定 gold-sample candidate 的演示 / 截图 runbook
 
-11. [../reports/gold_sample_qa_compare_latest.md](../reports/gold_sample_qa_compare_latest.md)
+12. [../reports/gold_sample_qa_compare_latest.md](../reports/gold_sample_qa_compare_latest.md)
 - 当前锁定 gold-sample candidate 的双模型比较结论
 
-12. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
+13. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
 - 当前锁定 gold-sample candidate 的真实 replay 汇总（权威最新版）
 
-13. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
+14. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
 - 当前锁定 gold-sample candidate 的真实 replay 明细（权威最新版）
 
-14. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
+15. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
 - 更宽样例覆盖的真实模型复跑汇总（次级参考）
 
-15. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
+16. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
 - 更宽样例覆盖的真实模型逐条复跑明细（次级参考）
 
 ## 使用建议
@@ -54,6 +57,7 @@
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`
 - 比赛/评审复跑与证据刷新：优先参考 `GOLD_SAMPLE_CANDIDATE_20260418.json`、`REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
+- PPT / 视频 / 海报统一资产收口：优先参考 `COMPETITION_ASSET_PACK.md`
 - 更宽样例补充复跑：参考 `SAMPLE_MANIFEST.json` 与 `scripts/replay_sample_set.py`
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`

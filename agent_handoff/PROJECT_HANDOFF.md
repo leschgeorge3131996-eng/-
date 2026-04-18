@@ -195,6 +195,7 @@ Main files:
 - `frontend/src/components/PdfPreviewPanel.tsx`
 - `frontend/src/App.smoke.test.tsx`
 - `scripts/capture_gold_sample_screenshots.js`
+- `evidence/materials/COMPETITION_ASSET_PACK.md`
 
 Key responsibilities:
 
@@ -226,7 +227,7 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Turn the locked candidate set plus refreshed screenshots/compare/replay outputs into PPT / video / poster wording
+1. Use `evidence/materials/COMPETITION_ASSET_PACK.md` to assemble the final PPT / video / poster assets
 2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 
