@@ -620,3 +620,37 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - fresh screenshot evidence is still the main remaining judging/demo gap
 - Recommended next step:
   - capture the fresh gold-sample screenshots and fold them into PPT / video / poster materials
+
+---
+
+## 2026-04-18 / Codex (gold-sample screenshot automation + refresh)
+
+- Summary:
+  - Added an automated browser screenshot script for the locked gold-sample path
+  - Refreshed the four core judging/demo screenshots under the current real `Wuwen Xinqiong` runtime
+  - Updated evidence docs and shared handoff files so screenshot refresh is no longer tracked as the main open gap
+- Files touched:
+  - `scripts/capture_gold_sample_screenshots.js`
+  - `evidence/README.md`
+  - `evidence/experiments/20260418_gold_sample_validation.md`
+  - `evidence/materials/REAL_EVIDENCE_REFRESH_CHECKLIST.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `evidence/screenshots/20260418_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260418_gold_pdf_render.png`
+  - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260418_gold_refusal.png`
+- Verification:
+  - real run succeeded via `node scripts/capture_gold_sample_screenshots.js`
+  - created screenshots:
+    - `evidence/screenshots/20260418_gold_ask_research_focus.png`
+    - `evidence/screenshots/20260418_gold_pdf_render.png`
+    - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
+    - `evidence/screenshots/20260418_gold_refusal.png`
+- Open risks:
+  - the script currently covers the four core gold-sample screenshots only, not the optional stats-panel or backend API-docs captures
+  - the script depends on `frontend/dist` being available locally
+- Recommended next step:
+  - use the refreshed screenshots plus the existing compare/replay reports to build the final PPT / video / poster asset pack

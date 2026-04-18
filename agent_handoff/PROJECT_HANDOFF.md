@@ -57,6 +57,11 @@ As of `2026-04-18`:
   - `2 answered + 1 refused`
   - `0 errors`
   - current replay tooling now reflects the cookie/session + document-token runtime posture
+- gold-sample screenshot refresh:
+  - `evidence/screenshots/20260418_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260418_gold_pdf_render.png`
+  - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260418_gold_refusal.png`
 
 Main verification commands:
 
@@ -189,6 +194,7 @@ Main files:
 - `frontend/src/components/ResultPanel.tsx`
 - `frontend/src/components/PdfPreviewPanel.tsx`
 - `frontend/src/App.smoke.test.tsx`
+- `scripts/capture_gold_sample_screenshots.js`
 
 Key responsibilities:
 
@@ -220,8 +226,8 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Refresh screenshots/evidence around the locked gold-sample candidate
-2. Turn the locked candidate set plus compare/replay outputs into PPT / video / poster wording
+1. Turn the locked candidate set plus refreshed screenshots/compare/replay outputs into PPT / video / poster wording
+2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 
 ### Highest value for broader external testing

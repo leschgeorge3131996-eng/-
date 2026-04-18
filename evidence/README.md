@@ -13,7 +13,8 @@ Use this directory to store reproducible project evidence for demos, reviews, an
   - comparison notes
   - sample replay reports
   - sample replay summaries
-  - use `sample_replay_real_latest.md` and `sample_replay_real_summary_latest.md` as the authoritative real replay outputs
+  - use `gold_sample_replay_real_latest.md` and `gold_sample_replay_real_summary_latest.md` as the authoritative judging/demo replay outputs
+  - treat `sample_replay_real_latest.md` and `sample_replay_real_summary_latest.md` as broader secondary coverage
   - treat `latest_log_summary.md` as global development telemetry unless a replay-specific scope is explicitly stated
 - `experiments/`
   - experiment records
@@ -37,3 +38,4 @@ Examples:
 - `20260415_summary_success.png`
 - `20260415_api_docs.png`
 - `20260415_log_summary.md`
+- `20260418_gold_ask_research_focus.png`

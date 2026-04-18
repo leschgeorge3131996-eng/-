@@ -97,6 +97,27 @@ Replay result:
 - `1 refused`
 - `0 errors`
 
+## Validation 4: Screenshot Refresh
+
+Automation artifact:
+
+- `scripts/capture_gold_sample_screenshots.js`
+
+Result:
+
+- automated browser path succeeded against the current real `Wuwen Xinqiong` runtime
+- the core four gold-sample screenshots were refreshed under `evidence/screenshots/`:
+  - `20260418_gold_ask_research_focus.png`
+  - `20260418_gold_pdf_render.png`
+  - `20260418_gold_ask_rank_accuracy.png`
+  - `20260418_gold_refusal.png`
+
+Notes:
+
+- the script serves `frontend/dist` locally with `/api` proxying to the backend, so it does not depend on the Vite dev server
+- the script uses the current local `.env`, logs in through the real session boundary, uploads the locked gold-sample PDF, runs the locked prompt set, and captures the result/panel screenshots directly
+- this closes the core screenshot refresh gap for the locked gold-sample path; stats-panel and API-docs screenshots are still optional follow-ups if the submission format needs them
+
 ## Operator Notes
 
 - For the refusal demo, keep the prompt purely off-topic.

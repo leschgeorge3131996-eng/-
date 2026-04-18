@@ -5,17 +5,13 @@
 - No hard engineering blocker is currently open
 - Real Wuwen Xinqiong minimal-path validation is now done in-project
 - A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked
-- If preparing for judging/demo, prioritize evidence refresh and material production rather than feature work
+- Core gold-sample screenshots are now refreshed under the current real runtime
+- If preparing for judging/demo, prioritize material production rather than feature work
 
 ## Next Best Tasks
 
-1. Refresh the real-only evidence pack around the locked gold-sample candidate:
-   - ask result with citations
-   - PDF evidence preview/render
-   - second answerable ask
-   - refusal screenshot
-   - candidate-set comparison report
-2. Turn the locked candidate set into PPT / video / poster wording and asset checklist
+1. Turn the locked candidate set plus refreshed screenshots into PPT / video / poster wording and asset checklist
+2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Add expired-session cleanup script
 5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
@@ -29,6 +25,7 @@
 - `2026-04-18`: replay tooling was updated to the current session/access-token boundary and refreshed `gold_sample_replay_real_*` outputs successfully
 - `2026-04-18`: demo/material docs were aligned to the locked gold-sample candidate, including `GOLD_SAMPLE_RUNBOOK.md`
 - `2026-04-18`: runtime/deploy/material docs were aligned to the current Wuwen Xinqiong baseline and gold-sample-primary evidence path
+- `2026-04-18`: automated browser capture refreshed the four core gold-sample screenshots in `evidence/screenshots/`
 
 ## Useful But Not Urgent
 

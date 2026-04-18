@@ -20,6 +20,12 @@ For the locked gold-sample candidate, prefer:
 powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1 -Manifest evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json -NamePrefix gold_sample_replay_real
 ```
 
+For the core four gold-sample screenshots, you can now also run:
+
+```powershell
+node scripts\capture_gold_sample_screenshots.js
+```
+
 ## Step 2: Refresh Reports
 
 - [ ] Export latest log summary:
@@ -40,6 +46,13 @@ Capture at least these:
 - [ ] Frontend refused result for `木星有几颗卫星？`
 - [ ] Frontend stats panel
 - [ ] Backend API docs page
+
+Latest automated gold-sample capture on `2026-04-18` produced:
+
+- `20260418_gold_ask_research_focus.png`
+- `20260418_gold_pdf_render.png`
+- `20260418_gold_ask_rank_accuracy.png`
+- `20260418_gold_refusal.png`
 
 Recommended naming:
 

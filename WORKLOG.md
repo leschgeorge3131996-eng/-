@@ -89,6 +89,8 @@
 - Gold-sample real replay report is available at `evidence/reports/gold_sample_replay_real_latest.md`
 - Gold-sample real replay summary is available at `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - Gold-sample runbook is available at `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
+- Gold-sample screenshot automation script is available at `scripts/capture_gold_sample_screenshots.js`
+- Gold-sample screenshots are refreshed under `evidence/screenshots/`
 
 ## Current Runtime Configuration
 
@@ -114,6 +116,10 @@ Notes:
 - Real sample replay report exists
 - Gold-sample real replay report exists
 - Gold-sample QA comparison report exists
+- Gold-sample ask/citation screenshot exists
+- Gold-sample PDF render screenshot exists
+- Gold-sample second-answerable screenshot exists
+- Gold-sample refusal screenshot exists
 - One-page project summary exists
 - Demo script exists
 - Sample set exists
@@ -149,6 +155,7 @@ Notes:
 - Startup scripts:
   - `scripts/bootstrap.ps1`
   - `scripts/dev.ps1`
+  - `scripts/capture_gold_sample_screenshots.js`
 
 ## How To Start
 
@@ -193,12 +200,8 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Refresh screenshots around the locked gold-sample candidate:
-   - ask with citations
-   - PDF evidence render
-   - second answerable ask
-   - refusal
-2. Use the locked candidate set and its reports as the factual source for PPT / video / poster
+1. Use the locked candidate set plus refreshed screenshots/compare/replay reports as the factual source for PPT / video / poster
+2. Optionally capture stats-panel and backend API-docs screenshots if the submission format needs them
 3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 

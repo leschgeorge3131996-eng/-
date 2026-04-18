@@ -143,6 +143,26 @@
   - `evidence/materials/MATERIALS_INDEX.md`
 - Broader sample-set replay is still available, but should now be treated as secondary coverage rather than the default judging/demo evidence path
 
+## Screenshot Refresh (`2026-04-18`)
+
+- Automated screenshot script added:
+  - `scripts/capture_gold_sample_screenshots.js`
+- The script uses:
+  - current local `.env`
+  - real session/login boundary
+  - locked gold-sample PDF upload
+  - the locked `2 answerable + 1 refusal` prompt path
+- Refreshed screenshot outputs:
+  - `evidence/screenshots/20260418_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260418_gold_pdf_render.png`
+  - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260418_gold_refusal.png`
+- Practical meaning:
+  - the core screenshot-evidence gap for the locked gold-sample path is now closed
+  - remaining optional screenshot work is mostly:
+    - stats panel
+    - backend API docs
+
 ## Current Meaning
 
 - Wuwen Xinqiong integration itself is no longer the blocker
@@ -152,13 +172,11 @@
 - The current `MODEL_QA` decision can remain on `qwen3-235b-a22b-instruct-2507` without blocking `G2`
 - The replay/evidence tooling is now aligned with the current session/access-token runtime posture
 - The repo docs/materials are now aligned around that locked gold-sample path instead of the older broader replay path
+- The locked gold-sample screenshot set is now refreshed under the current real runtime
 
 ## Recommended Next Step
 
-1. Refresh real-only evidence around the locked candidate set:
-   - answerable ask screenshot with citations
-   - cited PDF render screenshot
-   - refusal screenshot
-2. Turn the locked candidate set and its compare/replay reports into PPT/video/poster source material
+1. Turn the locked candidate set plus refreshed screenshots/compare/replay reports into PPT/video/poster source material
+2. Optionally capture stats-panel and backend API-docs screenshots if the submission pack needs them
 3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
