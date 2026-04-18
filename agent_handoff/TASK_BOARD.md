@@ -3,15 +3,25 @@
 ## Now
 
 - No hard engineering blocker is currently open
-- If preparing for judging/demo, prioritize presentation-path polish rather than feature work
+- Real Wuwen Xinqiong minimal-path validation is now done in-project
+- If preparing for judging/demo, prioritize gold-sample stability and evidence refresh rather than feature work
 
 ## Next Best Tasks
 
-1. ~~Demo-mode invite-code bypass~~ **DONE 2026-04-17** — `DEMO_MODE=true` env switch auto-creates sessions; invite form hidden in demo builds
-2. ~~Soften stats panel for demo~~ **DONE 2026-04-17** — collapsed by default, single-line summary
-3. ~~Add CSRF / origin validation for cookie-backed state-changing routes~~ **DONE 2026-04-17** — `OriginValidationMiddleware` rejects unsafe-method API requests whose Origin/Referer isn't in `CORS_ORIGINS`; missing-both passes (server-to-server)
+1. Lock one gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts under current Wuwen Xinqiong runtime
+2. Compare `MODEL_QA=qwen3-235b-a22b-instruct-2507` vs `qwen3-32b` on the gold-sample ask/refusal path, then decide the default
+3. Refresh the real-only evidence pack:
+   - ask result with citations
+   - PDF evidence preview/render
+   - refusal screenshot
+   - replay summary
 4. Add expired-session cleanup script
 5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
+
+## Recently Verified
+
+- `2026-04-18`: `evidence/samples/chinese_llm_spatial_eval.pdf` completed the real path `upload -> ask -> citation -> PDF render` with `qwen3-235b-a22b-instruct-2507`
+- `2026-04-18`: true off-topic ask (`木星有几颗卫星？`) refused correctly with `retrieval_no_match`
 
 ## Useful But Not Urgent
 
@@ -33,3 +43,4 @@
   - evidence-backed document QA for paper/report reading and defense prep
 - The weakest narrative remains:
   - generic document platform / open trial SaaS framing
+- Refusal demos must use prompts that are purely off-topic; prompts that still mention in-document entities can retrieve and answer

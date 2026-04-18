@@ -11,13 +11,32 @@
   - controlled alpha
   - not public open SaaS
 
+## 2026-04-18 Runtime Update
+
+- Current active provider/runtime is now `Wuwen Xinqiong`
+- Current default interface:
+  - `https://cloud.infini-ai.com/maas/v1/chat/completions`
+- Current primary/fallback decision under evaluation:
+  - primary: `qwen3-235b-a22b-instruct-2507`
+  - fallback candidate: `qwen3-32b`
+- Real in-project minimal path now verified on:
+  - `evidence/samples/chinese_llm_spatial_eval.pdf`
+- Verified path:
+  - `login -> upload -> ask -> citation -> PDF page -> PDF render`
+- Current caution:
+  - refusal demos should use a purely off-topic question; prompts that still mention document entities may retrieve and answer
+
 ## Current Verified State
 
-As of `2026-04-16`:
+As of `2026-04-18`:
 
-- backend tests: `44 passed`
+- backend tests: `54 passed`
 - frontend smoke tests: `7 passed`
 - frontend build: passed
+- real provider (`Wuwen Xinqiong`) minimal path:
+  - answerable `ask`: passed with citations
+  - cited PDF page fetch/render: passed
+  - true off-topic refusal: passed
 
 Main verification commands:
 
@@ -156,6 +175,10 @@ Key responsibilities:
 - `api.ts`: cookie-backed requests and document-token URL building
 - `ResultPanel.tsx`: output rendering, evidence/source display, export behavior
 - `PdfPreviewPanel.tsx`: iframe PDF preview plus page text matching feedback
+
+Main demo path should now be treated as:
+
+- `ask -> citation -> PDF render -> refusal`
 
 ## Environment And Runtime Notes
 

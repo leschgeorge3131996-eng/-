@@ -186,10 +186,10 @@ class ModelClient:
                   "answer": "你的最终回答",
                   "used_chunk_ids": ["实际使用的 chunk_id"],
                   "evidence_quotes": [
-                    {
+                    {{
                       "chunk_id": "实际使用的 chunk_id",
                       "quote": "可选：直接摘录的证据短句"
-                    }
+                    }}
                   ]
                 }}
                 """

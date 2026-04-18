@@ -410,3 +410,48 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 ### 下一轮建议
 - 跑 dev server，重新上传用户截图那个 PDF，再问一次同样的问题，看高亮是否缩到一两句
 - 如果"没高亮"的 citation 比例偏高，放开 fallback：snippet 匹配失败时保留原 chunk block bbox
+
+---
+
+## 2026-04-18 — Wuwen Xinqiong real minimal path validated
+
+### 背景
+当前优化主线已经切到比赛/评审准备，主链路目标是 `ask -> citation -> PDF -> refusal`。本轮继续按照 `agent_handoff/COMPETITION_PLAN_V2.md` 和 `agent_handoff/CURRENT_STATUS_20260418.md` 推进，验证当前新的 `.env` 是否已经能在项目内真正跑通无问芯穹闭环。
+
+### 关键发现
+- 当前活动 `.env` 确实是新的 `Wuwen Xinqiong` 配置；旧 replay 报告里出现的旧 provider 只能当历史记录，不代表当前运行态。
+- 最初一次“中文问题检索不到”的现象不是产品 bug，而是 PowerShell 把 inline Python 的中文字面量转成了 `?`，导致调试脚本自己把 query 发坏了。
+- 在允许真实出网后，项目内最小闭环已经跑通。
+
+### 本轮验证
+- 样例文档：`evidence/samples/chinese_llm_spatial_eval.pdf`
+- 路径：`login -> upload -> ask -> citation -> GET cited page -> GET cited page render`
+- 结果：
+  - `ask` 成功
+  - 模型：`qwen3-235b-a22b-instruct-2507`
+  - 检索状态：`matched`
+  - 引用数：`2`
+  - 典型延迟：约 `6686 ms`
+  - cited page 接口：通过
+  - cited render 接口：通过，返回 `image/png`
+- 同一问题随后命中缓存，`cache_hit=true`，说明当前缓存键路径也正常工作。
+
+### 观察到的引用情况
+- `used_chunk_ids` 命中了第 `2`、`3` 页相关 chunk
+- `evidence_quotes` 抽到了“本研究拟探究以下问题……”与 “本研究基于第四届中文空间语义理解评测任务（SpaCE2024）……” 两段
+- bbox/page 回链正常，可继续作为主演示链的一部分
+
+### 拒答观察
+- 半相关问题（带有文档内实体，例如“作者”）可能会命中检索并得到回答，所以不适合作为最终 refusal demo prompt
+- 真正纯离题的问题 `木星有几颗卫星？` 被正确拒答：
+  - `outcome=refused`
+  - `retrieval_status=no_match`
+  - 延迟约 `38 ms`
+
+### 当前结论
+- 无问芯穹接入本身不再是 blocker
+- 项目已经从“接通 provider”进入“锁 gold sample + 比较 QA 模型 + 刷新真实证据”的阶段
+- 当前最需要的是：
+  - 锁 `2 answerable + 1 refusal` 候选问题
+  - 用同一路径比较 `qwen3-235b-a22b-instruct-2507` 与 `qwen3-32b`
+  - 刷新真实截图和 replay/evidence
