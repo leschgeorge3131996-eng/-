@@ -80,6 +80,8 @@ As of `2026-04-18`:
 - asset-bundle export now includes:
   - `deliverables/competition_kit/*`
   - `scripts/export_competition_pdfs.js`
+- video subtitle baseline:
+  - `deliverables/competition_kit/video_subtitles.srt`
 
 Main verification commands:
 

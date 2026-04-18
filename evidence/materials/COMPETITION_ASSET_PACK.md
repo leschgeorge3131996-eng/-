@@ -50,6 +50,8 @@ Do not rebuild the story from scratch each time. Reuse this pack.
 - Current printable PDF baselines:
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
+- Video subtitle baseline:
+  - `deliverables/competition_kit/video_subtitles.srt`
 - One-click export script:
   - `scripts/export_competition_asset_pack.ps1`
 - PDF export script:
@@ -197,6 +199,7 @@ Recommended blocks:
 - [ ] `deliverables/competition_kit/poster.html`
 - [ ] `deliverables/competition_kit/deck.pdf`
 - [ ] `deliverables/competition_kit/poster.pdf`
+- [ ] `deliverables/competition_kit/video_subtitles.srt`
 - [ ] `gold_sample_qa_compare_latest.md`
 - [ ] `gold_sample_replay_real_summary_latest.md`
 - [ ] `20260418_gold_ask_research_focus.png`

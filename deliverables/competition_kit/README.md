@@ -14,6 +14,8 @@ production.
   - poster draft that can be printed to PDF or used as a layout reference
 - `poster.pdf`
   - current repo-generated PDF export from `poster.html`
+- `video_subtitles.srt`
+  - timed subtitles / narration baseline for the 2-minute demo video
 - `styles.css`
   - shared visual system for both files
 

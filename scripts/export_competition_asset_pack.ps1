@@ -63,6 +63,7 @@ $requiredFiles = @(
     "deliverables\competition_kit\styles.css",
     "deliverables\competition_kit\deck.pdf",
     "deliverables\competition_kit\poster.pdf",
+    "deliverables\competition_kit\video_subtitles.srt",
     "scripts\export_competition_asset_pack.ps1",
     "scripts\export_competition_pdfs.js"
 )

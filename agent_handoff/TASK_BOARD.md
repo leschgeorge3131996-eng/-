@@ -11,6 +11,7 @@
 - Repo-native deck / poster PDF export script now exists
 - Current deck/poster PDF baselines now exist in-repo
 - Asset-pack export now includes the deliverables folder and PDF export script
+- Timed video subtitle baseline now exists in-repo
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -38,6 +39,7 @@
 - `2026-04-19`: `scripts/export_competition_pdfs.js` can now export deck/poster PDFs directly from the HTML prototypes
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were exported successfully
 - `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now includes the deliverables folder and PDF export script
+- `2026-04-19`: `deliverables/competition_kit/video_subtitles.srt` was added as the 2-minute demo subtitle baseline
 
 ## Useful But Not Urgent
 

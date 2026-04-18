@@ -875,3 +875,30 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - full bundle should still be regenerated once after any future visual polish
 - Recommended next step:
   - run the upgraded asset-pack export once and use that directory as the canonical handoff bundle
+
+---
+
+## 2026-04-19 / Codex (video subtitle baseline added)
+
+- Summary:
+  - Added `deliverables/competition_kit/video_subtitles.srt` as a timed subtitle / narration baseline for the 2-minute demo video
+  - Updated the asset bundle so this file ships with the rest of the competition deliverables
+- Files touched:
+  - `deliverables/competition_kit/video_subtitles.srt`
+  - `deliverables/competition_kit/README.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - subtitle timing matches the current `VIDEO_SHOTLIST_2MIN.md` section boundaries
+  - export bundle required-file list now includes `deliverables/competition_kit/video_subtitles.srt`
+- Open risks:
+  - final recorded video still needs actual editing/rendering outside repo
+- Recommended next step:
+  - keep the current subtitle file as the canonical baseline and adjust only if the final cut changes shot timing
