@@ -1,0 +1,195 @@
+{
+  "manifest": {
+    "id": "gold_sample_candidate_20260418",
+    "document_path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+    "scenario": "中文学术论文 PDF / Gold Sample Candidate",
+    "response_detail_level": "balanced",
+    "prompts": [
+      {
+        "id": "answerable_research_focus",
+        "kind": "answerable",
+        "text": "这篇论文主要研究了什么问题？"
+      },
+      {
+        "id": "answerable_rank_accuracy",
+        "kind": "answerable",
+        "text": "作者最终的方法排名和总体准确率分别是多少？"
+      },
+      {
+        "id": "refusal_jupiter_moons",
+        "kind": "refusal",
+        "text": "木星有几颗卫星？"
+      }
+    ]
+  },
+  "summaries": [
+    {
+      "model_name": "qwen3-235b-a22b-instruct-2507",
+      "total_prompts": 3,
+      "passed_prompts": 3,
+      "answerable_passed": 2,
+      "answerable_total": 2,
+      "refusal_passed": 1,
+      "refusal_total": 1,
+      "average_latency_ms": 4896,
+      "max_latency_ms": 8352,
+      "all_passed": true
+    },
+    {
+      "model_name": "qwen3-32b",
+      "total_prompts": 3,
+      "passed_prompts": 3,
+      "answerable_passed": 2,
+      "answerable_total": 2,
+      "refusal_passed": 1,
+      "refusal_total": 1,
+      "average_latency_ms": 4396,
+      "max_latency_ms": 7549,
+      "all_passed": true
+    }
+  ],
+  "records": [
+    {
+      "model_name": "qwen3-235b-a22b-instruct-2507",
+      "prompt_id": "answerable_research_focus",
+      "prompt_kind": "answerable",
+      "prompt_text": "这篇论文主要研究了什么问题？",
+      "success": true,
+      "passed": true,
+      "outcome": "answered",
+      "latency_ms": 8352,
+      "route_tier": "task_specific",
+      "route_reason": "configured_ask_model",
+      "cache_hit": false,
+      "retrieval_status": "matched",
+      "citation_count": 2,
+      "cited_pages": [
+        2,
+        3
+      ],
+      "page_fetch_ok": true,
+      "render_ok": true,
+      "evidence_quote_count": 2,
+      "token_total": 2481,
+      "answer_preview": "这篇论文主要研究了大语言模型对空间语义的理解程度及其在具体任务中的优劣，基于第四届中文空间语义理解评测任务（SpaCE2024），通过实验分析不同模型的空间语义理解能力，并探讨其能力边界。",
+      "error": null
+    },
+    {
+      "model_name": "qwen3-235b-a22b-instruct-2507",
+      "prompt_id": "answerable_rank_accuracy",
+      "prompt_kind": "answerable",
+      "prompt_text": "作者最终的方法排名和总体准确率分别是多少？",
+      "success": true,
+      "passed": true,
+      "outcome": "answered",
+      "latency_ms": 6329,
+      "route_tier": "task_specific",
+      "route_reason": "configured_ask_model",
+      "cache_hit": false,
+      "retrieval_status": "matched",
+      "citation_count": 2,
+      "cited_pages": [
+        1,
+        6
+      ],
+      "page_fetch_ok": true,
+      "render_ok": true,
+      "evidence_quote_count": 2,
+      "token_total": 1963,
+      "answer_preview": "作者最终的方法排名第六，总体准确率为56.20%。",
+      "error": null
+    },
+    {
+      "model_name": "qwen3-235b-a22b-instruct-2507",
+      "prompt_id": "refusal_jupiter_moons",
+      "prompt_kind": "refusal",
+      "prompt_text": "木星有几颗卫星？",
+      "success": true,
+      "passed": true,
+      "outcome": "refused",
+      "latency_ms": 8,
+      "route_tier": "none",
+      "route_reason": "retrieval_no_match",
+      "cache_hit": false,
+      "retrieval_status": "no_match",
+      "citation_count": 0,
+      "cited_pages": [],
+      "page_fetch_ok": null,
+      "render_ok": null,
+      "evidence_quote_count": 0,
+      "token_total": null,
+      "answer_preview": "未在文档中检索到足够依据来回答这个问题。请换一个更贴近文档内容的问题，或上传更相关的文档。",
+      "error": null
+    },
+    {
+      "model_name": "qwen3-32b",
+      "prompt_id": "answerable_research_focus",
+      "prompt_kind": "answerable",
+      "prompt_text": "这篇论文主要研究了什么问题？",
+      "success": true,
+      "passed": true,
+      "outcome": "answered",
+      "latency_ms": 7549,
+      "route_tier": "task_specific",
+      "route_reason": "configured_ask_model",
+      "cache_hit": false,
+      "retrieval_status": "matched",
+      "citation_count": 1,
+      "cited_pages": [
+        2
+      ],
+      "page_fetch_ok": true,
+      "render_ok": true,
+      "evidence_quote_count": 1,
+      "token_total": 2351,
+      "answer_preview": "这篇论文主要研究了大语言模型在空间语义理解方面的能力，具体包括其对空间语义的理解程度以及在理解空间语义的具体任务上的优劣。",
+      "error": null
+    },
+    {
+      "model_name": "qwen3-32b",
+      "prompt_id": "answerable_rank_accuracy",
+      "prompt_kind": "answerable",
+      "prompt_text": "作者最终的方法排名和总体准确率分别是多少？",
+      "success": true,
+      "passed": true,
+      "outcome": "answered",
+      "latency_ms": 5631,
+      "route_tier": "task_specific",
+      "route_reason": "configured_ask_model",
+      "cache_hit": false,
+      "retrieval_status": "matched",
+      "citation_count": 1,
+      "cited_pages": [
+        1
+      ],
+      "page_fetch_ok": true,
+      "render_ok": true,
+      "evidence_quote_count": 1,
+      "token_total": 1880,
+      "answer_preview": "作者最终的方法排名第六，总体准确率为56.20%。",
+      "error": null
+    },
+    {
+      "model_name": "qwen3-32b",
+      "prompt_id": "refusal_jupiter_moons",
+      "prompt_kind": "refusal",
+      "prompt_text": "木星有几颗卫星？",
+      "success": true,
+      "passed": true,
+      "outcome": "refused",
+      "latency_ms": 8,
+      "route_tier": "none",
+      "route_reason": "retrieval_no_match",
+      "cache_hit": false,
+      "retrieval_status": "no_match",
+      "citation_count": 0,
+      "cited_pages": [],
+      "page_fetch_ok": null,
+      "render_ok": null,
+      "evidence_quote_count": 0,
+      "token_total": null,
+      "answer_preview": "未在文档中检索到足够依据来回答这个问题。请换一个更贴近文档内容的问题，或上传更相关的文档。",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "gold_sample_candidate_20260418",
+  "document_path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+  "scenario": "中文学术论文 PDF / Gold Sample Candidate",
+  "response_detail_level": "balanced",
+  "prompts": [
+    {
+      "id": "answerable_research_focus",
+      "kind": "answerable",
+      "text": "这篇论文主要研究了什么问题？"
+    },
+    {
+      "id": "answerable_rank_accuracy",
+      "kind": "answerable",
+      "text": "作者最终的方法排名和总体准确率分别是多少？"
+    },
+    {
+      "id": "refusal_jupiter_moons",
+      "kind": "refusal",
+      "text": "木星有几颗卫星？"
+    }
+  ]
+}

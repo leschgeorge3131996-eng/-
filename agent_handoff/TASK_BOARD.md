@@ -4,24 +4,26 @@
 
 - No hard engineering blocker is currently open
 - Real Wuwen Xinqiong minimal-path validation is now done in-project
-- If preparing for judging/demo, prioritize gold-sample stability and evidence refresh rather than feature work
+- A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked
+- If preparing for judging/demo, prioritize evidence refresh and material production rather than feature work
 
 ## Next Best Tasks
 
-1. Lock one gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts under current Wuwen Xinqiong runtime
-2. Compare `MODEL_QA=qwen3-235b-a22b-instruct-2507` vs `qwen3-32b` on the gold-sample ask/refusal path, then decide the default
-3. Refresh the real-only evidence pack:
+1. Refresh the real-only evidence pack around the locked gold-sample candidate:
    - ask result with citations
    - PDF evidence preview/render
    - refusal screenshot
-   - replay summary
-4. Add expired-session cleanup script
-5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
+   - candidate-set comparison report
+2. Decide whether the existing replay/sample-report workflow should be updated to use the new session/access-token boundary and the locked candidate set
+3. Add expired-session cleanup script
+4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 
 ## Recently Verified
 
 - `2026-04-18`: `evidence/samples/chinese_llm_spatial_eval.pdf` completed the real path `upload -> ask -> citation -> PDF render` with `qwen3-235b-a22b-instruct-2507`
 - `2026-04-18`: true off-topic ask (`木星有几颗卫星？`) refused correctly with `retrieval_no_match`
+- `2026-04-18`: locked gold-sample candidate set in `evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
+- `2026-04-18`: `qwen3-235b-a22b-instruct-2507` and `qwen3-32b` both passed the candidate set; primary remains `qwen3-235b-a22b-instruct-2507`
 
 ## Useful But Not Urgent
 
@@ -44,3 +46,6 @@
 - The weakest narrative remains:
   - generic document platform / open trial SaaS framing
 - Refusal demos must use prompts that are purely off-topic; prompts that still mention in-document entities can retrieve and answer
+- Current QA recommendation:
+  - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
+  - keep `qwen3-32b` as validated fallback if demo/runtime latency becomes tighter

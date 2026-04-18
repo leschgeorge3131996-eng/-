@@ -455,3 +455,59 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - 锁 `2 answerable + 1 refusal` 候选问题
   - 用同一路径比较 `qwen3-235b-a22b-instruct-2507` 与 `qwen3-32b`
   - 刷新真实截图和 replay/evidence
+
+---
+
+## 2026-04-18 — Gold-sample candidate locked and QA models compared
+
+### 背景
+上一轮已经确认当前新的 `.env` 下，`Wuwen Xinqiong` 项目内最小闭环是通的。本轮继续沿着 `COMPETITION_PLAN_V2` 推进，把“候选 gold sample + 题集 + QA 模型决策”固化下来，而不是再做泛化功能。
+
+### 新增资产
+- 候选题集清单：
+  - `evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
+- 可复跑比较脚本：
+  - `scripts/compare_qa_models.py`
+- 最新对比报告：
+  - `evidence/reports/gold_sample_qa_compare_latest.md`
+  - `evidence/reports/gold_sample_qa_compare_latest.json`
+
+### 锁定的 gold-sample candidate
+- 文档：
+  - `evidence/samples/chinese_llm_spatial_eval.pdf`
+- 候选问题：
+  - answerable 1：`这篇论文主要研究了什么问题？`
+  - answerable 2：`作者最终的方法排名和总体准确率分别是多少？`
+  - refusal：`木星有几颗卫星？`
+
+### 对比方式
+- 使用当前真实 `Wuwen Xinqiong` 运行时
+- 不走旧 replay 脚本，而是按当前 session/cookie/document token 边界直接通过服务层跑真实 `ask`
+- 每个模型都验证：
+  - ask 是否成功
+  - citations 是否返回
+  - cited page 是否能读取
+  - cited page render 是否能返回 PNG
+  - refusal 是否真正 `refused`
+
+### 对比结果
+- `qwen3-235b-a22b-instruct-2507`
+  - `3 / 3` 通过
+  - 平均延迟约 `4896 ms`
+  - 两个 answerable 都返回了更丰富的 citations / evidence quotes
+- `qwen3-32b`
+  - `3 / 3` 通过
+  - 平均延迟约 `4396 ms`
+  - 也能通过全部候选题，但通常返回更少的 citations / evidence quotes
+
+### 当前决策
+- 保持 `qwen3-235b-a22b-instruct-2507` 作为当前默认 `MODEL_QA`
+- 原因不是“绝对更快”，而是：
+  - 当前差距只有约 `500 ms`
+  - 但 `235b` 在 broad ask 上给出的 grounding 更丰满
+  - 比赛/demo 叙事里，“证据感更强”比这点延迟更值钱
+- `qwen3-32b` 已经完成同题集验证，可作为后续延迟受限时的 fallback
+
+### 后续建议
+- 现在更值得做的是刷新真实证据与截图，而不是继续横向加功能
+- 如果后面部署环境出现更紧的延迟压力，再用同一个脚本重跑一次，确认是否要把默认 QA 切到 `qwen3-32b`

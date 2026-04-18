@@ -72,22 +72,55 @@
   - one earlier local false negative came from PowerShell -> inline Python encoding turning Chinese prompt literals into `?`
   - that was a validation harness issue, not a project retrieval bug
 
+## Gold Sample Candidate Lock (`2026-04-18`)
+
+- Candidate PDF:
+  - `evidence/samples/chinese_llm_spatial_eval.pdf`
+- Candidate prompt set:
+  - answerable 1: `这篇论文主要研究了什么问题？`
+  - answerable 2: `作者最终的方法排名和总体准确率分别是多少？`
+  - refusal: `木星有几颗卫星？`
+- Candidate manifest saved at:
+  - `evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
+
+## QA Model Comparison (`2026-04-18`)
+
+- Reusable comparison script added:
+  - `scripts/compare_qa_models.py`
+- Latest report outputs:
+  - `evidence/reports/gold_sample_qa_compare_latest.md`
+  - `evidence/reports/gold_sample_qa_compare_latest.json`
+- Compared models:
+  - `qwen3-235b-a22b-instruct-2507`
+  - `qwen3-32b`
+- Result:
+  - both models passed `2 answerable + 1 refusal`
+  - both answerable prompts returned citations and passed page/render validation
+  - both models refused the off-topic prompt correctly
+- Latency summary:
+  - `qwen3-235b-a22b-instruct-2507`: average about `4896 ms`
+  - `qwen3-32b`: average about `4396 ms`
+- Quality/citation observation:
+  - `qwen3-235b-a22b-instruct-2507` returned slightly richer grounding on the broader research-focus question
+  - `qwen3-32b` was slightly faster, but typically returned fewer citations/evidence quotes
+- Current decision:
+  - keep `qwen3-235b-a22b-instruct-2507` as the primary `MODEL_QA`
+  - keep `qwen3-32b` as the validated fallback option
+
 ## Current Meaning
 
 - Wuwen Xinqiong integration itself is no longer the blocker
 - The project has moved from “external API validation” to “real in-project flow validation”
 - The main demo chain `ask -> citation -> PDF` has now been verified in-project under the current Wuwen Xinqiong `.env`
+- A Chinese gold-sample candidate and candidate question set are now locked for the current stage
+- The current `MODEL_QA` decision can remain on `qwen3-235b-a22b-instruct-2507` without blocking `G2`
 
 ## Recommended Next Step
 
-1. Lock one gold-sample candidate PDF and final candidate prompts:
-   - `2 answerable`
-   - `1 refusal` that is truly off-topic
-2. Run the same ask/refusal path again with `MODEL_QA=qwen3-32b`
-3. Compare:
-   - answer quality
-   - citation stability
-   - refusal precision
-   - latency
-4. Then decide whether `MODEL_QA` should stay on `qwen3-235b-a22b-instruct-2507` or fall back to `qwen3-32b`
-5. Refresh real-only evidence outputs and screenshots after the gold sample is locked
+1. Refresh real-only evidence around the locked candidate set:
+   - answerable ask screenshot with citations
+   - cited PDF render screenshot
+   - refusal screenshot
+2. Decide whether to regenerate replay/evidence artifacts using the locked candidate set instead of the older broad sample set
+3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
+4. Start turning the locked candidate set into paper/PPT/video/poster source material after screenshot evidence is refreshed

@@ -25,6 +25,17 @@
   - `login -> upload -> ask -> citation -> PDF page -> PDF render`
 - Current caution:
   - refusal demos should use a purely off-topic question; prompts that still mention document entities may retrieve and answer
+- Current gold-sample candidate:
+  - document: `evidence/samples/chinese_llm_spatial_eval.pdf`
+  - prompts:
+    - `这篇论文主要研究了什么问题？`
+    - `作者最终的方法排名和总体准确率分别是多少？`
+    - `木星有几颗卫星？`
+- Current QA comparison artifact:
+  - `evidence/reports/gold_sample_qa_compare_latest.md`
+- Current QA decision:
+  - keep `qwen3-235b-a22b-instruct-2507` as primary
+  - keep `qwen3-32b` as validated fallback
 
 ## Current Verified State
 
@@ -37,6 +48,9 @@ As of `2026-04-18`:
   - answerable `ask`: passed with citations
   - cited PDF page fetch/render: passed
   - true off-topic refusal: passed
+- gold-sample candidate QA comparison:
+  - `qwen3-235b-a22b-instruct-2507`: `3/3` passed
+  - `qwen3-32b`: `3/3` passed
 
 Main verification commands:
 
