@@ -126,18 +126,26 @@ function getEvidenceSectionTitle(result: TaskResult, evidenceMode: EvidenceMode)
   return "证据状态";
 }
 
+function isRetrievalGateResult(result: TaskResult): boolean {
+  return result.route_reason === "retrieval_no_match" || result.model_name === "retrieval_gate";
+}
+
 function buildExportLines(
   result: TaskResult,
   evidenceMode: EvidenceMode,
   evidenceItems: Citation[]
 ): string[] {
   const retrievedPages = result.retrieved_pages ?? [];
+  const isRetrievalGate = isRetrievalGateResult(result);
+  const modelExportLine = isRetrievalGate
+    ? "- 执行路径：retrieval_gate（未调用模型）"
+    : `- 模型：${result.model_name}`;
   const lines: string[] = [
     `# ${TASK_LABELS[result.task_type]}结果`,
     "",
     `- 文档：${result.document_name}`,
-    `- 请求 ID：${result.request_id}`,
-    `- 模型：${result.model_name}`,
+    ...(isRetrievalGate ? [] : [`- 请求 ID：${result.request_id}`]),
+    modelExportLine,
     `- 路由：${result.route_tier ?? "default"}`,
     result.route_reason ? `- 路由原因：${result.route_reason}` : null,
     result.response_detail_level
@@ -201,6 +209,11 @@ export default function ResultPanel({
   const evidenceItems = result ? getEvidenceItems(result, evidenceMode) : [];
   const evidenceSummary = result ? getEvidenceSummary(result, evidenceMode) : null;
   const retrievedPages = result?.retrieved_pages ?? [];
+  const isRetrievalGate = result ? isRetrievalGateResult(result) : false;
+  const modelMetaLabel = isRetrievalGate ? "执行路径" : "模型";
+  const modelMetaValue = isRetrievalGate
+    ? "retrieval_gate（未调用模型）"
+    : (result?.model_name ?? "-");
 
   useEffect(() => {
     setCopyState("idle");
@@ -421,14 +434,20 @@ export default function ResultPanel({
                 </span>
               ) : null}
               {result.task_type === "ask" ? (
-                <span className="badge badge-evidence">{EVIDENCE_MODE_LABELS[evidenceMode]}</span>
+                <span
+                  className="badge badge-evidence"
+                  data-testid={`evidence-mode-${evidenceMode}`}
+                  data-evidence-mode={evidenceMode}
+                >
+                  {EVIDENCE_MODE_LABELS[evidenceMode]}
+                </span>
               ) : null}
             </motion.div>
 
             <motion.div className="result-meta-grid" {...revealMotion(0.12)}>
               <div className="result-meta-card">
-                <span>模型</span>
-                <strong>{result.model_name}</strong>
+                <span>{modelMetaLabel}</span>
+                <strong>{modelMetaValue}</strong>
               </div>
               {result.route_reason ? (
                 <div className="result-meta-card">
@@ -440,15 +459,19 @@ export default function ResultPanel({
                 <span>耗时</span>
                 <strong>{result.latency_ms} ms</strong>
               </div>
-              <div className="result-meta-card">
-                <span>请求 ID</span>
-                <strong>{result.request_id}</strong>
-              </div>
+              {!isRetrievalGate ? (
+                <div className="result-meta-card">
+                  <span>请求 ID</span>
+                  <strong>{result.request_id}</strong>
+                </div>
+              ) : null}
             </motion.div>
 
             {evidenceSummary ? (
               <motion.div
                 className={`evidence-mode-card evidence-mode-${evidenceSummary.tone}`}
+                data-testid={`evidence-mode-card-${evidenceSummary.tone}`}
+                data-evidence-mode={evidenceSummary.tone}
                 {...revealMotion(0.2)}
               >
                 <strong>{evidenceSummary.title}</strong>

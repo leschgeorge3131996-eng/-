@@ -13,12 +13,15 @@
 - Asset-pack export now includes the deliverables folder and PDF export script
 - Timed video subtitle baseline now exists in-repo
 - External AI review bundle and review prompt now exist locally
+- Review-driven hardening for evidence/screenshot consistency is now landed in code and materials
+- Latest gold-sample screenshot pack is now refreshed as `20260419_*` with metadata sidecars
+- Latest export bundle now auto-picks the newest screenshot prefix
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
-1. Run `scripts/export_competition_asset_pack.ps1` and use the exported full bundle for any last-mile polish or external handoff
-2. Use `scripts/export_competition_asset_pack.ps1` whenever a clean handoff bundle is needed for PPT/video/poster production
+1. Run a formal `G3` rehearsal with a second operator and record `3` consecutive timed runs plus fallback handling
+2. Use `evidence/exports/competition_asset_pack_20260419_012336/` as the current handoff bundle for PPT/video/poster polishing
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 
@@ -42,6 +45,14 @@
 - `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now includes the deliverables folder and PDF export script
 - `2026-04-19`: `deliverables/competition_kit/video_subtitles.srt` was added as the 2-minute demo subtitle baseline
 - `2026-04-19`: external AI review bundle prepared at `review_bundle_stage_20260419_003447/` and zipped as `review_bundle_20260419_003447_competition_ai_review.zip`
+- `2026-04-19`: review-driven hardening landed for:
+  - preview quote/snippet alignment
+  - retrieval-gate refusal semantics
+  - stricter screenshot capture (`declared` required for answerable cases)
+  - appendix-only handling for stats/api-doc assets
+- `2026-04-19`: refreshed screenshot set created as `20260419_*`, with `.json` sidecars for ask/refusal screenshots
+- `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot prefix and includes the screenshot sidecars
+- `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were regenerated against the refreshed screenshots
 
 ## Useful But Not Urgent
 

@@ -171,6 +171,8 @@ class ModelClient:
             system_prompt = (
                 "你是文档问答助手。只能依据给定文档回答，回答要准确、结构清晰。"
                 "你必须只从给定的 Chunk 中选取你实际使用的证据块，并严格返回 JSON。"
+                "Return at least one evidence_quotes item. Each quote must be copied verbatim "
+                "from the corresponding chunk as one contiguous span."
                 f"{detail_instruction}"
             )
             user_prompt = textwrap.dedent(
@@ -188,7 +190,7 @@ class ModelClient:
                   "evidence_quotes": [
                     {{
                       "chunk_id": "实际使用的 chunk_id",
-                      "quote": "可选：直接摘录的证据短句"
+                      "quote": "required: copy one contiguous evidence span verbatim from the chunk"
                     }}
                   ]
                 }}

@@ -247,9 +247,13 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Start from the bundle exported by `scripts/export_competition_asset_pack.ps1`; it now includes the current HTML/PDF deliverables and the PDF re-export script
-2. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
-3. Keep the broader sample-set replay in a clearly secondary role
+1. Start from `evidence/exports/competition_asset_pack_20260419_012336/`; it includes the refreshed `20260419_*` screenshots, sidecar metadata, and current PDF deliverables
+2. Close `G3` next:
+   - second operator
+   - `3` consecutive timed runs
+   - explicit fallback notes
+3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
+4. Keep the broader sample-set replay in a clearly secondary role
 
 ### Highest value for broader external testing
 

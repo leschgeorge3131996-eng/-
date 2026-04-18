@@ -26,6 +26,13 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function buildCacheBustingPrompt(prompt, attempt) {
+  if (attempt <= 1) {
+    return prompt;
+  }
+  return `${prompt}${"\u200b".repeat(attempt - 1)}`;
+}
+
 function timestampDate() {
   const override = process.env.SCREENSHOT_DATE_OVERRIDE?.trim();
   if (override && /^\d{8}$/.test(override)) {
@@ -513,19 +520,21 @@ async function waitForOutputChange(cdp, previousText, { requirePdfButton = null,
       cdp,
       `(() => {
         const output = document.querySelector('[data-testid="result-output"]');
+        const panel = document.querySelector('[data-testid="result-panel"]');
         const submit = document.querySelector('[data-testid="submit-task-button"]');
         const pdfButtons = document.querySelectorAll('[data-testid^="open-pdf-"]').length;
         return {
           outputText: output ? output.innerText.trim() : '',
+          panelText: panel ? panel.innerText.trim() : '',
           submitText: submit ? submit.innerText.trim() : '',
           pdfButtons
         };
       })()`
     );
-    if (!state || !state.outputText || state.submitText !== "提交任务") {
+    if (!state || !state.outputText || !state.panelText || state.submitText !== "提交任务") {
       return null;
     }
-    if (state.outputText === previousText) {
+    if (state.panelText === previousText) {
       return null;
     }
     if (requirePdfButton === true && state.pdfButtons === 0) {
@@ -534,8 +543,25 @@ async function waitForOutputChange(cdp, previousText, { requirePdfButton = null,
     if (requirePdfButton === false && state.pdfButtons !== 0) {
       return null;
     }
-    return state.outputText;
+    return state;
   }, timeoutMs, "task result");
+}
+
+async function readEvidenceMode(cdp) {
+  return evaluate(
+    cdp,
+    `(() => {
+      if (document.querySelector('[data-testid="evidence-mode-declared"]')) return 'declared';
+      if (document.querySelector('[data-testid="evidence-mode-candidate"]')) return 'candidate';
+      if (document.querySelector('[data-testid="evidence-mode-none"]')) return 'none';
+      return null;
+    })()`
+  );
+}
+
+async function writeScreenshotMetadata(outputPath, payload) {
+  const metadataPath = outputPath.replace(/\.png$/i, ".json");
+  await fsp.writeFile(metadataPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
 async function getRootNodeId(cdp) {
@@ -687,12 +713,36 @@ async function setTaskPrompt(cdp, prompt) {
 }
 
 async function runAskAndCapture(cdp, { prompt, screenshotPath, previousOutput, requirePdfButton }) {
-  await setTaskPrompt(cdp, prompt);
-  await waitForEnabledSelector(cdp, '[data-testid="submit-task-button"]', 10_000);
-  await clickSelector(cdp, '[data-testid="submit-task-button"]');
-  const nextOutput = await waitForOutputChange(cdp, previousOutput, { requirePdfButton });
-  await captureElementScreenshot(cdp, '[data-testid="result-panel"]', screenshotPath);
-  return nextOutput;
+  const maxAttempts = requirePdfButton ? 3 : 1;
+  let latestPanelText = previousOutput;
+  let lastEvidenceMode = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    await setTaskPrompt(cdp, buildCacheBustingPrompt(prompt, attempt));
+    await waitForEnabledSelector(cdp, '[data-testid="submit-task-button"]', 10_000);
+    await clickSelector(cdp, '[data-testid="submit-task-button"]');
+    const nextState = await waitForOutputChange(cdp, latestPanelText, { requirePdfButton });
+    latestPanelText = nextState.panelText;
+    lastEvidenceMode = requirePdfButton ? await readEvidenceMode(cdp) : "none";
+
+    if (requirePdfButton && lastEvidenceMode !== "declared") {
+      continue;
+    }
+
+    await captureElementScreenshot(cdp, '[data-testid="result-panel"]', screenshotPath);
+    await writeScreenshotMetadata(screenshotPath, {
+      prompt,
+      attempt,
+      require_pdf_button: requirePdfButton,
+      evidence_mode: lastEvidenceMode,
+      captured_at: new Date().toISOString(),
+    });
+    return latestPanelText;
+  }
+
+  throw new Error(
+    `Failed to capture declared evidence screenshot for prompt: ${prompt} (last mode: ${lastEvidenceMode})`
+  );
 }
 
 async function waitForPdfPreviewLoaded(cdp) {

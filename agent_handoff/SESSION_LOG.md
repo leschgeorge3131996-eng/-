@@ -934,3 +934,51 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - this is a local review artifact and is not intended as a canonical long-term repo deliverable by default
 - Recommended next step:
   - hand the zip plus `REVIEW_PROMPT.md` to external AI reviewers and compare their gate/completion judgments against the current internal plan
+
+---
+
+## 2026-04-19 / Codex (review-driven hardening + refreshed evidence pack)
+
+- Summary:
+  - Converted the highest-value external-review findings into concrete code and material fixes
+  - Closed the main screenshot/evidence inconsistency in the current judging path
+  - Refreshed the gold-sample screenshot pack under the current `.env` and regenerated deliverables/export bundle
+- Files touched:
+  - `frontend/src/App.tsx`
+  - `frontend/src/components/ResultPanel.tsx`
+  - `backend/app/services/model_client.py`
+  - `backend/app/services/task_service.py`
+  - `scripts/capture_gold_sample_screenshots.js`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `evidence/materials/REAL_EVIDENCE_REFRESH_CHECKLIST.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm run build`
+  - `npm test -- --run` -> `7 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`
+  - `node scripts\capture_gold_sample_screenshots.js` refreshed `20260419_*` screenshots successfully
+  - refreshed sidecars confirm:
+    - `20260419_gold_ask_research_focus.json` -> `declared`
+    - `20260419_gold_ask_rank_accuracy.json` -> `declared` on retry attempt `2`
+    - `20260419_gold_refusal.json` -> `none`
+  - `node scripts\export_competition_pdfs.js` refreshed printable PDF baselines
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1` produced:
+    - `evidence/exports/competition_asset_pack_20260419_012336/`
+- Open risks:
+  - `G3` still lacks second-operator / 3-run / <=3-minute evidence
+  - final deck/poster/video still need human polish outside repo
+- Recommended next step:
+  - perform the formal `G3` rehearsal and record it as the next gate-closing artifact

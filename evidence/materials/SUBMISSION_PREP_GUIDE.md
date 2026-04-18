@@ -28,8 +28,8 @@ story. Broader replay outputs are secondary supporting material only.
 1. `ARCHITECTURE.md`
 2. `QA_BRIEF.md`
 3. one experiment note for the locked gold-sample validation
-4. optional stats-panel screenshot
-5. optional backend API-docs screenshot
+4. appendix-only stats-panel screenshot
+5. appendix-only backend API-docs screenshot
 
 ## One-Click Export
 

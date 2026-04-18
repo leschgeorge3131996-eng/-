@@ -1,4 +1,4 @@
-# Real Evidence Refresh Checklist
+﻿# Real Evidence Refresh Checklist
 
 ## Goal
 
@@ -40,21 +40,21 @@ python scripts\export_log_summary.py --format md --output evidence\reports\lates
 
 Capture at least these:
 
-- [ ] Frontend ask result with citations for `这篇论文主要研究了什么问题？`
+- [ ] Frontend ask result with citations for `杩欑瘒璁烘枃涓昏鐮旂┒浜嗕粈涔堥棶棰橈紵`
 - [ ] PDF render/evidence page opened from that citation
-- [ ] Frontend ask result for `作者最终的方法排名和总体准确率分别是多少？`
-- [ ] Frontend refused result for `木星有几颗卫星？`
+- [ ] Frontend ask result for `浣滆€呮渶缁堢殑鏂规硶鎺掑悕鍜屾€讳綋鍑嗙‘鐜囧垎鍒槸澶氬皯锛焋
+- [ ] Frontend refused result for `鏈ㄦ槦鏈夊嚑棰楀崼鏄燂紵`
 - [ ] Frontend stats panel
 - [ ] Backend API docs page
 
-Latest automated gold-sample capture on `2026-04-18` produced:
+Latest automated gold-sample capture on `2026-04-19` produced:
 
-- `20260418_gold_ask_research_focus.png`
-- `20260418_gold_pdf_render.png`
-- `20260418_gold_ask_rank_accuracy.png`
-- `20260418_gold_refusal.png`
-- `20260418_stats_panel.png`
-- `20260418_api_docs.png`
+- `20260419_gold_ask_research_focus.png`
+- `20260419_gold_pdf_render.png`
+- `20260419_gold_ask_rank_accuracy.png`
+- `20260419_gold_refusal.png`
+- `20260419_stats_panel.png`
+- `20260419_api_docs.png`
 
 Recommended naming:
 
@@ -88,3 +88,4 @@ Recommended naming:
 - [ ] Screenshots are refreshed
 - [ ] Experiment note is updated
 - [ ] Materials reflect the current product behavior
+

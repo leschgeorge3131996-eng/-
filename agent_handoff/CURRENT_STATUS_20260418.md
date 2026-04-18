@@ -221,9 +221,50 @@
 - The handoff/export bundle can now carry those HTML/PDF deliverables forward without manual file picking
 - The repo now also contains a timed subtitle baseline for the 2-minute demo video
 
+## Review-Driven Hardening (`2026-04-19`)
+
+- External-review findings were translated into code/material fixes:
+  - `frontend/src/App.tsx` now prefers the validated quote in `declared` mode for both automatic preview state and citation-click preview state
+  - `frontend/src/components/ResultPanel.tsx` now exposes `evidence-mode-*` test ids and treats retrieval-gated refusals as `执行路径: retrieval_gate（未调用模型）`, hiding request ID on that path
+  - `backend/app/services/model_client.py` now explicitly requires at least one verbatim evidence quote for `ask`
+  - `backend/app/services/task_service.py` now:
+    - labels retrieval-gated refusals as `model_name="retrieval_gate"`
+    - strips punctuation drift during quote normalization
+    - stops silently coercing plain-string quotes onto the first chunk
+  - `scripts/capture_gold_sample_screenshots.js` now:
+    - retries answerable screenshots until `evidence_mode=declared`
+    - cache-busts retries with zero-width prompt variants
+    - writes `.json` sidecars beside ask/refusal screenshots
+  - competition materials now keep `stats_panel` / `api_docs` appendix-only in the main story docs
+- Verification completed:
+  - `npm run build`
+  - `npm test -- --run` -> `7 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`
+  - `node scripts\capture_gold_sample_screenshots.js` refreshed:
+    - `evidence/screenshots/20260419_gold_ask_research_focus.png`
+    - `evidence/screenshots/20260419_gold_pdf_render.png`
+    - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
+    - `evidence/screenshots/20260419_gold_refusal.png`
+    - `evidence/screenshots/20260419_stats_panel.png`
+    - `evidence/screenshots/20260419_api_docs.png`
+  - sidecar metadata confirms:
+    - `20260419_gold_ask_research_focus.json` -> `evidence_mode=declared`
+    - `20260419_gold_ask_rank_accuracy.json` -> `evidence_mode=declared` on attempt `2`
+    - `20260419_gold_refusal.json` -> `evidence_mode=none`
+  - `node scripts\export_competition_pdfs.js` refreshed:
+    - `deliverables/competition_kit/deck.pdf`
+    - `deliverables/competition_kit/poster.pdf`
+  - `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot date prefix and exports sidecar metadata; latest pack:
+    - `evidence/exports/competition_asset_pack_20260419_012336/`
+- Practical meaning:
+  - the previously identified judge-facing mismatch (`candidate` screenshot mixed into the locked answerable path) is now closed in the current repo state
+  - the PDF preview snippet/highlight mismatch is now closed for `declared` ask results in the frontend
+  - the export/handoff path now follows the latest screenshot refresh without manual date-string edits
+
 ## Recommended Next Step
 
-1. Run `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1` and use the exported full bundle as the source for any last-mile polish or external handoff
-2. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
-3. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
-4. Do not expand product scope while final materials are being assembled
+1. Run a formal `G3` rehearsal with a second operator: `3` consecutive timed runs via `GOLD_SAMPLE_RUNBOOK.md`, plus fallback handling notes
+2. Treat `evidence/exports/competition_asset_pack_20260419_012336/` as the latest external handoff bundle until another screenshot refresh happens
+3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
+4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
+5. Do not expand product scope while final materials are being assembled

@@ -1,4 +1,4 @@
-# Competition Asset Pack
+﻿# Competition Asset Pack
 
 ## Goal
 
@@ -28,13 +28,13 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/reports/gold_sample_replay_real_summary_latest.md`
   - `evidence/reports/gold_sample_replay_real_latest.md`
 - Current authoritative screenshots:
-  - `evidence/screenshots/20260418_gold_ask_research_focus.png`
-  - `evidence/screenshots/20260418_gold_pdf_render.png`
-  - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
-  - `evidence/screenshots/20260418_gold_refusal.png`
-- Optional supporting screenshots already available:
-  - `evidence/screenshots/20260418_stats_panel.png`
-  - `evidence/screenshots/20260418_api_docs.png`
+  - `evidence/screenshots/20260419_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260419_gold_pdf_render.png`
+  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260419_gold_refusal.png`
+- Appendix-only supporting screenshots already available:
+  - `evidence/screenshots/20260419_stats_panel.png`
+  - `evidence/screenshots/20260419_api_docs.png`
 
 ## Ready-To-Use Deliverables
 
@@ -65,9 +65,9 @@ These points should stay word-for-word consistent across PPT, video, poster, and
 2. The live path already verified under the real runtime is:
    - `login -> upload -> ask -> citation -> PDF render -> refusal`
 3. The locked candidate question set is:
-   - `这篇论文主要研究了什么问题？`
-   - `作者最终的方法排名和总体准确率分别是多少？`
-   - `木星有几颗卫星？`
+   - `杩欑瘒璁烘枃涓昏鐮旂┒浜嗕粈涔堥棶棰橈紵`
+   - `浣滆€呮渶缁堢殑鏂规硶鎺掑悕鍜屾€讳綋鍑嗙‘鐜囧垎鍒槸澶氬皯锛焋
+   - `鏈ㄦ槦鏈夊嚑棰楀崼鏄燂紵`
 4. The current QA decision is:
    - keep `qwen3-235b-a22b-instruct-2507` as default
    - keep `qwen3-32b` as validated fallback
@@ -111,7 +111,7 @@ Suggested assets:
 ### Slide 3: Answerable Ask
 
 - Screenshot:
-  - `20260418_gold_ask_research_focus.png`
+  - `20260419_gold_ask_research_focus.png`
 - Talking point:
   - the answer appears together with citations and evidence snippets
   - this is not a chat shell response detached from the document
@@ -119,7 +119,7 @@ Suggested assets:
 ### Slide 4: PDF Evidence Render
 
 - Screenshot:
-  - `20260418_gold_pdf_render.png`
+  - `20260419_gold_pdf_render.png`
 - Talking point:
   - the system can jump back into the cited PDF page
   - evidence is shown visually, not only as a page number
@@ -127,7 +127,7 @@ Suggested assets:
 ### Slide 5: Second Answerable Ask + Model Decision
 
 - Screenshot:
-  - `20260418_gold_ask_rank_accuracy.png`
+  - `20260419_gold_ask_rank_accuracy.png`
 - Talking point:
   - the system can stably return concrete numeric answers with citations
   - both tested QA models pass, but `235b` remains the primary choice
@@ -139,7 +139,7 @@ Suggested supporting artifacts:
 ### Slide 6: Refusal
 
 - Screenshot:
-  - `20260418_gold_refusal.png`
+  - `20260419_gold_refusal.png`
 - Talking point:
   - when retrieval does not match, the system refuses instead of fabricating
   - this is part of reliability, not a fallback embarrassment
@@ -202,12 +202,12 @@ Recommended blocks:
 - [ ] `deliverables/competition_kit/video_subtitles.srt`
 - [ ] `gold_sample_qa_compare_latest.md`
 - [ ] `gold_sample_replay_real_summary_latest.md`
-- [ ] `20260418_gold_ask_research_focus.png`
-- [ ] `20260418_gold_pdf_render.png`
-- [ ] `20260418_gold_ask_rank_accuracy.png`
-- [ ] `20260418_gold_refusal.png`
-- [ ] `20260418_stats_panel.png` if a metrics/supporting slide is needed
-- [ ] `20260418_api_docs.png` if an engineering/supporting slide is needed
+- [ ] `20260419_gold_ask_research_focus.png`
+- [ ] `20260419_gold_pdf_render.png`
+- [ ] `20260419_gold_ask_rank_accuracy.png`
+- [ ] `20260419_gold_refusal.png`
+- [ ] keep `20260419_stats_panel.png` appendix-only; do not place it in the primary six-slide story
+- [ ] keep `20260419_api_docs.png` appendix-only; do not place it in the primary six-slide story
 - [ ] export a handoff bundle with `scripts/export_competition_asset_pack.ps1`
 - [ ] keep `scripts/export_competition_pdfs.js` available for re-export after any visual edits
 
@@ -218,3 +218,4 @@ Recommended blocks:
 - Do not use the broader sample-set replay as the primary evidence source.
 - Do not oversell `summary` / `outline` as having the same grounding semantics as `ask`.
 - Do not present auth/demo-mode behavior as a product differentiator.
+

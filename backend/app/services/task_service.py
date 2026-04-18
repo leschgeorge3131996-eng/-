@@ -135,7 +135,7 @@ class TaskService:
                     file_id=file_id,
                     document_name=metadata.original_name,
                     document_fingerprint=metadata.document_fingerprint,
-                    model_name=self.model_client.resolve_model_name(task_type),
+                    model_name="retrieval_gate",
                     route_tier=route_tier,
                     route_model=route_model,
                     route_reason=route_reason,
@@ -648,16 +648,16 @@ class TaskService:
             if chunk_id in used_chunk_ids and quote:
                 return chunk_id, quote
             return None, None
-
-        if isinstance(item, str):
-            quote = item.strip()
-            if quote and used_chunk_ids:
-                return used_chunk_ids[0], quote
         return None, None
 
     def _normalize_quote_text(self, text: str) -> str:
         normalized = text.replace("\x00", "")
         normalized = re.sub(r"\s+", "", normalized)
+        normalized = re.sub(
+            r"[，。、！？,\.!\?;；：:（）()\-\u2013\u2014\u2018\u2019\u201c\u201d\"']",
+            "",
+            normalized,
+        )
         return normalized.strip()
 
     def _extract_json_payload(self, raw_content: str) -> dict | None:

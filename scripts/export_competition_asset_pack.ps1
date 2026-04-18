@@ -14,6 +14,23 @@ function Resolve-OutputRootPath([string]$PathValue) {
     return Join-Path $root $PathValue
 }
 
+function Get-LatestScreenshotPrefix {
+    $screenshotDir = Join-Path $root "evidence\screenshots"
+    $latestFocusShot = Get-ChildItem -LiteralPath $screenshotDir -Filter "*_gold_ask_research_focus.png" -File |
+        Sort-Object Name -Descending |
+        Select-Object -First 1
+
+    if (-not $latestFocusShot) {
+        throw "No gold-sample screenshots found under evidence\\screenshots"
+    }
+
+    if ($latestFocusShot.BaseName -match '^(?<prefix>\d{8})_gold_ask_research_focus$') {
+        return $Matches.prefix
+    }
+
+    throw "Could not parse screenshot date prefix from $($latestFocusShot.Name)"
+}
+
 function Copy-RelativeFile(
     [string]$RelativePath,
     [string]$PackageDir,
@@ -37,6 +54,8 @@ function Copy-RelativeFile(
     return $true
 }
 
+$latestScreenshotPrefix = Get-LatestScreenshotPrefix
+
 $requiredFiles = @(
     "evidence\materials\PROJECT_ONE_PAGER.md",
     "evidence\materials\DEMO_SCRIPT_3MIN.md",
@@ -52,10 +71,13 @@ $requiredFiles = @(
     "evidence\reports\gold_sample_replay_real_summary_latest.md",
     "evidence\reports\gold_sample_replay_real_latest.md",
     "evidence\reports\gold_sample_qa_compare_latest.md",
-    "evidence\screenshots\20260418_gold_ask_research_focus.png",
-    "evidence\screenshots\20260418_gold_pdf_render.png",
-    "evidence\screenshots\20260418_gold_ask_rank_accuracy.png",
-    "evidence\screenshots\20260418_gold_refusal.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.json",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.json",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.json",
     "evidence\samples\chinese_llm_spatial_eval.pdf",
     "deliverables\competition_kit\README.md",
     "deliverables\competition_kit\deck.html",
@@ -69,8 +91,8 @@ $requiredFiles = @(
 )
 
 $optionalFiles = @(
-    "evidence\screenshots\20260418_stats_panel.png",
-    "evidence\screenshots\20260418_api_docs.png"
+    "evidence\screenshots\${latestScreenshotPrefix}_stats_panel.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_api_docs.png"
 )
 
 $outputRootPath = Resolve-OutputRootPath $OutputRoot

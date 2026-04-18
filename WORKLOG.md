@@ -228,9 +228,10 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Use `scripts/export_competition_asset_pack.ps1` to export a full handoff bundle that now includes the current HTML/PDF deliverables and video subtitle baseline, then decide whether only cosmetic polish remains
-2. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
-3. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
+1. Close `G3` with a second-operator rehearsal and `3` consecutive timed runs
+2. Use `evidence/exports/competition_asset_pack_20260419_012336/` as the current handoff bundle for external polishing / collaboration
+3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
+4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
 ## Session Handoff Rule
 
@@ -279,3 +280,27 @@ At the start of the next session:
   2. `agent_handoff/TASK_BOARD.md`
   3. `agent_handoff/SESSION_LOG.md`
 - Both Codex and Claude Code should append durable session summaries there instead of relying only on chat history
+
+## 2026-04-19 Review-Driven Hardening
+
+- Fixed judge-facing evidence consistency issues identified by external review:
+  - preview snippet now follows validated quote on `declared` ask results
+  - retrieval-gated refusal now renders as `retrieval_gate` / no-model path in the UI
+  - screenshot capture now retries until answerable cases are `declared`
+  - screenshot sidecar metadata (`.json`) is now written for ask/refusal captures
+  - `stats_panel` / `api_docs` are marked appendix-only in the main materials
+- Refreshed real screenshots:
+  - `20260419_gold_ask_research_focus.png`
+  - `20260419_gold_pdf_render.png`
+  - `20260419_gold_ask_rank_accuracy.png`
+  - `20260419_gold_refusal.png`
+  - `20260419_stats_panel.png`
+  - `20260419_api_docs.png`
+- Refreshed deliverables/export:
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
+  - `evidence/exports/competition_asset_pack_20260419_012336/`
+- Verification:
+  - `npm run build`
+  - `npm test -- --run` -> `7 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`

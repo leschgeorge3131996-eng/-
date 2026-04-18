@@ -20,6 +20,7 @@ import ResultPanel from "./components/ResultPanel";
 import type {
   AuthSession,
   BBoxRegion,
+  Citation,
   LogSummary,
   RecentDocument,
   RecentResult,
@@ -206,6 +207,27 @@ function normalizePreviewPages(pages: number[], fallbackPage = 1): number[] {
   return normalized.length > 0 ? normalized : [fallbackPage];
 }
 
+function findEvidenceQuoteForChunk(
+  taskResult: TaskResult,
+  chunkId: string | null | undefined
+): string | null {
+  if (!chunkId) {
+    return null;
+  }
+  return taskResult.evidence_quotes.find((item) => item.chunk_id === chunkId)?.quote ?? null;
+}
+
+function resolveAskPreviewSnippet(
+  taskResult: TaskResult,
+  citation: Pick<Citation, "chunk_id" | "snippet"> | null
+): string | null {
+  const matchedQuote = findEvidenceQuoteForChunk(taskResult, citation?.chunk_id);
+  if (taskResult.evidence_mode === "declared" && matchedQuote) {
+    return matchedQuote;
+  }
+  return citation?.snippet ?? matchedQuote ?? taskResult.evidence_quotes[0]?.quote ?? null;
+}
+
 function scrollPreviewIntoView(): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
@@ -237,7 +259,7 @@ function buildPreviewReference(taskResult: TaskResult): PreviewReference {
       primaryReference?.page_numbers ?? retrievedPages,
       page
     );
-    const snippet = primaryReference?.snippet ?? taskResult.evidence_quotes[0]?.quote ?? null;
+    const snippet = resolveAskPreviewSnippet(taskResult, primaryReference);
     return {
       page,
       pages,
@@ -1155,10 +1177,11 @@ export default function App() {
             onOpenPdfPage={(citation) => {
               const nextPages = normalizePreviewPages(citation.page_numbers);
               const nextPrimaryPage = nextPages[0] ?? 1;
+              const nextSnippet = result ? resolveAskPreviewSnippet(result, citation) : citation.snippet;
               setPreviewPages(nextPages);
               setPreviewPage(nextPrimaryPage);
-              setPreviewSnippet(citation.snippet);
-              setPreviewSnippetPage(citation.snippet ? nextPrimaryPage : null);
+              setPreviewSnippet(nextSnippet);
+              setPreviewSnippetPage(nextSnippet ? nextPrimaryPage : null);
               setPreviewBboxes(citation.bbox_regions ?? []);
               setPreviewOpen(true);
               scrollPreviewIntoView();
