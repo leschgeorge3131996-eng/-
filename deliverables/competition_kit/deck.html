@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>研答通 | Competition Deck</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style media="print">
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Evidence-Backed Document QA</div>
+          <div class="title-row">
+            <div>
+              <h1 class="hero-title">研答通</h1>
+              <p class="hero-subtitle">
+                带证据回链的论文 / 报告问答助手。核心能力不是“把答案说出来”，而是让每一条回答都能跳回
+                PDF 原文证据。
+              </p>
+            </div>
+            <div class="hero-side">
+              <div class="metric-card">
+                <strong>真实 replay</strong>
+                <span>2 answered + 1 refused</span>
+              </div>
+              <div class="metric-card">
+                <strong>默认 QA 模型</strong>
+                <span>qwen3-235b-a22b-instruct-2507</span>
+              </div>
+            </div>
+          </div>
+          <div class="body-grid two-col">
+            <div class="card">
+              <h2 class="section-title">为什么要做它</h2>
+              <ul class="bullet-list">
+                <li>长文阅读慢，答辩和复核更需要“说得出处”。</li>
+                <li>普通聊天工具会给答案，但很难证明答案真的来自文档。</li>
+                <li>我们把“答案必须回到原文”做成了一条可验证链路。</li>
+              </ul>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <strong>锁定样例</strong>
+                <span>中文论文 PDF</span>
+              </div>
+              <div class="metric-card">
+                <strong>核心主线</strong>
+                <span>ask → citation → PDF</span>
+              </div>
+              <div class="metric-card">
+                <strong>补充验证</strong>
+                <span>qwen3-32b 已验证可回退</span>
+              </div>
+              <div class="metric-card">
+                <strong>评审重点</strong>
+                <span>证据回链，不是泛化聊天</span>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bar">
+            <span>锁定样例：`chinese_llm_spatial_eval.pdf`</span>
+            <strong>2026-04-18 Gold Sample Story</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Verified Path</div>
+          <h2 class="section-title">最短可验证链路</h2>
+          <p class="section-subtitle">
+            在当前真实运行环境下，已经验证通过的主路径是：
+            <strong>login → upload → ask → citation → PDF render → refusal</strong>
+          </p>
+          <div class="pipeline">
+            <div class="pipeline-step">
+              <strong>1. Upload</strong>
+              <span>上传论文或报告，保留原始文件与解析输出。</span>
+            </div>
+            <div class="pipeline-step">
+              <strong>2. Parse</strong>
+              <span>保存页级结构、文本分块与页面上下文。</span>
+            </div>
+            <div class="pipeline-step">
+              <strong>3. Retrieve</strong>
+              <span>先检索相关片段，未命中就直接拒答。</span>
+            </div>
+            <div class="pipeline-step">
+              <strong>4. Answer</strong>
+              <span>模型返回回答、used chunks 与 evidence quotes。</span>
+            </div>
+            <div class="pipeline-step">
+              <strong>5. Cite</strong>
+              <span>输出 citation、页码和原文片段。</span>
+            </div>
+            <div class="pipeline-step">
+              <strong>6. Render</strong>
+              <span>点击引用，直接回到 PDF 页面证据。</span>
+            </div>
+          </div>
+          <div class="callout-row">
+            <div class="callout accent">
+              <strong>工程含义</strong>
+              <span>不是概念图，已经在当前 `.env` 和真实模型上验证。</span>
+            </div>
+            <div class="callout teal">
+              <strong>演示含义</strong>
+              <span>评审先看到结果，再理解工程路径，不需要先听复杂架构。</span>
+            </div>
+          </div>
+          <div class="mini-grid">
+            <div class="mini-card">
+              <strong>权威报告</strong>
+              <span>`gold_sample_replay_real_summary_latest.md`</span>
+            </div>
+            <div class="mini-card">
+              <strong>固定题集</strong>
+              <span>2 answerable + 1 refusal</span>
+            </div>
+            <div class="mini-card">
+              <strong>当前定位</strong>
+              <span>论文 / 报告阅读与答辩准备</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Question 1</div>
+          <div class="body-grid two-col">
+            <div>
+              <h2 class="section-title">文档内问题先给答案，再给证据</h2>
+              <p class="section-subtitle">
+                锁定问题：<strong>这篇论文主要研究了什么问题？</strong>
+              </p>
+              <ul class="bullet-list">
+                <li>系统先检索相关片段，再进入回答。</li>
+                <li>回答、citation、证据片段同步出现。</li>
+                <li>这一步已经证明它不是脱离文档的聊天壳。</li>
+              </ul>
+              <div class="quote-box">
+                <strong>评审要点</strong>
+                <span>
+                  先展示“回答 + citation”同屏，再解释这是后端反查原文后的产物。
+                </span>
+              </div>
+            </div>
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260418_gold_ask_research_focus.png"
+                  alt="Gold sample research focus ask screenshot"
+                />
+              </div>
+              <div class="caption">
+                `20260418_gold_ask_research_focus.png`：回答正文、引用页码与证据片段同屏。
+              </div>
+            </div>
+          </div>
+          <div class="footer-bar">
+            <span>主叙事必须强调 evidence-backed ask</span>
+            <strong>不要把 generic chat 当卖点</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Citation Jump</div>
+          <div class="body-grid two-col">
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260418_gold_pdf_render.png"
+                  alt="Gold sample PDF render screenshot"
+                />
+              </div>
+              <div class="caption">
+                `20260418_gold_pdf_render.png`：点击 citation 后，直接跳到对应 PDF 页面。
+              </div>
+            </div>
+            <div>
+              <h2 class="section-title">证据能回到 PDF 原文</h2>
+              <ul class="bullet-list">
+                <li>citation 不只是页码，而是能打开真实页面。</li>
+                <li>页面内显示证据高亮，旁边保留原文片段文本。</li>
+                <li>这一步把“回答可信”变成“证据可看”。</li>
+              </ul>
+              <div class="callout-row">
+                <div class="callout accent">
+                  <strong>对用户</strong>
+                  <span>可以快速确认答案出处，适合答辩和汇报前复核。</span>
+                </div>
+                <div class="callout teal">
+                  <strong>对评审</strong>
+                  <span>看得见 PDF 证据，比口头描述更有说服力。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Question 2 + Model Choice</div>
+          <div class="body-grid two-col">
+            <div>
+              <h2 class="section-title">数值问题也能稳定回链</h2>
+              <p class="section-subtitle">
+                锁定问题：<strong>作者最终的方法排名和总体准确率分别是多少？</strong>
+              </p>
+              <ul class="bullet-list">
+                <li>当前锁定结果：<strong>第六</strong>、<strong>56.20%</strong>。</li>
+                <li>两种 QA 模型都通过 `2 answerable + 1 refusal`。</li>
+                <li>`235b` grounding 更丰满，`32b` 可作 fallback。</li>
+              </ul>
+              <div class="mini-grid">
+                <div class="mini-card">
+                  <strong>主模型</strong>
+                  <span>qwen3-235b-a22b-instruct-2507</span>
+                </div>
+                <div class="mini-card">
+                  <strong>回退模型</strong>
+                  <span>qwen3-32b</span>
+                </div>
+                <div class="mini-card">
+                  <strong>结论</strong>
+                  <span>当前继续保持 235b 为默认 QA</span>
+                </div>
+              </div>
+            </div>
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260418_gold_ask_rank_accuracy.png"
+                  alt="Gold sample rank accuracy ask screenshot"
+                />
+              </div>
+              <div class="caption">
+                `20260418_gold_ask_rank_accuracy.png`：具体数值答案 + citations。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Reliability Boundary</div>
+          <div class="body-grid two-col">
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260418_gold_refusal.png"
+                  alt="Gold sample refusal screenshot"
+                />
+              </div>
+              <div class="caption">
+                `20260418_gold_refusal.png`：离题问题被明确拒答，`retrieval_status=no_match`。
+              </div>
+            </div>
+            <div>
+              <h2 class="section-title">离题不编造，才叫可靠</h2>
+              <ul class="bullet-list">
+                <li>锁定拒答问题：<strong>木星有几颗卫星？</strong></li>
+                <li>检索未命中时，系统不会硬答，而是直接拒答。</li>
+                <li>对文档助手而言，边界控制和可验证性同样重要。</li>
+              </ul>
+              <div class="quote-box">
+                <strong>收束结论</strong>
+                <span>
+                  研答通当前最强的差异点，不是“模型很强”，而是“每个结论都能回到文档证据”。
+                </span>
+              </div>
+              <div class="footer-bar">
+                <span>可选附录：stats panel / API docs 仅作支撑，不进主叙事</span>
+                <strong>Final Message: Answer, Cite, Return To Evidence</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

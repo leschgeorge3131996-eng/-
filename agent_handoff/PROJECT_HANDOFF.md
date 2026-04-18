@@ -69,6 +69,14 @@ As of `2026-04-18`:
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
   - `evidence/materials/POSTER_COPY.md`
   - `scripts/export_competition_asset_pack.ps1`
+- printable visual prototypes:
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+- PDF export helper:
+  - `scripts/export_competition_pdfs.js`
+- current exported PDFs:
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
 
 Main verification commands:
 
@@ -234,7 +242,7 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Turn the drafted repo-native materials into final PPT / video / poster files; use `scripts/export_competition_asset_pack.ps1` when handing the asset pack to another operator
+1. Start from `deliverables/competition_kit/deck.pdf` and `poster.pdf`; if polish is needed, edit the HTML prototypes and rerun `scripts/export_competition_pdfs.js`
 2. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 3. Keep the broader sample-set replay in a clearly secondary role
 

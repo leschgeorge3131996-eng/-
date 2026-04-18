@@ -59,6 +59,9 @@
 19. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
 - 更宽样例覆盖的真实模型逐条复跑明细（次级参考）
 
+20. [../../deliverables/competition_kit/README.md](../../deliverables/competition_kit/README.md)
+- 可打印的 deck / poster HTML 原型说明
+
 ## 使用建议
 
 - 报名表 / 作品简介：优先参考 `PROJECT_ONE_PAGER.md`
@@ -71,6 +74,8 @@
 - 视频口播与镜头：优先参考 `VIDEO_SHOTLIST_2MIN.md`
 - 海报文案：优先参考 `POSTER_COPY.md`
 - 最终打包导出：运行 `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+- 可打印 HTML 成品原型：参考 `deliverables/competition_kit/`
+- PDF 导出：运行 `node scripts/export_competition_pdfs.js`
 - 更宽样例补充复跑：参考 `SAMPLE_MANIFEST.json` 与 `scripts/replay_sample_set.py`
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`

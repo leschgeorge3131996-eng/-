@@ -758,3 +758,91 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - staging/demo environment should still be smoke-checked before formal judging
 - Recommended next step:
   - generate one export bundle and use it as the single source for final slide/video/poster file production
+
+---
+
+## 2026-04-19 / Codex (printable deck/poster prototypes added)
+
+- Summary:
+  - Added a repo-native six-slide HTML deck prototype and poster HTML prototype
+  - Both prototypes are aligned to the locked gold-sample wording and current authoritative screenshots
+  - Updated materials/handoff docs so later operators treat these HTML files as the default visual baseline for final production
+- Files touched:
+  - `deliverables/competition_kit/README.md`
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+  - `deliverables/competition_kit/styles.css`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - HTML references point to the locked `20260418_*` screenshot set
+  - the prototypes only use the current locked story:
+    - `chinese_llm_spatial_eval.pdf`
+    - `2 answerable + 1 refusal`
+    - `qwen3-235b-a22b-instruct-2507` primary
+    - `qwen3-32b` fallback
+- Open risks:
+  - browser-side print/export to final PDF still needs one operator pass
+  - final video file still needs timeline editing outside repo markdown/html
+- Recommended next step:
+  - print `deck.html` and `poster.html` to PDF, then decide whether any last-mile visual polish is still needed
+
+---
+
+## 2026-04-19 / Codex (PDF export scripted)
+
+- Summary:
+  - Added `scripts/export_competition_pdfs.js` to export the deck/poster PDFs through CDP instead of relying on browser CLI flags
+  - Updated materials and handoff docs so PDF export is now a named repo step
+  - The visual-material path is now: markdown copy -> HTML prototype -> scripted PDF export
+- Files touched:
+  - `scripts/export_competition_pdfs.js`
+  - `deliverables/competition_kit/README.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - script targets:
+    - `deliverables/competition_kit/deck.html -> deck.pdf`
+    - `deliverables/competition_kit/poster.html -> poster.pdf`
+  - script uses the same local browser-discovery approach already proven by screenshot automation
+- Open risks:
+  - final exported PDF visuals still need one visual inspection pass
+  - video output itself still needs editing outside repo
+- Recommended next step:
+  - inspect the generated PDFs and only do last-mile cosmetic polish if necessary
+
+---
+
+## 2026-04-19 / Codex (PDF baselines exported)
+
+- Summary:
+  - Ran `node scripts/export_competition_pdfs.js` with the necessary browser permission and exported the current deck/poster PDF baselines
+  - Shared status docs now treat the PDFs as existing outputs, not only as potential exports
+- Files touched:
+  - `deliverables/competition_kit/README.md`
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
+  - `WORKLOG.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - script completed successfully:
+    - `Created deliverables\competition_kit\deck.pdf`
+    - `Created deliverables\competition_kit\poster.pdf`
+- Open risks:
+  - PDFs still need one eyeball pass for layout polish
+  - final video output still needs timeline editing outside repo
+- Recommended next step:
+  - use the exported PDFs as the current baseline deliverables and only iterate if visual polish is still required

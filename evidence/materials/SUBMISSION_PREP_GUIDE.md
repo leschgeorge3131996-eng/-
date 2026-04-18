@@ -47,6 +47,23 @@ What it does:
 - writes `PACK_CONTENTS.md` into a timestamped export directory under
   `evidence/exports/`
 
+## HTML Draft Deliverables
+
+If you want a near-final visual baseline before moving into PowerPoint or a
+design tool, use:
+
+- `deliverables/competition_kit/deck.html`
+- `deliverables/competition_kit/poster.html`
+
+These files are aligned to the same locked gold-sample wording and can be
+printed to PDF directly from a browser.
+
+If you want the repo to generate the PDFs directly, run:
+
+```powershell
+node .\scripts\export_competition_pdfs.js
+```
+
 ## How To Present The Project
 
 ### Product positioning
@@ -87,5 +104,6 @@ What it does:
 - [ ] `gold_sample_qa_compare_latest.md` is current
 - [ ] The four gold-sample screenshots are current
 - [ ] `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` are still aligned with the same fixed wording
+- [ ] `deliverables/competition_kit/deck.html` and `poster.html` still match the same locked story
 - [ ] One-pager, demo script, and asset pack all use the same product positioning
 - [ ] No broad-sample or historical provider artifact is being presented as the primary judging evidence

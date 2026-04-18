@@ -7,11 +7,14 @@
 - A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked
 - Full gold-sample screenshot pack is now refreshed under the current real runtime
 - Ready-to-use PPT / video / poster drafting docs now exist in-repo
+- Printable deck / poster HTML prototypes now exist in-repo
+- Repo-native deck / poster PDF export script now exists
+- Current deck/poster PDF baselines now exist in-repo
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
-1. Turn the drafted repo-native materials into the final PPT / video / poster files
+1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf` and decide whether only cosmetic polish is still needed
 2. Use `scripts/export_competition_asset_pack.ps1` whenever a clean handoff bundle is needed for PPT/video/poster production
 3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
@@ -30,6 +33,9 @@
 - `2026-04-18`: automated browser capture also refreshed `20260418_stats_panel.png` and `20260418_api_docs.png`
 - `2026-04-18`: ready-to-use drafting docs were added for PPT (`PPT_DECK_6SLIDES.md`), video (`VIDEO_SHOTLIST_2MIN.md`), and poster (`POSTER_COPY.md`)
 - `2026-04-18`: `scripts/export_competition_asset_pack.ps1` can now export a timestamped production bundle for another operator
+- `2026-04-18`: printable HTML prototypes were added under `deliverables/competition_kit/` for deck/poster production
+- `2026-04-19`: `scripts/export_competition_pdfs.js` can now export deck/poster PDFs directly from the HTML prototypes
+- `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were exported successfully
 
 ## Useful But Not Urgent
 

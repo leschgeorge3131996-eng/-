@@ -184,9 +184,19 @@
   - `evidence/materials/POSTER_COPY.md`
 - Export helper added:
   - `scripts/export_competition_asset_pack.ps1`
+- Printable HTML prototypes added:
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+- PDF export helper added:
+  - `scripts/export_competition_pdfs.js`
+- Current exported PDFs:
+  - `deliverables/competition_kit/deck.pdf`
+  - `deliverables/competition_kit/poster.pdf`
 - Practical meaning:
   - the repo no longer stops at “asset collection”
   - the next operator can draft PPT / video / poster directly from repo-native materials
+  - there is now also a near-final visual baseline for deck/poster production
+  - deck/poster PDF export can now be reproduced from the repo rather than by manual browser steps
   - a timestamped bundle can be exported for handoff without manually re-picking files
 
 ## Current Meaning
@@ -201,10 +211,13 @@
 - The locked gold-sample screenshot set is now refreshed under the current real runtime
 - The repo now has a single asset-pack document for assembling final competition materials without re-deciding facts
 - The repo now also contains first-pass PPT / video / poster drafting docs plus a one-click export path for handoff packaging
+- The repo now contains printable HTML deck/poster prototypes, so the next operator can move straight into final PDF / slide production
+- The repo now has a direct script path for exporting deck/poster PDFs from those HTML prototypes
+- The repo now already contains one generated deck PDF and one generated poster PDF as the current baseline outputs
 
 ## Recommended Next Step
 
-1. Turn `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` into final submission-format files; use `scripts/export_competition_asset_pack.ps1` when handing material production to another operator
+1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf` for last-mile polish; if needed, adjust the HTML prototypes and rerun `node scripts/export_competition_pdfs.js`
 2. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 3. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
 4. Do not expand product scope while final materials are being assembled

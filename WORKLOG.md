@@ -58,6 +58,9 @@
 - Competition materials have been refined into reusable review/demo docs
 - Ready-to-use PPT / video / poster drafting docs have been added
 - Competition asset export script has been added
+- Printable HTML deck / poster prototypes have been added
+- Competition PDF export script has been added
+- Repo-generated deck/poster PDFs have been exported once successfully
 - Minimal model tier routing is implemented and test-covered
 - Fixed sample set replay script is available
 - Sample replay report can now be exported with route and evidence stats
@@ -98,6 +101,9 @@
 - Video shotlist is available at `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
 - Poster copy is available at `evidence/materials/POSTER_COPY.md`
 - Competition export script is available at `scripts/export_competition_asset_pack.ps1`
+- Printable deck/poster prototypes are available under `deliverables/competition_kit/`
+- Competition PDF export script is available at `scripts/export_competition_pdfs.js`
+- Current generated PDFs are available at `deliverables/competition_kit/deck.pdf` and `deliverables/competition_kit/poster.pdf`
 
 ## Current Runtime Configuration
 
@@ -134,6 +140,11 @@ Notes:
 - PPT deck draft exists
 - Video shotlist exists
 - Poster copy exists
+- HTML deck prototype exists
+- HTML poster prototype exists
+- Repo-native PDF export script exists
+- Deck PDF exists
+- Poster PDF exists
 - Sample set exists
 - Gold-sample runbook exists
 - Architecture note exists
@@ -212,7 +223,7 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Turn the drafted PPT / video / poster docs into the final submission-format files using `scripts/export_competition_asset_pack.ps1` as the handoff bundle source
+1. Inspect `deliverables/competition_kit/deck.pdf` and `poster.pdf`, then decide whether only cosmetic polish remains
 2. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 3. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
