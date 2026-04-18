@@ -9,8 +9,8 @@
 ## Current Status
 
 - Phase: `P1 / Demo-ready prototype`
-- Status: `running end-to-end with retrieval, citations, stats, sample replay tooling, and competition materials`
-- Verified on: `2026-04-15`
+- Status: `running end-to-end with Wuwen Xinqiong, locked gold-sample candidate, QA comparison tooling, and refreshed competition materials`
+- Verified on: `2026-04-18`
 
 ### Completed
 
@@ -27,7 +27,7 @@
 - Model client isolated in `backend/app/services/model_client.py`
 - Local JSONL logs implemented in `data/logs/call_logs.jsonl`
 - Swagger docs available at `http://localhost:8000/docs`
-- Real cloud integration switched from mock to `Volcengine Ark`
+- Real cloud integration switched from mock to `Wuwen Xinqiong`
 - Local result cache added for repeated requests
 - Frontend staged loading states added
 - Duplicate submit prevention added
@@ -78,21 +78,27 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Backend tests pass: `27 passed`
+- Backend tests pass: `54 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
 - Sample replay report exported to `evidence/reports/sample_replay_latest.md`
-- Real replay report exported to `evidence/reports/sample_replay_real_latest.md`
-- Real replay summary exported to `evidence/reports/sample_replay_real_summary_latest.md`
+- Broader sample-set real replay report exported to `evidence/reports/sample_replay_real_latest.md`
+- Broader sample-set real replay summary exported to `evidence/reports/sample_replay_real_summary_latest.md`
 - English paper validation recorded in `evidence/experiments/20260415_attention_is_all_you_need_validation.md`
+- Gold-sample candidate manifest is available at `evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
+- Gold-sample QA comparison report is available at `evidence/reports/gold_sample_qa_compare_latest.md`
+- Gold-sample real replay report is available at `evidence/reports/gold_sample_replay_real_latest.md`
+- Gold-sample real replay summary is available at `evidence/reports/gold_sample_replay_real_summary_latest.md`
+- Gold-sample runbook is available at `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
 
 ## Current Runtime Configuration
 
-- Provider: `volcengine_ark`
-- Base URL: `https://ark.cn-beijing.volces.com/api/v3`
-- Current endpoint id:
-  - `MODEL_QA=ep-m-20260401130050-qn8nk`
-  - `MODEL_SUMMARY=ep-m-20260401130050-qn8nk`
-  - `MODEL_OUTLINE=ep-m-20260401130050-qn8nk`
+- Provider: `infinigence_ai`
+- Base URL: `https://cloud.infini-ai.com/maas/v1`
+- Current validated model decision:
+  - primary `MODEL_QA=qwen3-235b-a22b-instruct-2507`
+  - validated fallback `qwen3-32b`
+  - `MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507`
+  - `MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507`
 
 Notes:
 
@@ -106,9 +112,12 @@ Notes:
 - Swagger/API screenshot exists
 - Sample replay report exists
 - Real sample replay report exists
+- Gold-sample real replay report exists
+- Gold-sample QA comparison report exists
 - One-page project summary exists
 - Demo script exists
 - Sample set exists
+- Gold-sample runbook exists
 - Architecture note exists
 - QA brief exists
 - Real call logs contain:
@@ -120,7 +129,7 @@ Notes:
 ## Known Issues
 
 - Latency is still high
-- Volcengine may return `HTTP 429` with `RequestBurstTooFast` if requests are sent too quickly
+- Real provider requests may still fail transiently due to network/runtime conditions and should be retried with cooling time
 - Current backend has minimal burst retry and local cache, but this is not a full queue/rate-limit system
 - Summary and outline still use source chunks rather than strict references
 - Retrieval quality controls can still be improved further, but are no longer minimal
@@ -180,33 +189,18 @@ cd C:\Users\Administrator\Desktop\project
 
 Current status:
 
-- `27 passed`
+- `54 passed`
 
 ## Next Recommended Steps
 
-1. Next session priority: formal online deployment
-   - target architecture:
-     - frontend: static site
-     - backend: web service
-     - backend data: persistent disk or equivalent persistent storage
-   - preferred domain split:
-     - main site: `yourdomain.com`
-     - api: `api.yourdomain.com`
-   - likely first deployment candidate: Render
-   - deployment prep checklist:
-     - verify frontend API base URL strategy
-     - verify backend CORS origins
-     - verify data directory persistence requirements for uploads / parsed / logs / cache
-     - prepare environment variables for production
-2. Preserve current product logic; do not start with large new feature work before deployment path is clear
-3. There are currently uncommitted UI-only experiments in:
-   - `frontend/src/App.tsx`
-   - `frontend/src/styles.css`
-   Tomorrow, decide first whether to keep, revise, or discard them before starting deployment changes
-4. After deployment path is clear:
-   - route-tier comparison on the real sample set
-   - summary/outline stricter reference semantics
-   - final submission-material polish
+1. Refresh screenshots around the locked gold-sample candidate:
+   - ask with citations
+   - PDF evidence render
+   - second answerable ask
+   - refusal
+2. Use the locked candidate set and its reports as the factual source for PPT / video / poster
+3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
+4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
 ## Session Handoff Rule
 

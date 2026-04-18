@@ -12,11 +12,13 @@
 1. Refresh the real-only evidence pack around the locked gold-sample candidate:
    - ask result with citations
    - PDF evidence preview/render
+   - second answerable ask
    - refusal screenshot
    - candidate-set comparison report
-2. Decide whether the existing replay/sample-report workflow should be updated to use the new session/access-token boundary and the locked candidate set
-3. Add expired-session cleanup script
-4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
+2. Turn the locked candidate set into PPT / video / poster wording and asset checklist
+3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
+4. Add expired-session cleanup script
+5. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
 
 ## Recently Verified
 
@@ -26,6 +28,7 @@
 - `2026-04-18`: `qwen3-235b-a22b-instruct-2507` and `qwen3-32b` both passed the candidate set; primary remains `qwen3-235b-a22b-instruct-2507`
 - `2026-04-18`: replay tooling was updated to the current session/access-token boundary and refreshed `gold_sample_replay_real_*` outputs successfully
 - `2026-04-18`: demo/material docs were aligned to the locked gold-sample candidate, including `GOLD_SAMPLE_RUNBOOK.md`
+- `2026-04-18`: runtime/deploy/material docs were aligned to the current Wuwen Xinqiong baseline and gold-sample-primary evidence path
 
 ## Useful But Not Urgent
 

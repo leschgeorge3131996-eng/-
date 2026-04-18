@@ -11,6 +11,13 @@
 - 后端把调用日志写入本地 JSONL
 - 未提供真实 API Key 时，默认使用可替换的 mock 模型返回，方便本地演示
 
+当前比赛验证基线：
+
+- provider: `Wuwen Xinqiong`
+- default API: `https://cloud.infini-ai.com/maas/v1/chat/completions`
+- current primary QA model: `qwen3-235b-a22b-instruct-2507`
+- validated fallback QA model: `qwen3-32b`
+
 ## 目录结构
 
 ```text
@@ -172,16 +179,16 @@ USE_MOCK_MODEL=true
 如果你要接真实云端接口，修改：
 
 ```env
-MODEL_PROVIDER=volcengine_ark
+MODEL_PROVIDER=infinigence_ai
 USE_MOCK_MODEL=false
-WUQIONG_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+WUQIONG_BASE_URL=https://cloud.infini-ai.com/maas/v1
 WUQIONG_API_KEY=你的密钥
-MODEL_QA=你的 Endpoint ID
-MODEL_SUMMARY=你的 Endpoint ID
-MODEL_OUTLINE=你的 Endpoint ID
+MODEL_QA=qwen3-235b-a22b-instruct-2507
+MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507
+MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507
 ```
 
-当前 [backend/app/services/model_client.py](/C:/Users/Administrator/Desktop/project/backend/app/services/model_client.py) 默认按 OpenAI 兼容的 `/chat/completions` 协议调用。接火山方舟时，`MODEL_*` 建议填写控制台创建好的 `Endpoint ID`。
+当前 [backend/app/services/model_client.py](/C:/Users/Administrator/Desktop/project/backend/app/services/model_client.py) 默认按 OpenAI 兼容的 `/chat/completions` 协议调用。接无问芯穹时，`MODEL_*` 直接填写模型名即可，例如 `qwen3-235b-a22b-instruct-2507`。
 
 ### 2. 安装依赖
 
@@ -240,6 +247,11 @@ npm run dev
 
 当前状态：`54 passed`
 
+前端当前验证基线：
+
+- smoke tests: `7 passed`
+- build: passed
+
 ## 日志汇总导出
 
 ```powershell
@@ -264,3 +276,16 @@ python scripts\export_log_summary.py --format json
 powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1
 ```
 
+比赛/评审当前推荐直接跑锁定 gold-sample candidate：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_real_replay.ps1 -Manifest evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json -NamePrefix gold_sample_replay_real
+```
+
+## 当前 gold sample 候选
+
+- 文档：`evidence/samples/chinese_llm_spatial_eval.pdf`
+- 候选题集：`evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
+- 演示 runbook：`evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
+- 双模型比较：`evidence/reports/gold_sample_qa_compare_latest.md`
+- 锁定候选题真实 replay：`evidence/reports/gold_sample_replay_real_latest.md`

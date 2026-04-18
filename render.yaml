@@ -32,11 +32,11 @@ services:
       - key: REQUEST_TIMEOUT_SECONDS
         value: "60"
       - key: MODEL_PROVIDER
-        value: volcengine_ark
+        value: infinigence_ai
       - key: USE_MOCK_MODEL
         value: "false"
       - key: WUQIONG_BASE_URL
-        value: https://ark.cn-beijing.volces.com/api/v3
+        value: https://cloud.infini-ai.com/maas/v1
       - key: WUQIONG_API_KEY
         sync: false
       - key: MODEL_QA

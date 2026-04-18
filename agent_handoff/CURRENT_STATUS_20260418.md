@@ -128,6 +128,21 @@
   - answerable citations present
   - refusal remained `retrieval_no_match`
 
+## Doc / Material Alignment (`2026-04-18`)
+
+- Runtime/deploy docs now align to the current Wuwen Xinqiong baseline:
+  - `.env.example`
+  - `README.md`
+  - `WORKLOG.md`
+  - `render.yaml`
+  - `docs/DEPLOY_RENDER.md`
+- Competition-facing materials now treat the locked gold-sample path as primary:
+  - `evidence/materials/SAMPLE_SET.md`
+  - `evidence/materials/PROJECT_ONE_PAGER.md`
+  - `evidence/materials/REAL_REPLAY_GUIDE.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+- Broader sample-set replay is still available, but should now be treated as secondary coverage rather than the default judging/demo evidence path
+
 ## Current Meaning
 
 - Wuwen Xinqiong integration itself is no longer the blocker
@@ -136,6 +151,7 @@
 - A Chinese gold-sample candidate and candidate question set are now locked for the current stage
 - The current `MODEL_QA` decision can remain on `qwen3-235b-a22b-instruct-2507` without blocking `G2`
 - The replay/evidence tooling is now aligned with the current session/access-token runtime posture
+- The repo docs/materials are now aligned around that locked gold-sample path instead of the older broader replay path
 
 ## Recommended Next Step
 
@@ -143,6 +159,6 @@
    - answerable ask screenshot with citations
    - cited PDF render screenshot
    - refusal screenshot
-2. Decide whether to retire the older broad sample-set replay as the default “latest” evidence path and replace it with the locked gold-sample path
+2. Turn the locked candidate set and its compare/replay reports into PPT/video/poster source material
 3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
-4. Start turning the locked candidate set into paper/PPT/video/poster source material after screenshot evidence is refreshed
+4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed

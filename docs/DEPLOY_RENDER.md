@@ -19,6 +19,8 @@ This repo is prepared for a two-service Render deployment:
 3. Prepare these backend values:
    - `CORS_ORIGINS`
    - `ALPHA_INVITE_CODES`
+   - `MODEL_PROVIDER`
+   - `WUQIONG_BASE_URL`
    - `WUQIONG_API_KEY`
    - `MODEL_QA`
    - `MODEL_SUMMARY`
@@ -34,6 +36,11 @@ Recommended values:
 
 - `CORS_ORIGINS=https://your-frontend.onrender.com`
 - `ALPHA_INVITE_CODES=share-this-only-with-invited-testers`
+- `MODEL_PROVIDER=infinigence_ai`
+- `WUQIONG_BASE_URL=https://cloud.infini-ai.com/maas/v1`
+- `MODEL_QA=qwen3-235b-a22b-instruct-2507`
+- `MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507`
+- `MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507`
 - `VITE_API_BASE_URL=https://your-api.onrender.com/api`
 - `DOCUMENT_RETENTION_HOURS=72`
 - `SESSION_RETENTION_HOURS=168`

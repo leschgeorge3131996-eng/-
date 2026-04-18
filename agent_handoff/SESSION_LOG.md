@@ -561,7 +561,7 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 
 ---
 
-## 2026-04-18 — Gold-sample materials aligned
+## 2026-04-18 – Gold-sample materials aligned
 
 ### 背景
 在锁定 gold-sample candidate、完成 QA 模型比较、修好 replay 工具链之后，下一步不该继续泛化功能，而是把这组固定题和固定文档沉到“可直接照着演示/截图”的材料层。
@@ -585,3 +585,38 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 1. 按 `GOLD_SAMPLE_RUNBOOK.md` 跑现场演示
 2. 刷新截图
 3. 用已有 compare/replay 报告做 paper/PPT/video/poster 的事实底稿
+
+---
+
+## 2026-04-18 / Codex
+
+- Summary:
+  - Aligned runtime/deploy docs to the current `Wuwen Xinqiong` baseline instead of the older Ark wording
+  - Promoted the locked gold-sample candidate to the default judging/demo replay path across replay/material docs
+  - Updated shared handoff files so the next operator sees screenshot/material production as the primary next step
+- Files touched:
+  - `.env.example`
+  - `README.md`
+  - `WORKLOG.md`
+  - `render.yaml`
+  - `docs/DEPLOY_RENDER.md`
+  - `evidence/materials/ARCHITECTURE.md`
+  - `evidence/materials/SAMPLE_SET.md`
+  - `evidence/materials/PROJECT_ONE_PAGER.md`
+  - `evidence/materials/REAL_REPLAY_GUIDE.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - doc-only alignment round; no new runtime behavior introduced
+  - checked that the current authoritative evidence artifacts remain:
+    - `evidence/reports/gold_sample_qa_compare_latest.md`
+    - `evidence/reports/gold_sample_replay_real_latest.md`
+    - `evidence/reports/gold_sample_replay_real_summary_latest.md`
+- Open risks:
+  - broader sample-set replay artifacts still exist and may confuse future operators if they skip the updated handoff/material docs
+  - fresh screenshot evidence is still the main remaining judging/demo gap
+- Recommended next step:
+  - capture the fresh gold-sample screenshots and fold them into PPT / video / poster materials

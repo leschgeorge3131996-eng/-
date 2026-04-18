@@ -16,7 +16,7 @@
 - Current active provider/runtime is now `Wuwen Xinqiong`
 - Current default interface:
   - `https://cloud.infini-ai.com/maas/v1/chat/completions`
-- Current primary/fallback decision under evaluation:
+- Current primary/fallback decision:
   - primary: `qwen3-235b-a22b-instruct-2507`
   - fallback candidate: `qwen3-32b`
 - Real in-project minimal path now verified on:
@@ -121,7 +121,7 @@ These points should stay stable unless the user explicitly changes direction:
 
 1. The strongest feature is evidence-backed `ask`
 2. `summary` and `outline` are useful, but they are still weaker in grounding semantics than `ask`
-3. Login / invite code exists to enforce a controlled-alpha boundary
+3. Login / invite code exists to enforce a controlled-alpha boundary, but `DEMO_MODE=true` can bypass it for judging/demo flow
 4. Login / invite code should not be presented as a product feature
 5. Public-SaaS framing is currently too broad and should be avoided
 
@@ -144,10 +144,11 @@ If the next operator is preparing for review, judging, or defense:
 Best short demo path:
 
 1. enter app
-2. use sample document or preloaded demo document
-3. run `ask`
+2. use the locked gold-sample candidate or the corresponding demo document
+3. run the primary answerable `ask`
 4. open citation
-5. show PDF evidence preview and page-specific snippet behavior
+5. show the cited PDF render / evidence highlight
+6. run the off-topic refusal prompt
 
 ## Architecture Map
 
@@ -194,7 +195,7 @@ Key responsibilities:
 - `App.tsx`: top-level session flow, upload/task flow, history restore, preview state
 - `api.ts`: cookie-backed requests and document-token URL building
 - `ResultPanel.tsx`: output rendering, evidence/source display, export behavior
-- `PdfPreviewPanel.tsx`: iframe PDF preview plus page text matching feedback
+- `PdfPreviewPanel.tsx`: rendered PDF-page preview with evidence-highlight overlays
 
 Main demo path should now be treated as:
 
@@ -219,20 +220,18 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Reduce demo friction
-   - possibly hide or weaken invite-code login for demo mode
-   - possibly simplify first-screen density
-2. Review whether the stats panel helps or hurts the presentation
-3. Tighten one-sentence product positioning in presentation materials
+1. Refresh screenshots/evidence around the locked gold-sample candidate
+2. Turn the locked candidate set plus compare/replay outputs into PPT / video / poster wording
+3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 
 ### Highest value for broader external testing
 
-1. Add CSRF / origin validation for cookie-backed state-changing routes
-2. Add a dedicated expired-session cleanup script
+1. Add a dedicated expired-session cleanup script
+2. Add CSRF / origin validation for cookie-backed state-changing routes
 
 ### Good but not urgent
 
-1. Detail-level replay comparison and report
+1. Broader sample-set replay refresh as secondary coverage
 2. Stronger grounding semantics for `summary` / `outline`
 
 ## Explicit Non-Priorities
@@ -247,15 +246,13 @@ Do not expand into these unless the user explicitly asks:
 
 ## Dirty Worktree Note
 
-The repo is currently in a dirty state and that is expected.
+The repo may still be in a dirty state between sessions, and that is expected.
 
-Recent uncommitted work includes:
+Recent uncommitted work is more likely to be:
 
-- auth/session/cookie boundary
-- document ownership and cleanup
-- frontend smoke tests
-- evidence/PDF preview improvements
-- review-bundle docs
+- doc/material alignment around the locked gold-sample path
+- external-review or external-strategy bundle files
+- temporary replay artifacts that should not be committed by default
 
 Always run:
 
@@ -267,10 +264,13 @@ before making assumptions.
 
 ## External Review Artifacts
 
-Recent external review bundle files:
+Recent external review / strategy bundle files may include:
 
 - `REVIEW_BUNDLE_INDEX.md`
 - `REVIEW_PROMPT.md`
+- `EXTERNAL_AI_STRATEGY_BRIEF.md`
+- `EXTERNAL_AI_STRATEGY_BUNDLE_INDEX.md`
+- `EXTERNAL_AI_STRATEGY_PROMPT.md`
 - `review_bundle_stage_20260416_231332.zip`
 
 These are useful for third-party model review, but they are not the canonical long-term handoff source.

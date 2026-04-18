@@ -12,7 +12,7 @@ flowchart LR
     G --> I[Coverage Selection]
     H --> J[Model Client]
     I --> J
-    J --> K[Volcengine Ark]
+    J --> K[Wuwen Xinqiong]
     B --> L[JSONL Logs]
     B --> M[Summary Export]
     A --> N[Stats Panel]
@@ -26,7 +26,7 @@ flowchart LR
 - Parser 保留页级结构
 - Chunk 层为检索和后续引用打基础
 - Context Planner 决定不同任务如何选择上下文
-- Volcengine Ark 负责生成能力
+- Wuwen Xinqiong 负责当前真实云端生成能力
 - JSONL Logs 和导出脚本负责证据沉淀
 
 ## 关键设计点
@@ -47,4 +47,3 @@ flowchart LR
 4. **证据可沉淀**
 - 结果不只在前端展示，还会进入日志、统计和 evidence 目录
 - 便于后续做比赛材料和答辩说明
-
