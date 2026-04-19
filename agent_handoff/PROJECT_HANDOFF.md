@@ -82,6 +82,14 @@ As of `2026-04-18`:
   - `scripts/export_competition_pdfs.js`
 - video subtitle baseline:
   - `deliverables/competition_kit/video_subtitles.srt`
+- fresh Q2 stability check:
+  - `evidence/experiments/20260419_q2_declared_stability_check.md`
+  - `3 / 3` fresh local real runs returned:
+    - `evidence_mode=declared`
+    - `used_chunk_count=2`
+    - `evidence_quote_count=2`
+    - `citation_count=2`
+    - answer: `作者最终的方法排名第六，总体准确率为56.20%。`
 
 Main verification commands:
 
@@ -203,6 +211,7 @@ Key responsibilities:
 - `context_planner.py`: task-specific chunk/context selection
 - `model_client.py`: provider integration and prompting
 - `task_service.py`: retrieval, evidence validation, response assembly, logging/cache interplay
+  - latest note: `ask` now performs a one-step internal retry when structured evidence is missing, and logs `ask_evidence_retry_count`
 
 ### Frontend
 
@@ -252,6 +261,7 @@ These are the best next steps if work continues:
    - second operator
    - `3` consecutive timed runs
    - explicit fallback notes
+   - do not keep treating Q2 as an open blocker; the fresh `candidate` regression has already been rechecked and closed
 3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 4. Keep the broader sample-set replay in a clearly secondary role
 

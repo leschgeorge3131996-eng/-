@@ -13,6 +13,42 @@ Entry format:
 - Recommended next step:
 ```
 
+## 2026-04-19 / Codex
+
+- Summary:
+  - Investigated the fresh Q2 instability reported during manual demo-mode testing: `作者最终的方法排名和总体准确率分别是多少？` was sometimes returning the correct answer text but falling back to `检索上下文 / candidate` even after cache clear
+  - Confirmed the issue was real, not just stale cache: the cached ask payload itself contained `evidence_mode=candidate`, `used_chunk_ids=[]`, `evidence_quotes=[]`
+  - Added a backend safety net in `TaskService`: when an `ask` turn has matched retrieval but missing structured evidence, the service now retries once internally before surfacing the result
+  - Added logging/caching metadata `ask_evidence_retry_count` so future drift can be diagnosed from `call_logs.jsonl` and cache payloads
+  - Added a regression test covering `plain text / no JSON on first ask -> declared JSON on second ask`
+  - Restarted the local backend, cleared `data/cache`, and verified Q2 again through local demo-session upload/ask flow
+  - Recorded a fresh stability check at `evidence/experiments/20260419_q2_declared_stability_check.md`: `3 / 3` fresh real runs returned `declared`, `2` used chunks, `2` evidence quotes, `2` citations, with the expected `第六 / 56.20%` answer
+- Files touched:
+  - `backend/app/services/task_service.py`
+  - `backend/tests/test_services.py`
+  - `evidence/experiments/20260419_q2_declared_stability_check.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+- Verification:
+  - backend tests: `55 passed`
+  - local backend health after restart: `demo_mode=true`
+  - local real Q2 ask:
+    - request `70248bc85f3d4a90a148b74147f0649a`
+    - `retrieval_status=matched`
+    - `evidence_mode=declared`
+    - `citation_count=2`
+  - fresh Q2 stability requests:
+    - `785bf35b11e5418f942a7e08d5b33351`
+    - `1e38cbd263424988a1880bb286a20fcf`
+    - `9df441cc64bc487aa90a59fc66275602`
+- Open risks:
+  - formal `G3` is still not passed until the operator checklist is completed and recorded
+  - `model_client.py` still has historical prompt-string encoding debt; current fix avoided a risky prompt-file rewrite and instead hardened the service layer
+- Recommended next step:
+  - resume from formal `G3` rehearsal; the known Q2 evidence blocker is no longer the reason to hold it
+
 ## 2026-04-16 / Codex
 
 - Summary:

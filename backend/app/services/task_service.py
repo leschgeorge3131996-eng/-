@@ -10,7 +10,14 @@ from uuid import uuid4
 from ..core.exceptions import AppError
 from ..schemas.document import ParsedChunk, ParsedLine
 from ..schemas.log import CallLogEntry
-from ..schemas.task import Citation, EvidenceQuote, ResponseDetailLevel, TaskResult, TaskType
+from ..schemas.task import (
+    Citation,
+    EvidenceQuote,
+    ModelResult,
+    ResponseDetailLevel,
+    TaskResult,
+    TaskType,
+)
 from .bbox_matcher import match_snippet_to_line_bboxes
 from .cache_service import CacheService
 from .context_planner import ContextPlannerService
@@ -23,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 class TaskService:
+    ASK_EVIDENCE_MAX_ATTEMPTS = 2
+
     def __init__(
         self,
         file_service: FileService | None = None,
@@ -68,6 +77,7 @@ class TaskService:
         route_tier = "task_specific"
         route_model: str | None = None
         route_reason: str | None = None
+        ask_evidence_retry_count = 0
 
         try:
             metadata = self.file_service.get_document_metadata(
@@ -316,30 +326,42 @@ class TaskService:
                             "citation_count": len(task_result.citations),
                             "candidate_chunk_count": len(task_result.candidate_chunks),
                             "source_chunk_count": len(task_result.source_chunks),
+                            "ask_evidence_retry_count": cached_result.get(
+                                "ask_evidence_retry_count",
+                                0,
+                            ),
                         },
                     )
                 )
                 return task_result
 
-            model_result = self.model_client.call_model(
-                task_type=task_type,
-                document_text=document_text,
-                user_input=user_input,
-                model_name_override=resolved_model_name,
-                response_detail_level=response_detail_level,
-            )
-            result_content = model_result.content
+            result_content = ""
             used_chunk_ids: list[str] = []
             evidence_quotes: list[EvidenceQuote] = []
             if task_type == "ask" and selected_chunks:
                 (
+                    model_result,
                     result_content,
                     used_chunk_ids,
                     evidence_quotes,
-                ) = self._extract_ask_evidence(
-                    model_result.content,
-                    selected_chunks,
+                    ask_evidence_retry_count,
+                ) = self._call_ask_model_with_evidence_retry(
+                    document_text=document_text,
+                    user_input=user_input,
+                    model_name_override=resolved_model_name,
+                    response_detail_level=response_detail_level,
+                    selected_chunks=selected_chunks,
                 )
+            else:
+                model_result = self.model_client.call_model(
+                    task_type=task_type,
+                    document_text=document_text,
+                    user_input=user_input,
+                    model_name_override=resolved_model_name,
+                    response_detail_level=response_detail_level,
+                )
+                result_content = model_result.content
+            if task_type == "ask" and selected_chunks:
                 if used_chunk_ids:
                     evidence_mode = "declared"
                     selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
@@ -379,6 +401,7 @@ class TaskService:
                     "citations": [citation.model_dump() for citation in citations],
                     "candidate_chunks": [chunk.model_dump() for chunk in candidate_chunks],
                     "source_chunks": [chunk.model_dump() for chunk in source_chunks],
+                    "ask_evidence_retry_count": ask_evidence_retry_count,
                     "source_document_chars": model_result.source_document_chars,
                     "used_document_chars": model_result.used_document_chars,
                     "truncation_message": model_result.truncation_message,
@@ -439,6 +462,7 @@ class TaskService:
                             "citation_count": len(citations),
                             "candidate_chunk_count": len(candidate_chunks),
                             "source_chunk_count": len(source_chunks),
+                            "ask_evidence_retry_count": ask_evidence_retry_count,
                         }
                         if retrieved_pages or citations or candidate_chunks or source_chunks
                         else None
@@ -582,6 +606,72 @@ class TaskService:
                         matched.extend(result)
                         break
             citation.bbox_regions = matched
+
+    def _call_ask_model_with_evidence_retry(
+        self,
+        *,
+        document_text: str,
+        user_input: str | None,
+        model_name_override: str | None,
+        response_detail_level: ResponseDetailLevel,
+        selected_chunks: list[ParsedChunk],
+    ) -> tuple[ModelResult, str, list[str], list[EvidenceQuote], int]:
+        best_rank = -1
+        best_result: tuple[ModelResult, str, list[str], list[EvidenceQuote]] | None = None
+        performed_retry_count = 0
+
+        for attempt in range(self.ASK_EVIDENCE_MAX_ATTEMPTS):
+            if attempt > 0:
+                performed_retry_count = attempt
+            current_user_input = (
+                user_input
+                if attempt == 0
+                else self._build_ask_evidence_retry_input(user_input)
+            )
+            model_result = self.model_client.call_model(
+                task_type="ask",
+                document_text=document_text,
+                user_input=current_user_input,
+                model_name_override=model_name_override,
+                response_detail_level=response_detail_level,
+            )
+            result_content, used_chunk_ids, evidence_quotes = self._extract_ask_evidence(
+                model_result.content,
+                selected_chunks,
+            )
+
+            rank = 0
+            if used_chunk_ids:
+                rank = 1
+            if used_chunk_ids and evidence_quotes:
+                rank = 2
+
+            if rank > best_rank:
+                best_rank = rank
+                best_result = (
+                    model_result,
+                    result_content,
+                    used_chunk_ids,
+                    evidence_quotes,
+                )
+
+            if rank >= 2:
+                break
+
+        if best_result is None:
+            raise RuntimeError("ask evidence retry produced no model result")
+
+        return (*best_result, performed_retry_count)
+
+    def _build_ask_evidence_retry_input(self, user_input: str | None) -> str:
+        base_question = (user_input or "请基于文档回答问题。").strip()
+        retry_instruction = (
+            "补充要求：这次必须只返回一个 JSON 对象，不要输出任何额外说明。"
+            "used_chunk_ids 必须填写你实际使用的 chunk_id；"
+            "evidence_quotes 至少返回 1 条；"
+            "quote 必须从对应 chunk 原文连续逐字复制，不得改写、不得省略号、不得合并两段。"
+        )
+        return f"{base_question}\n\n{retry_instruction}"
 
     def _extract_ask_evidence(
         self,

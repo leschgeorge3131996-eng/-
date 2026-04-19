@@ -16,6 +16,7 @@
 - Review-driven hardening for evidence/screenshot consistency is now landed in code and materials
 - Latest gold-sample screenshot pack is now refreshed as `20260419_*` with metadata sidecars
 - Latest export bundle now auto-picks the newest screenshot prefix
+- Fresh Q2 ask instability is now closed at the code/runtime layer; `3 / 3` fresh local runs returned `declared`
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -53,6 +54,7 @@
 - `2026-04-19`: refreshed screenshot set created as `20260419_*`, with `.json` sidecars for ask/refusal screenshots
 - `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot prefix and includes the screenshot sidecars
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were regenerated against the refreshed screenshots
+- `2026-04-19`: Q2 fresh stability check recorded at `evidence/experiments/20260419_q2_declared_stability_check.md`; `3 / 3` runs returned `declared`
 
 ## Useful But Not Urgent
 

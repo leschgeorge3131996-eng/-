@@ -303,6 +303,44 @@ class PlainTextAskModelClient(ModelClient):
         )
 
 
+class RetryThenStructuredAskModelClient(ModelClient):
+    def __init__(self, settings: Settings) -> None:
+        super().__init__(settings=settings)
+        self.ask_call_count = 0
+
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+        model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
+    ):
+        if task_type == "ask":
+            self.ask_call_count += 1
+            if self.ask_call_count == 1:
+                plain_text_answer = "Plain text answer without JSON."
+                return super().call_model(
+                    task_type,
+                    document_text,
+                    user_input,
+                    model_name_override=model_name_override,
+                    response_detail_level=response_detail_level,
+                ).model_copy(
+                    update={
+                        "content": plain_text_answer,
+                        "output_chars": len(plain_text_answer),
+                    }
+                )
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
+        )
+
+
 def test_parse_error_is_normalized() -> None:
     workspace = make_workspace()
     try:
@@ -597,6 +635,40 @@ def test_ask_plain_text_response_does_not_fallback_to_candidate_citations() -> N
         assert result.evidence_quotes == []
         assert result.citations == []
         assert len(result.candidate_chunks) >= 1
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_ask_retries_once_when_structured_evidence_is_missing() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        model_client = RetryThenStructuredAskModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "retry.md",
+            "# Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.".encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="What is the first-phase goal?",
+        )
+
+        assert model_client.ask_call_count == 2
+        assert result.evidence_mode == "declared"
+        assert result.used_chunk_ids
+        assert result.evidence_quotes
+        assert result.citations
+        assert result.candidate_chunks == []
     finally:
         cleanup_workspace(workspace)
 
@@ -968,4 +1040,3 @@ def test_retrieval_skips_oversized_chunk_and_continues() -> None:
     selected = retrieval.retrieve("method", chunked)
 
     assert [chunk.chunk_id for chunk in selected] == ["small-2", "small-1"]
-

@@ -45,6 +45,34 @@
 - Backend tests rerun after the fix:
   - `54 passed`
 
+## Q2 Evidence Stability Fix (`2026-04-19`)
+
+- Trigger:
+  - manual demo-mode testing exposed a fresh Q2 regression:
+    - prompt: `作者最终的方法排名和总体准确率分别是多少？`
+    - symptom: answer text was correct, but `evidence_mode` fell back to `candidate`
+    - this still happened after clearing `data/cache`, so it was not just a stale cache artifact
+- Code fix applied:
+  - `backend/app/services/task_service.py`
+    - added a one-step internal retry for `ask` when structured evidence is missing
+    - cached/logged `ask_evidence_retry_count` for later debugging
+  - `backend/tests/test_services.py`
+    - added a regression test covering: first ask response missing JSON evidence -> second ask response declared
+- Verification after the fix:
+  - backend tests: `55 passed`
+  - fresh local real-path check for Q2: `declared`
+  - independent fresh stability check:
+    - `evidence/experiments/20260419_q2_declared_stability_check.md`
+    - `3 / 3` fresh runs returned:
+      - `evidence_mode=declared`
+      - `used_chunk_count=2`
+      - `evidence_quote_count=2`
+      - `citation_count=2`
+      - answer: `作者最终的方法排名第六，总体准确率为56.20%。`
+- Practical meaning:
+  - the previously open Q2 blocker for `G3` is now closed at the code/runtime level
+  - the remaining `G3` work is process validation, not another known Q2 evidence bug
+
 ## Real In-Project Minimal Path Validation (`2026-04-18`)
 
 - Environment note:
@@ -220,6 +248,7 @@
 - The repo now already contains one generated deck PDF and one generated poster PDF as the current baseline outputs
 - The handoff/export bundle can now carry those HTML/PDF deliverables forward without manual file picking
 - The repo now also contains a timed subtitle baseline for the 2-minute demo video
+- The previous fresh-Q2 `candidate` instability has now been fixed and independently rechecked with `3 / 3` fresh declared runs
 
 ## Review-Driven Hardening (`2026-04-19`)
 
