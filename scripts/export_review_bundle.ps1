@@ -58,11 +58,17 @@ $latestScreenshotPrefix = Get-LatestScreenshotPrefix
 
 $requiredFiles = @(
     "README.md",
+    ".env.example",
+    "render.yaml",
+    "pytest.ini",
     "WORKLOG.md",
     "agent_handoff\COMPETITION_PLAN_V2.md",
     "agent_handoff\CURRENT_STATUS_20260418.md",
+    "agent_handoff\FREEZE_FACT_SHEET_20260419.md",
     "agent_handoff\PROJECT_HANDOFF.md",
+    "agent_handoff\SESSION_LOG.md",
     "agent_handoff\TASK_BOARD.md",
+    "docs\DEPLOY_RENDER.md",
     "evidence\materials\PROJECT_ONE_PAGER.md",
     "evidence\materials\COMPETITION_ASSET_PACK.md",
     "evidence\materials\SUBMISSION_PREP_GUIDE.md",
@@ -74,6 +80,11 @@ $requiredFiles = @(
     "evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json",
     "evidence\materials\ARCHITECTURE.md",
     "evidence\materials\QA_BRIEF.md",
+    "evidence\materials\MATERIALS_INDEX.md",
+    "evidence\materials\REAL_EVIDENCE_REFRESH_CHECKLIST.md",
+    "evidence\materials\REAL_REPLAY_GUIDE.md",
+    "evidence\materials\SAMPLE_MANIFEST.json",
+    "evidence\materials\SAMPLE_SET.md",
     "evidence\experiments\20260418_gold_sample_validation.md",
     "evidence\experiments\20260419_q2_declared_stability_check.md",
     "evidence\experiments\20260419_g3_rehearsal_template.md",
@@ -95,20 +106,45 @@ $requiredFiles = @(
     "deliverables\competition_kit\deck.pdf",
     "deliverables\competition_kit\poster.pdf",
     "deliverables\competition_kit\video_subtitles.srt",
+    "backend\requirements.txt",
     "backend\app\main.py",
     "backend\app\api\routes.py",
     "backend\app\core\config.py",
+    "backend\app\core\csrf.py",
+    "backend\app\core\exceptions.py",
+    "backend\app\core\logging_config.py",
+    "backend\app\schemas\auth.py",
+    "backend\app\schemas\common.py",
+    "backend\app\schemas\document.py",
+    "backend\app\schemas\log.py",
+    "backend\app\schemas\task.py",
+    "backend\app\services\auth_service.py",
+    "backend\app\services\bbox_matcher.py",
+    "backend\app\services\cache_service.py",
+    "backend\app\services\chunk_service.py",
     "backend\app\services\model_client.py",
     "backend\app\services\context_planner.py",
+    "backend\app\services\document_parser.py",
     "backend\app\services\retrieval_service.py",
     "backend\app\services\task_service.py",
     "backend\app\services\file_service.py",
+    "backend\app\services\log_service.py",
+    "backend\tests\test_api.py",
+    "backend\tests\test_config.py",
     "backend\tests\test_services.py",
+    "frontend\index.html",
+    "frontend\package.json",
+    "frontend\vite.config.ts",
     "frontend\src\App.tsx",
     "frontend\src\api.ts",
+    "frontend\src\main.tsx",
+    "frontend\src\styles.css",
+    "frontend\src\types.ts",
+    "frontend\src\components\MarkdownResult.tsx",
     "frontend\src\components\ResultPanel.tsx",
     "frontend\src\components\PdfPreviewPanel.tsx",
     "frontend\src\App.smoke.test.tsx",
+    "frontend\src\test\setup.ts",
     "scripts\capture_gold_sample_screenshots.js",
     "scripts\compare_qa_models.py",
     "scripts\run_real_replay.ps1",
@@ -175,7 +211,15 @@ $bundleDeliverablesSection = (
 )
 $bundleCodeSection = (
     ($copiedRequired |
-        Where-Object { $_ -like 'backend*' -or $_ -like 'frontend*' -or $_ -like 'scripts*' } |
+        Where-Object {
+            $_ -like 'backend*' -or
+            $_ -like 'frontend*' -or
+            $_ -like 'scripts*' -or
+            $_ -like 'docs*' -or
+            $_ -eq '.env.example' -or
+            $_ -eq 'render.yaml' -or
+            $_ -eq 'pytest.ini'
+        } |
         ForEach-Object { "- $_" }) -join [Environment]::NewLine
 )
 $bundleOptionalSection = if ($copiedOptional.Count -eq 0) {
@@ -230,8 +274,15 @@ The current strategy is intentionally narrow:
 - Gold-sample replay reports, screenshots, and PDF evidence exist.
 - Q2 fresh declared-evidence instability was fixed and rechecked.
 - G3 operator rehearsal is recorded as pass in the current handoff.
-- PPT / poster / video-script / deck-poster PDFs already exist as working
-  submission materials.
+- The competition material chain was rebuilt from clean source docs after an
+  external review identified corruption in the earlier printable baseline.
+- The current printable baseline has already been regenerated and rechecked:
+  - deliverables/competition_kit/deck.pdf -> 6 pages
+  - deliverables/competition_kit/poster.pdf -> 1 page
+- The latest screenshot sidecars now explicitly record:
+  - attempt
+  - evidence_mode
+  - cache_hit
 
 ## What "Pass" Currently Means
 
@@ -247,6 +298,19 @@ Important caveat:
 
 - current G3 evidence is **not** a stricter cold-start upload-from-zero pass
 - it is a warm-state judged-demo rehearsal after warmup on the locked document
+
+## What File Should Override Older Historical Notes
+
+If the reviewer sees older statements that conflict with the latest state,
+prefer:
+
+1. agent_handoff/FREEZE_FACT_SHEET_20260419.md
+2. agent_handoff/CURRENT_STATUS_20260418.md
+3. the latest screenshot sidecars under evidence/screenshots/
+4. the current printable deliverables under deliverables/competition_kit/
+
+Historical notes are still useful, but they should not outweigh the current
+freeze-fact layer.
 
 ## Real Goal Of This Review
 
@@ -281,13 +345,14 @@ exploration.
 1. PROJECT_CONTEXT.md
 2. REVIEW_PROMPT.md
 3. BUNDLE_INDEX.md
-4. agent_handoff/CURRENT_STATUS_20260418.md
-5. agent_handoff/PROJECT_HANDOFF.md
-6. evidence/materials/COMPETITION_ASSET_PACK.md
-7. evidence/experiments/20260419_q2_declared_stability_check.md
-8. evidence/experiments/20260419_g3_rehearsal_template.md
-9. current deck / poster / video-script materials
-10. code paths only where needed to verify a claim
+4. agent_handoff/FREEZE_FACT_SHEET_20260419.md
+5. agent_handoff/CURRENT_STATUS_20260418.md
+6. agent_handoff/PROJECT_HANDOFF.md
+7. evidence/materials/COMPETITION_ASSET_PACK.md
+8. evidence/experiments/20260419_q2_declared_stability_check.md
+9. evidence/experiments/20260419_g3_rehearsal_template.md
+10. current deck / poster / video-script materials
+11. code paths only where needed to verify a claim
 "@
 
 $bundleIndex = @"
@@ -311,6 +376,8 @@ bundle** after the following have already happened:
 - the locked gold-sample path is in place
 - the fresh Q2 declared-evidence regression has been fixed
 - G3 has been recorded as pass in the current handoff
+- the competition material chain has been rebuilt from clean sources
+- the current printable baseline has been regenerated with sanity checks
 
 The goal is to catch the remaining high-value risks before final submission /
 judging material freeze.
@@ -330,6 +397,8 @@ judging material freeze.
 - Important caveat already documented by the team:
   - current G3 evidence is a warm-state reproducibility pass after warmup on
     the locked sample document, not a stricter cold-start upload-from-zero pass
+- Current freeze-fact file:
+  - agent_handoff/FREEZE_FACT_SHEET_20260419.md
 
 ## What Changed Since The Previous External Review
 
@@ -341,6 +410,12 @@ judging material freeze.
   - evidence/experiments/20260419_q2_declared_stability_check.md
 - G3 rehearsal was recorded in:
   - evidence/experiments/20260419_g3_rehearsal_template.md
+- the competition material chain was rebuilt and current printable outputs now
+  pass the intended page-count sanity check:
+  - deck.pdf -> 6 pages
+  - poster.pdf -> 1 page
+- the latest screenshot sidecars now include cache_hit so the reviewer can
+  distinguish fresh results from cached results
 
 ## Review Focus
 
@@ -385,13 +460,14 @@ $bundleOptionalSection
 
 1. Read PROJECT_CONTEXT.md
 2. Read REVIEW_PROMPT.md
-3. Read agent_handoff/CURRENT_STATUS_20260418.md
-4. Read agent_handoff/PROJECT_HANDOFF.md
-5. Read evidence/materials/COMPETITION_ASSET_PACK.md
-6. Read evidence/experiments/20260419_q2_declared_stability_check.md
-7. Read evidence/experiments/20260419_g3_rehearsal_template.md
-8. Inspect the current deck/poster/video deliverables
-9. Inspect the current ask/evidence code path only if needed
+3. Read agent_handoff/FREEZE_FACT_SHEET_20260419.md
+4. Read agent_handoff/CURRENT_STATUS_20260418.md
+5. Read agent_handoff/PROJECT_HANDOFF.md
+6. Read evidence/materials/COMPETITION_ASSET_PACK.md
+7. Read evidence/experiments/20260419_q2_declared_stability_check.md
+8. Read evidence/experiments/20260419_g3_rehearsal_template.md
+9. Inspect the current deck/poster/video deliverables
+10. Inspect the current ask/evidence code path only if needed
 
 ## Generation Metadata
 
@@ -412,8 +488,9 @@ Before writing any judgment, first read:
 1. PROJECT_CONTEXT.md
 2. REVIEW_PROMPT.md
 3. BUNDLE_INDEX.md
-4. agent_handoff/CURRENT_STATUS_20260418.md
-5. agent_handoff/PROJECT_HANDOFF.md
+4. agent_handoff/FREEZE_FACT_SHEET_20260419.md
+5. agent_handoff/CURRENT_STATUS_20260418.md
+6. agent_handoff/PROJECT_HANDOFF.md
 
 ## Your Role
 
@@ -436,8 +513,12 @@ remaining blockers, and "this could still embarrass the team live" risks.
   - refusal semantics (retrieval_gate)
   - screenshot evidence consistency
   - G3 recorded as pass
+  - printable material corruption in the earlier deck/poster baseline
 - Do **not** spend most of the review repeating stale historical findings unless
   the current files still show those problems are still open.
+- If you find historical contradictions, explicitly distinguish:
+  - stale historical artifact
+  - current blocker
 
 ## Project Context
 
@@ -485,6 +566,8 @@ remaining blockers, and "this could still embarrass the team live" risks.
 - Decide whether G1, G2, and G3 are actually passed **on current evidence**.
 - Pay special attention to whether the current G3 evidence is strong enough,
   given that it is documented as a warm-state operator rehearsal.
+- Pay special attention to whether the reviewer now has enough context to
+  fairly judge the project end-to-end without guessing missing background.
 - Identify the minimum remaining work before confident final submission /
   judging freeze.
 

@@ -1167,3 +1167,24 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - the current judge-facing screenshot set is cleaner than the earlier `cache-hit` version
   - another AI can now review the project without inheriting the stale “attempt 2 / maybe cached” screenshot concern
+
+---
+
+## 2026-04-19 / Codex (full-context external review bundle expanded)
+
+- Summary:
+  - expanded `scripts/export_review_bundle.ps1` so the external review zip now carries a much fuller high-relevance picture of the project instead of only the narrow late-stage slices
+  - added freeze facts, session log, supplementary material indexes, deployment/env references, more backend service/core/schema files, and more frontend entry/support files
+  - regenerated a new full-context review bundle after the script upgrade
+- Files touched:
+  - `scripts/export_review_bundle.ps1`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+- New local review artifact:
+  - stage dir:
+    - `review_bundle_stage_20260419_171308/`
+  - zip:
+    - `review_bundle_20260419_171308_final_competition_review.zip`
+- Practical meaning:
+  - another AI can now understand the project with less guessing and less dependence on a narrow curated slice
+  - this bundle is better suited for “full project understanding + final-stage judgment” than the earlier lighter review zips

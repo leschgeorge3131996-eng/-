@@ -327,7 +327,7 @@ Recent external review / strategy bundle files may include:
 - `EXTERNAL_AI_STRATEGY_BUNDLE_INDEX.md`
 - `EXTERNAL_AI_STRATEGY_PROMPT.md`
 - `review_bundle_stage_20260416_231332.zip`
-- `review_bundle_stage_20260419_165239/`
-- `review_bundle_20260419_165239_final_competition_review.zip`
+- `review_bundle_stage_20260419_171308/`
+- `review_bundle_20260419_171308_final_competition_review.zip`
 
 These are useful for third-party model review, but they are not the canonical long-term handoff source.
