@@ -303,14 +303,14 @@
     - `evidence/screenshots/20260419_stats_panel.png`
     - `evidence/screenshots/20260419_api_docs.png`
   - sidecar metadata confirms:
-    - `20260419_gold_ask_research_focus.json` -> `evidence_mode=declared`
-    - `20260419_gold_ask_rank_accuracy.json` -> `evidence_mode=declared` on attempt `2`
-    - `20260419_gold_refusal.json` -> `evidence_mode=none`
+    - `20260419_gold_ask_research_focus.json` -> `evidence_mode=declared`, `attempt=1`, `cache_hit=false`
+    - `20260419_gold_ask_rank_accuracy.json` -> `evidence_mode=declared`, `attempt=1`, `cache_hit=false`
+    - `20260419_gold_refusal.json` -> `evidence_mode=none`, `attempt=1`, `cache_hit=false`
   - `node scripts\export_competition_pdfs.js` refreshed:
     - `deliverables/competition_kit/deck.pdf`
     - `deliverables/competition_kit/poster.pdf`
   - `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot date prefix and exports sidecar metadata; latest pack:
-    - `evidence/exports/competition_asset_pack_20260419_144125/`
+    - `evidence/exports/competition_asset_pack_20260419_165205/`
 - Practical meaning:
   - the previously identified judge-facing mismatch (`candidate` screenshot mixed into the locked answerable path) is now closed in the current repo state
   - the PDF preview snippet/highlight mismatch is now closed for `declared` ask results in the frontend

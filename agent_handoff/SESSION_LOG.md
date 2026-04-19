@@ -1132,3 +1132,38 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - future PDF exports now fail fast if page counts or obvious corruption regress
 - Recommended next step:
   - export a refreshed competition handoff bundle so the rebuilt printable outputs replace the previously broken bundle contents
+
+---
+
+## 2026-04-19 / Codex (fresh screenshot metadata + bundle refresh)
+
+- Summary:
+  - refreshed the locked gold-sample screenshots after clearing `data/cache`
+  - extended screenshot sidecars with `cache_hit` so a future reviewer can tell whether a screenshot came from a fresh or cached result
+  - regenerated both the competition handoff bundle and the external review bundle from this fresher screenshot state
+- Files touched:
+  - `scripts/capture_gold_sample_screenshots.js`
+  - `evidence/screenshots/20260419_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260419_gold_ask_research_focus.json`
+  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.json`
+  - `evidence/screenshots/20260419_gold_refusal.png`
+  - `evidence/screenshots/20260419_gold_refusal.json`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `WORKLOG.md`
+- Verification:
+  - refreshed sidecars now show:
+    - `20260419_gold_ask_research_focus.json` -> `attempt=1`, `cache_hit=false`, `evidence_mode=declared`
+    - `20260419_gold_ask_rank_accuracy.json` -> `attempt=1`, `cache_hit=false`, `evidence_mode=declared`
+    - `20260419_gold_refusal.json` -> `attempt=1`, `cache_hit=false`, `evidence_mode=none`
+  - refreshed competition handoff bundle:
+    - `evidence/exports/competition_asset_pack_20260419_165205/`
+  - refreshed external review bundle:
+    - `review_bundle_stage_20260419_165239/`
+    - `review_bundle_20260419_165239_final_competition_review.zip`
+- Practical meaning:
+  - the current judge-facing screenshot set is cleaner than the earlier `cache-hit` version
+  - another AI can now review the project without inheriting the stale “attempt 2 / maybe cached” screenshot concern

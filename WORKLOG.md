@@ -229,7 +229,7 @@ Current status:
 ## Next Recommended Steps
 
 1. Close `G3` with a second-operator rehearsal and `3` consecutive timed runs
-2. Use `evidence/exports/competition_asset_pack_20260419_144125/` as the current handoff bundle for external polishing / collaboration
+2. Use `evidence/exports/competition_asset_pack_20260419_165205/` as the current handoff bundle for external polishing / collaboration
 3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
@@ -299,7 +299,7 @@ At the start of the next session:
 - Refreshed deliverables/export:
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
-  - `evidence/exports/competition_asset_pack_20260419_144125/`
+  - `evidence/exports/competition_asset_pack_20260419_165205/`
 - Verification:
   - `npm run build`
   - `npm test -- --run` -> `7 passed`

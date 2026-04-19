@@ -716,6 +716,7 @@ async function runAskAndCapture(cdp, { prompt, screenshotPath, previousOutput, r
   const maxAttempts = requirePdfButton ? 3 : 1;
   let latestPanelText = previousOutput;
   let lastEvidenceMode = null;
+  let lastCacheHit = false;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     await setTaskPrompt(cdp, buildCacheBustingPrompt(prompt, attempt));
@@ -724,6 +725,7 @@ async function runAskAndCapture(cdp, { prompt, screenshotPath, previousOutput, r
     const nextState = await waitForOutputChange(cdp, latestPanelText, { requirePdfButton });
     latestPanelText = nextState.panelText;
     lastEvidenceMode = requirePdfButton ? await readEvidenceMode(cdp) : "none";
+    lastCacheHit = nextState.panelText.includes("本次结果命中本地缓存");
 
     if (requirePdfButton && lastEvidenceMode !== "declared") {
       continue;
@@ -735,6 +737,7 @@ async function runAskAndCapture(cdp, { prompt, screenshotPath, previousOutput, r
       attempt,
       require_pdf_button: requirePdfButton,
       evidence_mode: lastEvidenceMode,
+      cache_hit: lastCacheHit,
       captured_at: new Date().toISOString(),
     });
     return latestPanelText;

@@ -71,7 +71,7 @@ Use this file as the quickest authoritative reference when another operator or a
   - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
   - `evidence/screenshots/20260419_gold_refusal.png`
 - Current rehearse/export bundle before the next refresh:
-  - `evidence/exports/competition_asset_pack_20260419_144125/`
+  - `evidence/exports/competition_asset_pack_20260419_165205/`
 
 ## What Still Matters
 

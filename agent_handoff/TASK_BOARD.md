@@ -94,8 +94,8 @@
 - Authoritative freeze facts now live in:
   - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 - The latest external final-review artifact is:
-  - `review_bundle_stage_20260419_132632/`
-  - `review_bundle_20260419_132632_final_competition_review.zip`
+  - `review_bundle_stage_20260419_165239/`
+  - `review_bundle_20260419_165239_final_competition_review.zip`
 - This latest review bundle is preferred over the older broad review pack because it now includes:
   - `PROJECT_CONTEXT.md`
   - refreshed `REVIEW_PROMPT.md`
