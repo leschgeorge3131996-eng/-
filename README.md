@@ -252,6 +252,11 @@ npm run dev
 - smoke tests: `7 passed`
 - build: passed
 
+## 部署文档
+
+- Render: `docs/DEPLOY_RENDER.md`
+- 阿里云轻量应用服务器: `docs/DEPLOY_ALIYUN_LIGHTSERVER.md`
+
 ## 日志汇总导出
 
 ```powershell

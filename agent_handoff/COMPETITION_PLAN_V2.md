@@ -10,10 +10,10 @@ Created: `2026-04-18`
 
 ## Goal
 
-- Primary goal: enter the top `20%` of the `Wuwen Xinqiong` topic and reach the national finals
-- Secondary goal: compete for the topic award line
+- Primary goal: build a `national first prize`-level submission package for the `Wuwen Xinqiong` topic
+- Secondary goal: if time or environment constraints appear, still keep the package strong enough for the national finals and topic-award line
 - Main demo path: `ask -> citation -> PDF back-link -> refusal`
-- Strategy: stop expanding product scope, focus on platform alignment, demo stability, evidence, and submission materials
+- Strategy: stop expanding product scope, focus on platform alignment, judge-proof evidence, stricter reproducibility, and submission completion
 
 ## Gold Sample Policy
 
@@ -103,6 +103,7 @@ Pass conditions:
 - poster
 - product/technical write-up
 - platform usage page
+- scoring-to-evidence mapping page
 - final screenshot set
 
 ## Hard Rules
@@ -116,12 +117,12 @@ Pass conditions:
 
 ## Immediate Next Actions
 
-1. Create/update the competition tracking sheet with owners and due dates
-2. Lock the gold-sample candidate and candidate question set
-3. Validate `Wuwen Xinqiong` API outside the project
-4. Switch the main provider and push for `G1`
-5. Define `real-only` evidence rules and old-material exclusion rules
-6. Start paper outline, video storyboard, and poster skeleton, but do not finalize official screenshots before `G2`
+1. Freeze the official submission spec crosswalk and score-to-evidence matrix
+2. Lock the judge-facing platform usage page and hard-evidence summary
+3. Keep only `real-only` evidence in the main judging path and push historical artifacts to appendix
+4. Upgrade `G3` from warm-state rehearsal toward a stricter reproducibility pass
+5. Finish the product/technical write-up, `3`-page PPT, `5`-minute video, and poster around the same locked gold-sample wording
+6. Only after the main materials and reproducibility path are frozen, decide whether a judged-demo URL is worth the remaining time
 
 ## Notes
 

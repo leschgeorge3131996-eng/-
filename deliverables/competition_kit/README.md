@@ -12,6 +12,11 @@ Current printable baseline:
 - `node scripts/export_competition_pdfs.js`
   - now performs HTML/PDF sanity checks before a baseline is treated as valid
 
+Important:
+
+- `deck.html` / `deck.pdf` are visual baselines, not the final official `3`-page submission deck.
+- `video_subtitles.srt` is a `2`-minute narration baseline, not the final official `5`-minute submission video.
+
 ## Files
 
 - `deck.html`

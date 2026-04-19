@@ -60,6 +60,11 @@ $requiredFiles = @(
     "agent_handoff\FREEZE_FACT_SHEET_20260419.md",
     "evidence\materials\PROJECT_ONE_PAGER.md",
     "evidence\materials\DEMO_SCRIPT_3MIN.md",
+    "evidence\materials\PRODUCT_TECHNICAL_WRITEUP.md",
+    "evidence\materials\PLATFORM_USAGE_EVIDENCE.md",
+    "evidence\materials\HARD_EVIDENCE_SUMMARY.md",
+    "evidence\materials\SCORING_EVIDENCE_MATRIX.md",
+    "evidence\materials\HANDOFF_PACKAGE_BOUNDARY.md",
     "evidence\materials\GOLD_SAMPLE_RUNBOOK.md",
     "evidence\materials\COMPETITION_ASSET_PACK.md",
     "evidence\materials\PPT_DECK_6SLIDES.md",
@@ -67,6 +72,7 @@ $requiredFiles = @(
     "evidence\materials\POSTER_COPY.md",
     "evidence\materials\QA_BRIEF.md",
     "evidence\materials\SUBMISSION_PREP_GUIDE.md",
+    "evidence\materials\SUBMISSION_SPEC_CROSSWALK.md",
     "evidence\materials\MATERIALS_INDEX.md",
     "evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json",
     "evidence\reports\gold_sample_replay_real_summary_latest.md",
@@ -130,6 +136,7 @@ $indexLines.Add("- Locked sample: evidence/samples/chinese_llm_spatial_eval.pdf"
 $indexLines.Add("- Locked prompts: 2 answerable + 1 refusal from GOLD_SAMPLE_CANDIDATE_20260418.json")
 $indexLines.Add("- Current primary QA model: qwen3-235b-a22b-instruct-2507")
 $indexLines.Add("- Validated fallback QA model: qwen3-32b")
+$indexLines.Add("- Package boundary guide: evidence/materials/HANDOFF_PACKAGE_BOUNDARY.md")
 $indexLines.Add("")
 $indexLines.Add("## Required Files")
 foreach ($relativePath in $copiedRequired) {
@@ -148,13 +155,18 @@ else {
 }
 
 $indexLines.Add("")
+$indexLines.Add("## Package Boundary")
+$indexLines.Add("- Main submission: final 3-page PPT, final 5-minute video, PRODUCT_TECHNICAL_WRITEUP.md, PLATFORM_USAGE_EVIDENCE.md, HARD_EVIDENCE_SUMMARY.md, SCORING_EVIDENCE_MATRIX.md, final screenshots")
+$indexLines.Add("- Appendix: replay reports, experiment notes, GOLD_SAMPLE_RUNBOOK.md, QA_BRIEF.md, appendix-only screenshots")
+$indexLines.Add("- Ops/source: PROJECT_ONE_PAGER.md, DEMO_SCRIPT_3MIN.md, COMPETITION_ASSET_PACK.md, PPT_DECK_6SLIDES.md, VIDEO_SHOTLIST_2MIN.md, POSTER_COPY.md, deliverables/competition_kit/, export scripts")
+$indexLines.Add("")
 $indexLines.Add("## Recommended Build Order")
-$indexLines.Add("1. Read evidence/materials/COMPETITION_ASSET_PACK.md")
-$indexLines.Add("2. Draft slides from evidence/materials/PPT_DECK_6SLIDES.md")
-$indexLines.Add("3. Use deliverables/competition_kit/deck.pdf and poster.pdf as the current printable baselines")
-$indexLines.Add("4. If visual polish is needed, edit deliverables/competition_kit/*.html and rerun scripts/export_competition_pdfs.js")
-$indexLines.Add("5. Record or edit video using evidence/materials/VIDEO_SHOTLIST_2MIN.md")
-$indexLines.Add("6. Keep wording aligned with PROJECT_ONE_PAGER.md and QA_BRIEF.md")
+$indexLines.Add("1. Read evidence/materials/HANDOFF_PACKAGE_BOUNDARY.md and evidence/materials/SUBMISSION_SPEC_CROSSWALK.md")
+$indexLines.Add("2. Lock judge-facing wording from PRODUCT_TECHNICAL_WRITEUP.md, PLATFORM_USAGE_EVIDENCE.md, HARD_EVIDENCE_SUMMARY.md, and SCORING_EVIDENCE_MATRIX.md")
+$indexLines.Add("3. Draft final slides from evidence/materials/PPT_DECK_6SLIDES.md and export an official 3-page deck")
+$indexLines.Add("4. Use deliverables/competition_kit/deck.pdf and poster.pdf only as printable baselines, not as final official substitutes")
+$indexLines.Add("5. Record or edit the final video from evidence/materials/VIDEO_SHOTLIST_2MIN.md and export an official 5-minute submission video")
+$indexLines.Add("6. Keep wording aligned with PROJECT_ONE_PAGER.md, DEMO_SCRIPT_3MIN.md, and QA_BRIEF.md")
 
 Set-Content -LiteralPath $indexPath -Value $indexLines -Encoding UTF8
 
