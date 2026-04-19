@@ -12,6 +12,25 @@
 - Status: `running end-to-end with Wuwen Xinqiong, locked gold-sample candidate, QA comparison tooling, and refreshed competition materials`
 - Verified on: `2026-04-18`
 
+### 2026-04-19 Final Sweep
+
+- `DEMO_SCRIPT_3MIN.md` now matches the real judged-demo path
+- `QA_BRIEF.md` now includes fixed spoken answers for:
+  - warm-state `G3`
+  - pure off-topic refusal wording
+  - `summary / outline` de-emphasis
+- screenshot sidecars now use ASCII-safe provenance fields:
+  - `prompt_id`
+  - `source_prompt_id`
+  - `preview_page`
+  - `pdf_status_present`
+  - `evidence_snippet_present`
+- latest production bundle:
+  - `evidence/exports/competition_asset_pack_20260419_211551/`
+- latest external review bundle:
+  - `review_bundle_stage_20260419_211551/`
+  - `review_bundle_20260419_211551_final_competition_review.zip`
+
 ### Completed
 
 - React + TypeScript + Vite frontend created

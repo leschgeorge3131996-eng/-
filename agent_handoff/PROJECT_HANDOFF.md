@@ -31,6 +31,11 @@
     - `这篇论文主要研究了什么问题？`
     - `作者最终的方法排名和总体准确率分别是多少？`
     - `木星有几颗卫星？`
+- Authoritative prompt identifiers for fresh artifacts:
+  - `askResearchFocus`
+  - `askRankAccuracy`
+  - `refusal`
+- If another doc still shows mojibake prompt text, treat that as a stale text artifact and use the prompt identifiers above.
 - Current QA comparison artifact:
   - `evidence/reports/gold_sample_qa_compare_latest.md`
 - Current gold-sample replay artifact:
@@ -64,6 +69,11 @@ As of `2026-04-18`:
   - `evidence/screenshots/20260419_gold_refusal.png`
   - `evidence/screenshots/20260419_stats_panel.png`
   - `evidence/screenshots/20260419_api_docs.png`
+  - metadata sidecars:
+    - `20260419_gold_ask_research_focus.json`
+    - `20260419_gold_pdf_render.json`
+    - `20260419_gold_ask_rank_accuracy.json`
+    - `20260419_gold_refusal.json`
 - competition drafting assets:
   - `evidence/materials/PPT_DECK_6SLIDES.md`
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
@@ -92,7 +102,7 @@ As of `2026-04-18`:
     - answer: `作者最终的方法排名第六，总体准确率为56.20%。`
 - `G3` rehearsal record:
   - `evidence/experiments/20260419_g3_rehearsal_template.md`
-  - current status: `pass`
+  - current status: `pass (warm-state operator rehearsal)`
   - caveat:
     - this was a warm-state reproducibility pass after warmup on the already-loaded locked sample document
     - not a stricter upload-from-zero cold-start pass
@@ -113,6 +123,25 @@ Operator rehearsal result:
 - `G3`: pass (warm-state operator rehearsal)
 - authoritative freeze-fact reference:
   - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+
+## 2026-04-19 Final Sweep
+
+- `DEMO_SCRIPT_3MIN.md` now follows the real judged-demo path instead of the old "homepage sample entry loads the locked PDF" wording
+- `QA_BRIEF.md` now includes fixed spoken answers for:
+  - warm-state `G3`
+  - pure off-topic refusal wording
+  - `summary / outline` de-emphasis
+- screenshot sidecars now use ASCII-safe provenance keys:
+  - `prompt_id`
+  - `source_prompt_id`
+  - `preview_page`
+  - `pdf_status_present`
+  - `evidence_snippet_present`
+- latest production bundle:
+  - `evidence/exports/competition_asset_pack_20260419_211551/`
+- latest external review bundle:
+  - `review_bundle_stage_20260419_211551/`
+  - `review_bundle_20260419_211551_final_competition_review.zip`
 
 ## What Was Added In The Latest Iterations
 
@@ -270,14 +299,14 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Start from `evidence/exports/competition_asset_pack_20260419_144125/`; it includes the refreshed `20260419_*` screenshots, sidecar metadata, and current PDF deliverables
+1. Start from `evidence/exports/competition_asset_pack_20260419_211551/`
 2. Use the latest final external-review bundle for one more targeted judging-risk review:
-   - `review_bundle_stage_20260419_132632/`
-   - `review_bundle_20260419_132632_final_competition_review.zip`
+   - `review_bundle_stage_20260419_211551/`
+   - `review_bundle_20260419_211551_final_competition_review.zip`
    - this version adds `PROJECT_CONTEXT.md`, so another AI sees the project background, target, and scope constraints before judging the current state
 3. Treat `G3` as closed for the current warm-state judged-demo path; do not reopen Q2 or G3 as default blockers unless new evidence appears
 4. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
-5. Keep the broader sample-set replay in a clearly secondary role
+5. Finalize judged-demo materials and spoken defense wording before doing any new feature work
 
 ### Highest value for broader external testing
 
@@ -327,7 +356,7 @@ Recent external review / strategy bundle files may include:
 - `EXTERNAL_AI_STRATEGY_BUNDLE_INDEX.md`
 - `EXTERNAL_AI_STRATEGY_PROMPT.md`
 - `review_bundle_stage_20260416_231332.zip`
-- `review_bundle_stage_20260419_171308/`
-- `review_bundle_20260419_171308_final_competition_review.zip`
+- `review_bundle_stage_*`
+- `review_bundle_*_final_competition_review.zip`
 
 These are useful for third-party model review, but they are not the canonical long-term handoff source.

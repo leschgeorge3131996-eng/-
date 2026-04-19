@@ -18,6 +18,14 @@ Use this file as the quickest authoritative reference when another operator or a
   - `作者最终的方法排名和总体准确率分别是多少？`
   - `木星有几颗卫星？`
 
+- Authoritative prompt identifiers for all fresh screenshot/report artifacts:
+  - `askResearchFocus`
+  - `askRankAccuracy`
+  - `refusal`
+- If an older file still shows mojibake prompt literals, treat that as a historical text artifact and use the prompt identifiers above.
+- Exact wording source of truth:
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+
 ## Runtime Facts
 
 - Current active provider path:
@@ -71,7 +79,23 @@ Use this file as the quickest authoritative reference when another operator or a
   - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
   - `evidence/screenshots/20260419_gold_refusal.png`
 - Current rehearse/export bundle before the next refresh:
-  - `evidence/exports/competition_asset_pack_20260419_165205/`
+  - superseded by `evidence/exports/competition_asset_pack_20260419_193852/`
+
+- Sidecars now exist for:
+  - `20260419_gold_ask_research_focus.json`
+  - `20260419_gold_pdf_render.json`
+  - `20260419_gold_ask_rank_accuracy.json`
+  - `20260419_gold_refusal.json`
+- Latest production handoff bundle:
+  - `evidence/exports/competition_asset_pack_20260419_211551/`
+  - now also carries:
+    - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+    - `evidence/screenshots/20260419_gold_pdf_render.json`
+- Latest external final-review bundle:
+  - `review_bundle_stage_20260419_211551/`
+  - `review_bundle_20260419_211551_final_competition_review.zip`
+  - now also carries:
+    - `evidence/screenshots/20260419_gold_pdf_render.json`
 
 ## What Still Matters
 

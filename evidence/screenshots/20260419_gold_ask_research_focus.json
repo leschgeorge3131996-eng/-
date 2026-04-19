@@ -1,8 +1,8 @@
 {
-  "prompt": "这篇论文主要研究了什么问题？",
+  "prompt_id": "askResearchFocus",
   "attempt": 1,
   "require_pdf_button": true,
   "evidence_mode": "declared",
   "cache_hit": false,
-  "captured_at": "2026-04-19T08:50:58.974Z"
+  "captured_at": "2026-04-19T11:37:07.031Z"
 }

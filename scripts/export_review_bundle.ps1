@@ -94,6 +94,7 @@ $requiredFiles = @(
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.png",

@@ -13,6 +13,53 @@ Entry format:
 - Recommended next step:
 ```
 
+## 2026-04-19 / Codex (final materials + review sweep)
+
+- Summary:
+  - Evaluated two new external AI final reviews in parallel and treated them as roadmap input rather than raw truth
+  - Confirmed the remaining highest-value work is material/script/wording cleanup, not new feature work
+  - Aligned `DEMO_SCRIPT_3MIN.md` to the real judged-demo path instead of the nonexistent "homepage sample entry loads the real PDF" story
+  - Added explicit defense wording to `QA_BRIEF.md` for:
+    - why `G3` is only a warm-state pass
+    - why refusal stays on the pure off-topic prompt
+    - why `summary / outline` are not the main judged-demo path
+  - Removed visible backticks from `deck.html` / `poster.html`, re-exported clean `deck.pdf` / `poster.pdf`, and kept page-count sanity (`6 / 1`)
+  - Extended screenshot metadata so `gold_pdf_render.png` now also has a sidecar; switched sidecars to ASCII-safe provenance fields (`prompt_id`, `source_prompt_id`, `preview_page`, `pdf_status_present`, `evidence_snippet_present`)
+  - Refreshed the latest production/review bundles after the sweep and ensured the exports now carry the new `gold_pdf_render.json` sidecar
+- Files touched:
+  - `evidence/materials/DEMO_SCRIPT_3MIN.md`
+  - `evidence/materials/QA_BRIEF.md`
+  - `README.md`
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+  - `scripts/capture_gold_sample_screenshots.js`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `scripts/export_review_bundle.ps1`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Verification:
+  - `node scripts\\capture_gold_sample_screenshots.js` passed
+  - `node scripts\\export_competition_pdfs.js` passed
+  - refreshed sidecars:
+    - `20260419_gold_ask_research_focus.json`
+    - `20260419_gold_pdf_render.json`
+    - `20260419_gold_ask_rank_accuracy.json`
+    - `20260419_gold_refusal.json`
+  - `deck.pdf = 6` pages
+  - `poster.pdf = 1` page
+  - latest production bundle:
+    - `evidence/exports/competition_asset_pack_20260419_211551/`
+  - latest external review bundle:
+    - `review_bundle_stage_20260419_211551/`
+    - `review_bundle_20260419_211551_final_competition_review.zip`
+- Open risks:
+  - strict `G3` is still only covered at warm-state; cold-start or second-operator remains optional hardening, not a reopened blocker
+  - older historical docs/log entries still contain mojibake prompt literals in places; current fact-sheet wording now points operators to prompt identifiers instead
+- Recommended next step:
+  - use the refreshed `20260419_211551` pack/review bundle pair as the frozen judged-demo handoff baseline
+
 ## 2026-04-19 / Codex
 
 - Summary:

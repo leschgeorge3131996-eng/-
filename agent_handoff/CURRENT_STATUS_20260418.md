@@ -44,6 +44,35 @@
 
 - Backend tests rerun after the fix:
   - `55 passed`
+- Authoritative prompt identifiers for current gold-sample artifacts:
+  - `askResearchFocus`
+  - `askRankAccuracy`
+  - `refusal`
+- If older sections below still show mojibake prompt literals, treat them as historical text artifacts and use the prompt identifiers above.
+
+## Final Demo / Material Sweep (`2026-04-19`)
+
+- `evidence/materials/DEMO_SCRIPT_3MIN.md` now matches the real judged-demo path:
+  - upload locked PDF (or reuse the warmed current document state)
+  - `askResearchFocus`
+  - citation / PDF preview
+  - `askRankAccuracy`
+  - `refusal`
+- `evidence/materials/QA_BRIEF.md` now includes fixed spoken answers for:
+  - why `G3` is only a warm-state pass
+  - why refusal stays on the pure off-topic prompt
+  - why `summary / outline` are not the primary judged-demo path
+- `scripts/capture_gold_sample_screenshots.js` now writes ASCII-safe sidecars:
+  - `prompt_id` / `source_prompt_id`
+  - `attempt`
+  - `cache_hit`
+  - `preview_page`
+  - `pdf_status_present`
+  - `evidence_snippet_present`
+- Latest refreshed bundles:
+  - production handoff bundle: `evidence/exports/competition_asset_pack_20260419_211551/`
+  - external review stage: `review_bundle_stage_20260419_211551/`
+  - external review zip: `review_bundle_20260419_211551_final_competition_review.zip`
 
 ## Q2 Evidence Stability Fix (`2026-04-19`)
 
@@ -76,7 +105,7 @@
 ## G3 Rehearsal Result (`2026-04-19`)
 
 - Operator result:
-  - `G3` is now marked `pass`
+  - `G3` is now marked `pass (warm-state operator rehearsal)`
 - Record:
   - `evidence/experiments/20260419_g3_rehearsal_template.md`
 - What was verified:
@@ -309,8 +338,8 @@
   - `node scripts\export_competition_pdfs.js` refreshed:
     - `deliverables/competition_kit/deck.pdf`
     - `deliverables/competition_kit/poster.pdf`
-  - `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot date prefix and exports sidecar metadata; latest pack:
-    - `evidence/exports/competition_asset_pack_20260419_165205/`
+  - `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot date prefix and exports sidecar metadata; latest pack follows:
+    - `evidence/exports/competition_asset_pack_*`
 - Practical meaning:
   - the previously identified judge-facing mismatch (`candidate` screenshot mixed into the locked answerable path) is now closed in the current repo state
   - the PDF preview snippet/highlight mismatch is now closed for `declared` ask results in the frontend

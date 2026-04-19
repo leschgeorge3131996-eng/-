@@ -1,8 +1,8 @@
 {
-  "prompt": "作者最终的方法排名和总体准确率分别是多少？",
+  "prompt_id": "askRankAccuracy",
   "attempt": 1,
   "require_pdf_button": true,
   "evidence_mode": "declared",
   "cache_hit": false,
-  "captured_at": "2026-04-19T08:51:05.146Z"
+  "captured_at": "2026-04-19T11:37:15.510Z"
 }

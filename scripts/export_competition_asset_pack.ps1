@@ -57,6 +57,7 @@ function Copy-RelativeFile(
 $latestScreenshotPrefix = Get-LatestScreenshotPrefix
 
 $requiredFiles = @(
+    "agent_handoff\FREEZE_FACT_SHEET_20260419.md",
     "evidence\materials\PROJECT_ONE_PAGER.md",
     "evidence\materials\DEMO_SCRIPT_3MIN.md",
     "evidence\materials\GOLD_SAMPLE_RUNBOOK.md",
@@ -74,6 +75,7 @@ $requiredFiles = @(
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.png",
+    "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_rank_accuracy.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.png",

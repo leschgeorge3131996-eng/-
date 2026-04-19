@@ -22,6 +22,26 @@ const PROMPTS = {
   refusal: "木星有几颗卫星？",
 };
 
+// Keep a clean copy of the locked prompts for metadata sidecars.
+const LOCKED_PROMPTS = {
+  askResearchFocus: "这篇论文主要研究了什么问题？",
+  askRankAccuracy: "作者最终的方法排名和总体准确率分别是多少？",
+  refusal: "木星有几颗卫星？",
+};
+
+const PROMPT_IDS = {
+  askResearchFocus: "askResearchFocus",
+  askRankAccuracy: "askRankAccuracy",
+  refusal: "refusal",
+};
+
+const LOCKED_PROMPT_TEXTS = {
+  askResearchFocus: "\u8fd9\u7bc7\u8bba\u6587\u4e3b\u8981\u7814\u7a76\u4e86\u4ec0\u4e48\u95ee\u9898\uff1f",
+  askRankAccuracy:
+    "\u4f5c\u8005\u6700\u7ec8\u7684\u65b9\u6cd5\u6392\u540d\u548c\u603b\u4f53\u51c6\u786e\u7387\u5206\u522b\u662f\u591a\u5c11\uff1f",
+  refusal: "\u6728\u661f\u6709\u51e0\u9897\u536b\u661f\uff1f",
+};
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -559,6 +579,10 @@ async function readEvidenceMode(cdp) {
   );
 }
 
+async function readCacheHitFlag(cdp) {
+  return evaluate(cdp, "Boolean(document.querySelector('.cache-hit'))");
+}
+
 async function writeScreenshotMetadata(outputPath, payload) {
   const metadataPath = outputPath.replace(/\.png$/i, ".json");
   await fsp.writeFile(metadataPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
@@ -748,6 +772,45 @@ async function runAskAndCapture(cdp, { prompt, screenshotPath, previousOutput, r
   );
 }
 
+async function runAskAndCaptureWithPromptId(
+  cdp,
+  { prompt, promptId, screenshotPath, previousOutput, requirePdfButton }
+) {
+  const maxAttempts = requirePdfButton ? 3 : 1;
+  let latestPanelText = previousOutput;
+  let lastEvidenceMode = null;
+  let lastCacheHit = false;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    await setTaskPrompt(cdp, buildCacheBustingPrompt(prompt, attempt));
+    await waitForEnabledSelector(cdp, '[data-testid="submit-task-button"]', 10_000);
+    await clickSelector(cdp, '[data-testid="submit-task-button"]');
+    const nextState = await waitForOutputChange(cdp, latestPanelText, { requirePdfButton });
+    latestPanelText = nextState.panelText;
+    lastEvidenceMode = requirePdfButton ? await readEvidenceMode(cdp) : "none";
+    lastCacheHit = await readCacheHitFlag(cdp);
+
+    if (requirePdfButton && lastEvidenceMode !== "declared") {
+      continue;
+    }
+
+    await captureElementScreenshot(cdp, '[data-testid="result-panel"]', screenshotPath);
+    await writeScreenshotMetadata(screenshotPath, {
+      prompt_id: promptId,
+      attempt,
+      require_pdf_button: requirePdfButton,
+      evidence_mode: lastEvidenceMode,
+      cache_hit: lastCacheHit,
+      captured_at: new Date().toISOString(),
+    });
+    return latestPanelText;
+  }
+
+  throw new Error(
+    `Failed to capture declared evidence screenshot for prompt_id: ${promptId} (last mode: ${lastEvidenceMode})`
+  );
+}
+
 async function waitForPdfPreviewLoaded(cdp) {
   await waitForSelector(cdp, '[data-testid="pdf-preview-panel"]', 20_000);
   await waitFor(
@@ -764,6 +827,42 @@ async function waitForPdfPreviewLoaded(cdp) {
       ),
     30_000,
     "PDF preview load"
+  );
+}
+
+async function readPdfPreviewMetadata(cdp) {
+  return evaluate(
+    cdp,
+    `(() => {
+      const status = document.querySelector('[data-testid="pdf-preview-status"]');
+      const snippet = document.querySelector('[data-testid="pdf-evidence-snippet"]');
+      const statusText = status?.innerText?.trim() ?? "";
+      const snippetText = snippet?.innerText?.trim() ?? "";
+      const pageMatch = statusText.match(/第\\s*(\\d+)\\s*页/);
+      return {
+        status_text: statusText || null,
+        snippet_text: snippetText || null,
+        page: pageMatch ? Number(pageMatch[1]) : null,
+      };
+    })()`
+  );
+}
+
+async function readPdfPreviewProvenance(cdp) {
+  return evaluate(
+    cdp,
+    `(() => {
+      const status = document.querySelector('[data-testid="pdf-preview-status"]');
+      const snippet = document.querySelector('[data-testid="pdf-evidence-snippet"]');
+      const statusText = status?.innerText?.trim() ?? "";
+      const snippetText = snippet?.innerText?.trim() ?? "";
+      const pageMatch = statusText.match(/(\\d+)/);
+      return {
+        page: pageMatch ? Number(pageMatch[1]) : null,
+        status_present: Boolean(statusText),
+        snippet_present: Boolean(snippetText),
+      };
+    })()`
   );
 }
 
@@ -784,6 +883,16 @@ async function captureApiDocsScreenshot(cdp, outputPath) {
   await waitForSelector(cdp, "#swagger-ui", 20_000);
   await sleep(1000);
   await captureElementScreenshot(cdp, "#swagger-ui", outputPath, 8);
+}
+
+async function captureApiDocsScreenshotIfAvailable(cdp, outputPath) {
+  try {
+    await captureApiDocsScreenshot(cdp, outputPath);
+    return true;
+  } catch (error) {
+    console.warn(`[capture] api docs screenshot skipped: ${error.message}`);
+    return false;
+  }
 }
 
 async function main() {
@@ -820,8 +929,9 @@ async function main() {
     let previousOutput = "";
 
     const ask1Path = path.join(SCREENSHOT_DIR, `${datePrefix}_gold_ask_research_focus.png`);
-    previousOutput = await runAskAndCapture(browser.cdp, {
-      prompt: PROMPTS.askResearchFocus,
+    previousOutput = await runAskAndCaptureWithPromptId(browser.cdp, {
+      prompt: LOCKED_PROMPT_TEXTS.askResearchFocus,
+      promptId: PROMPT_IDS.askResearchFocus,
       screenshotPath: ask1Path,
       previousOutput,
       requirePdfButton: true,
@@ -831,12 +941,22 @@ async function main() {
     await clickSelector(browser.cdp, '[data-testid^="open-pdf-"]');
     await waitForPdfPreviewLoaded(browser.cdp);
     const pdfPath = path.join(SCREENSHOT_DIR, `${datePrefix}_gold_pdf_render.png`);
+    const pdfMetadata = await readPdfPreviewProvenance(browser.cdp);
     await captureElementScreenshot(browser.cdp, '[data-testid="pdf-preview-panel"]', pdfPath);
+    await writeScreenshotMetadata(pdfPath, {
+      source_prompt_id: PROMPT_IDS.askResearchFocus,
+      source_screenshot: path.basename(ask1Path),
+      preview_page: pdfMetadata?.page ?? null,
+      pdf_status_present: pdfMetadata?.status_present ?? false,
+      evidence_snippet_present: pdfMetadata?.snippet_present ?? false,
+      captured_at: new Date().toISOString(),
+    });
     createdPaths.push(pdfPath);
 
     const ask2Path = path.join(SCREENSHOT_DIR, `${datePrefix}_gold_ask_rank_accuracy.png`);
-    previousOutput = await runAskAndCapture(browser.cdp, {
-      prompt: PROMPTS.askRankAccuracy,
+    previousOutput = await runAskAndCaptureWithPromptId(browser.cdp, {
+      prompt: LOCKED_PROMPT_TEXTS.askRankAccuracy,
+      promptId: PROMPT_IDS.askRankAccuracy,
       screenshotPath: ask2Path,
       previousOutput,
       requirePdfButton: true,
@@ -844,8 +964,9 @@ async function main() {
     createdPaths.push(ask2Path);
 
     const refusalPath = path.join(SCREENSHOT_DIR, `${datePrefix}_gold_refusal.png`);
-    previousOutput = await runAskAndCapture(browser.cdp, {
-      prompt: PROMPTS.refusal,
+    previousOutput = await runAskAndCaptureWithPromptId(browser.cdp, {
+      prompt: LOCKED_PROMPT_TEXTS.refusal,
+      promptId: PROMPT_IDS.refusal,
       screenshotPath: refusalPath,
       previousOutput,
       requirePdfButton: false,
@@ -857,8 +978,9 @@ async function main() {
     createdPaths.push(statsPath);
 
     const apiDocsPath = path.join(SCREENSHOT_DIR, `${datePrefix}_api_docs.png`);
-    await captureApiDocsScreenshot(browser.cdp, apiDocsPath);
-    createdPaths.push(apiDocsPath);
+    if (await captureApiDocsScreenshotIfAvailable(browser.cdp, apiDocsPath)) {
+      createdPaths.push(apiDocsPath);
+    }
 
     console.log("Created screenshots:");
     for (const screenshotPath of createdPaths) {
