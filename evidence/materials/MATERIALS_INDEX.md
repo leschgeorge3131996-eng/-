@@ -59,25 +59,28 @@
 19. [HANDOFF_PACKAGE_BOUNDARY.md](./HANDOFF_PACKAGE_BOUNDARY.md)
 - 主提交、答辩附录与操作资料的边界说明
 
-20. [GOLD_SAMPLE_RUNBOOK.md](./GOLD_SAMPLE_RUNBOOK.md)
+20. [STRICT_G3_EXECUTION_PLAN.md](./STRICT_G3_EXECUTION_PLAN.md)
+- 严格版 G3 的角色分工、操作步骤、记录字段与验收标准
+
+21. [GOLD_SAMPLE_RUNBOOK.md](./GOLD_SAMPLE_RUNBOOK.md)
 - 当前锁定 gold-sample candidate 的演示 / 截图 runbook
 
-21. [../reports/gold_sample_qa_compare_latest.md](../reports/gold_sample_qa_compare_latest.md)
+22. [../reports/gold_sample_qa_compare_latest.md](../reports/gold_sample_qa_compare_latest.md)
 - 当前锁定 gold-sample candidate 的双模型比较结论
 
-22. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
+23. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
 - 当前锁定 gold-sample candidate 的真实 replay 汇总（权威最新版）
 
-23. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
+24. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
 - 当前锁定 gold-sample candidate 的真实 replay 明细（权威最新版）
 
-24. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
+25. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
 - 更宽样例覆盖的真实模型复跑汇总（次级参考）
 
-25. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
+26. [../reports/sample_replay_real_latest.md](../reports/sample_replay_real_latest.md)
 - 更宽样例覆盖的真实模型逐条复跑明细（次级参考）
 
-26. [../../deliverables/competition_kit/README.md](../../deliverables/competition_kit/README.md)
+27. [../../deliverables/competition_kit/README.md](../../deliverables/competition_kit/README.md)
 - 可打印的 deck / poster HTML 原型说明
 
 ## 使用建议
@@ -89,6 +92,7 @@
 - 正式产品 / 技术说明：优先参考 `PRODUCT_TECHNICAL_WRITEUP.md`
 - 官方评分项对照：优先参考 `SCORING_EVIDENCE_MATRIX.md`
 - 主提交 / 附录 / 操作资料边界：优先参考 `HANDOFF_PACKAGE_BOUNDARY.md`
+- 严格版 G3 执行：优先参考 `STRICT_G3_EXECUTION_PLAN.md`
 - 现场展示 / 录屏脚本：优先参考 `DEMO_SCRIPT_3MIN.md`
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`
