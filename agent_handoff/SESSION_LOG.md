@@ -1060,3 +1060,36 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - the next operator no longer needs to invent a `G3` logging format
   - fallback behavior is now written down before the rehearsal rather than improvised during it
+
+---
+
+## 2026-04-19 / Codex (final external-review bundle refreshed after `Q2` fix + `G3` pass)
+
+- Summary:
+  - Added a reusable `scripts/export_review_bundle.ps1` to generate a late-stage external-review bundle from the current repo state
+  - Regenerated the external-review package after the `Q2` declared-evidence fix and recorded `G3` pass
+  - Strengthened the bundle so another AI sees the project background and target clearly before reviewing
+- Files touched:
+  - `scripts/export_review_bundle.ps1`
+- New bundle contents:
+  - generated top-level `PROJECT_CONTEXT.md`
+  - refreshed `REVIEW_PROMPT.md`
+  - refreshed `BUNDLE_INDEX.md`
+  - current handoff/material/evidence/deliverable/code slices
+- Latest local review artifact:
+  - stage dir:
+    - `review_bundle_stage_20260419_132632/`
+  - zip:
+    - `review_bundle_20260419_132632_final_competition_review.zip`
+- Practical meaning:
+  - this latest bundle is better than the older broad review pack for final-stage review
+  - another AI can now read:
+    - what the project is
+    - why the team is narrowing scope
+    - what `G1` / `G2` / `G3` currently mean
+    - what kind of risks should still be challenged
+- Open risks:
+  - bundle artifacts are local review outputs and should not be committed by default
+  - old local review bundle folders/zips may still exist unless manually cleaned
+- Recommended next step:
+  - hand `review_bundle_20260419_132632_final_competition_review.zip` to external reviewers and compare whether they still challenge the current `G1/G2/G3` story

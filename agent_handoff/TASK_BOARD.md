@@ -83,3 +83,16 @@
 - Current QA recommendation:
   - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
   - keep `qwen3-32b` as validated fallback if demo/runtime latency becomes tighter
+
+## Latest Override (`2026-04-19`)
+
+- `G3` should now be treated as closed for the current warm-state judged-demo path
+- The latest external final-review artifact is:
+  - `review_bundle_stage_20260419_132632/`
+  - `review_bundle_20260419_132632_final_competition_review.zip`
+- This latest review bundle is preferred over the older broad review pack because it now includes:
+  - `PROJECT_CONTEXT.md`
+  - refreshed `REVIEW_PROMPT.md`
+  - `Q2` stability evidence
+  - recorded `G3` pass evidence
+- If another AI is asked to review the project now, use this latest bundle first

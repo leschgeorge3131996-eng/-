@@ -269,13 +269,13 @@ These are the best next steps if work continues:
 ### Highest value for judging/demo
 
 1. Start from `evidence/exports/competition_asset_pack_20260419_012336/`; it includes the refreshed `20260419_*` screenshots, sidecar metadata, and current PDF deliverables
-2. Close `G3` next:
-   - second operator
-   - `3` consecutive timed runs
-   - explicit fallback notes
-   - do not keep treating Q2 as an open blocker; the fresh `candidate` regression has already been rechecked and closed
-3. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
-4. Keep the broader sample-set replay in a clearly secondary role
+2. Use the latest final external-review bundle for one more targeted judging-risk review:
+   - `review_bundle_stage_20260419_132632/`
+   - `review_bundle_20260419_132632_final_competition_review.zip`
+   - this version adds `PROJECT_CONTEXT.md`, so another AI sees the project background, target, and scope constraints before judging the current state
+3. Treat `G3` as closed for the current warm-state judged-demo path; do not reopen Q2 or G3 as default blockers unless new evidence appears
+4. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
+5. Keep the broader sample-set replay in a clearly secondary role
 
 ### Highest value for broader external testing
 
@@ -325,5 +325,7 @@ Recent external review / strategy bundle files may include:
 - `EXTERNAL_AI_STRATEGY_BUNDLE_INDEX.md`
 - `EXTERNAL_AI_STRATEGY_PROMPT.md`
 - `review_bundle_stage_20260416_231332.zip`
+- `review_bundle_stage_20260419_132632/`
+- `review_bundle_20260419_132632_final_competition_review.zip`
 
 These are useful for third-party model review, but they are not the canonical long-term handoff source.

@@ -318,8 +318,15 @@
 
 ## Recommended Next Step
 
-1. Run a formal `G3` rehearsal with a second operator: `3` consecutive timed runs via `GOLD_SAMPLE_RUNBOOK.md`, plus fallback handling notes
-2. Treat `evidence/exports/competition_asset_pack_20260419_012336/` as the latest external handoff bundle until another screenshot refresh happens
-3. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
-4. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
-5. Do not expand product scope while final materials are being assembled
+1. Use the latest final external-review bundle for one more targeted judging-risk review:
+   - `review_bundle_stage_20260419_132632/`
+   - `review_bundle_20260419_132632_final_competition_review.zip`
+2. Prefer this latest review bundle over the older broad review pack because it now includes:
+   - `PROJECT_CONTEXT.md`
+   - refreshed `REVIEW_PROMPT.md`
+   - `Q2` stability evidence
+   - recorded `G3` pass evidence
+3. Treat `evidence/exports/competition_asset_pack_20260419_012336/` as the current production handoff bundle for PPT/video/poster polishing until another screenshot refresh happens
+4. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
+5. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
+6. Do not expand product scope while final materials are being assembled
