@@ -90,6 +90,12 @@ As of `2026-04-18`:
     - `evidence_quote_count=2`
     - `citation_count=2`
     - answer: `作者最终的方法排名第六，总体准确率为56.20%。`
+- `G3` rehearsal record:
+  - `evidence/experiments/20260419_g3_rehearsal_template.md`
+  - current status: `pass`
+  - caveat:
+    - this was a warm-state reproducibility pass after warmup on the already-loaded locked sample document
+    - not a stricter upload-from-zero cold-start pass
 
 Main verification commands:
 
@@ -99,6 +105,12 @@ cd frontend
 npm test
 npm run build
 ```
+
+Operator rehearsal result:
+
+- `G1`: pass
+- `G2`: pass
+- `G3`: pass
 
 ## What Was Added In The Latest Iterations
 

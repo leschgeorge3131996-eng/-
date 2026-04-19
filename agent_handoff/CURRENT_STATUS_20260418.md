@@ -73,6 +73,29 @@
   - the previously open Q2 blocker for `G3` is now closed at the code/runtime level
   - the remaining `G3` work is process validation, not another known Q2 evidence bug
 
+## G3 Rehearsal Result (`2026-04-19`)
+
+- Operator result:
+  - `G3` is now marked `pass`
+- Record:
+  - `evidence/experiments/20260419_g3_rehearsal_template.md`
+- What was verified:
+  - `3` consecutive operator runs completed successfully
+  - answerable 1 stayed `declared`
+  - answerable 2 stayed `declared`
+  - PDF jump/preview worked during the runs
+  - refusal stayed `retrieval_gate / retrieval_no_match`
+- Run timing window:
+  - run 1: `56s`
+  - run 2: `67s`
+  - run 3: `24s`
+- Honest caveat:
+  - this operator rehearsal reused the already-loaded locked sample document after warmup
+  - it is therefore a warm demo reproducibility pass rather than a stricter cold-start upload-from-zero pass
+- Practical meaning:
+  - for the current competition/demo goal, `G3` is no longer the active blocker
+  - the next work should shift to final submission-material polish and final export freeze
+
 ## Real In-Project Minimal Path Validation (`2026-04-18`)
 
 - Environment note:
@@ -249,6 +272,9 @@
 - The handoff/export bundle can now carry those HTML/PDF deliverables forward without manual file picking
 - The repo now also contains a timed subtitle baseline for the 2-minute demo video
 - The previous fresh-Q2 `candidate` instability has now been fixed and independently rechecked with `3 / 3` fresh declared runs
+- `G1`: pass
+- `G2`: pass
+- `G3`: pass (warm operator rehearsal)
 
 ## Review-Driven Hardening (`2026-04-19`)
 

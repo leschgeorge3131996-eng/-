@@ -49,6 +49,34 @@ Entry format:
 - Recommended next step:
   - resume from formal `G3` rehearsal; the known Q2 evidence blocker is no longer the reason to hold it
 
+## 2026-04-19 / Codex (G3 marked pass)
+
+- Summary:
+  - User completed the planned `G3` operator rehearsal on the locked gold sample flow
+  - Recorded the three timed runs in `evidence/experiments/20260419_g3_rehearsal_template.md`
+  - All three runs passed the same core checks:
+    - answerable 1 declared
+    - answerable 2 declared
+    - PDF jump/preview confirmed
+    - refusal remained `retrieval_gate / retrieval_no_match`
+  - Marked `G3` as `pass` in the shared handoff files, with one explicit caveat: this was a warm-state repeatability pass on the same already-loaded document after warmup, not a stricter cold-start upload-from-zero rehearsal
+- Files touched:
+  - `evidence/experiments/20260419_g3_rehearsal_template.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Verification:
+  - run 1: `12:55:21 -> 12:56:17` (`56s`)
+  - run 2: `12:58:14 -> 12:59:21` (`67s`)
+  - run 3: `13:01:20 -> 13:01:44` (`24s`)
+  - request ids logged for all `3 x 3` ask/refusal calls
+- Open risks:
+  - if a fully cold-start rehearsal is later required by another reviewer, one more upload-from-zero pass would still be useful
+  - current top priority is no longer a feature or stability blocker; it is final competition asset polish/freeze
+- Recommended next step:
+  - refresh the final bundle and push materials toward final PPT / poster / video submission shape
+
 ## 2026-04-16 / Codex
 
 - Summary:
