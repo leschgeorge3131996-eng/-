@@ -22,7 +22,7 @@
 - Real in-project minimal path now verified on:
   - `evidence/samples/chinese_llm_spatial_eval.pdf`
 - Verified path:
-  - `login -> upload -> ask -> citation -> PDF page -> PDF render`
+  - `upload -> ask -> citation -> PDF -> refusal`
 - Current caution:
   - refusal demos should use a purely off-topic question; prompts that still mention document entities may retrieve and answer
 - Current gold-sample candidate:
@@ -43,7 +43,7 @@
 
 As of `2026-04-18`:
 
-- backend tests: `54 passed`
+- backend tests: `55 passed`
 - frontend smoke tests: `7 passed`
 - frontend build: passed
 - real provider (`Wuwen Xinqiong`) minimal path:
@@ -58,12 +58,12 @@ As of `2026-04-18`:
   - `0 errors`
   - current replay tooling now reflects the cookie/session + document-token runtime posture
 - gold-sample screenshot refresh:
-  - `evidence/screenshots/20260418_gold_ask_research_focus.png`
-  - `evidence/screenshots/20260418_gold_pdf_render.png`
-  - `evidence/screenshots/20260418_gold_ask_rank_accuracy.png`
-  - `evidence/screenshots/20260418_gold_refusal.png`
-  - `evidence/screenshots/20260418_stats_panel.png`
-  - `evidence/screenshots/20260418_api_docs.png`
+  - `evidence/screenshots/20260419_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260419_gold_pdf_render.png`
+  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260419_gold_refusal.png`
+  - `evidence/screenshots/20260419_stats_panel.png`
+  - `evidence/screenshots/20260419_api_docs.png`
 - competition drafting assets:
   - `evidence/materials/PPT_DECK_6SLIDES.md`
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
@@ -110,7 +110,9 @@ Operator rehearsal result:
 
 - `G1`: pass
 - `G2`: pass
-- `G3`: pass
+- `G3`: pass (warm-state operator rehearsal)
+- authoritative freeze-fact reference:
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 
 ## What Was Added In The Latest Iterations
 
@@ -268,7 +270,7 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Start from `evidence/exports/competition_asset_pack_20260419_012336/`; it includes the refreshed `20260419_*` screenshots, sidecar metadata, and current PDF deliverables
+1. Start from `evidence/exports/competition_asset_pack_20260419_144125/`; it includes the refreshed `20260419_*` screenshots, sidecar metadata, and current PDF deliverables
 2. Use the latest final external-review bundle for one more targeted judging-risk review:
    - `review_bundle_stage_20260419_132632/`
    - `review_bundle_20260419_132632_final_competition_review.zip`

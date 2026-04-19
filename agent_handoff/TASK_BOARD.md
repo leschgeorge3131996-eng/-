@@ -17,15 +17,18 @@
 - Latest gold-sample screenshot pack is now refreshed as `20260419_*` with metadata sidecars
 - Latest export bundle now auto-picks the newest screenshot prefix
 - Fresh Q2 ask instability is now closed at the code/runtime layer; `3 / 3` fresh local runs returned `declared`
-- `G3` operator rehearsal is now recorded as pass
+- `G3` operator rehearsal is now recorded as a warm-state pass
+- Competition material chain has now been rebuilt from clean source docs
+- Printable export now has sanity checks and a clean baseline (`deck.pdf=6` pages, `poster.pdf=1` page)
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
-1. Use `evidence/exports/competition_asset_pack_20260419_012336/` as the current handoff bundle for PPT/video/poster polishing
-2. Freeze a final submission-oriented material set after one more asset refresh if wording/screenshots change
-3. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
-4. Before 电赛 demo: set `DEMO_MODE=true` on deployed env and verify opening flow on staging URL
+1. Export a refreshed competition handoff bundle so the rebuilt `deck/poster` outputs replace the older printable baseline
+2. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first reference for any further external review or operator handoff
+3. Freeze a final submission-oriented material set after one more asset refresh if wording/screenshots change
+4. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
+5. Before judged demo: set `DEMO_MODE=true` on the target env and verify the opening flow on the target URL
 
 ## Recently Verified
 
@@ -57,6 +60,7 @@
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were regenerated against the refreshed screenshots
 - `2026-04-19`: Q2 fresh stability check recorded at `evidence/experiments/20260419_q2_declared_stability_check.md`; `3 / 3` runs returned `declared`
 - `2026-04-19`: `G3` rehearsal recorded at `evidence/experiments/20260419_g3_rehearsal_template.md`; `3` consecutive runs passed on the locked gold-sample flow
+- `2026-04-19`: competition material chain rebuilt from clean docs; printable export now verifies `deck.pdf=6` pages and `poster.pdf=1` page
 
 ## Useful But Not Urgent
 
@@ -87,6 +91,8 @@
 ## Latest Override (`2026-04-19`)
 
 - `G3` should now be treated as closed for the current warm-state judged-demo path
+- Authoritative freeze facts now live in:
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 - The latest external final-review artifact is:
   - `review_bundle_stage_20260419_132632/`
   - `review_bundle_20260419_132632_final_competition_review.zip`

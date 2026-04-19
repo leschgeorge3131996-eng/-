@@ -3,6 +3,15 @@
 This folder contains near-final static deliverables for judging/demo material
 production.
 
+Current printable baseline:
+
+- `deck.pdf`
+  - repo-generated export with `6` pages
+- `poster.pdf`
+  - repo-generated export with `1` page
+- `node scripts/export_competition_pdfs.js`
+  - now performs HTML/PDF sanity checks before a baseline is treated as valid
+
 ## Files
 
 - `deck.html`
@@ -43,8 +52,11 @@ story:
 
 ## Editing Notes
 
-- Screenshot references point to `evidence/screenshots/20260418_*`.
+- Screenshot references point to `evidence/screenshots/20260419_*`.
 - If the locked sample changes, update the source markdown files first, then
   update these HTML files.
 - Keep the main story centered on evidence-backed `ask`; do not reframe this as
   generic chat.
+- If `deck.pdf` is not `6` pages or `poster.pdf` is not `1` page, treat the
+  export as invalid and rerun `node scripts/export_competition_pdfs.js` after
+  fixing the source HTML/CSS.

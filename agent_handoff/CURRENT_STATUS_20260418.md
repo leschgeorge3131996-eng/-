@@ -43,7 +43,7 @@
 ## Verification
 
 - Backend tests rerun after the fix:
-  - `54 passed`
+  - `55 passed`
 
 ## Q2 Evidence Stability Fix (`2026-04-19`)
 
@@ -294,7 +294,7 @@
 - Verification completed:
   - `npm run build`
   - `npm test -- --run` -> `7 passed`
-  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `55 passed`
   - `node scripts\capture_gold_sample_screenshots.js` refreshed:
     - `evidence/screenshots/20260419_gold_ask_research_focus.png`
     - `evidence/screenshots/20260419_gold_pdf_render.png`
@@ -310,23 +310,57 @@
     - `deliverables/competition_kit/deck.pdf`
     - `deliverables/competition_kit/poster.pdf`
   - `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot date prefix and exports sidecar metadata; latest pack:
-    - `evidence/exports/competition_asset_pack_20260419_012336/`
+    - `evidence/exports/competition_asset_pack_20260419_144125/`
 - Practical meaning:
   - the previously identified judge-facing mismatch (`candidate` screenshot mixed into the locked answerable path) is now closed in the current repo state
   - the PDF preview snippet/highlight mismatch is now closed for `declared` ask results in the frontend
   - the export/handoff path now follows the latest screenshot refresh without manual date-string edits
 
+## Material Freeze Rebuild (`2026-04-19`)
+
+- Trigger:
+  - targeted external review correctly flagged that the competition-material chain was not freeze-ready:
+    - corrupted Chinese drafting docs
+    - broken HTML deliverables
+    - `deck.pdf` / `poster.pdf` page counts not matching the intended judged-demo outputs
+- Clean-source rebuild completed:
+  - rebuilt source docs:
+    - `evidence/materials/PPT_DECK_6SLIDES.md`
+    - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+    - `evidence/materials/POSTER_COPY.md`
+    - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - rebuilt deliverable sources:
+    - `deliverables/competition_kit/deck.html`
+    - `deliverables/competition_kit/poster.html`
+  - hardened export path:
+    - `scripts/export_competition_pdfs.js`
+      - now rejects malformed HTML patterns
+      - now rejects known mojibake markers
+      - now rejects incorrect PDF page counts
+- Verification after rebuild:
+  - `node scripts\export_competition_pdfs.js`
+  - confirmed outputs:
+    - `deliverables/competition_kit/deck.pdf` -> `6` pages
+    - `deliverables/competition_kit/poster.pdf` -> `1` page
+  - UTF-8 reads of the rebuilt HTML files show:
+    - `研答通`
+    - `upload → ask → citation → PDF → refusal`
+    - no known mojibake markers
+- Practical meaning:
+  - the current blocker has shifted away from “broken submission materials”
+  - the repo again has a sane printable baseline for deck/poster work
+  - future exports now fail fast instead of silently producing a bad `deck/poster` PDF baseline
+
+## Freeze Fact Reference
+
+- Prefer this file when another operator or another AI needs the current authoritative judged-demo facts:
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+
 ## Recommended Next Step
 
-1. Use the latest final external-review bundle for one more targeted judging-risk review:
-   - `review_bundle_stage_20260419_132632/`
-   - `review_bundle_20260419_132632_final_competition_review.zip`
-2. Prefer this latest review bundle over the older broad review pack because it now includes:
-   - `PROJECT_CONTEXT.md`
-   - refreshed `REVIEW_PROMPT.md`
-   - `Q2` stability evidence
-   - recorded `G3` pass evidence
-3. Treat `evidence/exports/competition_asset_pack_20260419_012336/` as the current production handoff bundle for PPT/video/poster polishing until another screenshot refresh happens
+1. Export a refreshed competition handoff bundle so the rebuilt `deck/poster` outputs replace the previously broken printable baseline
+2. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first file for any further external review or operator handoff
+3. If another judging-risk review is needed, regenerate the review bundle from the rebuilt material state first
 4. If deployment/demo latency becomes a practical issue, rerun the same compare script before switching `MODEL_QA` to `qwen3-32b`
 5. Keep the broader sample-set replay as secondary coverage only unless wider capability sampling is explicitly needed
 6. Do not expand product scope while final materials are being assembled

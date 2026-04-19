@@ -1032,7 +1032,7 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Verification:
   - `npm run build`
   - `npm test -- --run` -> `7 passed`
-  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `55 passed`
   - `node scripts\capture_gold_sample_screenshots.js` refreshed `20260419_*` screenshots successfully
   - refreshed sidecars confirm:
     - `20260419_gold_ask_research_focus.json` -> `declared`
@@ -1093,3 +1093,42 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - old local review bundle folders/zips may still exist unless manually cleaned
 - Recommended next step:
   - hand `review_bundle_20260419_132632_final_competition_review.zip` to external reviewers and compare whether they still challenge the current `G1/G2/G3` story
+
+---
+
+## 2026-04-19 / Codex (material freeze rebuild after external review)
+
+- Summary:
+  - external review correctly identified that the competition material chain was not freeze-ready
+  - rebuilt the core Chinese drafting docs from clean source text instead of continuing to patch the corrupted printable outputs
+  - rebuilt `deck.html` / `poster.html` and hardened the PDF export script so future broken outputs fail fast
+- Files touched:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+  - `deliverables/competition_kit/styles.css`
+  - `deliverables/competition_kit/README.md`
+  - `scripts/export_competition_pdfs.js`
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `agent_handoff/CURRENT_STATUS_20260418.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `WORKLOG.md`
+- Verification:
+  - `node scripts\export_competition_pdfs.js`
+  - `deliverables/competition_kit/deck.pdf` -> `6` pages
+  - `deliverables/competition_kit/poster.pdf` -> `1` page
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1` produced:
+    - `evidence/exports/competition_asset_pack_20260419_144125/`
+  - UTF-8 checks confirm rebuilt HTML sources contain:
+    - `研答通`
+    - `upload → ask → citation → PDF → refusal`
+    - no known mojibake markers
+- Practical meaning:
+  - the active blocker has moved away from broken printable materials
+  - the repo again has a sane deck/poster baseline for final judging materials
+  - future PDF exports now fail fast if page counts or obvious corruption regress
+- Recommended next step:
+  - export a refreshed competition handoff bundle so the rebuilt printable outputs replace the previously broken bundle contents

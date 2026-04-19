@@ -85,7 +85,7 @@
 - `outline` works with real model
 - API docs page works
 - Call logs are written locally
-- Backend tests pass: `54 passed`
+- Backend tests pass: `55 passed`
 - Log summary exported to `evidence/reports/latest_log_summary.md`
 - Sample replay report exported to `evidence/reports/sample_replay_latest.md`
 - Broader sample-set real replay report exported to `evidence/reports/sample_replay_real_latest.md`
@@ -224,12 +224,12 @@ cd C:\Users\Administrator\Desktop\project
 
 Current status:
 
-- `54 passed`
+- `55 passed`
 
 ## Next Recommended Steps
 
 1. Close `G3` with a second-operator rehearsal and `3` consecutive timed runs
-2. Use `evidence/exports/competition_asset_pack_20260419_012336/` as the current handoff bundle for external polishing / collaboration
+2. Use `evidence/exports/competition_asset_pack_20260419_144125/` as the current handoff bundle for external polishing / collaboration
 3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
 4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
@@ -299,8 +299,30 @@ At the start of the next session:
 - Refreshed deliverables/export:
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
-  - `evidence/exports/competition_asset_pack_20260419_012336/`
+  - `evidence/exports/competition_asset_pack_20260419_144125/`
 - Verification:
   - `npm run build`
   - `npm test -- --run` -> `7 passed`
-  - `.venv\Scripts\python.exe -m pytest` -> `54 passed`
+  - `.venv\Scripts\python.exe -m pytest` -> `55 passed`
+
+## 2026-04-19 Material Freeze Rebuild
+
+- Rebuilt the competition material chain from clean source docs instead of patching the corrupted printable outputs in place:
+  - `evidence/materials/PPT_DECK_6SLIDES.md`
+  - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
+  - `evidence/materials/POSTER_COPY.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+- Rebuilt printable deliverable sources:
+  - `deliverables/competition_kit/deck.html`
+  - `deliverables/competition_kit/poster.html`
+- Hardened printable export path:
+  - `scripts/export_competition_pdfs.js`
+    - rejects malformed HTML patterns
+    - rejects known mojibake markers
+    - rejects wrong PDF page counts
+- Verification:
+  - `node scripts/export_competition_pdfs.js`
+  - `deliverables/competition_kit/deck.pdf` -> `6` pages
+  - `deliverables/competition_kit/poster.pdf` -> `1` page
+- Current authoritative freeze facts:
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`

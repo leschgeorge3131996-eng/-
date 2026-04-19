@@ -1,4 +1,4 @@
-﻿# Competition Asset Pack
+# Competition Asset Pack
 
 ## Goal
 
@@ -63,18 +63,18 @@ These points should stay word-for-word consistent across PPT, video, poster, and
 
 1. The strongest feature is not generic generation, but evidence-backed `ask`.
 2. The live path already verified under the real runtime is:
-   - `login -> upload -> ask -> citation -> PDF render -> refusal`
+   - `upload -> ask -> citation -> PDF -> refusal`
 3. The locked candidate question set is:
-   - `杩欑瘒璁烘枃涓昏鐮旂┒浜嗕粈涔堥棶棰橈紵`
-   - `浣滆€呮渶缁堢殑鏂规硶鎺掑悕鍜屾€讳綋鍑嗙‘鐜囧垎鍒槸澶氬皯锛焋
-   - `鏈ㄦ槦鏈夊嚑棰楀崼鏄燂紵`
+   - `这篇论文主要研究了什么问题？`
+   - `作者最终的方法排名和总体准确率分别是多少？`
+   - `木星有几颗卫星？`
 4. The current QA decision is:
    - keep `qwen3-235b-a22b-instruct-2507` as default
    - keep `qwen3-32b` as validated fallback
 5. The comparison result is:
    - both models pass `2 answerable + 1 refusal`
-   - `235b` gives slightly richer grounding on the broader question
-   - `32b` is slightly faster
+   - keep `235b` as the default choice for the current demo path
+   - keep `32b` as the validated fallback if runtime latency becomes tighter
 
 ## PPT Mapping
 
@@ -96,12 +96,10 @@ Suggested assets:
 
 - Show the shortest verified path:
   - upload
-  - parse
-  - retrieve
-  - answer
-  - open citation
-  - render PDF evidence
-  - refuse off-topic asks
+  - ask
+  - citation
+  - PDF
+  - refusal
 
 Suggested assets:
 
@@ -129,7 +127,7 @@ Suggested assets:
 - Screenshot:
   - `20260419_gold_ask_rank_accuracy.png`
 - Talking point:
-  - the system can stably return concrete numeric answers with citations
+  - the system can return concrete numeric answers with citations
   - both tested QA models pass, but `235b` remains the primary choice
 
 Suggested supporting artifacts:
@@ -141,81 +139,36 @@ Suggested supporting artifacts:
 - Screenshot:
   - `20260419_gold_refusal.png`
 - Talking point:
-  - when retrieval does not match, the system refuses instead of fabricating
-  - this is part of reliability, not a fallback embarrassment
+  - if the ask is off-topic, the system refuses instead of fabricating
+  - this keeps the demo focused on evidence-backed answers, not generic chat
 
 ## Video Mapping
 
-Recommended structure:
-
-1. 0-15s:
-   - title + product positioning
-2. 15-45s:
-   - answerable ask screenshot / live flow
-3. 45-65s:
-   - PDF render screenshot / citation jump
-4. 65-85s:
-   - second answerable ask with numeric answer
-5. 85-105s:
-   - refusal screenshot
-6. 105-120s:
-   - close with current verification and model decision
-
-Keep the video narration aligned with `DEMO_SCRIPT_3MIN.md`.
+- The 2-minute path should stay:
+  - open the locked sample
+  - ask Q1
+  - open citation and PDF
+  - ask Q2
+  - ask refusal
+- Use:
+  - `VIDEO_SHOTLIST_2MIN.md`
+  - `video_subtitles.srt`
 
 ## Poster Mapping
 
-Recommended blocks:
+- Keep the center story simple:
+  - why generic document chat is not enough
+  - how evidence-backed ask works
+  - one answerable example
+  - one refusal example
+- Use:
+  - `POSTER_COPY.md`
+  - `poster.html`
+  - `poster.pdf`
 
-1. Problem
-   - document reading is slow
-   - generic chat tools lack verifiable evidence
-2. Method
-   - parse
-   - chunk
-   - retrieve
-   - answer
-   - jump back to PDF evidence
-3. Product demonstration
-   - answerable ask screenshot
-   - PDF render screenshot
-   - refusal screenshot
-4. Validation
-   - real replay result: `2 answered + 1 refused`
-   - QA comparison: `235b` primary, `32b` fallback
-5. Conclusion
-   - strongest differentiator is evidence-backed document QA
+## Defense Notes
 
-## Asset Checklist
-
-- [ ] `PROJECT_ONE_PAGER.md`
-- [ ] `DEMO_SCRIPT_3MIN.md`
-- [ ] `ARCHITECTURE.md`
-- [ ] `QA_BRIEF.md`
-- [ ] `PPT_DECK_6SLIDES.md`
-- [ ] `VIDEO_SHOTLIST_2MIN.md`
-- [ ] `POSTER_COPY.md`
-- [ ] `deliverables/competition_kit/deck.html`
-- [ ] `deliverables/competition_kit/poster.html`
-- [ ] `deliverables/competition_kit/deck.pdf`
-- [ ] `deliverables/competition_kit/poster.pdf`
-- [ ] `deliverables/competition_kit/video_subtitles.srt`
-- [ ] `gold_sample_qa_compare_latest.md`
-- [ ] `gold_sample_replay_real_summary_latest.md`
-- [ ] `20260419_gold_ask_research_focus.png`
-- [ ] `20260419_gold_pdf_render.png`
-- [ ] `20260419_gold_ask_rank_accuracy.png`
-- [ ] `20260419_gold_refusal.png`
-- [ ] keep `20260419_stats_panel.png` appendix-only; do not place it in the primary six-slide story
-- [ ] keep `20260419_api_docs.png` appendix-only; do not place it in the primary six-slide story
-- [ ] export a handoff bundle with `scripts/export_competition_asset_pack.ps1`
-- [ ] keep `scripts/export_competition_pdfs.js` available for re-export after any visual edits
-
-## Do Not Improvise
-
-- Do not swap the sample document without re-locking the story.
-- Do not change the fixed prompt set during judging/demo.
-- Do not use the broader sample-set replay as the primary evidence source.
-- Do not oversell `summary` / `outline` as having the same grounding semantics as `ask`.
-- Do not present auth/demo-mode behavior as a product differentiator.
-
+- Do not over-sell `summary` / `outline` as having the same evidence semantics as `ask`.
+- Do not center login/invite-code flow in the product story.
+- Do not use broader replay artifacts as the main judging evidence unless specifically asked.
+- If asked about stability, cite the locked gold-sample reports first, then mention broader replay as secondary coverage.

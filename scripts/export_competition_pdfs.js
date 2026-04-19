@@ -16,6 +16,8 @@ const JOBS = [
     paperWidth: 16,
     paperHeight: 9,
     waitSelector: ".slide",
+    expectedPages: 6,
+    requiredStrings: ["研答通", "upload → ask → citation → PDF → refusal"],
   },
   {
     inputPath: path.join(ROOT, "deliverables", "competition_kit", "poster.html"),
@@ -23,8 +25,22 @@ const JOBS = [
     paperWidth: 23.39,
     paperHeight: 33.11,
     waitSelector: ".poster",
+    expectedPages: 1,
+    requiredStrings: ["研答通", "upload → ask → citation → PDF → refusal"],
   },
 ];
+
+const BAD_HTML_PATTERNS = [
+  { label: "bare /h1>", regex: /(^|[^<])\/h1>/ },
+  { label: "bare /h2>", regex: /(^|[^<])\/h2>/ },
+  { label: "bare /li>", regex: /(^|[^<])\/li>/ },
+  { label: "bare /span>", regex: /(^|[^<])\/span>/ },
+  { label: "bare /strong>", regex: /(^|[^<])\/strong>/ },
+  { label: "garbled ?strong>", regex: /\?strong>/ },
+  { label: "garbled ?/span>", regex: /\?\/span>/ },
+];
+
+const MOJIBAKE_MARKERS = ["鐮旂瓟閫", "鈫?", "闈㈠悜璁烘枃", "鍥為€€妯″瀷"];
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,6 +48,34 @@ function sleep(ms) {
 
 async function ensureDir(dirPath) {
   await fsp.mkdir(dirPath, { recursive: true });
+}
+
+async function assertHtmlSanity(job) {
+  const html = await fsp.readFile(job.inputPath, "utf8");
+
+  for (const pattern of BAD_HTML_PATTERNS) {
+    if (pattern.regex.test(html)) {
+      throw new Error(
+        `HTML sanity check failed for ${path.basename(job.inputPath)}: found bad pattern ${pattern.label}`
+      );
+    }
+  }
+
+  for (const marker of MOJIBAKE_MARKERS) {
+    if (html.includes(marker)) {
+      throw new Error(
+        `HTML sanity check failed for ${path.basename(job.inputPath)}: found mojibake marker ${marker}`
+      );
+    }
+  }
+
+  for (const required of job.requiredStrings ?? []) {
+    if (!html.includes(required)) {
+      throw new Error(
+        `HTML sanity check failed for ${path.basename(job.inputPath)}: missing required text ${required}`
+      );
+    }
+  }
 }
 
 async function fetchJson(url) {
@@ -228,12 +272,25 @@ async function exportPdf(cdp, job) {
   await fsp.writeFile(job.outputPath, Buffer.from(pdf.data, "base64"));
 }
 
+async function assertPdfSanity(job) {
+  const buffer = await fsp.readFile(job.outputPath);
+  const content = buffer.toString("latin1");
+  const pageCount = (content.match(/\/Type\s*\/Page\b/g) || []).length;
+
+  if (pageCount !== job.expectedPages) {
+    throw new Error(
+      `PDF sanity check failed for ${path.basename(job.outputPath)}: expected ${job.expectedPages} pages, got ${pageCount}`
+    );
+  }
+}
+
 async function main() {
   await ensureDir(TMP_DIR);
   for (const job of JOBS) {
     if (!fs.existsSync(job.inputPath)) {
       throw new Error(`Missing input file: ${job.inputPath}`);
     }
+    await assertHtmlSanity(job);
   }
 
   let browser = null;
@@ -241,6 +298,7 @@ async function main() {
     browser = await startBrowser();
     for (const job of JOBS) {
       await exportPdf(browser.cdp, job);
+      await assertPdfSanity(job);
       console.log(`Created ${path.relative(ROOT, job.outputPath)}`);
     }
   } finally {

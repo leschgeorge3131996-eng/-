@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>鐮旂瓟閫?| Competition Deck</title>
+    <title>研答通 | Competition Deck</title>
     <link rel="stylesheet" href="./styles.css" />
     <style media="print">
       @page {
@@ -19,52 +19,54 @@
           <div class="eyebrow">Evidence-Backed Document QA</div>
           <div class="title-row">
             <div>
-              <h1 class="hero-title">鐮旂瓟閫?/h1>
+              <h1 class="hero-title">研答通</h1>
               <p class="hero-subtitle">
-                甯﹁瘉鎹洖閾剧殑璁烘枃 / 鎶ュ憡闂瓟鍔╂墜銆傛牳蹇冭兘鍔涗笉鏄€滄妸绛旀璇村嚭鏉モ€濓紝鑰屾槸璁╂瘡涓€鏉″洖绛旈兘鑳借烦鍥?                PDF 鍘熸枃璇佹嵁銆?              </p>
+                面向论文阅读、报告复核、答辩准备的文档问答助手。核心不是泛化聊天，
+                而是让每条回答都能回到 PDF 原文证据。
+              </p>
             </div>
             <div class="hero-side">
               <div class="metric-card">
-                <strong>鐪熷疄 replay</strong>
-                <span>2 answered + 1 refused</span>
+                <strong>锁定样例</strong>
+                <span>中文论文 PDF</span>
               </div>
               <div class="metric-card">
-                <strong>榛樿 QA 妯″瀷</strong>
-                <span>qwen3-235b-a22b-instruct-2507</span>
+                <strong>当前主链路</strong>
+                <span>upload → ask → citation → PDF → refusal</span>
               </div>
             </div>
           </div>
           <div class="body-grid two-col">
             <div class="card">
-              <h2 class="section-title">涓轰粈涔堣鍋氬畠</h2>
+              <h2 class="section-title">为什么要做它</h2>
               <ul class="bullet-list">
-                <li>闀挎枃闃呰鎱紝绛旇京鍜屽鏍告洿闇€瑕佲€滆寰楀嚭澶勨€濄€?/li>
-                <li>鏅€氳亰澶╁伐鍏蜂細缁欑瓟妗堬紝浣嗗緢闅捐瘉鏄庣瓟妗堢湡鐨勬潵鑷枃妗ｃ€?/li>
-                <li>鎴戜滑鎶娾€滅瓟妗堝繀椤诲洖鍒板師鏂団€濆仛鎴愪簡涓€鏉″彲楠岃瘉閾捐矾銆?/li>
+                <li>长文阅读成本高，关键信息分散，复核效率低。</li>
+                <li>普通聊天工具能给答案，但很难证明答案来自原文。</li>
+                <li>答辩和汇报场景里，真正重要的是“说得出依据”。</li>
               </ul>
             </div>
             <div class="metric-grid">
               <div class="metric-card">
-                <strong>閿佸畾鏍蜂緥</strong>
-                <span>涓枃璁烘枃 PDF</span>
+                <strong>目标场景</strong>
+                <span>论文精读 / 报告复核 / 答辩准备</span>
               </div>
               <div class="metric-card">
-                <strong>鏍稿績涓荤嚎</strong>
-                <span>ask 鈫?citation 鈫?PDF</span>
+                <strong>核心卖点</strong>
+                <span>答案、citation 与 PDF 证据同屏闭环</span>
               </div>
               <div class="metric-card">
-                <strong>琛ュ厖楠岃瘉</strong>
-                <span>qwen3-32b 宸查獙璇佸彲鍥為€€</span>
+                <strong>当前主模型</strong>
+                <span>qwen3-235b-a22b-instruct-2507</span>
               </div>
               <div class="metric-card">
-                <strong>璇勫閲嶇偣</strong>
-                <span>璇佹嵁鍥為摼锛屼笉鏄硾鍖栬亰澶?/span>
+                <strong>回退模型</strong>
+                <span>qwen3-32b</span>
               </div>
             </div>
           </div>
           <div class="footer-bar">
-            <span>閿佸畾鏍蜂緥锛歚chinese_llm_spatial_eval.pdf`</span>
-              <strong>2026-04-19 Gold Sample Story</strong>
+            <span>锁定样例：`chinese_llm_spatial_eval.pdf`</span>
+            <strong>评审应记住：不是更会聊，而是更能回证据</strong>
           </div>
         </div>
       </section>
@@ -72,59 +74,59 @@
       <section class="slide">
         <div class="slide-inner">
           <div class="eyebrow">Verified Path</div>
-          <h2 class="section-title">鏈€鐭彲楠岃瘉閾捐矾</h2>
+          <h2 class="section-title">最短可验证链路</h2>
           <p class="section-subtitle">
-            鍦ㄥ綋鍓嶇湡瀹炶繍琛岀幆澧冧笅锛屽凡缁忛獙璇侀€氳繃鐨勪富璺緞鏄細
-            <strong>login 鈫?upload 鈫?ask 鈫?citation 鈫?PDF render 鈫?refusal</strong>
+            当前真实运行环境下，已经验证通过的 judge-facing 主链路是
+            <strong>upload → ask → citation → PDF → refusal</strong>。
           </p>
           <div class="pipeline">
             <div class="pipeline-step">
-              <strong>1. Upload</strong>
-              <span>涓婁紶璁烘枃鎴栨姤鍛婏紝淇濈暀鍘熷鏂囦欢涓庤В鏋愯緭鍑恒€?/span>
+              <strong>Upload</strong>
+              <span>上传论文或报告，保留原始文件与解析结果。</span>
             </div>
             <div class="pipeline-step">
-              <strong>2. Parse</strong>
-              <span>淇濆瓨椤电骇缁撴瀯銆佹枃鏈垎鍧椾笌椤甸潰涓婁笅鏂囥€?/span>
+              <strong>Structure</strong>
+              <span>保留页级结构、文本分块与 PDF 页面上下文。</span>
             </div>
             <div class="pipeline-step">
-              <strong>3. Retrieve</strong>
-              <span>鍏堟绱㈢浉鍏崇墖娈碉紝鏈懡涓氨鐩存帴鎷掔瓟銆?/span>
+              <strong>Ask</strong>
+              <span>先检索相关片段，再调用模型回答问题。</span>
             </div>
             <div class="pipeline-step">
-              <strong>4. Answer</strong>
-              <span>妯″瀷杩斿洖鍥炵瓟銆乽sed chunks 涓?evidence quotes銆?/span>
+              <strong>Citation</strong>
+              <span>同步返回页码、citation 与证据区。</span>
             </div>
             <div class="pipeline-step">
-              <strong>5. Cite</strong>
-              <span>杈撳嚭 citation銆侀〉鐮佸拰鍘熸枃鐗囨銆?/span>
+              <strong>PDF</strong>
+              <span>点击 citation 后，直接回到 PDF 原页查看证据。</span>
             </div>
             <div class="pipeline-step">
-              <strong>6. Render</strong>
-              <span>鐐瑰嚮寮曠敤锛岀洿鎺ュ洖鍒?PDF 椤甸潰璇佹嵁銆?/span>
+              <strong>Refusal</strong>
+              <span>检索无命中时直接拒答，不编造。</span>
             </div>
           </div>
           <div class="callout-row">
             <div class="callout accent">
-              <strong>宸ョ▼鍚箟</strong>
-              <span>涓嶆槸姒傚康鍥撅紝宸茬粡鍦ㄥ綋鍓?`.env` 鍜岀湡瀹炴ā鍨嬩笂楠岃瘉銆?/span>
+              <strong>评审含义</strong>
+              <span>不是概念图，而是当前环境里真实跑通过的闭环。</span>
             </div>
             <div class="callout teal">
-              <strong>婕旂ず鍚箟</strong>
-              <span>璇勫鍏堢湅鍒扮粨鏋滐紝鍐嶇悊瑙ｅ伐绋嬭矾寰勶紝涓嶉渶瑕佸厛鍚鏉傛灦鏋勩€?/span>
+              <strong>工程含义</strong>
+              <span>解析、检索、引用校验和 PDF 呈现已经接成一条链。</span>
             </div>
           </div>
           <div class="mini-grid">
             <div class="mini-card">
-              <strong>鏉冨▉鎶ュ憡</strong>
-              <span>`gold_sample_replay_real_summary_latest.md`</span>
+              <strong>锁定题组</strong>
+              <span>2 个 answerable + 1 个 refusal</span>
             </div>
             <div class="mini-card">
-              <strong>鍥哄畾棰橀泦</strong>
-              <span>2 answerable + 1 refusal</span>
+              <strong>主样例</strong>
+              <span>中文空间语义评测论文</span>
             </div>
             <div class="mini-card">
-              <strong>褰撳墠瀹氫綅</strong>
-              <span>璁烘枃 / 鎶ュ憡闃呰涓庣瓟杈╁噯澶?/span>
+              <strong>主结论</strong>
+              <span>问答必须回到原文，而不是停在生成</span>
             </div>
           </div>
         </div>
@@ -134,70 +136,60 @@
         <div class="slide-inner">
           <div class="eyebrow">Question 1</div>
           <div class="body-grid two-col">
-            <div>
-              <h2 class="section-title">鏂囨。鍐呴棶棰樺厛缁欑瓟妗堬紝鍐嶇粰璇佹嵁</h2>
+            <div class="card">
+              <h2 class="section-title">先给回答，再给证据</h2>
               <p class="section-subtitle">
-                閿佸畾闂锛?strong>杩欑瘒璁烘枃涓昏鐮旂┒浜嗕粈涔堥棶棰橈紵</strong>
+                锁定问题：<strong>这篇论文主要研究了什么问题？</strong>
               </p>
               <ul class="bullet-list">
-                <li>绯荤粺鍏堟绱㈢浉鍏崇墖娈碉紝鍐嶈繘鍏ュ洖绛斻€?/li>
-                <li>鍥炵瓟銆乧itation銆佽瘉鎹墖娈靛悓姝ュ嚭鐜般€?/li>
-                <li>杩欎竴姝ュ凡缁忚瘉鏄庡畠涓嶆槸鑴辩鏂囨。鐨勮亰澶╁３銆?/li>
+                <li>结果面板同时出现回答正文、citation 和证据区。</li>
+                <li>这不是脱离原文的聊天回复，而是带证据的文档问答。</li>
+                <li>回答的可信度来自“能回去看原文”，不是模型语气。</li>
               </ul>
               <div class="quote-box">
-                <strong>璇勫瑕佺偣</strong>
-                <span>
-                  鍏堝睍绀衡€滃洖绛?+ citation鈥濆悓灞忥紝鍐嶈В閲婅繖鏄悗绔弽鏌ュ師鏂囧悗鐨勪骇鐗┿€?                </span>
+                “评审第一眼要看到的不是模型会说话，而是它的回答和证据一起出现。”
               </div>
             </div>
             <div class="image-panel">
               <div class="image-frame">
                 <img
                   src="../../evidence/screenshots/20260419_gold_ask_research_focus.png"
-                  alt="Gold sample research focus ask screenshot"
+                  alt="Question 1 result panel"
                 />
               </div>
               <div class="caption">
-                `20260419_gold_ask_research_focus.png`锛氬洖绛旀鏂囥€佸紩鐢ㄩ〉鐮佷笌璇佹嵁鐗囨鍚屽睆銆?              </div>
+                当前锁定 Q1 截图：answerable 问题、回答结果、citation 和证据区同屏呈现。
+              </div>
             </div>
-          </div>
-          <div class="footer-bar">
-            <span>涓诲彊浜嬪繀椤诲己璋?evidence-backed ask</span>
-            <strong>涓嶈鎶?generic chat 褰撳崠鐐?/strong>
           </div>
         </div>
       </section>
 
       <section class="slide">
         <div class="slide-inner">
-          <div class="eyebrow">Citation Jump</div>
+          <div class="eyebrow">PDF Back-Link</div>
           <div class="body-grid two-col">
             <div class="image-panel">
               <div class="image-frame">
                 <img
                   src="../../evidence/screenshots/20260419_gold_pdf_render.png"
-                  alt="Gold sample PDF render screenshot"
+                  alt="PDF evidence render"
                 />
               </div>
               <div class="caption">
-                `20260419_gold_pdf_render.png`锛氱偣鍑?citation 鍚庯紝鐩存帴璺冲埌瀵瑰簲 PDF 椤甸潰銆?              </div>
+                点击 citation 后，右侧直接打开 PDF 原页，证据片段与高亮位置同时可见。
+              </div>
             </div>
-            <div>
-              <h2 class="section-title">璇佹嵁鑳藉洖鍒?PDF 鍘熸枃</h2>
+            <div class="card">
+              <h2 class="section-title">把“能回答”变成“能验证”</h2>
               <ul class="bullet-list">
-                <li>citation 涓嶅彧鏄〉鐮侊紝鑰屾槸鑳芥墦寮€鐪熷疄椤甸潰銆?/li>
-                <li>椤甸潰鍐呮樉绀鸿瘉鎹珮浜紝鏃佽竟淇濈暀鍘熸枃鐗囨鏂囨湰銆?/li>
-                <li>杩欎竴姝ユ妸鈥滃洖绛斿彲淇♀€濆彉鎴愨€滆瘉鎹彲鐪嬧€濄€?/li>
+                <li>citation 不只是页码，而是一个可回跳的原文入口。</li>
+                <li>PDF 面板同时保留原文片段和高亮位置。</li>
+                <li>对论文阅读和答辩场景来说，这一步才是真正的信任锚点。</li>
               </ul>
-              <div class="callout-row">
-                <div class="callout accent">
-                  <strong>瀵圭敤鎴?/strong>
-                  <span>鍙互蹇€熺‘璁ょ瓟妗堝嚭澶勶紝閫傚悎绛旇京鍜屾眹鎶ュ墠澶嶆牳銆?/span>
-                </div>
-                <div class="callout teal">
-                  <strong>瀵硅瘎瀹?/strong>
-                  <span>鐪嬪緱瑙?PDF 璇佹嵁锛屾瘮鍙ｅご鎻忚堪鏇存湁璇存湇鍔涖€?/span>
-                </div>
+              <div class="callout teal">
+                <strong>区别于普通聊天工具</strong>
+                <span>结果不是止于文本输出，而是能继续追到 PDF 里的证据位置。</span>
               </div>
             </div>
           </div>
@@ -206,30 +198,30 @@
 
       <section class="slide">
         <div class="slide-inner">
-          <div class="eyebrow">Question 2 + Model Choice</div>
+          <div class="eyebrow">Question 2</div>
           <div class="body-grid two-col">
-            <div>
-              <h2 class="section-title">鏁板€奸棶棰樹篃鑳界ǔ瀹氬洖閾?/h2>
+            <div class="card">
+              <h2 class="section-title">具体数字也能回到原文</h2>
               <p class="section-subtitle">
-                閿佸畾闂锛?strong>浣滆€呮渶缁堢殑鏂规硶鎺掑悕鍜屾€讳綋鍑嗙‘鐜囧垎鍒槸澶氬皯锛?/strong>
+                锁定问题：<strong>作者最终的方法排名和总体准确率分别是多少？</strong>
               </p>
               <ul class="bullet-list">
-                <li>褰撳墠閿佸畾缁撴灉锛?strong>绗叚</strong>銆?strong>56.20%</strong>銆?/li>
-                <li>涓ょ QA 妯″瀷閮介€氳繃 `2 answerable + 1 refusal`銆?/li>
-                <li>`235b` grounding 鏇翠赴婊★紝`32b` 鍙綔 fallback銆?/li>
+                <li>当前锁定答案：<strong>第六名</strong>、<strong>56.20%</strong>。</li>
+                <li>两个 QA 模型都通过了当前锁定题组。</li>
+                <li>默认保持 `qwen3-235b-a22b-instruct-2507`，同时保留 `qwen3-32b` 作为 fallback。</li>
               </ul>
               <div class="mini-grid">
                 <div class="mini-card">
-                  <strong>涓绘ā鍨?/strong>
+                  <strong>默认 QA</strong>
                   <span>qwen3-235b-a22b-instruct-2507</span>
                 </div>
                 <div class="mini-card">
-                  <strong>鍥為€€妯″瀷</strong>
+                  <strong>Fallback</strong>
                   <span>qwen3-32b</span>
                 </div>
                 <div class="mini-card">
-                  <strong>缁撹</strong>
-                  <span>褰撳墠缁х画淇濇寔 235b 涓洪粯璁?QA</span>
+                  <strong>当前判断</strong>
+                  <span>两者都可用，235b 继续作为主路径默认值</span>
                 </div>
               </div>
             </div>
@@ -237,11 +229,12 @@
               <div class="image-frame">
                 <img
                   src="../../evidence/screenshots/20260419_gold_ask_rank_accuracy.png"
-                  alt="Gold sample rank accuracy ask screenshot"
+                  alt="Question 2 result panel"
                 />
               </div>
               <div class="caption">
-                `20260419_gold_ask_rank_accuracy.png`锛氬叿浣撴暟鍊肩瓟妗?+ citations銆?              </div>
+                数值问题同样要求回答、citation 和证据区一起出现，而不是只给一个最终数字。
+              </div>
             </div>
           </div>
         </div>
@@ -249,39 +242,38 @@
 
       <section class="slide">
         <div class="slide-inner">
-          <div class="eyebrow">Reliability Boundary</div>
+          <div class="eyebrow">Refusal</div>
           <div class="body-grid two-col">
             <div class="image-panel">
               <div class="image-frame">
                 <img
                   src="../../evidence/screenshots/20260419_gold_refusal.png"
-                  alt="Gold sample refusal screenshot"
+                  alt="Refusal result panel"
                 />
               </div>
               <div class="caption">
-                `20260419_gold_refusal.png`锛氱棰橀棶棰樿鏄庣‘鎷掔瓟锛宍retrieval_status=no_match`銆?              </div>
+                锁定 refusal：`木星有几颗卫星？`，检索无命中时直接拒答。
+              </div>
             </div>
-            <div>
-              <h2 class="section-title">绂婚涓嶇紪閫狅紝鎵嶅彨鍙潬</h2>
+            <div class="card">
+              <h2 class="section-title">离题不编造，边界才可靠</h2>
               <ul class="bullet-list">
-                <li>閿佸畾鎷掔瓟闂锛?strong>鏈ㄦ槦鏈夊嚑棰楀崼鏄燂紵</strong></li>
-                <li>妫€绱㈡湭鍛戒腑鏃讹紝绯荤粺涓嶄細纭瓟锛岃€屾槸鐩存帴鎷掔瓟銆?/li>
-                <li>瀵规枃妗ｅ姪鎵嬭€岃█锛岃竟鐣屾帶鍒跺拰鍙獙璇佹€у悓鏍烽噸瑕併€?/li>
+                <li>锁定题组当前结果：<strong>2 answered + 1 refused</strong>。</li>
+                <li>拒答的意义不是“更会聊天”，而是把无依据问题挡在链路外。</li>
+                <li>项目的最终差异点仍然是：答案、citation 与 PDF 证据闭环。</li>
               </ul>
-              <div class="quote-box">
-                <strong>鏀舵潫缁撹</strong>
-                <span>
-                  鐮旂瓟閫氬綋鍓嶆渶寮虹殑宸紓鐐癸紝涓嶆槸鈥滄ā鍨嬪緢寮衡€濓紝鑰屾槸鈥滄瘡涓粨璁洪兘鑳藉洖鍒版枃妗ｈ瘉鎹€濄€?                </span>
-              </div>
-              <div class="footer-bar">
-                <span>鍙€夐檮褰曪細stats panel / API docs 浠呬綔鏀拺锛屼笉杩涗富鍙欎簨</span>
-                <strong>Final Message: Answer, Cite, Return To Evidence</strong>
+              <div class="callout accent">
+                <strong>结论</strong>
+                <span>研答通不是一个更会说话的聊天壳，而是一个更能回证据的文档问答助手。</span>
               </div>
             </div>
+          </div>
+          <div class="footer-bar">
+            <span>锁定题组：Q1 / Q2 / refusal</span>
+            <strong>主叙事固定为：upload → ask → citation → PDF → refusal</strong>
           </div>
         </div>
       </section>
     </main>
   </body>
 </html>
-

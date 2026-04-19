@@ -479,13 +479,17 @@ img {
 }
 
 @media print {
+  html,
   body {
+    margin: 0;
     background: white;
   }
 
   .page-shell,
   .poster-shell {
     padding: 0;
+    display: block;
+    gap: 0;
   }
 
   .slide,
@@ -494,5 +498,33 @@ img {
     border-radius: 0;
     box-shadow: none;
     border: none;
+    break-inside: avoid;
+    overflow: hidden;
+  }
+
+  .slide {
+    width: 16in;
+    min-height: 0;
+    height: 9in;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .slide:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .poster {
+    width: 23.39in;
+    min-height: 0;
+    height: 33.11in;
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .slide-inner,
+  .poster-inner {
+    height: 100%;
   }
 }
