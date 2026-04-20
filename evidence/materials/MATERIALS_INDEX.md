@@ -98,6 +98,12 @@
 32. [../../deliverables/competition_kit/video_subtitles_5min_final.srt](../../deliverables/competition_kit/video_subtitles_5min_final.srt)
 - 正式 `5` 分钟提交版字幕 / 旁白基线
 
+33. [FINAL_SUBMISSION_CHECKLIST.md](./FINAL_SUBMISSION_CHECKLIST.md)
+- 最终提交封板检查清单
+
+34. [DEFENSE_DEMO_RISK_CHECKLIST.md](./DEFENSE_DEMO_RISK_CHECKLIST.md)
+- 答辩 / 演示高风险点检查清单
+
 ## 使用建议
 
 - 报名表 / 作品简介：优先参考 `PROJECT_ONE_PAGER.md`
@@ -113,6 +119,8 @@
 - 正式 `5` 分钟视频稿：优先参考 `VIDEO_SHOTLIST_5MIN_FINAL.md`
 - 正式 `3` 页可打印基线：优先参考 `deliverables/competition_kit/deck_3page_final.pdf`
 - 正式 `5` 分钟字幕基线：优先参考 `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- 最终封板检查：优先参考 `FINAL_SUBMISSION_CHECKLIST.md`
+- 答辩 / 演示风控：优先参考 `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - 现场展示 / 录屏脚本：优先参考 `DEMO_SCRIPT_3MIN.md`
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`

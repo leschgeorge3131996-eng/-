@@ -171,7 +171,7 @@ Operator rehearsal result:
   - `deck.pdf` -> `6` pages
   - `poster.pdf` -> `1` page
 - Latest local handoff pack after these additions:
-  - `evidence/exports/competition_asset_pack_20260420_135135/`
+  - `evidence/exports/competition_asset_pack_20260420_173101/`
 
 ## 2026-04-20 External Review Pack Refresh
 
@@ -197,6 +197,28 @@ Operator rehearsal result:
   - `deliverables/competition_kit/video_subtitles_5min_final.srt`
 - Provider residue was also removed from the live error wording in:
   - `backend/app/services/model_client.py`
+
+## 2026-04-20 Final Submission / Defense Control Sheets
+
+- Two explicit operator-control docs now exist for the last mile:
+  - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
+- They were also wired into the primary prep/material/export path:
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `scripts/export_review_bundle.ps1`
+- Practical meaning:
+  - final native `PPT` and final edited `5`-minute video now have a single freeze-control sheet
+  - judged-demo warmup, fallback, and anti-overclaim rules now have a single live operator sheet
+  - this does not reopen scope; it narrows execution around the current strongest judged path
+- Latest export verification after wiring these docs:
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - `evidence/exports/competition_asset_pack_20260420_173101/`
+  - `PACK_CONTENTS.md` confirms both:
+    - `FINAL_SUBMISSION_CHECKLIST.md`
+    - `DEFENSE_DEMO_RISK_CHECKLIST.md`
 
 ## What Was Added In The Latest Iterations
 

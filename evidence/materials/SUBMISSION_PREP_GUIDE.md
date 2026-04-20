@@ -34,6 +34,11 @@ story. Broader replay outputs are secondary supporting material only.
 10. `evidence/reports/gold_sample_replay_real_summary_latest.md`
 11. `evidence/reports/gold_sample_qa_compare_latest.md`
 
+### Freeze control docs
+
+1. `FINAL_SUBMISSION_CHECKLIST.md`
+2. `DEFENSE_DEMO_RISK_CHECKLIST.md`
+
 ### Nice-to-have
 
 1. `ARCHITECTURE.md`
@@ -56,6 +61,8 @@ Use:
 
 - `SUBMISSION_SPEC_CROSSWALK.md`
 - `HANDOFF_PACKAGE_BOUNDARY.md`
+- `FINAL_SUBMISSION_CHECKLIST.md`
+- `DEFENSE_DEMO_RISK_CHECKLIST.md`
 
 Important:
 
@@ -144,6 +151,8 @@ node .\scripts\export_competition_pdfs.js
 
 ## Suggested Final Check Before Submission
 
+- [ ] `FINAL_SUBMISSION_CHECKLIST.md` is complete or intentionally frozen with explicit open items
+- [ ] `DEFENSE_DEMO_RISK_CHECKLIST.md` has been reviewed before the live slot
 - [ ] Locked prompts still match `GOLD_SAMPLE_CANDIDATE_20260418.json`
 - [ ] `gold_sample_replay_real_summary_latest.md` is current
 - [ ] `gold_sample_qa_compare_latest.md` is current

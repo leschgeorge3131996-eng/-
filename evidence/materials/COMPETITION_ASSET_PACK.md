@@ -51,6 +51,9 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
 - Poster copy:
   - `evidence/materials/POSTER_COPY.md`
+- Freeze-control docs:
+  - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
 - Printable deck/poster prototypes:
   - `deliverables/competition_kit/deck.html`
   - `deliverables/competition_kit/poster.html`
@@ -193,6 +196,8 @@ Suggested supporting artifacts:
 
 ## Defense Notes
 
+- Use `FINAL_SUBMISSION_CHECKLIST.md` as the final freeze sheet.
+- Use `DEFENSE_DEMO_RISK_CHECKLIST.md` as the live operator sheet.
 - Do not over-sell `summary` / `outline` as having the same evidence semantics as `ask`.
 - Do not center login/invite-code flow in the product story.
 - Do not use broader replay artifacts as the main judging evidence unless specifically asked.

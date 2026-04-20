@@ -26,17 +26,18 @@
 - Repo-native final judged-video subtitle baseline now exists in-repo (`video_subtitles_5min_final.srt`)
 - Root external-review context/prompt/index now exist in-repo
 - Old `6`-slide / `2`-minute assets have now been demoted from primary-entry status in the highest-visibility material docs
+- Final submission and defense-risk control sheets now exist in-repo
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
 1. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first reference for any further external review or operator handoff
 2. Use the latest local handoff/export artifacts as the default judged-material baseline:
-   - `evidence/exports/competition_asset_pack_20260420_135135/`
+   - `evidence/exports/competition_asset_pack_20260420_173101/`
    - `review_bundle_stage_20260420_141123/`
    - `review_bundle_20260420_141123_final_competition_review.zip`
-3. Convert `deck_3page_final.pdf` into the final native PPT file and `video_subtitles_5min_final.srt` into the final recorded/edited video
-4. Before judged demo: set `DEMO_MODE=true` on the target env and verify the opening flow on the target URL
+3. Use `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze sheet while converting `deck_3page_final.pdf` into the final native PPT and `video_subtitles_5min_final.srt` into the final recorded/edited video
+4. Before judged demo: run `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` together with `GOLD_SAMPLE_RUNBOOK.md`, set `DEMO_MODE=true` on the target env, and verify the opening flow on the target URL
 5. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
 ## Recently Verified
@@ -77,7 +78,10 @@
   - `deliverables/competition_kit/deck_3page_final.pdf`
 - `2026-04-20`: repo-native judged-video timing baseline added:
   - `deliverables/competition_kit/video_subtitles_5min_final.srt`
-- `2026-04-20`: latest competition asset pack regenerated at `evidence/exports/competition_asset_pack_20260420_135135/` and verified to include the final deck HTML/PDF plus 5-minute subtitle baseline
+- `2026-04-20`: latest competition asset pack regenerated at `evidence/exports/competition_asset_pack_20260420_173101/` and verified to include:
+  - final deck HTML/PDF plus 5-minute subtitle baseline
+  - `FINAL_SUBMISSION_CHECKLIST.md`
+  - `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - `2026-04-20`: latest external review artifacts regenerated at:
   - `review_bundle_stage_20260420_141123/`
   - `review_bundle_20260420_141123_final_competition_review.zip`
@@ -124,6 +128,9 @@
 - `G3` should now be treated as closed at the stricter fresh-upload level for the locked judged-demo path
 - Authoritative freeze facts now live in:
   - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+- Last-mile operator-control docs now live at:
+  - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
 - The latest external final-review artifact is:
   - `review_bundle_stage_20260420_141123/`
   - `review_bundle_20260420_141123_final_competition_review.zip`

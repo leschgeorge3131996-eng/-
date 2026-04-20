@@ -88,6 +88,8 @@ $requiredFiles = @(
     "evidence\materials\POSTER_COPY.md",
     "evidence\materials\DEMO_SCRIPT_3MIN.md",
     "evidence\materials\GOLD_SAMPLE_RUNBOOK.md",
+    "evidence\materials\FINAL_SUBMISSION_CHECKLIST.md",
+    "evidence\materials\DEFENSE_DEMO_RISK_CHECKLIST.md",
     "evidence\materials\GOLD_SAMPLE_CANDIDATE_20260418.json",
     "evidence\materials\ARCHITECTURE.md",
     "evidence\materials\QA_BRIEF.md",

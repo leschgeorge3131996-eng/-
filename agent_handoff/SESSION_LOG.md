@@ -192,6 +192,37 @@ Entry format:
   - still final native `PPT`
   - still final edited `5`-minute video
 
+## 2026-04-20 / Codex (final submission + defense control sheets)
+
+- Summary:
+  - Added `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze-control sheet for the last-mile submission package
+  - Added `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` as the single live operator sheet for judged demo / defense risk control
+  - Wired both docs into the primary material/prep/export chain so future operators and Claude do not miss them
+- Files touched:
+  - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `scripts/export_review_bundle.ps1`
+  - `WORKLOG.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - generated:
+    - `evidence/exports/competition_asset_pack_20260420_173101/`
+  - generated `PACK_CONTENTS.md` includes:
+    - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+    - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
+- Open risks:
+  - final native `PPT` is still not produced
+  - final edited `5`-minute video is still not produced
+- Recommended next step:
+  - use `FINAL_SUBMISSION_CHECKLIST.md` as the explicit closeout gate while producing the final native deck/video assets
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:

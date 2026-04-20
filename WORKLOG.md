@@ -110,6 +110,27 @@
   - `backend/app/services/model_client.py`
   - `429` burst-limit wording no longer mentions the old provider name
 
+### 2026-04-20 Final Submission / Defense Control Sheets
+
+- added final freeze-control docs:
+  - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
+- wired the new checklists into the highest-visibility prep/material/export docs:
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `scripts/export_review_bundle.ps1`
+- practical meaning:
+  - final native `PPT` / final edited `5`-minute video now have an explicit repo check-sheet
+  - judged-demo warmup / fallback / anti-overclaim rules now have a single operator reference
+- export verification:
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - `evidence/exports/competition_asset_pack_20260420_173101/`
+  - generated `PACK_CONTENTS.md` now includes:
+    - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
+    - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`
+
 ### Completed
 
 - React + TypeScript + Vite frontend created
