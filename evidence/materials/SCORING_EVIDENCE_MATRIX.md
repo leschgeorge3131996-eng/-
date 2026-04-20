@@ -84,6 +84,7 @@
 2. `ask` 先检索再作答，并返回 citation 与 evidence quotes
 3. citation 可回到 PDF 原页做高亮与旁证展示
 4. 检索无命中时显式拒答，而不是编造
+5. 量化指标：证据声明率 `100%`、引用准确率 `100%`、拒答精确率 `100%`、跨轮一致性 `100%`（strict G3 三轮 fresh-upload 评测，详见 `quantitative_eval_metrics.md`）
 
 ### 追问 2：你们怎么证明不是只会演示一题？
 

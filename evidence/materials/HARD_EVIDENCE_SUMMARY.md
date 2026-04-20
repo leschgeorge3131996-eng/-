@@ -87,6 +87,25 @@
 
 ## 当前诚实边界
 
+### 6. 量化评测指标（strict G3 三轮 fresh-upload）
+
+来源：`evidence/reports/quantitative_eval_metrics.md`
+
+| 指标 | 值 |
+| --- | --- |
+| 证据声明率 | `100%` |
+| 引用页码准确率 | `100%` |
+| 检索页码覆盖率 | `100%` |
+| 证据引文提取率 | `100%` |
+| 检索利用率 | `38%` |
+| 拒答精确率 | `100%` |
+| 跨轮一致性 | `100%` |
+| 平均 answerable 延迟 | `5521 ms` |
+
+检索利用率 `38%` 说明模型从 `4` 个候选片段中选择性引用了 `1-2` 个最相关片段，而非全盘接受检索结果。
+
+## 当前诚实边界
+
 1. 当前最强证据是锁定 gold-sample judged-demo path，不是开放域产品泛化证明。
 2. 当前 `G3` 最强记录是 strict three-run batch；它证明 judged-demo path 可复现，但仍不是开放域泛化证明。
 3. `ask` 是主卖点；`summary / outline` 已支持，但 grounding 语义弱于 `ask`。
