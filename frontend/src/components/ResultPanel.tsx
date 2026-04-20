@@ -126,6 +126,38 @@ function getEvidenceSectionTitle(result: TaskResult, evidenceMode: EvidenceMode)
   return "证据状态";
 }
 
+function getConfidenceBar(result: TaskResult, evidenceMode: EvidenceMode): {
+  level: "high" | "partial" | "none";
+  label: string;
+  detail: string;
+} | null {
+  if (result.task_type !== "ask") return null;
+  if (result.outcome === "refused") return null;
+
+  const citationCount = (result.citations ?? []).length;
+  const quoteCount = (result.evidence_quotes ?? []).length;
+
+  if (evidenceMode === "declared" && citationCount > 0) {
+    return {
+      level: "high",
+      label: "原文证据支撑",
+      detail: `基于 ${citationCount} 条原文引用${quoteCount > 0 ? `，含 ${quoteCount} 段逐字摘录` : ""}`
+    };
+  }
+  if (evidenceMode === "candidate") {
+    return {
+      level: "partial",
+      label: "检索上下文参考",
+      detail: "模型未完成证据声明，答案基于检索候选片段"
+    };
+  }
+  return {
+    level: "none",
+    label: "无可验证证据",
+    detail: "本次回答缺乏原文依据，请谨慎使用"
+  };
+}
+
 function isRetrievalGateResult(result: TaskResult): boolean {
   return result.route_reason === "retrieval_no_match" || result.model_name === "retrieval_gate";
 }
@@ -208,6 +240,7 @@ export default function ResultPanel({
   const evidenceMode = result ? getEvidenceMode(result) : "none";
   const evidenceItems = result ? getEvidenceItems(result, evidenceMode) : [];
   const evidenceSummary = result ? getEvidenceSummary(result, evidenceMode) : null;
+  const confidenceBar = result ? getConfidenceBar(result, evidenceMode) : null;
   const retrievedPages = result?.retrieved_pages ?? [];
   const isRetrievalGate = result ? isRetrievalGateResult(result) : false;
   const modelMetaLabel = isRetrievalGate ? "执行路径" : "模型";
@@ -443,6 +476,24 @@ export default function ResultPanel({
                 </span>
               ) : null}
             </motion.div>
+
+            {confidenceBar ? (
+              <motion.div
+                className={`confidence-bar confidence-bar-${confidenceBar.level}`}
+                data-testid="confidence-bar"
+                {...revealMotion(0.08)}
+              >
+                <div className="confidence-bar-indicator" aria-hidden="true">
+                  <span className="confidence-dot" />
+                  <span className="confidence-dot" />
+                  <span className="confidence-dot" />
+                </div>
+                <div className="confidence-bar-text">
+                  <strong>{confidenceBar.label}</strong>
+                  <span>{confidenceBar.detail}</span>
+                </div>
+              </motion.div>
+            ) : null}
 
             <motion.div className="result-meta-grid" {...revealMotion(0.12)}>
               <div className="result-meta-card">

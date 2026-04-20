@@ -1111,7 +1111,78 @@ textarea {
   color: var(--error);
 }
 
-.terminal-shell {
+.confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1.5px solid transparent;
+}
+
+.confidence-bar-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.confidence-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.25;
+}
+
+.confidence-bar-text {
+  display: grid;
+  gap: 3px;
+}
+
+.confidence-bar-text strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.confidence-bar-text span {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.confidence-bar-high {
+  border-color: rgba(31, 106, 78, 0.28);
+  background: rgba(236, 250, 243, 0.9);
+  color: var(--success);
+}
+
+.confidence-bar-high .confidence-dot {
+  opacity: 1;
+}
+
+.confidence-bar-partial {
+  border-color: rgba(173, 76, 35, 0.22);
+  background: rgba(255, 249, 242, 0.9);
+  color: var(--accent-deep);
+}
+
+.confidence-bar-partial .confidence-dot:first-child,
+.confidence-bar-partial .confidence-dot:nth-child(2) {
+  opacity: 1;
+}
+
+.confidence-bar-none {
+  border-color: rgba(177, 53, 26, 0.22);
+  background: rgba(255, 244, 242, 0.9);
+  color: var(--error);
+}
+
+.confidence-bar-none .confidence-dot:first-child {
+  opacity: 1;
+}
+
+
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
