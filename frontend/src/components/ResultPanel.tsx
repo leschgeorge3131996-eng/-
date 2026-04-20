@@ -305,25 +305,32 @@ export default function ResultPanel({
           ? "复制失败"
           : "复制";
 
+    const cardContent = (
+      <>
+        <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
+        <p>{item.snippet}</p>
+      </>
+    );
+
     return (
       <motion.article
         key={`${item.chunk_id}-${index}`}
         className="citation-card"
         {...revealMotion(baseDelay + index * 0.05)}
       >
-        <p className="citation-meta">页码：{item.page_numbers.join(", ")}</p>
-        <p>{item.snippet}</p>
+        {canOpenPdfPreview && onOpenPdfPage ? (
+          <button
+            data-testid={`open-pdf-${item.chunk_id}-${index}`}
+            className="citation-button"
+            type="button"
+            onClick={() => onOpenPdfPage(item)}
+          >
+            {cardContent}
+          </button>
+        ) : (
+          cardContent
+        )}
         <div className="citation-actions">
-          {canOpenPdfPreview && onOpenPdfPage ? (
-            <button
-              data-testid={`open-pdf-${item.chunk_id}-${index}`}
-              className="mini-action-button"
-              type="button"
-              onClick={() => onOpenPdfPage(item)}
-            >
-              打开定位
-            </button>
-          ) : null}
           <button
             className="mini-action-button"
             type="button"
