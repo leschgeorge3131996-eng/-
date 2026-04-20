@@ -42,6 +42,9 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
 - Official `5`-minute video source:
   - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- Repo-native official deck baseline:
+  - `deliverables/competition_kit/deck_3page_final.html`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
 - PPT page copy:
   - `evidence/materials/PPT_DECK_6SLIDES.md`
 - Video shotlist:
@@ -52,9 +55,11 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `deliverables/competition_kit/deck.html`
   - `deliverables/competition_kit/poster.html`
 - Current printable PDF baselines:
+  - `deliverables/competition_kit/deck_3page_final.pdf`
   - `deliverables/competition_kit/deck.pdf`
   - `deliverables/competition_kit/poster.pdf`
 - Video subtitle baseline:
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
   - `deliverables/competition_kit/video_subtitles.srt`
 - One-click export script:
   - `scripts/export_competition_asset_pack.ps1`
@@ -65,9 +70,14 @@ Do not rebuild the story from scratch each time. Reuse this pack.
 
 - `PPT_DECK_3PAGES_FINAL.md`
   - current repo source draft for the official `3`-page submission deck
+  - current repo-native printable baseline:
+    - `deliverables/competition_kit/deck_3page_final.html`
+    - `deliverables/competition_kit/deck_3page_final.pdf`
   - use this first; keep `PPT_DECK_6SLIDES.md` only as the compression baseline
 - `VIDEO_SHOTLIST_5MIN_FINAL.md`
   - current repo source draft for the official `5`-minute submission video
+  - current repo-native timing baseline:
+    - `deliverables/competition_kit/video_subtitles_5min_final.srt`
   - use this first; keep `VIDEO_SHOTLIST_2MIN.md` only as the pacing baseline
 
 ## Fixed Demo Facts
@@ -166,6 +176,8 @@ Suggested supporting artifacts:
 - Use:
   - `VIDEO_SHOTLIST_2MIN.md`
   - `video_subtitles.srt`
+  - `VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - `video_subtitles_5min_final.srt`
 
 ## Poster Mapping
 

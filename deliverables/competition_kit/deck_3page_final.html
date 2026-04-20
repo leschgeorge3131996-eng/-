@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>研答通 | Final 3-Page Deck</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style media="print">
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Judged Submission / Page 1</div>
+          <div class="title-row">
+            <div>
+              <h1 class="hero-title">研答通</h1>
+              <p class="hero-subtitle">
+                面向论文阅读、报告复核、答辩准备的 evidence-backed 文档问答助手。
+                评审要记住的不是“更会聊天”，而是“每条回答都能回到 PDF 原文证据”。
+              </p>
+            </div>
+            <div class="hero-side">
+              <div class="metric-card">
+                <strong>锁定样例</strong>
+                <span>中文论文 PDF</span>
+              </div>
+              <div class="metric-card">
+                <strong>主叙事链路</strong>
+                <span>upload -&gt; ask -&gt; citation -&gt; PDF -&gt; refusal</span>
+              </div>
+              <div class="metric-card">
+                <strong>当前定位</strong>
+                <span>证据回链优先于泛化聊天</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="body-grid two-col">
+            <div class="card">
+              <h2 class="section-title">评审真正关心的痛点</h2>
+              <ul class="bullet-list">
+                <li>长文阅读成本高，关键信息分散，人工复核效率低。</li>
+                <li>普通聊天工具能给结论，但很难证明答案来自原文。</li>
+                <li>答辩和汇报场景最重要的不是“说得顺”，而是“说得出依据”。</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h2 class="section-title">最短可验证链路</h2>
+              <ol class="number-list">
+                <li>上传论文或报告，保留页级结构。</li>
+                <li>先检索相关片段，再执行 ask。</li>
+                <li>同步返回 citation、页码和证据片段。</li>
+                <li>点击 citation 后直接回到 PDF 原页。</li>
+                <li>离题问题 refusal，不为看起来聪明而编造。</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="callout accent">
+            <strong>Judge-facing 结论</strong>
+            <span>我们不是做一个更会聊天的壳，而是把“答案可回原文”做成一条硬链路。</span>
+          </div>
+
+          <div class="footer-bar">
+            <span>锁定样例：evidence/samples/chinese_llm_spatial_eval.pdf</span>
+            <strong>核心链路固定为 upload -&gt; ask -&gt; citation -&gt; PDF -&gt; refusal</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Locked Demo / Page 2</div>
+          <h2 class="section-title">先给回答，再给证据，再回到 PDF</h2>
+          <p class="section-subtitle">
+            锁定文档为 `chinese_llm_spatial_eval.pdf`，锁定问题 1 为
+            “这篇论文主要研究了什么问题？” 这一页只证明一件事：证据回链是真的。
+          </p>
+
+          <div class="body-grid two-col">
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260419_gold_ask_research_focus.png"
+                  alt="Question 1 result panel"
+                />
+              </div>
+              <div class="caption">
+                Q1 结果面板同时出现 answer、citation 和 evidence snippet。
+                评委看到的不是脱离原文的聊天回复，而是带证据的 ask。
+              </div>
+            </div>
+
+            <div class="image-panel">
+              <div class="image-frame">
+                <img
+                  src="../../evidence/screenshots/20260419_gold_pdf_render.png"
+                  alt="PDF evidence render"
+                />
+              </div>
+              <div class="caption">
+                点击 citation 后直接回到 PDF 原页。证据位置与原文片段在同一视图中可见，
+                这一步把“能回答”升级成“能验证”。
+              </div>
+            </div>
+          </div>
+
+          <div class="callout-row">
+            <div class="callout accent">
+              <strong>Q1 要证明什么</strong>
+              <span>答案、citation 和证据片段必须同屏出现，而不是只给一句生成式结论。</span>
+            </div>
+            <div class="callout teal">
+              <strong>PDF 回链要证明什么</strong>
+              <span>citation 不是静态页码，而是可跳回 PDF 的证据入口。</span>
+            </div>
+          </div>
+
+          <div class="footer-bar">
+            <span>锁定问题 1：研究问题 ask</span>
+            <strong>这一页只服务一个结论：答案之后必须还能回证据</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="slide-inner">
+          <div class="eyebrow">Boundary &amp; Reproducibility / Page 3</div>
+          <h2 class="section-title">数值能回原文，离题会拒答，strict G3 可复现</h2>
+          <p class="section-subtitle">
+            最后一页把评审最关心的边界与稳定性说清楚：Q2 是具体数值题，refusal 走
+            retrieval_no_match，双模型决策和 strict G3 都已经锁定。
+          </p>
+
+          <div class="body-grid two-col">
+            <div style="display: grid; gap: 18px;">
+              <div class="image-panel">
+                <div class="image-frame">
+                  <img
+                    src="../../evidence/screenshots/20260419_gold_ask_rank_accuracy.png"
+                    alt="Question 2 result panel"
+                  />
+                </div>
+                <div class="caption">
+                  锁定问题 2：作者最终的方法排名和总体准确率分别是多少。
+                  当前锁定答案为第六名、56.20%，并且同样带 citation。
+                </div>
+              </div>
+
+              <div class="image-panel">
+                <div class="image-frame">
+                  <img
+                    src="../../evidence/screenshots/20260419_gold_refusal.png"
+                    alt="Refusal result panel"
+                  />
+                </div>
+                <div class="caption">
+                  离题问题“木星有几颗卫星？” 直接 refusal；
+                  这里的拒答语义是 retrieval_no_match，而不是模型硬猜。
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; gap: 18px;">
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <strong>默认 QA</strong>
+                  <span>qwen3-235b-a22b-instruct-2507</span>
+                </div>
+                <div class="metric-card">
+                  <strong>Validated fallback</strong>
+                  <span>qwen3-32b</span>
+                </div>
+                <div class="metric-card">
+                  <strong>strict G3</strong>
+                  <span>fresh-upload 3 / 3</span>
+                </div>
+                <div class="metric-card">
+                  <strong>Refusal mode</strong>
+                  <span>retrieval_no_match</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <h2 class="section-title">锁定判断</h2>
+                <ul class="bullet-list">
+                  <li>Q2 证明系统不仅会概括，也能把具体数值落回原文。</li>
+                  <li>双模型在锁定题组上都通过 3 / 3，当前默认保持 235b。</li>
+                  <li>strict G3 三轮 fresh-upload 全通过，log-backed spans 为 13.5s / 12.9s / 15.8s。</li>
+                  <li>三轮 refusal 均保持 retrieval_no_match，fallback 为 0 / 3。</li>
+                </ul>
+              </div>
+
+              <div class="callout accent">
+                <strong>收束结论</strong>
+                <span>研答通的差异点不是更会聊天，而是把 evidence-backed QA 做成了可演示、可复现、可追溯的闭环。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

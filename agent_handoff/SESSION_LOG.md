@@ -88,6 +88,49 @@ Entry format:
 - Recommended next step:
   - turn the new source drafts into the actual official deck/video deliverables
 
+## 2026-04-20 / Codex (repo-native final deck/video baselines)
+
+- Summary:
+  - Added a repo-native `3`-page judged-deck HTML/PDF pair so the official deck story is no longer only a markdown source draft
+  - Added a repo-native `5`-minute subtitle / narration baseline so video editing can start from timed copy instead of raw shot notes
+  - Extended the PDF export script and handoff export script so these new deliverables are generated and shipped with the rest of the competition pack
+- Files touched:
+  - `deliverables/competition_kit/deck_3page_final.html`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+  - `deliverables/competition_kit/README.md`
+  - `scripts/export_competition_pdfs.js`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/SUBMISSION_SPEC_CROSSWALK.md`
+  - `WORKLOG.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `node .\scripts\export_competition_pdfs.js`
+  - exported:
+    - `deliverables/competition_kit/deck_3page_final.pdf`
+    - `deliverables/competition_kit/deck.pdf`
+    - `deliverables/competition_kit/poster.pdf`
+  - page-count sanity passed:
+    - `deck_3page_final.pdf` -> `3`
+    - `deck.pdf` -> `6`
+    - `poster.pdf` -> `1`
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - generated:
+    - `evidence/exports/competition_asset_pack_20260420_135135/`
+  - generated `PACK_CONTENTS.md` includes:
+    - `deliverables/competition_kit/deck_3page_final.html`
+    - `deliverables/competition_kit/deck_3page_final.pdf`
+    - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- Open risks:
+  - the final native PPT file still needs last-mile layout work outside HTML/PDF
+  - the final recorded/edited video still needs actual capture/edit/rendering
+- Recommended next step:
+  - use `deck_3page_final.pdf` and `video_subtitles_5min_final.srt` as the new default production baseline instead of starting from markdown only
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:

@@ -22,16 +22,18 @@
 - Competition material chain has now been rebuilt from clean source docs
 - Latest asset-pack export was re-run after the official-source-draft upgrade and now includes the final `3`-page PPT / `5`-minute video source files
 - Printable export now has sanity checks and a clean baseline (`deck.pdf=6` pages, `poster.pdf=1` page)
+- Repo-native final judged-deck PDF baseline now exists in-repo (`deck_3page_final.pdf=3` pages)
+- Repo-native final judged-video subtitle baseline now exists in-repo (`video_subtitles_5min_final.srt`)
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
 1. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first reference for any further external review or operator handoff
 2. Use the latest local handoff/export artifacts as the default judged-material baseline:
-   - `evidence/exports/competition_asset_pack_20260420_125210/`
+   - `evidence/exports/competition_asset_pack_20260420_135135/`
    - `review_bundle_stage_20260419_211551/`
    - `review_bundle_20260419_211551_final_competition_review.zip`
-3. Convert `PPT_DECK_3PAGES_FINAL.md` and `VIDEO_SHOTLIST_5MIN_FINAL.md` into the actual judged assets
+3. Convert `deck_3page_final.pdf` into the final native PPT file and `video_subtitles_5min_final.srt` into the final recorded/edited video
 4. Before judged demo: set `DEMO_MODE=true` on the target env and verify the opening flow on the target URL
 5. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
@@ -68,7 +70,12 @@
 - `2026-04-20`: official source drafts added for final judged assets:
   - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
   - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
-- `2026-04-20`: latest competition asset pack regenerated at `evidence/exports/competition_asset_pack_20260420_125210/` and verified to include both official source drafts
+- `2026-04-20`: repo-native judged-deck outputs added:
+  - `deliverables/competition_kit/deck_3page_final.html`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+- `2026-04-20`: repo-native judged-video timing baseline added:
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- `2026-04-20`: latest competition asset pack regenerated at `evidence/exports/competition_asset_pack_20260420_135135/` and verified to include the final deck HTML/PDF plus 5-minute subtitle baseline
 - `2026-04-19`: competition material chain rebuilt from clean docs; printable export now verifies `deck.pdf=6` pages and `poster.pdf=1` page
 - `2026-04-19`: final materials/doc sweep aligned `DEMO_SCRIPT_3MIN.md`, added `gold_pdf_render.json`, and refreshed:
   - `evidence/exports/competition_asset_pack_20260419_211551/`

@@ -11,6 +11,20 @@ const WINDOW_HEIGHT = 1200;
 
 const JOBS = [
   {
+    inputPath: path.join(ROOT, "deliverables", "competition_kit", "deck_3page_final.html"),
+    outputPath: path.join(ROOT, "deliverables", "competition_kit", "deck_3page_final.pdf"),
+    paperWidth: 16,
+    paperHeight: 9,
+    waitSelector: ".slide",
+    expectedPages: 3,
+    requiredStrings: [
+      "upload -&gt; ask -&gt; citation -&gt; PDF -&gt; refusal",
+      "strict G3",
+      "retrieval_no_match",
+      "qwen3-235b-a22b-instruct-2507",
+    ],
+  },
+  {
     inputPath: path.join(ROOT, "deliverables", "competition_kit", "deck.html"),
     outputPath: path.join(ROOT, "deliverables", "competition_kit", "deck.pdf"),
     paperWidth: 16,

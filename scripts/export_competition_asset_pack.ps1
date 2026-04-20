@@ -90,11 +90,14 @@ $requiredFiles = @(
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.json",
     "evidence\samples\chinese_llm_spatial_eval.pdf",
     "deliverables\competition_kit\README.md",
+    "deliverables\competition_kit\deck_3page_final.html",
     "deliverables\competition_kit\deck.html",
     "deliverables\competition_kit\poster.html",
     "deliverables\competition_kit\styles.css",
+    "deliverables\competition_kit\deck_3page_final.pdf",
     "deliverables\competition_kit\deck.pdf",
     "deliverables\competition_kit\poster.pdf",
+    "deliverables\competition_kit\video_subtitles_5min_final.srt",
     "deliverables\competition_kit\video_subtitles.srt",
     "scripts\export_competition_asset_pack.ps1",
     "scripts\export_competition_pdfs.js"
@@ -165,9 +168,9 @@ $indexLines.Add("")
 $indexLines.Add("## Recommended Build Order")
 $indexLines.Add("1. Read evidence/materials/HANDOFF_PACKAGE_BOUNDARY.md and evidence/materials/SUBMISSION_SPEC_CROSSWALK.md")
 $indexLines.Add("2. Lock judge-facing wording from PRODUCT_TECHNICAL_WRITEUP.md, PLATFORM_USAGE_EVIDENCE.md, HARD_EVIDENCE_SUMMARY.md, and SCORING_EVIDENCE_MATRIX.md")
-$indexLines.Add("3. Draft final slides from evidence/materials/PPT_DECK_3PAGES_FINAL.md; use PPT_DECK_6SLIDES.md only as the compression baseline")
-$indexLines.Add("4. Use deliverables/competition_kit/deck.pdf and poster.pdf only as printable baselines, not as final official substitutes")
-$indexLines.Add("5. Record or edit the final video from evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md; use VIDEO_SHOTLIST_2MIN.md only as the pacing baseline")
+$indexLines.Add("3. Use evidence/materials/PPT_DECK_3PAGES_FINAL.md plus deliverables/competition_kit/deck_3page_final.html and deck_3page_final.pdf as the repo-native judged-deck baseline; keep PPT_DECK_6SLIDES.md only as the compression baseline")
+$indexLines.Add("4. Use deliverables/competition_kit/deck.pdf and poster.pdf only as supporting printable baselines, not as official substitutes for the judged deck")
+$indexLines.Add("5. Record or edit the final video from evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md with deliverables/competition_kit/video_subtitles_5min_final.srt as the timing baseline; keep VIDEO_SHOTLIST_2MIN.md only as the pacing baseline")
 $indexLines.Add("6. Keep wording aligned with PROJECT_ONE_PAGER.md, DEMO_SCRIPT_3MIN.md, and QA_BRIEF.md")
 
 Set-Content -LiteralPath $indexPath -Value $indexLines -Encoding UTF8

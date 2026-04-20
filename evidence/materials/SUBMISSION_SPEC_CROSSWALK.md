@@ -20,8 +20,8 @@
 
 | 官方要求 | 当前仓库资产 | 当前状态 | 主要差距 | 下一动作 |
 | --- | --- | --- | --- | --- |
-| `3 页内 PPT` | `evidence/materials/PPT_DECK_3PAGES_FINAL.md`、`evidence/materials/PPT_DECK_6SLIDES.md`、`deliverables/competition_kit/deck.pdf`（`6` 页） | `源稿已就位` | 当前已有正式 `3` 页源稿，但还不是最终导出的官方 PPT / PDF | 按 `PPT_DECK_3PAGES_FINAL.md` 出正式提交版 |
-| `5 分钟内方案介绍及演示视频` | `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`、`evidence/materials/VIDEO_SHOTLIST_2MIN.md`、`deliverables/competition_kit/video_subtitles.srt` | `源稿已就位` | 当前已有正式 `5` 分钟源稿，但还不是最终录制 / 剪辑成片 | 按 `VIDEO_SHOTLIST_5MIN_FINAL.md` 出正式成片 |
+| `3 页内 PPT` | `evidence/materials/PPT_DECK_3PAGES_FINAL.md`、`deliverables/competition_kit/deck_3page_final.html`、`deliverables/competition_kit/deck_3page_final.pdf`、`evidence/materials/PPT_DECK_6SLIDES.md` | `源稿 + repo-native 可打印基线已就位` | 当前已有正式 `3` 页源稿和仓库内可打印 PDF 基线，但还不是最终原生 PPT 文件 | 以 `PPT_DECK_3PAGES_FINAL.md` 和 `deck_3page_final.pdf` 出正式提交版 |
+| `5 分钟内方案介绍及演示视频` | `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`、`deliverables/competition_kit/video_subtitles_5min_final.srt`、`evidence/materials/VIDEO_SHOTLIST_2MIN.md`、`deliverables/competition_kit/video_subtitles.srt` | `源稿 + repo-native 节奏基线已就位` | 当前已有正式 `5` 分钟源稿和字幕节奏基线，但还不是最终录制 / 剪辑成片 | 按 `VIDEO_SHOTLIST_5MIN_FINAL.md` 与 `video_subtitles_5min_final.srt` 出正式成片 |
 | `产品及技术文档` | `PROJECT_ONE_PAGER.md`、`ARCHITECTURE.md`、`QA_BRIEF.md`、`PRODUCT_TECHNICAL_WRITEUP.md` | `judge-facing 文档已成型` | 还未导出到最终提交格式，也还未与最终 `3` 页 PPT / `5` 分钟视频完全封板 | 锁定 `PRODUCT_TECHNICAL_WRITEUP.md` 为正式版本并在最终包中单列 |
 | `平台使用证明` | `PLATFORM_USAGE_EVIDENCE.md`、gold-sample 报告、实验记录、`data/logs/call_logs.jsonl` | `judge-facing 可用` | 原始日志混有历史开发数据，不适合直接主呈现 | 以 `PLATFORM_USAGE_EVIDENCE.md` 为主证明，request id 走附录索引 |
 | `最终截图集` | `evidence/screenshots/20260419_gold_*` 四张主截图；`stats_panel` 与 `api_docs` 附录图 | `接近可用` | 仍需与最终提交环境和最终口径对齐 | 最终环境确定后刷新一次截图集 |
@@ -31,8 +31,8 @@
 
 ## 当前明确结论
 
-1. `PPT_DECK_3PAGES_FINAL.md` 已可视为正式 `3` 页提交稿源文件，但最终 PPT / PDF 仍需单独导出。
-2. `VIDEO_SHOTLIST_5MIN_FINAL.md` 已可视为正式 `5` 分钟提交稿源文件，但最终视频成片仍需单独导出。
+1. `PPT_DECK_3PAGES_FINAL.md` 已可视为正式 `3` 页提交稿源文件，且仓库内已有 `deliverables/competition_kit/deck_3page_final.html` / `deck_3page_final.pdf` 作为可打印基线。
+2. `VIDEO_SHOTLIST_5MIN_FINAL.md` 已可视为正式 `5` 分钟提交稿源文件，且仓库内已有 `deliverables/competition_kit/video_subtitles_5min_final.srt` 作为节奏 / 旁白基线。
 3. `PPT_DECK_6SLIDES.md` 和 `deliverables/competition_kit/deck.pdf` 仍只是内容 / 视觉基线，不能直接代替正式提交版 PPT。
 4. `VIDEO_SHOTLIST_2MIN.md` 和 `video_subtitles.srt` 仍只是叙事 / 节奏基线，不能直接代替正式提交版视频。
 5. 当前仓库已经具备 judge-facing 核心文档：

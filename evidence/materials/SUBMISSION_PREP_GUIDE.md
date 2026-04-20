@@ -59,8 +59,9 @@ Use:
 
 Important:
 
-- `PPT_DECK_3PAGES_FINAL.md` is now the current repo source draft for the official `3`-page submission deck, but the actual final PPT/PDF still needs to be produced.
-- `VIDEO_SHOTLIST_5MIN_FINAL.md` is now the current repo source draft for the official `5`-minute submission video, but the actual final recorded/edited video still needs to be produced.
+- `PPT_DECK_3PAGES_FINAL.md` is now the current repo source draft for the official `3`-page submission deck, and `deliverables/competition_kit/deck_3page_final.html` plus `deck_3page_final.pdf` are the current repo-native printable baseline for that judged story.
+- `VIDEO_SHOTLIST_5MIN_FINAL.md` is now the current repo source draft for the official `5`-minute submission video, and `deliverables/competition_kit/video_subtitles_5min_final.srt` is the current repo-native timing baseline for narration/editing.
+- The actual native PPT file and final recorded/edited video still need to be produced.
 - `PPT_DECK_6SLIDES.md` and `deliverables/competition_kit/deck.pdf` remain content/visual baselines, not the final `3`-page submission deck.
 - `VIDEO_SHOTLIST_2MIN.md` and `video_subtitles.srt` remain story/pacing baselines, not the final `5`-minute submission video.
 - `PROJECT_ONE_PAGER.md`, `DEMO_SCRIPT_3MIN.md`, and `POSTER_COPY.md` are also source materials, not official substitutes for the final judged package.
@@ -80,7 +81,7 @@ What it does:
 - copies the judge-facing proof pages and package-boundary docs
 - includes the ready-to-use PPT/video/poster drafting docs
 - includes the current HTML/PDF deliverables under `deliverables/competition_kit/`
-- includes the timed subtitle baseline `deliverables/competition_kit/video_subtitles.srt`
+- includes the timed subtitle baselines `deliverables/competition_kit/video_subtitles.srt` and `deliverables/competition_kit/video_subtitles_5min_final.srt`
 - writes `PACK_CONTENTS.md` into a timestamped export directory under
   `evidence/exports/`
 
@@ -95,6 +96,7 @@ Recommended boundary:
 If you want a near-final visual baseline before moving into PowerPoint or a
 design tool, use:
 
+- `deliverables/competition_kit/deck_3page_final.html`
 - `deliverables/competition_kit/deck.html`
 - `deliverables/competition_kit/poster.html`
 
@@ -147,7 +149,9 @@ node .\scripts\export_competition_pdfs.js
 - [ ] `gold_sample_qa_compare_latest.md` is current
 - [ ] The four gold-sample screenshots are current
 - [ ] `PPT_DECK_3PAGES_FINAL.md` and `VIDEO_SHOTLIST_5MIN_FINAL.md` are aligned with the same fixed wording as the evidence pages
+- [ ] `deliverables/competition_kit/deck_3page_final.pdf` is current and still `3` pages
+- [ ] `deliverables/competition_kit/video_subtitles_5min_final.srt` still matches the official `5`-minute narration
 - [ ] `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` still remain usable baselines
-- [ ] `deliverables/competition_kit/deck.html` and `poster.html` still match the same locked story
+- [ ] `deliverables/competition_kit/deck_3page_final.html`, `deck.html`, and `poster.html` still match the same locked story
 - [ ] One-pager, demo script, and asset pack all use the same product positioning
 - [ ] No broad-sample or historical provider artifact is being presented as the primary judging evidence

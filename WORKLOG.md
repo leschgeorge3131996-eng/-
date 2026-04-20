@@ -68,6 +68,20 @@
     - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
     - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
 
+### 2026-04-20 Repo-Native Final Asset Baselines
+
+- added repo-native judged-deck deliverables:
+  - `deliverables/competition_kit/deck_3page_final.html`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+- added repo-native judged-video timing baseline:
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- upgraded the PDF export path so `node .\scripts\export_competition_pdfs.js` now exports:
+  - `deck_3page_final.pdf` -> `3` pages
+  - `deck.pdf` -> `6` pages
+  - `poster.pdf` -> `1` page
+- regenerated the handoff export bundle after adding these assets:
+  - `evidence/exports/competition_asset_pack_20260420_135135/`
+
 ### Completed
 
 - React + TypeScript + Vite frontend created

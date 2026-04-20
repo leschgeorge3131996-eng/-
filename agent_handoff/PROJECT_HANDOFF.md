@@ -159,6 +159,20 @@ Operator rehearsal result:
   - `evidence/exports/competition_asset_pack_20260420_125210/`
   - `PACK_CONTENTS.md` in that folder confirms both final-source drafts are included
 
+## 2026-04-20 Repo-Native Final Asset Baselines
+
+- Repo-native judged-deck outputs now exist:
+  - `deliverables/competition_kit/deck_3page_final.html`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+- Repo-native judged-video timing baseline now exists:
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- `scripts/export_competition_pdfs.js` now exports and sanity-checks:
+  - `deck_3page_final.pdf` -> `3` pages
+  - `deck.pdf` -> `6` pages
+  - `poster.pdf` -> `1` page
+- Latest local handoff pack after these additions:
+  - `evidence/exports/competition_asset_pack_20260420_135135/`
+
 ## What Was Added In The Latest Iterations
 
 ### Evidence and PDF chain
