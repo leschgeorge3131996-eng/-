@@ -50,6 +50,44 @@ Entry format:
 - Recommended next step:
   - freeze the strict `G3` wording and move straight into final judged asset production
 
+## 2026-04-20 / Codex (official PPT/video source drafts)
+
+- Summary:
+  - Added a formal `3`-page judged-deck source at `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - Added a formal `5`-minute judged-video source at `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - Kept the older `6`-slide / `2`-minute files as baselines instead of overwriting them
+  - Updated package/export/index/handoff docs so future operators and Claude see the new official-source drafts first
+  - Re-ran the competition asset-pack export and confirmed the new source drafts are present in the generated package
+- Files touched:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/SUBMISSION_SPEC_CROSSWALK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `deliverables/competition_kit/README.md`
+  - `scripts/export_competition_asset_pack.ps1`
+  - `WORKLOG.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - source drafts are now referenced by the export script required-file list
+  - submission-prep and handoff docs now distinguish:
+    - official-source drafts
+    - old baselines
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - generated:
+    - `evidence/exports/competition_asset_pack_20260420_125210/`
+  - generated `PACK_CONTENTS.md` includes:
+    - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+    - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- Open risks:
+  - the actual final PPT/PDF and final recorded/edited video still need to be produced
+  - screenshots may still need one final refresh if the target environment changes
+- Recommended next step:
+  - turn the new source drafts into the actual official deck/video deliverables
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:

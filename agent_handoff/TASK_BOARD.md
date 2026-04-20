@@ -7,6 +7,7 @@
 - A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked
 - Full gold-sample screenshot pack is now refreshed under the current real runtime
 - Ready-to-use PPT / video / poster drafting docs now exist in-repo
+- Official-source drafts for the final `3`-page PPT and `5`-minute video now exist in-repo
 - Printable deck / poster HTML prototypes now exist in-repo
 - Repo-native deck / poster PDF export script now exists
 - Current deck/poster PDF baselines now exist in-repo
@@ -19,17 +20,18 @@
 - Fresh Q2 ask instability is now closed at the code/runtime layer; `3 / 3` fresh local runs returned `declared`
 - strict `G3` is now recorded as a fresh-upload `3`-run pass with request-id traceability
 - Competition material chain has now been rebuilt from clean source docs
+- Latest asset-pack export was re-run after the official-source-draft upgrade and now includes the final `3`-page PPT / `5`-minute video source files
 - Printable export now has sanity checks and a clean baseline (`deck.pdf=6` pages, `poster.pdf=1` page)
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
 
 1. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first reference for any further external review or operator handoff
-2. Use the frozen bundle pair as the default handoff baseline:
-   - `evidence/exports/competition_asset_pack_20260419_211551/`
+2. Use the latest local handoff/export artifacts as the default judged-material baseline:
+   - `evidence/exports/competition_asset_pack_20260420_125210/`
    - `review_bundle_stage_20260419_211551/`
    - `review_bundle_20260419_211551_final_competition_review.zip`
-3. Finalize judged assets against the strict `G3` wording; do not reopen engineering scope unless the target demo environment changes
+3. Convert `PPT_DECK_3PAGES_FINAL.md` and `VIDEO_SHOTLIST_5MIN_FINAL.md` into the actual judged assets
 4. Before judged demo: set `DEMO_MODE=true` on the target env and verify the opening flow on the target URL
 5. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
@@ -63,6 +65,10 @@
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were regenerated against the refreshed screenshots
 - `2026-04-19`: Q2 fresh stability check recorded at `evidence/experiments/20260419_q2_declared_stability_check.md`; `3 / 3` runs returned `declared`
 - `2026-04-20`: strict `G3` recorded at `evidence/experiments/20260420_g3_strict_rehearsal.md`; final authoritative batch passed `3 / 3` on fresh uploads with no fallback
+- `2026-04-20`: official source drafts added for final judged assets:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- `2026-04-20`: latest competition asset pack regenerated at `evidence/exports/competition_asset_pack_20260420_125210/` and verified to include both official source drafts
 - `2026-04-19`: competition material chain rebuilt from clean docs; printable export now verifies `deck.pdf=6` pages and `poster.pdf=1` page
 - `2026-04-19`: final materials/doc sweep aligned `DEMO_SCRIPT_3MIN.md`, added `gold_pdf_render.json`, and refreshed:
   - `evidence/exports/competition_asset_pack_20260419_211551/`

@@ -86,6 +86,12 @@
 28. [../experiments/20260420_g3_strict_rehearsal.md](../experiments/20260420_g3_strict_rehearsal.md)
 - 严格版 `G3` 三轮权威记录，包含 request id、log-backed 时长与 fallback 结论
 
+29. [PPT_DECK_3PAGES_FINAL.md](./PPT_DECK_3PAGES_FINAL.md)
+- 正式 `3` 页提交版 PPT 源稿
+
+30. [VIDEO_SHOTLIST_5MIN_FINAL.md](./VIDEO_SHOTLIST_5MIN_FINAL.md)
+- 正式 `5` 分钟提交版视频分镜稿
+
 ## 使用建议
 
 - 报名表 / 作品简介：优先参考 `PROJECT_ONE_PAGER.md`
@@ -97,6 +103,8 @@
 - 主提交 / 附录 / 操作资料边界：优先参考 `HANDOFF_PACKAGE_BOUNDARY.md`
 - 严格版 G3 执行：优先参考 `STRICT_G3_EXECUTION_PLAN.md`
 - 严格版 G3 实验记录：优先参考 `evidence/experiments/20260420_g3_strict_rehearsal.md`
+- 正式 `3` 页提交稿：优先参考 `PPT_DECK_3PAGES_FINAL.md`
+- 正式 `5` 分钟视频稿：优先参考 `VIDEO_SHOTLIST_5MIN_FINAL.md`
 - 现场展示 / 录屏脚本：优先参考 `DEMO_SCRIPT_3MIN.md`
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`

@@ -38,6 +38,10 @@ Do not rebuild the story from scratch each time. Reuse this pack.
 
 ## Ready-To-Use Deliverables
 
+- Official `3`-page deck source:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+- Official `5`-minute video source:
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
 - PPT page copy:
   - `evidence/materials/PPT_DECK_6SLIDES.md`
 - Video shotlist:
@@ -56,6 +60,15 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `scripts/export_competition_asset_pack.ps1`
 - PDF export script:
   - `scripts/export_competition_pdfs.js`
+
+## Official Submission Drafts
+
+- `PPT_DECK_3PAGES_FINAL.md`
+  - current repo source draft for the official `3`-page submission deck
+  - use this first; keep `PPT_DECK_6SLIDES.md` only as the compression baseline
+- `VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - current repo source draft for the official `5`-minute submission video
+  - use this first; keep `VIDEO_SHOTLIST_2MIN.md` only as the pacing baseline
 
 ## Fixed Demo Facts
 

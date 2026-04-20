@@ -26,11 +26,13 @@ story. Broader replay outputs are secondary supporting material only.
 2. `DEMO_SCRIPT_3MIN.md`
 3. `GOLD_SAMPLE_RUNBOOK.md`
 4. `COMPETITION_ASSET_PACK.md`
-5. `PPT_DECK_6SLIDES.md`
-6. `VIDEO_SHOTLIST_2MIN.md`
-7. `POSTER_COPY.md`
-8. `evidence/reports/gold_sample_replay_real_summary_latest.md`
-9. `evidence/reports/gold_sample_qa_compare_latest.md`
+5. `PPT_DECK_3PAGES_FINAL.md`
+6. `VIDEO_SHOTLIST_5MIN_FINAL.md`
+7. `PPT_DECK_6SLIDES.md`
+8. `VIDEO_SHOTLIST_2MIN.md`
+9. `POSTER_COPY.md`
+10. `evidence/reports/gold_sample_replay_real_summary_latest.md`
+11. `evidence/reports/gold_sample_qa_compare_latest.md`
 
 ### Nice-to-have
 
@@ -57,8 +59,10 @@ Use:
 
 Important:
 
-- `PPT_DECK_6SLIDES.md` and `deliverables/competition_kit/deck.pdf` are current content baselines, not the final `3`-page submission deck.
-- `VIDEO_SHOTLIST_2MIN.md` and `video_subtitles.srt` are current story baselines, not the final `5`-minute submission video.
+- `PPT_DECK_3PAGES_FINAL.md` is now the current repo source draft for the official `3`-page submission deck, but the actual final PPT/PDF still needs to be produced.
+- `VIDEO_SHOTLIST_5MIN_FINAL.md` is now the current repo source draft for the official `5`-minute submission video, but the actual final recorded/edited video still needs to be produced.
+- `PPT_DECK_6SLIDES.md` and `deliverables/competition_kit/deck.pdf` remain content/visual baselines, not the final `3`-page submission deck.
+- `VIDEO_SHOTLIST_2MIN.md` and `video_subtitles.srt` remain story/pacing baselines, not the final `5`-minute submission video.
 - `PROJECT_ONE_PAGER.md`, `DEMO_SCRIPT_3MIN.md`, and `POSTER_COPY.md` are also source materials, not official substitutes for the final judged package.
 
 ## One-Click Export
@@ -84,7 +88,7 @@ Recommended boundary:
 
 - main submission: final `3`-page PPT, final `5`-minute video, product/technical write-up, platform proof, hard-evidence summary, scoring matrix, final screenshots
 - appendix: replay reports, experiment notes, runbook, QA brief, appendix-only screenshots
-- ops/source: one-pager, demo script, asset pack, `6`-page deck baseline, `2`-minute video baseline, poster copy, HTML prototypes, export scripts
+- ops/source: one-pager, demo script, asset pack, `3`-page deck source draft, `5`-minute video source draft, `6`-page deck baseline, `2`-minute video baseline, poster copy, HTML prototypes, export scripts
 
 ## HTML Draft Deliverables
 
@@ -142,7 +146,8 @@ node .\scripts\export_competition_pdfs.js
 - [ ] `gold_sample_replay_real_summary_latest.md` is current
 - [ ] `gold_sample_qa_compare_latest.md` is current
 - [ ] The four gold-sample screenshots are current
-- [ ] `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` are still aligned with the same fixed wording
+- [ ] `PPT_DECK_3PAGES_FINAL.md` and `VIDEO_SHOTLIST_5MIN_FINAL.md` are aligned with the same fixed wording as the evidence pages
+- [ ] `PPT_DECK_6SLIDES.md`, `VIDEO_SHOTLIST_2MIN.md`, and `POSTER_COPY.md` still remain usable baselines
 - [ ] `deliverables/competition_kit/deck.html` and `poster.html` still match the same locked story
 - [ ] One-pager, demo script, and asset pack all use the same product positioning
 - [ ] No broad-sample or historical provider artifact is being presented as the primary judging evidence

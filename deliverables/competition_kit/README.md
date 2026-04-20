@@ -14,6 +14,7 @@ Current printable baseline:
 
 Important:
 
+- `evidence/materials/PPT_DECK_3PAGES_FINAL.md` and `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md` are now the current official-source drafts for the judged submission assets.
 - `deck.html` / `deck.pdf` are visual baselines, not the final official `3`-page submission deck.
 - `video_subtitles.srt` is a `2`-minute narration baseline, not the final official `5`-minute submission video.
 
@@ -39,7 +40,9 @@ These HTML deliverables are intentionally aligned to the locked gold-sample
 story:
 
 - `evidence/materials/COMPETITION_ASSET_PACK.md`
+- `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
 - `evidence/materials/PPT_DECK_6SLIDES.md`
+- `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
 - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
 - `evidence/materials/POSTER_COPY.md`
 - `evidence/reports/gold_sample_replay_real_summary_latest.md`
@@ -51,8 +54,7 @@ story:
 2. Print to PDF in landscape mode with background graphics enabled.
 3. Open `poster.html` in a browser.
 4. Print to PDF in portrait mode with background graphics enabled.
-5. If a designer or another operator takes over, hand them this folder plus the
-   export bundle from `scripts/export_competition_asset_pack.ps1`.
+5. If a designer or another operator takes over, hand them this folder, `PPT_DECK_3PAGES_FINAL.md`, `VIDEO_SHOTLIST_5MIN_FINAL.md`, plus the export bundle from `scripts/export_competition_asset_pack.ps1`.
 6. To export repo-native PDFs directly, run `node scripts/export_competition_pdfs.js`.
 
 ## Editing Notes

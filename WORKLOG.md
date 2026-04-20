@@ -49,6 +49,25 @@
   - `retrieval_no_match` for every refusal
   - no fallback used
 
+### 2026-04-20 Final Submission Source Drafts
+
+- added official judged-asset source drafts:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- updated packaging/index/handoff so the new final-source drafts are now first-class repo assets:
+  - `evidence/materials/COMPETITION_ASSET_PACK.md`
+  - `evidence/materials/SUBMISSION_PREP_GUIDE.md`
+  - `evidence/materials/SUBMISSION_SPEC_CROSSWALK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `deliverables/competition_kit/README.md`
+  - `scripts/export_competition_asset_pack.ps1`
+- verified the export path after the source-draft upgrade:
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
+  - `evidence/exports/competition_asset_pack_20260420_125210/`
+  - generated `PACK_CONTENTS.md` now lists both:
+    - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+    - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+
 ### Completed
 
 - React + TypeScript + Vite frontend created
@@ -265,10 +284,10 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Finalize the official `3`-page PPT against the strict `G3` wording
-2. Finalize the official `5`-minute video against the same locked story
+1. Convert `PPT_DECK_3PAGES_FINAL.md` into the actual official `3`-page PPT/PDF
+2. Convert `VIDEO_SHOTLIST_5MIN_FINAL.md` into the actual official `5`-minute video
 3. If the final demo environment changes, refresh the four gold-sample screenshots once
-4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
+4. Export the final competition asset pack after the official assets are produced
 
 ## Session Handoff Rule
 

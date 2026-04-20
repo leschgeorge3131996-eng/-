@@ -75,6 +75,8 @@ As of `2026-04-18`:
     - `20260419_gold_ask_rank_accuracy.json`
     - `20260419_gold_refusal.json`
 - competition drafting assets:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
   - `evidence/materials/PPT_DECK_6SLIDES.md`
   - `evidence/materials/VIDEO_SHOTLIST_2MIN.md`
   - `evidence/materials/POSTER_COPY.md`
@@ -142,6 +144,20 @@ Operator rehearsal result:
 - latest external review bundle:
   - `review_bundle_stage_20260419_211551/`
   - `review_bundle_20260419_211551_final_competition_review.zip`
+
+## 2026-04-20 Submission-Source Upgrade
+
+- Official source drafts now exist for the remaining judged assets:
+  - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+  - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- The old `6`-slide / `2`-minute files remain baselines only:
+  - `PPT_DECK_6SLIDES.md`
+  - `VIDEO_SHOTLIST_2MIN.md`
+- Export packaging now includes the new final-source drafts:
+  - `scripts/export_competition_asset_pack.ps1`
+- Export packaging was also re-run successfully after the update:
+  - `evidence/exports/competition_asset_pack_20260420_125210/`
+  - `PACK_CONTENTS.md` in that folder confirms both final-source drafts are included
 
 ## What Was Added In The Latest Iterations
 
