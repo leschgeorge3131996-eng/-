@@ -2,6 +2,41 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-21 / Claude Code (quantitative evaluation metrics)
+
+- Summary:
+  - Created `scripts/compute_eval_metrics.py` to compute 8 quantitative metrics from strict G3 call logs
+  - Generated `evidence/reports/quantitative_eval_metrics.md` with full metric report
+  - Updated `HARD_EVIDENCE_SUMMARY.md` with a new quantitative metrics section
+  - Updated `SCORING_EVIDENCE_MATRIX.md` technical capability answer with concrete numbers
+  - Updated handoff docs (`PROJECT_HANDOFF.md`, `TASK_BOARD.md`) for Codex continuity
+- Files touched:
+  - `scripts/compute_eval_metrics.py` (new)
+  - `evidence/reports/quantitative_eval_metrics.md` (new)
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - script runs cleanly: `.venv/Scripts/python.exe scripts/compute_eval_metrics.py`
+  - backend tests: `55 passed`
+  - committed and pushed to GitHub
+- Key metrics:
+  - evidence declaration rate: `100%`
+  - citation page accuracy: `100%`
+  - retrieval page coverage: `100%`
+  - evidence quote rate: `100%`
+  - chunk utilization: `38%`
+  - refusal precision: `100%`
+  - cross-run consistency: `100%`
+  - avg answerable latency: `5521 ms`
+- Open risks:
+  - final native `3`-page PPT still not produced
+  - final `5`-minute video still not produced
+- Recommended next step:
+  - cite these metrics in PPT and defense wording; continue with final asset production
+
 Entry format:
 
 ```text

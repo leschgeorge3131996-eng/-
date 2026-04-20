@@ -200,6 +200,31 @@ Operator rehearsal result:
 
 ## 2026-04-20 Final Submission / Defense Control Sheets
 
+## 2026-04-21 Quantitative Evaluation Metrics
+
+- A new evaluation script now exists:
+  - `scripts/compute_eval_metrics.py`
+- It reads the `9` strict G3 request entries from `data/logs/call_logs.jsonl` and computes `8` quantitative metrics
+- Output report:
+  - `evidence/reports/quantitative_eval_metrics.md`
+- Key numbers (strict G3, `3` runs × `3` prompts):
+  - evidence declaration rate: `100%`
+  - citation page accuracy: `100%`
+  - retrieval page coverage: `100%`
+  - evidence quote rate: `100%`
+  - chunk utilization: `38%`
+  - refusal precision: `100%`
+  - cross-run consistency: `100%`
+  - avg answerable latency: `5521 ms`
+- These numbers were also written into:
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md` (new "量化评测指标" section)
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md` (技术能力追问答法 updated)
+- Practical meaning:
+  - judge-facing docs now have concrete numbers instead of only qualitative pass/fail
+  - PPT and defense wording can cite specific metrics
+
+## 2026-04-20 Final Submission / Defense Control Sheets
+
 - Two explicit operator-control docs now exist for the last mile:
   - `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md`
   - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`

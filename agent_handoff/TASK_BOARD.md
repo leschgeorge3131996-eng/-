@@ -27,6 +27,7 @@
 - Root external-review context/prompt/index now exist in-repo
 - Old `6`-slide / `2`-minute assets have now been demoted from primary-entry status in the highest-visibility material docs
 - Final submission and defense-risk control sheets now exist in-repo
+- Quantitative evaluation metrics now exist: `evidence/reports/quantitative_eval_metrics.md` with `8` metrics computed from strict G3 logs; key numbers written into `HARD_EVIDENCE_SUMMARY.md` and `SCORING_EVIDENCE_MATRIX.md`
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -123,7 +124,17 @@
   - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
   - keep `qwen3-32b` as validated fallback if demo/runtime latency becomes tighter
 
-## Latest Override (`2026-04-20`)
+## Latest Override (`2026-04-21`)
+
+- Quantitative evaluation metrics now exist:
+  - script: `scripts/compute_eval_metrics.py`
+  - report: `evidence/reports/quantitative_eval_metrics.md`
+  - key numbers: evidence declaration `100%`, citation accuracy `100%`, refusal precision `100%`, cross-run consistency `100%`, chunk utilization `38%`, avg latency `5521 ms`
+- These numbers are now in `HARD_EVIDENCE_SUMMARY.md` and `SCORING_EVIDENCE_MATRIX.md`
+- PPT / video / defense wording should cite these metrics
+- Everything below from `2026-04-20` still applies:
+
+## Previous Override (`2026-04-20`)
 
 - `G3` should now be treated as closed at the stricter fresh-upload level for the locked judged-demo path
 - Authoritative freeze facts now live in:
