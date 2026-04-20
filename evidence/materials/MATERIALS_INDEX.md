@@ -27,10 +27,10 @@
 - 把 gold-sample 截图、报告和口径收成 PPT / 视频 / 海报统一资产包
 
 9. [PPT_DECK_6SLIDES.md](./PPT_DECK_6SLIDES.md)
-- 六页 PPT 现成页面稿
+- 六页 PPT 历史压缩基线，仅作归档参考
 
 10. [VIDEO_SHOTLIST_2MIN.md](./VIDEO_SHOTLIST_2MIN.md)
-- 2 分钟视频分镜与口播稿
+- 2 分钟视频历史节奏基线，仅作归档参考
 
 11. [POSTER_COPY.md](./POSTER_COPY.md)
 - 海报版面文案稿
@@ -92,6 +92,12 @@
 30. [VIDEO_SHOTLIST_5MIN_FINAL.md](./VIDEO_SHOTLIST_5MIN_FINAL.md)
 - 正式 `5` 分钟提交版视频分镜稿
 
+31. [../../deliverables/competition_kit/deck_3page_final.pdf](../../deliverables/competition_kit/deck_3page_final.pdf)
+- 正式 `3` 页提交版 repo-native 可打印基线
+
+32. [../../deliverables/competition_kit/video_subtitles_5min_final.srt](../../deliverables/competition_kit/video_subtitles_5min_final.srt)
+- 正式 `5` 分钟提交版字幕 / 旁白基线
+
 ## 使用建议
 
 - 报名表 / 作品简介：优先参考 `PROJECT_ONE_PAGER.md`
@@ -105,19 +111,23 @@
 - 严格版 G3 实验记录：优先参考 `evidence/experiments/20260420_g3_strict_rehearsal.md`
 - 正式 `3` 页提交稿：优先参考 `PPT_DECK_3PAGES_FINAL.md`
 - 正式 `5` 分钟视频稿：优先参考 `VIDEO_SHOTLIST_5MIN_FINAL.md`
+- 正式 `3` 页可打印基线：优先参考 `deliverables/competition_kit/deck_3page_final.pdf`
+- 正式 `5` 分钟字幕基线：优先参考 `deliverables/competition_kit/video_subtitles_5min_final.srt`
 - 现场展示 / 录屏脚本：优先参考 `DEMO_SCRIPT_3MIN.md`
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`
 - 比赛 / 评审复跑与证据刷新：优先参考 `GOLD_SAMPLE_CANDIDATE_20260418.json`、`REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
 - PPT / 视频 / 海报统一资产收口：优先参考 `COMPETITION_ASSET_PACK.md`
-- PPT 页面稿：优先参考 `PPT_DECK_6SLIDES.md`
-- 视频口播与镜头：优先参考 `VIDEO_SHOTLIST_2MIN.md`
+- 历史 `6` 页压缩稿：仅在回溯旧材料结构时参考 `PPT_DECK_6SLIDES.md`
+- 历史 `2` 分钟视频基线：仅在回溯旧节奏时参考 `VIDEO_SHOTLIST_2MIN.md`
 - 海报文案：优先参考 `POSTER_COPY.md`
 - 最终打包导出：运行 `powershell -ExecutionPolicy Bypass -File .\scripts\export_competition_asset_pack.ps1`
 - 可打印 HTML 成品原型：参考 `deliverables/competition_kit/`
 - PDF 导出：运行 `node scripts/export_competition_pdfs.js`
-- 当前 PDF 基线：`deliverables/competition_kit/deck.pdf`、`deliverables/competition_kit/poster.pdf`
-- 视频字幕基线：`deliverables/competition_kit/video_subtitles.srt`
+- 当前正式 PDF 基线：`deliverables/competition_kit/deck_3page_final.pdf`、`deliverables/competition_kit/poster.pdf`
+- 历史 PDF 压缩基线：`deliverables/competition_kit/deck.pdf`
+- 当前正式视频字幕基线：`deliverables/competition_kit/video_subtitles_5min_final.srt`
+- 历史视频字幕基线：`deliverables/competition_kit/video_subtitles.srt`
 - 更宽样例补充复跑：参考 `SAMPLE_MANIFEST.json` 与 `scripts/replay_sample_set.py`
 - 真实证据收口：优先参考 `REAL_EVIDENCE_REFRESH_CHECKLIST.md`
 - 最终提交准备：优先参考 `SUBMISSION_PREP_GUIDE.md`

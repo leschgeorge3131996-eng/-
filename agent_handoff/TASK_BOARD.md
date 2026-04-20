@@ -25,6 +25,7 @@
 - Repo-native final judged-deck PDF baseline now exists in-repo (`deck_3page_final.pdf=3` pages)
 - Repo-native final judged-video subtitle baseline now exists in-repo (`video_subtitles_5min_final.srt`)
 - Root external-review context/prompt/index now exist in-repo
+- Old `6`-slide / `2`-minute assets have now been demoted from primary-entry status in the highest-visibility material docs
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -84,6 +85,8 @@
     - `PROJECT_CONTEXT.md`
     - `REVIEW_PROMPT.md`
     - `REVIEW_BUNDLE_INDEX.md`
+- `2026-04-20`: old `6`-slide / `2`-minute baselines were downgraded in `MATERIALS_INDEX.md` and `PRODUCT_TECHNICAL_WRITEUP.md`; primary judged-material references now point to the `3`-page / `5`-minute final path
+- `2026-04-20`: provider residue removed from `backend/app/services/model_client.py` `429` burst-limit wording
 - `2026-04-19`: competition material chain rebuilt from clean docs; printable export now verifies `deck.pdf=6` pages and `poster.pdf=1` page
 - `2026-04-19`: final materials/doc sweep aligned `DEMO_SCRIPT_3MIN.md`, added `gold_pdf_render.json`, and refreshed:
   - `evidence/exports/competition_asset_pack_20260419_211551/`

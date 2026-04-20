@@ -167,11 +167,20 @@
 
 - `PROJECT_ONE_PAGER.md`
 - `DEMO_SCRIPT_3MIN.md`
-- `PPT_DECK_6SLIDES.md`（当前为内容基线）
-- `VIDEO_SHOTLIST_2MIN.md`（当前为内容基线）
+- `PPT_DECK_3PAGES_FINAL.md`
+- `VIDEO_SHOTLIST_5MIN_FINAL.md`
+- `deliverables/competition_kit/deck_3page_final.pdf`（当前为正式 repo-native 可打印基线）
+- `deliverables/competition_kit/video_subtitles_5min_final.srt`（当前为正式 repo-native 字幕 / 旁白基线）
 - `POSTER_COPY.md`
 - `PLATFORM_USAGE_EVIDENCE.md`
 - `HARD_EVIDENCE_SUMMARY.md`
+
+### 归档基线
+
+- `PPT_DECK_6SLIDES.md`（仅作旧压缩结构参考）
+- `VIDEO_SHOTLIST_2MIN.md`（仅作旧节奏参考）
+- `deliverables/competition_kit/deck.pdf`（旧 `6` 页可打印基线）
+- `deliverables/competition_kit/video_subtitles.srt`（旧 `2` 分钟字幕基线）
 
 ### 权威证据
 

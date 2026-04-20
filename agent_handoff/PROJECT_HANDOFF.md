@@ -185,6 +185,19 @@ Operator rehearsal result:
   - `review_bundle_20260420_141123_final_competition_review.zip`
 - Older `review_bundle_*.zip` archives were removed locally; old `review_bundle_stage_*` directories remain as readable history
 
+## 2026-04-20 Review-Driven Final-Material Cleanup
+
+- The old `6`-slide / `2`-minute materials were not deleted, but they were demoted from primary-entry status in the highest-visibility material docs:
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+- The explicit primary judged-material path is now:
+  - `PPT_DECK_3PAGES_FINAL.md`
+  - `VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- Provider residue was also removed from the live error wording in:
+  - `backend/app/services/model_client.py`
+
 ## What Was Added In The Latest Iterations
 
 ### Evidence and PDF chain

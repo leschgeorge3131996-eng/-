@@ -96,6 +96,20 @@
   - `review_bundle_stage_20260420_141123/`
   - `review_bundle_20260420_141123_final_competition_review.zip`
 
+### 2026-04-20 Review-Driven Final-Material Cleanup
+
+- downgraded the old `6`-slide / `2`-minute assets from primary-entry status in the highest-visibility material indexes:
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+- the primary judged-material path is now stated more explicitly as:
+  - `PPT_DECK_3PAGES_FINAL.md`
+  - `VIDEO_SHOTLIST_5MIN_FINAL.md`
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- fixed provider residue in:
+  - `backend/app/services/model_client.py`
+  - `429` burst-limit wording no longer mentions the old provider name
+
 ### Completed
 
 - React + TypeScript + Vite frontend created

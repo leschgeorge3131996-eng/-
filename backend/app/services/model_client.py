@@ -275,7 +275,7 @@ class ModelClient:
 
                 if exc.code == 429 and self._is_burst_limit_error(error_body):
                     raise ModelServiceError(
-                        "请求过快，触发了火山方舟限流。请等待 10 到 30 秒后重试。",
+                        "请求过快，触发了当前 MaaS 平台限流。请等待 10 到 30 秒后重试。",
                         details={"response": error_body},
                     ) from exc
 

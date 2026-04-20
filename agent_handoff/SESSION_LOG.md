@@ -171,6 +171,27 @@ Entry format:
 - Recommended next step:
   - hand `review_bundle_20260420_141123_final_competition_review.zip` to another AI with `REVIEW_PROMPT.md` as the primary instruction file
 
+## 2026-04-20 / Codex (review-driven final-material cleanup)
+
+- Summary:
+  - Used the latest external review to identify two high-value cleanup items that were worth landing immediately instead of treating as mere commentary
+  - Demoted the old `6`-slide / `2`-minute assets from primary-entry status in the highest-visibility material docs so future operators do not accidentally keep leading with baseline files
+  - Removed the old-provider name from the live `429` burst-limit error wording
+- Files touched:
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+  - `backend/app/services/model_client.py`
+  - `WORKLOG.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Practical meaning:
+  - the project still keeps its old baseline materials for archive/reference, but the main judged-material path is now harder to misuse
+  - the runtime/provider story is slightly cleaner and less likely to expose a stale platform name during demo or review
+- Remaining gap after this cleanup:
+  - still final native `PPT`
+  - still final edited `5`-minute video
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:
