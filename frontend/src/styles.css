@@ -1182,7 +1182,61 @@ textarea {
   opacity: 1;
 }
 
+.refusal-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 20px 20px 22px;
+  border: 1.5px solid rgba(177, 53, 26, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 244, 242, 0.96), rgba(255, 238, 234, 0.9));
+}
 
+.refusal-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.refusal-icon span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--error);
+}
+
+.refusal-icon span:nth-child(2),
+.refusal-icon span:nth-child(3) {
+  opacity: 0.35;
+}
+
+.refusal-body {
+  display: grid;
+  gap: 6px;
+}
+
+.refusal-body strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--error);
+}
+
+.refusal-body p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-strong);
+  line-height: 1.6;
+}
+
+.refusal-reason {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.terminal-shell {
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);

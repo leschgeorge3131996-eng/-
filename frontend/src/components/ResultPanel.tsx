@@ -591,40 +591,61 @@ export default function ResultPanel({
               </motion.div>
             ) : null}
 
-            <motion.div
-              className="terminal-shell terminal-shell-sweep"
-              initial={{ opacity: 0, scale: 0.985 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
-            >
-              <div className="terminal-head">
-                <div className="terminal-lights" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
+            {result.outcome === "refused" ? (
+              <motion.div
+                className="refusal-card"
+                data-testid="refusal-card"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
+              >
+                <div className="refusal-icon" aria-hidden="true">
+                  <span /><span /><span />
                 </div>
-                <div className="terminal-actions">
-                  <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
-                  <button className="copy-button" type="button" onClick={handleCopyResult}>
-                    {copyState === "done"
-                      ? "已复制"
-                      : copyState === "error"
-                        ? "复制失败"
-                        : "复制结果"}
-                  </button>
-                  <button className="copy-button" type="button" onClick={handleExportResult}>
-                    {exportState === "done"
-                      ? "已导出"
-                      : exportState === "error"
-                        ? "导出失败"
-                        : "导出 Markdown"}
-                  </button>
+                <div className="refusal-body">
+                  <strong>检索无命中，拒绝回答</strong>
+                  <p>{result.result}</p>
+                  <span className="refusal-reason">
+                    系统在文档中未找到与该问题相关的片段，已在检索阶段拦截，未调用模型生成。
+                  </span>
                 </div>
-              </div>
-              <div className="terminal-output markdown-stage" data-testid="result-output">
-                <MarkdownResult content={result.result} />
-              </div>
-            </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                className="terminal-shell terminal-shell-sweep"
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
+              >
+                <div className="terminal-head">
+                  <div className="terminal-lights" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="terminal-actions">
+                    <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
+                    <button className="copy-button" type="button" onClick={handleCopyResult}>
+                      {copyState === "done"
+                        ? "已复制"
+                        : copyState === "error"
+                          ? "复制失败"
+                          : "复制结果"}
+                    </button>
+                    <button className="copy-button" type="button" onClick={handleExportResult}>
+                      {exportState === "done"
+                        ? "已导出"
+                        : exportState === "error"
+                          ? "导出失败"
+                          : "导出 Markdown"}
+                    </button>
+                  </div>
+                </div>
+                <div className="terminal-output markdown-stage" data-testid="result-output">
+                  <MarkdownResult content={result.result} />
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
