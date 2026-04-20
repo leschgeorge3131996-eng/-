@@ -82,6 +82,20 @@
 - regenerated the handoff export bundle after adding these assets:
   - `evidence/exports/competition_asset_pack_20260420_135135/`
 
+### 2026-04-20 External Review Bundle Refresh
+
+- deleted old local external-review zip archives:
+  - `review_bundle_*.zip`
+- kept old `review_bundle_stage_*` directories in place as local readable history
+- added root review handoff docs so another AI gets explicit background and goal before reviewing:
+  - `PROJECT_CONTEXT.md`
+  - `REVIEW_PROMPT.md`
+  - `REVIEW_BUNDLE_INDEX.md`
+- refreshed `scripts/export_review_bundle.ps1` to package the current strict `G3` evidence, current judged materials, current repo-native deliverables, and whole-project code context
+- generated the latest external review artifacts:
+  - `review_bundle_stage_20260420_141123/`
+  - `review_bundle_20260420_141123_final_competition_review.zip`
+
 ### Completed
 
 - React + TypeScript + Vite frontend created

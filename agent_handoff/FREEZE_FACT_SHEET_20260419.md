@@ -92,13 +92,19 @@ Use this file as the quickest authoritative reference when another operator or a
     - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
     - `evidence/screenshots/20260419_gold_pdf_render.json`
 - Latest external final-review bundle:
-  - `review_bundle_stage_20260419_211551/`
-  - `review_bundle_20260419_211551_final_competition_review.zip`
-  - now also carries:
-    - `evidence/screenshots/20260419_gold_pdf_render.json`
+  - `review_bundle_stage_20260420_141123/`
+  - `review_bundle_20260420_141123_final_competition_review.zip`
+  - root review docs now also exist in-repo:
+    - `PROJECT_CONTEXT.md`
+    - `REVIEW_PROMPT.md`
+    - `REVIEW_BUNDLE_INDEX.md`
 
 ## What Still Matters
 
 1. Keep materials, screenshots, and handoff docs aligned to this fact sheet.
 2. If another export bundle is created, ensure it carries the rebuilt `deck/poster` outputs.
-3. If another AI reviews the project, point it here first so it does not over-index on stale `54 passed`, older screenshot prefixes, or pre-rebuild material corruption.
+3. If another AI reviews the project, point it first to:
+   - `PROJECT_CONTEXT.md`
+   - `REVIEW_PROMPT.md`
+   - this fact sheet
+   so it does not over-index on stale warm-state `G3`, older screenshot prefixes, or pre-rebuild material corruption.

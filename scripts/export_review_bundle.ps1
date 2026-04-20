@@ -57,6 +57,9 @@ function Copy-RelativeFile(
 $latestScreenshotPrefix = Get-LatestScreenshotPrefix
 
 $requiredFiles = @(
+    "PROJECT_CONTEXT.md",
+    "REVIEW_BUNDLE_INDEX.md",
+    "REVIEW_PROMPT.md",
     "README.md",
     ".env.example",
     "render.yaml",
@@ -72,6 +75,14 @@ $requiredFiles = @(
     "evidence\materials\PROJECT_ONE_PAGER.md",
     "evidence\materials\COMPETITION_ASSET_PACK.md",
     "evidence\materials\SUBMISSION_PREP_GUIDE.md",
+    "evidence\materials\SUBMISSION_SPEC_CROSSWALK.md",
+    "evidence\materials\HANDOFF_PACKAGE_BOUNDARY.md",
+    "evidence\materials\PRODUCT_TECHNICAL_WRITEUP.md",
+    "evidence\materials\PLATFORM_USAGE_EVIDENCE.md",
+    "evidence\materials\HARD_EVIDENCE_SUMMARY.md",
+    "evidence\materials\SCORING_EVIDENCE_MATRIX.md",
+    "evidence\materials\PPT_DECK_3PAGES_FINAL.md",
+    "evidence\materials\VIDEO_SHOTLIST_5MIN_FINAL.md",
     "evidence\materials\PPT_DECK_6SLIDES.md",
     "evidence\materials\VIDEO_SHOTLIST_2MIN.md",
     "evidence\materials\POSTER_COPY.md",
@@ -85,9 +96,11 @@ $requiredFiles = @(
     "evidence\materials\REAL_REPLAY_GUIDE.md",
     "evidence\materials\SAMPLE_MANIFEST.json",
     "evidence\materials\SAMPLE_SET.md",
+    "evidence\materials\STRICT_G3_EXECUTION_PLAN.md",
     "evidence\experiments\20260418_gold_sample_validation.md",
     "evidence\experiments\20260419_q2_declared_stability_check.md",
     "evidence\experiments\20260419_g3_rehearsal_template.md",
+    "evidence\experiments\20260420_g3_strict_rehearsal.md",
     "evidence\reports\gold_sample_replay_real_summary_latest.md",
     "evidence\reports\gold_sample_replay_real_latest.md",
     "evidence\reports\gold_sample_qa_compare_latest.md",
@@ -101,11 +114,14 @@ $requiredFiles = @(
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.json",
     "evidence\samples\chinese_llm_spatial_eval.pdf",
     "deliverables\competition_kit\README.md",
+    "deliverables\competition_kit\deck_3page_final.html",
     "deliverables\competition_kit\deck.html",
     "deliverables\competition_kit\poster.html",
     "deliverables\competition_kit\styles.css",
+    "deliverables\competition_kit\deck_3page_final.pdf",
     "deliverables\competition_kit\deck.pdf",
     "deliverables\competition_kit\poster.pdf",
+    "deliverables\competition_kit\video_subtitles_5min_final.srt",
     "deliverables\competition_kit\video_subtitles.srt",
     "backend\requirements.txt",
     "backend\app\main.py",
@@ -123,13 +139,13 @@ $requiredFiles = @(
     "backend\app\services\bbox_matcher.py",
     "backend\app\services\cache_service.py",
     "backend\app\services\chunk_service.py",
-    "backend\app\services\model_client.py",
     "backend\app\services\context_planner.py",
     "backend\app\services\document_parser.py",
-    "backend\app\services\retrieval_service.py",
-    "backend\app\services\task_service.py",
     "backend\app\services\file_service.py",
     "backend\app\services\log_service.py",
+    "backend\app\services\model_client.py",
+    "backend\app\services\retrieval_service.py",
+    "backend\app\services\task_service.py",
     "backend\tests\test_api.py",
     "backend\tests\test_config.py",
     "backend\tests\test_services.py",
@@ -142,8 +158,8 @@ $requiredFiles = @(
     "frontend\src\styles.css",
     "frontend\src\types.ts",
     "frontend\src\components\MarkdownResult.tsx",
-    "frontend\src\components\ResultPanel.tsx",
     "frontend\src\components\PdfPreviewPanel.tsx",
+    "frontend\src\components\ResultPanel.tsx",
     "frontend\src\App.smoke.test.tsx",
     "frontend\src\test\setup.ts",
     "scripts\capture_gold_sample_screenshots.js",
@@ -181,13 +197,17 @@ foreach ($relativePath in $optionalFiles) {
     }
 }
 
-$bundleIndexPath = Join-Path $packageDir "BUNDLE_INDEX.md"
-$projectContextPath = Join-Path $packageDir "PROJECT_CONTEXT.md"
-$reviewPromptPath = Join-Path $packageDir "REVIEW_PROMPT.md"
+$bundleManifestPath = Join-Path $packageDir "BUNDLE_MANIFEST.md"
 $generatedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+$bundleContextSection = (
+    ($copiedRequired |
+        Where-Object { $_ -eq 'PROJECT_CONTEXT.md' -or $_ -eq 'REVIEW_BUNDLE_INDEX.md' -or $_ -eq 'REVIEW_PROMPT.md' -or $_ -eq 'README.md' -or $_ -eq 'WORKLOG.md' } |
+        ForEach-Object { "- $_" }) -join [Environment]::NewLine
+)
 $bundleBaselineSection = (
     ($copiedRequired |
-        Where-Object { $_ -like 'agent_handoff*' -or $_ -eq 'README.md' -or $_ -eq 'WORKLOG.md' } |
+        Where-Object { $_ -like 'agent_handoff*' } |
         ForEach-Object { "- $_" }) -join [Environment]::NewLine
 )
 $bundleMaterialsSection = (
@@ -230,226 +250,71 @@ else {
     ($copiedOptional | ForEach-Object { "- $_" }) -join [Environment]::NewLine
 }
 
-$projectContext = @"
-# Project Context
+$bundleManifest = @"
+# Review Bundle Manifest
 
-## One-Paragraph Summary
-
-YanDatong is a competition-focused document QA project for paper/report reading
-and defense preparation. The core differentiator is not "generic chat over
-PDFs", but an evidence-backed ask flow that can answer from retrieved document
-evidence, expose the supporting citation blocks, jump back into the PDF, and
-refuse unsupported off-topic questions.
-
-## Why This Project Exists
-
-The team is preparing a late-stage competition submission and judging demo.
-They do **not** need a broad SaaS product review. They need a hard review of
-whether the current project story, evidence, and materials are strong enough to
-survive judging.
-
-The current strategy is intentionally narrow:
-
-- center the demo on ask -> citation -> PDF back-link -> refusal
-- emphasize evidence credibility over feature breadth
-- keep summary / outline as supporting capabilities rather than the main story
-- avoid expanding scope this late in the cycle
-
-## Current Background
-
-- Runtime provider has been switched to Wuwen Xinqiong and validated in the
-  real in-project path.
-- The team locked a Chinese paper as the current gold-sample demo document:
-  - evidence/samples/chinese_llm_spatial_eval.pdf
-- The locked judging path currently uses:
-  - 2 answerable asks
-  - 1 refusal ask
-- The current primary QA model is:
-  - qwen3-235b-a22b-instruct-2507
-- A validated fallback also exists:
-  - qwen3-32b
-
-## What Has Already Been Done
-
-- Real provider path is live in-project.
-- Gold-sample replay reports, screenshots, and PDF evidence exist.
-- Q2 fresh declared-evidence instability was fixed and rechecked.
-- G3 operator rehearsal is recorded as pass in the current handoff.
-- The competition material chain was rebuilt from clean source docs after an
-  external review identified corruption in the earlier printable baseline.
-- The current printable baseline has already been regenerated and rechecked:
-  - deliverables/competition_kit/deck.pdf -> 6 pages
-  - deliverables/competition_kit/poster.pdf -> 1 page
-- The latest screenshot sidecars now explicitly record:
-  - attempt
-  - evidence_mode
-  - cache_hit
-
-## What "Pass" Currently Means
-
-- G1:
-  - real provider path is live and the main ask/citation/PDF/refusal flow works
-- G2:
-  - the locked gold-sample path now has answerable evidence plus refusal proof
-- G3:
-  - a warm-state operator rehearsal on the locked sample path passed for 3
-    consecutive runs
-
-Important caveat:
-
-- current G3 evidence is **not** a stricter cold-start upload-from-zero pass
-- it is a warm-state judged-demo rehearsal after warmup on the locked document
-
-## What File Should Override Older Historical Notes
-
-If the reviewer sees older statements that conflict with the latest state,
-prefer:
-
-1. agent_handoff/FREEZE_FACT_SHEET_20260419.md
-2. agent_handoff/CURRENT_STATUS_20260418.md
-3. the latest screenshot sidecars under evidence/screenshots/
-4. the current printable deliverables under deliverables/competition_kit/
-
-Historical notes are still useful, but they should not outweigh the current
-freeze-fact layer.
-
-## Real Goal Of This Review
-
-The reviewer should judge whether the current project is genuinely close to
-submission freeze, not whether it could become a much broader product someday.
-
-The highest-value questions are:
-
-1. Is the competition story clear, memorable, and honest?
-2. Is the evidence-backed ask path convincing enough for judges?
-3. Are the current screenshots / replay reports / deck / poster / video script
-   internally consistent?
-4. Are there still any "this could embarrass the team live" risks?
-5. Are the current G1/G2/G3 pass claims actually defensible?
-
-## What Not To Optimize For
-
-Do not optimize this review for:
-
-- broad product pivots
-- new task types
-- OCR-heavy redesigns
-- local-model strategy branches
-- generic SaaS reframing
-- large visual rewrites
-
-This bundle is for **final-stage competition judgment**, not long-range product
-exploration.
-
-## Recommended Reading Order
-
-1. PROJECT_CONTEXT.md
-2. REVIEW_PROMPT.md
-3. BUNDLE_INDEX.md
-4. agent_handoff/FREEZE_FACT_SHEET_20260419.md
-5. agent_handoff/CURRENT_STATUS_20260418.md
-6. agent_handoff/PROJECT_HANDOFF.md
-7. evidence/materials/COMPETITION_ASSET_PACK.md
-8. evidence/experiments/20260419_q2_declared_stability_check.md
-9. evidence/experiments/20260419_g3_rehearsal_template.md
-10. current deck / poster / video-script materials
-11. code paths only where needed to verify a claim
-"@
-
-$bundleIndex = @"
-# Final Review Bundle
-
-## Read This First
+## Read First
 
 - PROJECT_CONTEXT.md
 - REVIEW_PROMPT.md
-- BUNDLE_INDEX.md
+- REVIEW_BUNDLE_INDEX.md
+- agent_handoff/FREEZE_FACT_SHEET_20260419.md
 
 ## Purpose
 
-This bundle is for a fresh external AI review of the **current** competition
-state of YanDatong.
+This generated bundle packages the current end-to-end review surface for
+YanDatong.
 
-This is not an early exploratory review. It is a **late-stage final-review
-bundle** after the following have already happened:
+The review target is the whole project in its current late-stage competition
+state:
 
-- the real provider path is live
-- the locked gold-sample path is in place
-- the fresh Q2 declared-evidence regression has been fixed
-- G3 has been recorded as pass in the current handoff
-- the competition material chain has been rebuilt from clean sources
-- the current printable baseline has been regenerated with sanity checks
-
-The goal is to catch the remaining high-value risks before final submission /
-judging material freeze.
+- product positioning
+- engineering / architecture credibility
+- demo path credibility
+- evidence chain
+- submission material readiness
+- remaining last-mile risks
 
 ## Current Snapshot
 
-- Project: YanDatong
-- Positioning: evidence-backed document QA for paper/report reading and defense prep
-- Primary demo path: ask -> citation -> PDF back-link -> refusal
-- Runtime: Wuwen Xinqiong
-- Primary QA model: qwen3-235b-a22b-instruct-2507
-- Validated fallback: qwen3-32b
-- Claimed gate status in the current bundle:
-  - G1: pass
-  - G2: pass
-  - G3: pass
-- Important caveat already documented by the team:
-  - current G3 evidence is a warm-state reproducibility pass after warmup on
-    the locked sample document, not a stricter cold-start upload-from-zero pass
-- Current freeze-fact file:
-  - agent_handoff/FREEZE_FACT_SHEET_20260419.md
+- Runtime provider: `Wuwen Xinqiong`
+- Primary QA model: `qwen3-235b-a22b-instruct-2507`
+- Validated fallback: `qwen3-32b`
+- Locked sample: `evidence/samples/chinese_llm_spatial_eval.pdf`
+- Strongest judged path: `upload -> ask -> citation -> PDF -> refusal`
+- Strict `G3` status: fresh-upload `3 / 3` recorded in
+  `evidence/experiments/20260420_g3_strict_rehearsal.md`
+- Repo-native final asset baselines now exist:
+  - `deliverables/competition_kit/deck_3page_final.pdf`
+  - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+- Remaining default open work:
+  - final native `PPT`
+  - final edited `5`-minute video
+  - screenshot refresh only if target environment changes
 
-## What Changed Since The Previous External Review
+## Included Files
 
-- Q2 fresh ask evidence instability was investigated and fixed
-- backend/app/services/task_service.py now includes an internal one-step ask
-  evidence retry when structured evidence is missing
-- regression coverage was added in backend/tests/test_services.py
-- fresh Q2 re-check was recorded in:
-  - evidence/experiments/20260419_q2_declared_stability_check.md
-- G3 rehearsal was recorded in:
-  - evidence/experiments/20260419_g3_rehearsal_template.md
-- the competition material chain was rebuilt and current printable outputs now
-  pass the intended page-count sanity check:
-  - deck.pdf -> 6 pages
-  - poster.pdf -> 1 page
-- the latest screenshot sidecars now include cache_hit so the reviewer can
-  distinguish fresh results from cached results
+### 1. Context / Review Instructions
 
-## Review Focus
+$bundleContextSection
 
-The reviewer should focus on:
-
-1. final competition strategy coherence
-2. demo / screenshot / PDF-evidence credibility
-3. submission-material consistency across deck / poster / video script
-4. hidden implementation risks that could still hurt judging
-5. whether the current "pass" claims are truly defensible
-
-Do **not** spend most of the review re-reporting already-fixed old issues unless
-the current bundle still proves they remain open.
-
-## Included Sections
-
-### 1. Baseline / Status / Handoff
+### 2. Baseline / Handoff
 
 $bundleBaselineSection
 
-### 2. Competition Story / Materials
+### 3. Competition Story / Materials
 
 $bundleMaterialsSection
 
-### 3. Evidence / Validation
+### 4. Evidence / Validation
 
 $bundleEvidenceSection
 
-### 4. Current Deliverables
+### 5. Current Deliverables
 
 $bundleDeliverablesSection
 
-### 5. Core Code / Scripts
+### 6. Core Code / Scripts
 
 $bundleCodeSection
 
@@ -457,174 +322,16 @@ $bundleCodeSection
 
 $bundleOptionalSection
 
-## Recommended Review Order
-
-1. Read PROJECT_CONTEXT.md
-2. Read REVIEW_PROMPT.md
-3. Read agent_handoff/FREEZE_FACT_SHEET_20260419.md
-4. Read agent_handoff/CURRENT_STATUS_20260418.md
-5. Read agent_handoff/PROJECT_HANDOFF.md
-6. Read evidence/materials/COMPETITION_ASSET_PACK.md
-7. Read evidence/experiments/20260419_q2_declared_stability_check.md
-8. Read evidence/experiments/20260419_g3_rehearsal_template.md
-9. Inspect the current deck/poster/video deliverables
-10. Inspect the current ask/evidence code path only if needed
-
-## Generation Metadata
+## Bundle Generation Metadata
 
 - Generated at: $generatedAt
 - Source repo path: $root
-- Bundle directory: $packageDir
+- Latest screenshot prefix: $latestScreenshotPrefix
+- Stage directory: $packageDir
 - Zip path: $zipPath
 "@
 
-$reviewPrompt = @"
-# Final External Review Prompt
-
-You are reviewing a **late-stage competition submission bundle** for
-YanDatong.
-
-Before writing any judgment, first read:
-
-1. PROJECT_CONTEXT.md
-2. REVIEW_PROMPT.md
-3. BUNDLE_INDEX.md
-4. agent_handoff/FREEZE_FACT_SHEET_20260419.md
-5. agent_handoff/CURRENT_STATUS_20260418.md
-6. agent_handoff/PROJECT_HANDOFF.md
-
-## Your Role
-
-Act as a strict final reviewer across:
-
-- competition strategy
-- demo / evidence credibility
-- submission-material readiness
-- implementation risks that could still damage judging
-
-Do not waste time on generic praise. Prioritize contradictions, weak claims,
-remaining blockers, and "this could still embarrass the team live" risks.
-
-## Important Context
-
-- This is a **second-pass** external review, not an early exploration review.
-- Some earlier problems were already identified and then fixed by the team.
-- In particular, the team now claims the following are already addressed:
-  - fresh Q2 declared-evidence instability
-  - refusal semantics (retrieval_gate)
-  - screenshot evidence consistency
-  - G3 recorded as pass
-  - printable material corruption in the earlier deck/poster baseline
-- Do **not** spend most of the review repeating stale historical findings unless
-  the current files still show those problems are still open.
-- If you find historical contradictions, explicitly distinguish:
-  - stale historical artifact
-  - current blocker
-
-## Project Context
-
-- Product framing:
-  - evidence-backed document QA for paper/report reading and defense prep
-- Primary demo path:
-  - ask -> citation -> PDF back-link -> refusal
-- Current target:
-  - top 20% of the topic and qualification for national finals
-- Scope is intentionally frozen.
-- Do not recommend broad pivots into:
-  - new task types
-  - OCR-heavy direction
-  - local-model branch
-  - public SaaS reframing
-  - large frontend redesign
-
-## What To Review
-
-### 1. Final Strategy / Narrative
-
-- Is the current competition story coherent and memorable?
-- Is the "evidence-backed ask" positioning strong enough?
-- Is anything still overclaimed, weakly framed, or internally inconsistent?
-- Does the current G1/G2/G3 narrative sound honest and defensible?
-
-### 2. Demo / Evidence / Material Readiness
-
-- Are the current screenshots, replay reports, PDF evidence, and deliverables
-  convincing enough for judges?
-- Are the current deck / poster / video-script materials aligned?
-- Is anything obviously still in "draft mode" rather than "submission mode"?
-- If the team froze materials today, what would still be risky?
-
-### 3. Technical / Product Risk
-
-- What implementation risks could still break trust or weaken the demo?
-- Which current code/design decisions are strongest?
-- What remaining weaknesses are most dangerous under judging conditions?
-- If you challenge a claimed fix, point to the current file evidence directly.
-
-### 4. Final Competition Readiness
-
-- Give a realistic completion estimate based on the current bundle.
-- Decide whether G1, G2, and G3 are actually passed **on current evidence**.
-- Pay special attention to whether the current G3 evidence is strong enough,
-  given that it is documented as a warm-state operator rehearsal.
-- Pay special attention to whether the reviewer now has enough context to
-  fairly judge the project end-to-end without guessing missing background.
-- Identify the minimum remaining work before confident final submission /
-  judging freeze.
-
-## Output Format
-
-Use this exact structure:
-
-### A. Top Findings
-
-List the most important findings first, ordered by severity.
-For each finding include:
-
-- severity: critical / high / medium / low
-- concise title
-- why it matters
-- file references
-- concrete recommendation
-
-### B. Gate Assessment
-
-State whether each gate is truly:
-
-- G1: pass / borderline / fail
-- G2: pass / borderline / fail
-- G3: pass / borderline / fail
-
-Keep the explanation brief and evidence-based.
-
-### C. Completion Estimate
-
-Give your own completion percentage for:
-
-- engineering / demo path
-- competition materials
-- final competition readiness
-- overall total
-
-### D. Best Next Actions
-
-Give the top 5 remaining actions with the highest leverage before formal
-submission / judging.
-
-### E. Optional Strategic Challenge
-
-If the team is still making one major wrong assumption, say it directly.
-
-## Review Standard
-
-Assume the team does not need encouragement. They need a high-signal final
-review that reflects the **current** state of the project and helps them avoid
-avoidable mistakes in the final stretch.
-"@
-
-Set-Content -LiteralPath $projectContextPath -Value $projectContext -Encoding UTF8
-Set-Content -LiteralPath $bundleIndexPath -Value $bundleIndex -Encoding UTF8
-Set-Content -LiteralPath $reviewPromptPath -Value $reviewPrompt -Encoding UTF8
+Set-Content -LiteralPath $bundleManifestPath -Value $bundleManifest -Encoding UTF8
 
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
@@ -635,4 +342,4 @@ Compress-Archive -LiteralPath $packageDir -DestinationPath $zipPath -Force
 Write-Host "Review bundle created."
 Write-Host "Stage directory: $packageDir"
 Write-Host "Zip file: $zipPath"
-Write-Host "Prompt file: $reviewPromptPath"
+Write-Host "Bundle manifest: $bundleManifestPath"

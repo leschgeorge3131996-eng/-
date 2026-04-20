@@ -173,6 +173,18 @@ Operator rehearsal result:
 - Latest local handoff pack after these additions:
   - `evidence/exports/competition_asset_pack_20260420_135135/`
 
+## 2026-04-20 External Review Pack Refresh
+
+- Root review docs now exist for direct handoff to another AI:
+  - `PROJECT_CONTEXT.md`
+  - `REVIEW_PROMPT.md`
+  - `REVIEW_BUNDLE_INDEX.md`
+- `scripts/export_review_bundle.ps1` now packages the current strict `G3` evidence, current judged-asset baselines, and current whole-project review context instead of the older warm-state framing
+- Latest external review artifacts:
+  - `review_bundle_stage_20260420_141123/`
+  - `review_bundle_20260420_141123_final_competition_review.zip`
+- Older `review_bundle_*.zip` archives were removed locally; old `review_bundle_stage_*` directories remain as readable history
+
 ## What Was Added In The Latest Iterations
 
 ### Evidence and PDF chain

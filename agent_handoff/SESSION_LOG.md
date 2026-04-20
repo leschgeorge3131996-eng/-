@@ -131,6 +131,46 @@ Entry format:
 - Recommended next step:
   - use `deck_3page_final.pdf` and `video_subtitles_5min_final.srt` as the new default production baseline instead of starting from markdown only
 
+## 2026-04-20 / Codex (external review bundle refresh)
+
+- Summary:
+  - Removed the old local `review_bundle_*.zip` archives so the machine no longer keeps multiple stale zipped review packages around
+  - Added root review handoff docs with explicit background and goal:
+    - `PROJECT_CONTEXT.md`
+    - `REVIEW_PROMPT.md`
+    - `REVIEW_BUNDLE_INDEX.md`
+  - Rebuilt `scripts/export_review_bundle.ps1` so the generated review bundle reflects the current strict `G3` state, current judged-asset baselines, and current whole-project scope
+  - Generated a new full review bundle for another AI to review the whole project end-to-end
+- Files touched:
+  - `PROJECT_CONTEXT.md`
+  - `REVIEW_PROMPT.md`
+  - `REVIEW_BUNDLE_INDEX.md`
+  - `scripts/export_review_bundle.ps1`
+  - `WORKLOG.md`
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\export_review_bundle.ps1`
+  - generated:
+    - `review_bundle_stage_20260420_141123/`
+    - `review_bundle_20260420_141123_final_competition_review.zip`
+  - generated `BUNDLE_MANIFEST.md` confirms the latest bundle includes:
+    - `PROJECT_CONTEXT.md`
+    - `REVIEW_PROMPT.md`
+    - `REVIEW_BUNDLE_INDEX.md`
+    - `evidence/experiments/20260420_g3_strict_rehearsal.md`
+    - `deliverables/competition_kit/deck_3page_final.pdf`
+    - `deliverables/competition_kit/video_subtitles_5min_final.srt`
+  - old zipped review bundles were removed via:
+    - `Get-ChildItem -Path '.' -Filter 'review_bundle_*.zip' -File | Remove-Item -Force`
+- Open risks:
+  - old `review_bundle_stage_*` directories still remain locally as readable history
+  - the final native `PPT` and final edited `5`-minute video are still not produced
+- Recommended next step:
+  - hand `review_bundle_20260420_141123_final_competition_review.zip` to another AI with `REVIEW_PROMPT.md` as the primary instruction file
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:
