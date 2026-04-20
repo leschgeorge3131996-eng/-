@@ -138,4 +138,4 @@ To close `G3`, a second operator should record:
 
 Recommended log file:
 
-- `evidence/experiments/20260419_g3_rehearsal_template.md`
+- `evidence/experiments/20260420_g3_strict_rehearsal.md`

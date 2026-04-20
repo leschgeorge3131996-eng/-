@@ -51,10 +51,10 @@ Use this file as the quickest authoritative reference when another operator or a
 
 - `G1`: pass
 - `G2`: pass
-- `G3`: pass for the current **warm-state operator rehearsal** path
+- `G3`: pass for the current **strict fresh-upload three-run** path
 - Honest caveat for `G3`:
-  - current recorded rehearsal is **not** the stricter upload-from-zero cold-start + second-operator version
-  - if a stricter judging requirement appears, treat that as an additional rehearsal task rather than reopening the engineering chain
+  - current strongest evidence is still for the locked gold-sample judged-demo path, not open-domain product generalization
+  - if the final target environment changes, treat screenshot refresh / final dry-run as asset work rather than reopening the engineering chain
 
 ## Material Freeze Facts
 

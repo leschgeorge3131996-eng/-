@@ -10,7 +10,7 @@
 - 无问芯穹命题要求：
   - 使用无问芯穹平台资源
   - 初赛提交 `3 页内 PPT`、`5 分钟内方案介绍及演示视频`、`产品及技术文档`
-  - 决赛补 `平台使用日志信息 / MaaS API 调用记录`
+  - 决赛看 `平台使用日志信息 / MaaS API 调用记录`
 
 官方文件：
 
@@ -20,14 +20,14 @@
 
 | 官方要求 | 当前仓库资产 | 当前状态 | 主要差距 | 下一动作 |
 | --- | --- | --- | --- | --- |
-| `3 页内 PPT` | `evidence/materials/PPT_DECK_6SLIDES.md`；`deliverables/competition_kit/deck.pdf`（`6` 页） | `仅有基线` | 当前是六页稿和六页 PDF，不是正式三页提交版 | 压缩成正式 `3` 页提交稿并封板 |
-| `5 分钟内方案介绍及演示视频` | `evidence/materials/VIDEO_SHOTLIST_2MIN.md`；`deliverables/competition_kit/video_subtitles.srt` | `仅有基线` | 当前是 `2` 分钟分镜和字幕基线，不是正式 `5` 分钟提交版 | 扩展成 `5` 分钟正式脚本、镜头表和成片 |
-| `产品及技术文档` | `PROJECT_ONE_PAGER.md`、`ARCHITECTURE.md`、`QA_BRIEF.md`、`PRODUCT_TECHNICAL_WRITEUP.md` | `judge-facing 文档已形成` | 还未导出到最终提交格式，也还未与最终 `3` 页 PPT / `5` 分钟视频统一封板 | 锁定 `PRODUCT_TECHNICAL_WRITEUP.md` 为正式版本并在最终包中单列 |
-| `平台使用证明` | `PLATFORM_USAGE_EVIDENCE.md`、gold-sample 报告、实验记录、`data/logs/call_logs.jsonl` | `judge-facing 页面已形成` | 仍需把主证明、附录和日志原件边界切清 | 以 `PLATFORM_USAGE_EVIDENCE.md` 为主证明，real-only 日志走附录 |
+| `3 页内 PPT` | `evidence/materials/PPT_DECK_6SLIDES.md`、`deliverables/competition_kit/deck.pdf`（`6` 页） | `仅有基线` | 当前是六页稿和六页 PDF，不是正式三页提交版 | 压缩成正式 `3` 页提交稿并封板 |
+| `5 分钟内方案介绍及演示视频` | `evidence/materials/VIDEO_SHOTLIST_2MIN.md`、`deliverables/competition_kit/video_subtitles.srt` | `仅有基线` | 当前是 `2` 分钟分镜和字幕基线，不是正式 `5` 分钟提交件 | 扩展成 `5` 分钟正式脚本、镜头表和成片 |
+| `产品及技术文档` | `PROJECT_ONE_PAGER.md`、`ARCHITECTURE.md`、`QA_BRIEF.md`、`PRODUCT_TECHNICAL_WRITEUP.md` | `judge-facing 文档已成型` | 还未导出到最终提交格式，也还未与最终 `3` 页 PPT / `5` 分钟视频完全封板 | 锁定 `PRODUCT_TECHNICAL_WRITEUP.md` 为正式版本并在最终包中单列 |
+| `平台使用证明` | `PLATFORM_USAGE_EVIDENCE.md`、gold-sample 报告、实验记录、`data/logs/call_logs.jsonl` | `judge-facing 可用` | 原始日志混有历史开发数据，不适合直接主呈现 | 以 `PLATFORM_USAGE_EVIDENCE.md` 为主证明，request id 走附录索引 |
 | `最终截图集` | `evidence/screenshots/20260419_gold_*` 四张主截图；`stats_panel` 与 `api_docs` 附录图 | `接近可用` | 仍需与最终提交环境和最终口径对齐 | 最终环境确定后刷新一次截图集 |
-| `决赛平台使用日志 / MaaS API 调用记录` | `data/logs/call_logs.jsonl`；`Q2` 与 `G3` request id 已记录在实验文档中 | `部分就绪` | 当前日志混有历史开发阶段数据，不适合直接 judge-facing 使用 | 生成 real-only 证据索引和附录 |
-| `演示 runbook / 复现证据` | `GOLD_SAMPLE_RUNBOOK.md`；`20260419_g3_rehearsal_template.md` | `可用但偏 warm-state` | 当前最强 G3 仍是本机 warm-state 路径 | 补严格版 `G3` |
-| `海报 / 一页纸` | `POSTER_COPY.md`；`poster.pdf`；`PROJECT_ONE_PAGER.md` | `支持性资产已具备` | 不是官方主要求，但会影响答辩观感 | 在正式封板时同步统一口径 |
+| `决赛平台使用日志 / MaaS API 调用记录` | `data/logs/call_logs.jsonl`、`20260419_q2_declared_stability_check.md`、`20260420_g3_strict_rehearsal.md` | `可交叉核对` | 原始日志仍是全量历史文件 | 以 strict `G3` 和 Q2 fresh rerun 索引作为主附录，原始日志只作备查 |
+| `演示 runbook / 复现证据` | `GOLD_SAMPLE_RUNBOOK.md`、`20260420_g3_strict_rehearsal.md` | `严格版已补齐` | 当前仍需把最终 `3` 页 PPT / `5` 分钟视频与这一口径完全对齐 | 以 strict `G3` 为主附录，旧 warm-state note 降为历史参考 |
+| `海报 / 一页纸` | `POSTER_COPY.md`、`poster.pdf`、`PROJECT_ONE_PAGER.md` | `支持性资产已具备` | 不是官方主要要求，但会影响答辩观感 | 在正式封板时同步统一口径 |
 
 ## 当前明确结论
 
@@ -62,7 +62,7 @@
 3. `gold_sample_replay_real_summary_latest.md`
 4. `GOLD_SAMPLE_RUNBOOK.md`
 5. `20260419_q2_declared_stability_check.md`
-6. `20260419_g3_rehearsal_template.md`
+6. `20260420_g3_strict_rehearsal.md`
 7. `HANDOFF_PACKAGE_BOUNDARY.md`
 
 ## 封板前检查
@@ -73,4 +73,4 @@
 - `平台使用证据页` 已包含可追溯 request id / report / screenshot 索引
 - `主提交 / 附录 / 操作资料` 的边界已明确
 - 四张主截图与最终运行环境一致
-- 所有主材料不再出现“基线 / 草稿 / candidate / current / next step”这类试制品语气
+- 所有主材料不再出现 `baseline / draft / candidate / current / next step` 这类试制品语气

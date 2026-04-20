@@ -37,13 +37,13 @@
 4. `GOLD_SAMPLE_RUNBOOK.md`
 5. `QA_BRIEF.md`
 6. `evidence/experiments/20260419_q2_declared_stability_check.md`
-7. `evidence/experiments/20260419_g3_rehearsal_template.md`
+7. `evidence/experiments/20260420_g3_strict_rehearsal.md`
 8. appendix-only 截图，如 `stats_panel` / `api_docs`
 
 规则：
 
 - 附录可以回答追问，但不能替代主提交
-- 附录里的“warm-state / fallback / request id”信息只在被追问时展开
+- 附录里的“strict G3 / fallback / request id”信息只在被追问时展开
 
 ### 3. 操作与制作材料
 
@@ -75,5 +75,5 @@
 ## 封板前必查
 
 - 主提交中不再出现 `baseline / draft / candidate / latest / current / next step`
-- 附录中的 request id、实验记录、warm-state 说明都有主证据页可回指
+- 附录中的 request id、实验记录、strict G3 说明都有主证据页可回指
 - 操作资料不会混入正式主提交目录

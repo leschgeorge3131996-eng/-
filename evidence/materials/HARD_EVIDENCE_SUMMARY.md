@@ -2,7 +2,7 @@
 
 ## 一句话结论
 
-研答通当前最强、最可信的能力，不是“泛化生成”，而是已经在无问芯穹真实运行环境里反复验证过的：
+研答通当前最强、最可核验的能力，不是泛化生成，而是已经在无问芯穹真实运行环境里完成多轮留痕验证的：
 
 `upload -> ask -> citation -> PDF -> refusal`
 
@@ -17,12 +17,12 @@
 
 ## 最重要的五条证据
 
-### 1. 真实平台路径已经切到无问芯穹
+### 1. 真实平台主路径已经切到无问芯穹
 
 - 当前平台：`Wuwen Xinqiong`
 - 当前默认 QA 模型：`qwen3-235b-a22b-instruct-2507`
 
-### 2. 双模型在锁定题组三题全部通过
+### 2. 锁定题组已经完成双模型 `3 / 3` 验证
 
 来源：`evidence/reports/gold_sample_qa_compare_latest.md`
 
@@ -40,7 +40,7 @@
 - `errors`：`0`
 - 平均延迟：`5386 ms`
 
-### 4. 数值题 fresh rerun 的当前记录均回到 declared evidence
+### 4. 数值题 fresh rerun 已稳定回到 declared evidence
 
 来源：`evidence/experiments/20260419_q2_declared_stability_check.md`
 
@@ -51,17 +51,22 @@
   - `evidence_quote_count=2`
   - `citation_count=2`
 
-### 5. 当前 judged-demo 已完成三次连续 rehearsal
+### 5. 严格版 G3 已完成三轮 fresh-upload 连续通过
 
-来源：`evidence/experiments/20260419_g3_rehearsal_template.md`
+来源：`evidence/experiments/20260420_g3_strict_rehearsal.md`
 
-- Run 1：`56s`
-- Run 2：`67s`
-- Run 3：`24s`
+- `3 / 3` authoritative runs passed
+- 三轮都使用新的 `file_id`，不再复用已加载文档状态
+- 两次 answerable 都保持 `evidence_mode=declared`
+- refusal 都保持 `retrieval_status=no_match`
+- log-backed spans：
+  - `13.5s`
+  - `12.9s`
+  - `15.8s`
+- fallback：`0 / 3`
 
 当前结论：
-
-- 已有 `3` 次 warm-state self-rehearsal 记录，可作为 judged-demo 预演证据
+- 当前最强 `G3` 证据已经从 earlier warm-state self-rehearsal 升级为 strict three-run batch，可作为更强的 judged-demo reproducibility evidence
 
 ## 当前 judge-facing 截图
 
@@ -73,21 +78,19 @@
 ## 当前模型决策
 
 为什么默认保留 `235b`：
-
-- 当前 lock 的 gold path 下，两模型都过
-- `235b` 仍是当前主演示链默认选择
+- 当前 lock 的 gold path 下，两模型都通过
+- `235b` 仍是当前主演示链路默认选择
 
 答辩备用：
-
 - `32b` 已验证通过同一锁定题组
-- 仅在部署环境更紧时作为备用路径使用，不进入主标题叙事
+- 仅在部署环境明显更紧时作为备用路径使用，不进入主标题叙事
 
 ## 当前诚实边界
 
 1. 当前最强证据是锁定 gold-sample judged-demo path，不是开放域产品泛化证明。
-2. 当前 `G3` 是 warm-state operator rehearsal pass，不是更严格的 cold-start second-machine pass。
+2. 当前 `G3` 最强记录是 strict three-run batch；它证明 judged-demo path 可复现，但仍不是开放域泛化证明。
 3. `ask` 是主卖点；`summary / outline` 已支持，但 grounding 语义弱于 `ask`。
 
 ## judge-facing 推荐说法
 
-“我们不是先生成再补页码，而是把答案回到 PDF 原文证据做成了一条硬链路。这条链路已经在无问芯穹真实运行环境里完成双模型验证、fresh rerun 记录和连续 rehearsal 记录。”
+“我们不是先生成再补页码，而是把答案回到 PDF 原文证据做成了一条硬链路。这条链路已经在无问芯穹真实运行环境里完成双模型验证、fresh rerun 记录和严格版 G3 三连跑记录。”

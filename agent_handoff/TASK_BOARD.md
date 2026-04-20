@@ -17,7 +17,7 @@
 - Latest gold-sample screenshot pack is now refreshed as `20260419_*` with metadata sidecars
 - Latest export bundle now auto-picks the newest screenshot prefix
 - Fresh Q2 ask instability is now closed at the code/runtime layer; `3 / 3` fresh local runs returned `declared`
-- `G3` operator rehearsal is now recorded as a warm-state pass
+- strict `G3` is now recorded as a fresh-upload `3`-run pass with request-id traceability
 - Competition material chain has now been rebuilt from clean source docs
 - Printable export now has sanity checks and a clean baseline (`deck.pdf=6` pages, `poster.pdf=1` page)
 - If preparing for judging/demo, prioritize final asset production rather than feature work
@@ -29,7 +29,7 @@
    - `evidence/exports/competition_asset_pack_20260419_211551/`
    - `review_bundle_stage_20260419_211551/`
    - `review_bundle_20260419_211551_final_competition_review.zip`
-3. If stricter judging requires it, add one cold-start or second-operator `G3` follow-up without reopening the engineering chain
+3. Finalize judged assets against the strict `G3` wording; do not reopen engineering scope unless the target demo environment changes
 4. Before judged demo: set `DEMO_MODE=true` on the target env and verify the opening flow on the target URL
 5. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
@@ -62,7 +62,7 @@
 - `2026-04-19`: `scripts/export_competition_asset_pack.ps1` now auto-detects the latest screenshot prefix and includes the screenshot sidecars
 - `2026-04-19`: `deliverables/competition_kit/deck.pdf` and `poster.pdf` were regenerated against the refreshed screenshots
 - `2026-04-19`: Q2 fresh stability check recorded at `evidence/experiments/20260419_q2_declared_stability_check.md`; `3 / 3` runs returned `declared`
-- `2026-04-19`: `G3` rehearsal recorded at `evidence/experiments/20260419_g3_rehearsal_template.md`; `3` consecutive runs passed on the locked gold-sample flow
+- `2026-04-20`: strict `G3` recorded at `evidence/experiments/20260420_g3_strict_rehearsal.md`; final authoritative batch passed `3 / 3` on fresh uploads with no fallback
 - `2026-04-19`: competition material chain rebuilt from clean docs; printable export now verifies `deck.pdf=6` pages and `poster.pdf=1` page
 - `2026-04-19`: final materials/doc sweep aligned `DEMO_SCRIPT_3MIN.md`, added `gold_pdf_render.json`, and refreshed:
   - `evidence/exports/competition_asset_pack_20260419_211551/`
@@ -95,17 +95,19 @@
   - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
   - keep `qwen3-32b` as validated fallback if demo/runtime latency becomes tighter
 
-## Latest Override (`2026-04-19`)
+## Latest Override (`2026-04-20`)
 
-- `G3` should now be treated as closed for the current warm-state judged-demo path
+- `G3` should now be treated as closed at the stricter fresh-upload level for the locked judged-demo path
 - Authoritative freeze facts now live in:
   - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 - The latest external final-review artifact is:
   - `review_bundle_stage_20260419_211551/`
   - `review_bundle_20260419_211551_final_competition_review.zip`
-- This latest review bundle is preferred over the older broad review pack because it now includes:
+- This latest review bundle is still preferred over the older broad review pack because it now includes:
   - `PROJECT_CONTEXT.md`
   - refreshed `REVIEW_PROMPT.md`
   - `Q2` stability evidence
   - recorded `G3` pass evidence
+- The current authoritative strict-run note is:
+  - `evidence/experiments/20260420_g3_strict_rehearsal.md`
 - If another AI is asked to review the project now, use this latest bundle first

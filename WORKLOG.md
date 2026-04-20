@@ -10,7 +10,7 @@
 
 - Phase: `P1 / Demo-ready prototype`
 - Status: `running end-to-end with Wuwen Xinqiong, locked gold-sample candidate, QA comparison tooling, and refreshed competition materials`
-- Verified on: `2026-04-18`
+- Verified on: `2026-04-20`
 
 ### 2026-04-19 Final Sweep
 
@@ -30,6 +30,24 @@
 - latest external review bundle:
   - `review_bundle_stage_20260419_211551/`
   - `review_bundle_20260419_211551_final_competition_review.zip`
+
+### 2026-04-20 Strict G3 Closeout
+
+- added formal strict-run experiment record:
+  - `evidence/experiments/20260420_g3_strict_rehearsal.md`
+- upgraded judge-facing evidence wording from warm-state-only `G3` to strict fresh-upload `3`-run batch in:
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/PLATFORM_USAGE_EVIDENCE.md`
+  - `evidence/materials/QA_BRIEF.md`
+  - `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+  - `evidence/materials/SUBMISSION_SPEC_CROSSWALK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+- strict authoritative batch now records:
+  - `3 / 3` continuous passes
+  - distinct `file_id` per run
+  - `declared` for both answerable asks in every run
+  - `retrieval_no_match` for every refusal
+  - no fallback used
 
 ### Completed
 
@@ -247,9 +265,9 @@ Current status:
 
 ## Next Recommended Steps
 
-1. Close `G3` with a second-operator rehearsal and `3` consecutive timed runs
-2. Use `evidence/exports/competition_asset_pack_20260419_165205/` as the current handoff bundle for external polishing / collaboration
-3. If latency becomes tighter in the deployment environment, rerun the QA compare script before switching from `235b` to `32b`
+1. Finalize the official `3`-page PPT against the strict `G3` wording
+2. Finalize the official `5`-minute video against the same locked story
+3. If the final demo environment changes, refresh the four gold-sample screenshots once
 4. Keep product scope frozen; do not add new tasks or redesign work ahead of competition material lock
 
 ## Session Handoff Rule

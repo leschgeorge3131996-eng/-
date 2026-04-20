@@ -59,7 +59,7 @@
   - `askRankAccuracy`
   - `refusal`
 - `evidence/materials/QA_BRIEF.md` now includes fixed spoken answers for:
-  - why `G3` is only a warm-state pass
+  - why current `G3` is a strict locked-path reproducibility pass
   - why refusal stays on the pure off-topic prompt
   - why `summary / outline` are not the primary judged-demo path
 - `scripts/capture_gold_sample_screenshots.js` now writes ASCII-safe sidecars:
@@ -105,9 +105,9 @@
 ## G3 Rehearsal Result (`2026-04-19`)
 
 - Operator result:
-  - `G3` is now marked `pass (warm-state operator rehearsal)`
+  - `G3` is now marked `pass (strict fresh-upload three-run batch)`
 - Record:
-  - `evidence/experiments/20260419_g3_rehearsal_template.md`
+  - `evidence/experiments/20260420_g3_strict_rehearsal.md`
 - What was verified:
   - `3` consecutive operator runs completed successfully
   - answerable 1 stayed `declared`
@@ -115,12 +115,12 @@
   - PDF jump/preview worked during the runs
   - refusal stayed `retrieval_gate / retrieval_no_match`
 - Run timing window:
-  - run 1: `56s`
-  - run 2: `67s`
-  - run 3: `24s`
+  - run 1: `13.5s` log-backed request span
+  - run 2: `12.9s` log-backed request span
+  - run 3: `15.8s` log-backed request span
 - Honest caveat:
-  - this operator rehearsal reused the already-loaded locked sample document after warmup
-  - it is therefore a warm demo reproducibility pass rather than a stricter cold-start upload-from-zero pass
+  - this is locked-path judged-demo reproducibility evidence, not open-domain product generalization proof
+  - the repo-verifiable portion is the request-id / timestamp trace; the PDF click itself is part of the live checklist rather than the server log
 - Practical meaning:
   - for the current competition/demo goal, `G3` is no longer the active blocker
   - the next work should shift to final submission-material polish and final export freeze
@@ -303,7 +303,7 @@
 - The previous fresh-Q2 `candidate` instability has now been fixed and independently rechecked with `3 / 3` fresh declared runs
 - `G1`: pass
 - `G2`: pass
-- `G3`: pass (warm operator rehearsal)
+- `G3`: pass (strict fresh-upload three-run batch)
 
 ## Review-Driven Hardening (`2026-04-19`)
 

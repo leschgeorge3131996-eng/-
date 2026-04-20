@@ -69,10 +69,10 @@
 - 当前锁定 gold-sample candidate 的双模型比较结论
 
 23. [../reports/gold_sample_replay_real_summary_latest.md](../reports/gold_sample_replay_real_summary_latest.md)
-- 当前锁定 gold-sample candidate 的真实 replay 汇总（权威最新版）
+- 当前锁定 gold-sample candidate 的真实 replay 汇总
 
 24. [../reports/gold_sample_replay_real_latest.md](../reports/gold_sample_replay_real_latest.md)
-- 当前锁定 gold-sample candidate 的真实 replay 明细（权威最新版）
+- 当前锁定 gold-sample candidate 的真实 replay 明细
 
 25. [../reports/sample_replay_real_summary_latest.md](../reports/sample_replay_real_summary_latest.md)
 - 更宽样例覆盖的真实模型复跑汇总（次级参考）
@@ -82,6 +82,9 @@
 
 27. [../../deliverables/competition_kit/README.md](../../deliverables/competition_kit/README.md)
 - 可打印的 deck / poster HTML 原型说明
+
+28. [../experiments/20260420_g3_strict_rehearsal.md](../experiments/20260420_g3_strict_rehearsal.md)
+- 严格版 `G3` 三轮权威记录，包含 request id、log-backed 时长与 fallback 结论
 
 ## 使用建议
 
@@ -93,10 +96,11 @@
 - 官方评分项对照：优先参考 `SCORING_EVIDENCE_MATRIX.md`
 - 主提交 / 附录 / 操作资料边界：优先参考 `HANDOFF_PACKAGE_BOUNDARY.md`
 - 严格版 G3 执行：优先参考 `STRICT_G3_EXECUTION_PLAN.md`
+- 严格版 G3 实验记录：优先参考 `evidence/experiments/20260420_g3_strict_rehearsal.md`
 - 现场展示 / 录屏脚本：优先参考 `DEMO_SCRIPT_3MIN.md`
 - 固定演示内容：优先参考 `SAMPLE_SET.md` 与 `GOLD_SAMPLE_RUNBOOK.md`
 - 技术路线说明：优先参考 `ARCHITECTURE.md`
-- 比赛/评审复跑与证据刷新：优先参考 `GOLD_SAMPLE_CANDIDATE_20260418.json`、`REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
+- 比赛 / 评审复跑与证据刷新：优先参考 `GOLD_SAMPLE_CANDIDATE_20260418.json`、`REAL_REPLAY_GUIDE.md` 与 `scripts/run_real_replay.ps1`
 - PPT / 视频 / 海报统一资产收口：优先参考 `COMPETITION_ASSET_PACK.md`
 - PPT 页面稿：优先参考 `PPT_DECK_6SLIDES.md`
 - 视频口播与镜头：优先参考 `VIDEO_SHOTLIST_2MIN.md`
@@ -113,6 +117,4 @@
 - 当前锁定 gold-sample 证据：优先参考 `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - 更宽样例的 route-tier / outcome / response-detail / grounding 对比：参考 `evidence/reports/sample_replay_real_summary_latest.md`
 - 答辩准备：优先参考 `QA_BRIEF.md`
-- 更宽样例的真实模型结果总览：参考 `evidence/reports/sample_replay_real_summary_latest.md`
-- 更宽样例的真实模型逐条证据：参考 `evidence/reports/sample_replay_real_latest.md`
 - `latest_log_summary.md` 仅作为全历史开发遥测，不作为 replay 权威结论

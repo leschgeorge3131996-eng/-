@@ -101,11 +101,11 @@ As of `2026-04-18`:
     - `citation_count=2`
     - answer: `作者最终的方法排名第六，总体准确率为56.20%。`
 - `G3` rehearsal record:
-  - `evidence/experiments/20260419_g3_rehearsal_template.md`
-  - current status: `pass (warm-state operator rehearsal)`
+  - `evidence/experiments/20260420_g3_strict_rehearsal.md`
+  - current status: `pass (strict fresh-upload three-run batch)`
   - caveat:
-    - this was a warm-state reproducibility pass after warmup on the already-loaded locked sample document
-    - not a stricter upload-from-zero cold-start pass
+    - this is locked-path reproducibility evidence, not open-domain generalization proof
+    - the PDF click/render step is part of the live checklist, while the repo-verifiable portion is the request-id/timestamp trace
 
 Main verification commands:
 
@@ -120,7 +120,7 @@ Operator rehearsal result:
 
 - `G1`: pass
 - `G2`: pass
-- `G3`: pass (warm-state operator rehearsal)
+- `G3`: pass (strict fresh-upload three-run batch)
 - authoritative freeze-fact reference:
   - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 
@@ -128,7 +128,7 @@ Operator rehearsal result:
 
 - `DEMO_SCRIPT_3MIN.md` now follows the real judged-demo path instead of the old "homepage sample entry loads the locked PDF" wording
 - `QA_BRIEF.md` now includes fixed spoken answers for:
-  - warm-state `G3`
+  - strict `G3`
   - pure off-topic refusal wording
   - `summary / outline` de-emphasis
 - screenshot sidecars now use ASCII-safe provenance keys:
@@ -304,7 +304,7 @@ These are the best next steps if work continues:
    - `review_bundle_stage_20260419_211551/`
    - `review_bundle_20260419_211551_final_competition_review.zip`
    - this version adds `PROJECT_CONTEXT.md`, so another AI sees the project background, target, and scope constraints before judging the current state
-3. Treat `G3` as closed for the current warm-state judged-demo path; do not reopen Q2 or G3 as default blockers unless new evidence appears
+3. Treat `G3` as closed for the current strict fresh-upload judged-demo path; do not reopen Q2 or G3 as default blockers unless the final environment changes or new contrary evidence appears
 4. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
 5. Finalize judged-demo materials and spoken defense wording before doing any new feature work
 

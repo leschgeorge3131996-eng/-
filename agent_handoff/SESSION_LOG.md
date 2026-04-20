@@ -13,6 +13,43 @@ Entry format:
 - Recommended next step:
 ```
 
+## 2026-04-20 / Codex (strict G3 evidence closeout)
+
+- Summary:
+  - Added a formal strict-run experiment note at `evidence/experiments/20260420_g3_strict_rehearsal.md`
+  - Treated the final three fresh-upload success passes in `data/logs/call_logs.jsonl` as the authoritative strict batch
+  - Recorded request ids, `UTC+08` run spans, `declared` answerable status, `retrieval_no_match` refusal status, and no-fallback result
+  - Rewrote the core judge-facing proof pages so the strongest current wording is now strict `G3`, not warm-state-only rehearsal
+  - Updated shared handoff docs so Claude / future operators do not inherit the older `G3` state by mistake
+- Files touched:
+  - `evidence/experiments/20260420_g3_strict_rehearsal.md`
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/PLATFORM_USAGE_EVIDENCE.md`
+  - `evidence/materials/QA_BRIEF.md`
+  - `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+  - `evidence/materials/SUBMISSION_SPEC_CROSSWALK.md`
+  - `evidence/materials/MATERIALS_INDEX.md`
+  - `evidence/materials/GOLD_SAMPLE_RUNBOOK.md`
+  - `WORKLOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - manually cross-checked the authoritative strict batch against `data/logs/call_logs.jsonl`
+  - strict authoritative request ids:
+    - run 1: `1f959e23693e4e32acf49b460009ccd7` / `9bcd0f09b2bd407192ac8461c3a7423c` / `d44bfdfa4cdf4aec9adc90322ec942c4`
+    - run 2: `77cb7a1a6865446fa66df8d2f01dfc0c` / `808e42258ae545f9a1f0f2a33ef44549` / `04220964210d408596541371a6685ff1`
+    - run 3: `5363a0edc7074ef082148f84d6bda839` / `605fd2f0feae45c193379aba6a02723a` / `8ec726ccfb5c413ba62bb5e6599373d6`
+  - log-backed spans:
+    - `13.5s`
+    - `12.9s`
+    - `15.8s`
+- Open risks:
+  - final official `3`-page PPT and `5`-minute video are still not produced
+  - if the final demo environment changes, screenshots may need one last refresh
+- Recommended next step:
+  - freeze the strict `G3` wording and move straight into final judged asset production
+
 ## 2026-04-19 / Codex (final materials + review sweep)
 
 - Summary:

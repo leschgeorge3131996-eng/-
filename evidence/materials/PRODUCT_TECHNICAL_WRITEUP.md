@@ -129,10 +129,12 @@
 
 ### 6.4 judged-demo rehearsal
 
-来源：`evidence/experiments/20260419_g3_rehearsal_template.md`
+来源：`evidence/experiments/20260420_g3_strict_rehearsal.md`
 
-- 已有 `3` 次连续 warm-state self-rehearsal 记录
-- 可作为 judged-demo 预演证据；严格版 `G3` 仍待补录
+- 已有 `3` 次连续 strict fresh-upload 记录
+- 两次 answerable 全部保持 `declared`
+- refusal 全部保持 `retrieval_no_match`
+- 可作为当前更强的 judged-demo reproducibility evidence
 
 ### 6.5 judge-facing 截图集
 
@@ -157,7 +159,7 @@
 1. 当前最强、最适合比赛主展示的能力是 `ask`，不是 `summary / outline`
 2. `summary / outline` 已支持，但 grounding 语义弱于 `ask`
 3. 当前 judged-demo 最强证据是锁定 gold-sample 路径，不是开放域产品泛化证明
-4. 当前 `G3` 仍是 warm-state operator rehearsal，不应过度包装成更强结论
+4. 当前 `G3` 最强记录已升级为 strict three-run batch，但仍不应包装成开放域泛化证明
 
 ## 9. 当前提交物结构
 
@@ -176,14 +178,14 @@
 - `gold_sample_qa_compare_latest.md`
 - `gold_sample_replay_real_summary_latest.md`
 - `20260419_q2_declared_stability_check.md`
-- `20260419_g3_rehearsal_template.md`
+- `20260420_g3_strict_rehearsal.md`
 
 ## 10. 下一步收口方向
 
 后续工作不再以扩功能为主，而以“把现有能力升级为 judge-proof 证据链”为主：
 
-1. 平台使用证据正式封板
-2. 严格版 `G3` 复现
-3. 技术收益量化表
-4. `3` 页 PPT 与 `5` 分钟视频正式成片
-5. judge-facing 文案去掉试制品语气
+1. `3` 页 PPT 正式成片
+2. `5` 分钟视频正式成片
+3. 如最终演示环境变化，刷新四张核心截图
+4. 导出最终 competition asset pack
+5. 保持 judge-facing 文案与 strict `G3` 口径一致
