@@ -202,6 +202,26 @@ Operator rehearsal result:
 
 ## 2026-04-21 Quantitative Evaluation Metrics
 
+## 2026-04-21 Frontend UX Polish
+
+- Evidence confidence bar added to ask results:
+  - three-dot signal indicator: green (declared) / orange (candidate) / red (none)
+  - shows citation count and quote count inline
+  - file: `frontend/src/components/ResultPanel.tsx`
+- Citation card is now fully clickable for PDF jump:
+  - entire card wraps a button when PDF preview is available
+  - hover shows "→ 跳转 PDF" hint via existing `.citation-button::after`
+- Refusal result now renders a dedicated card instead of plain warning text:
+  - red-bordered card with "检索无命中，拒绝回答" heading
+  - explains retrieval-gate interception without model call
+  - `data-testid="refusal-card"` for test targeting
+- Drag-and-drop upload zone replaces plain file input:
+  - dashed border highlights on drag-over
+  - click still opens file picker
+  - shows selected filename or placeholder hint
+- Hero button ("填充示例文档") now pulses like the submit button
+- All 7 frontend smoke tests still pass; build clean
+
 - A new evaluation script now exists:
   - `scripts/compute_eval_metrics.py`
 - It reads the `9` strict G3 request entries from `data/logs/call_logs.jsonl` and computes `8` quantitative metrics

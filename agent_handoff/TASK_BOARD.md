@@ -28,6 +28,7 @@
 - Old `6`-slide / `2`-minute assets have now been demoted from primary-entry status in the highest-visibility material docs
 - Final submission and defense-risk control sheets now exist in-repo
 - Quantitative evaluation metrics now exist: `evidence/reports/quantitative_eval_metrics.md` with `8` metrics computed from strict G3 logs; key numbers written into `HARD_EVIDENCE_SUMMARY.md` and `SCORING_EVIDENCE_MATRIX.md`
+- Frontend UX polish landed: confidence bar, clickable citation cards, refusal card, drag-and-drop upload, hero-button pulse
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

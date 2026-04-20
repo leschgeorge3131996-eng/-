@@ -2,6 +2,33 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-21 / Claude Code (frontend UX polish)
+
+- Summary:
+  - Added evidence confidence bar (three-dot signal + citation count) to ask results
+  - Made citation cards fully clickable for PDF jump
+  - Added dedicated refusal card replacing plain warning text
+  - Added drag-and-drop upload zone with visual feedback
+  - Added pulse animation to hero button ("填充示例文档")
+- Files touched:
+  - `frontend/src/components/ResultPanel.tsx`
+  - `frontend/src/App.tsx`
+  - `frontend/src/styles.css`
+  - `agent_handoff/PROJECT_HANDOFF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm run build` passed
+  - `npm test -- --run`: 7 passed
+  - `git push origin master` done
+- Estimated score impact: +3 产品能力, +3 技术能力 (78-88 / 100)
+- Open risks:
+  - final native PPT still not produced
+  - final 5-minute video still not produced
+  -彩排 not yet done
+- Recommended next step:
+  - 组员完成 PPT/视频后做完整彩排，对照 QA_BRIEF.md 和 DEFENSE_DEMO_RISK_CHECKLIST.md
+
 ## 2026-04-21 / Claude Code (quantitative evaluation metrics)
 
 - Summary:
