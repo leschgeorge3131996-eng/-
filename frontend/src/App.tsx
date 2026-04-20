@@ -342,6 +342,7 @@ export default function App() {
   const [statsExpanded, setStatsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hadStoredSessionRef = useRef(Boolean(readStoredSession()));
+  const [dragOver, setDragOver] = useState(false);
 
   const isAuthenticated = Boolean(session);
   const currentOption = TASK_OPTIONS.find((item) => item.value === taskType)!;
@@ -962,12 +963,44 @@ export default function App() {
                 <form className="form" onSubmit={handleSubmit}>
               <label className="field">
                 <span>上传文档</span>
+                <div
+                  className={`drop-zone${dragOver ? " drop-zone-active" : ""}${loading ? " drop-zone-disabled" : ""}`}
+                  onDragOver={(e) => { e.preventDefault(); if (!loading) setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    if (loading) return;
+                    const file = e.dataTransfer.files?.[0] ?? null;
+                    if (!file) return;
+                    setSelectedFile(file);
+                    setUploadedMetadata(null);
+                    setResult(null);
+                    setError(null);
+                    setNotice(null);
+                    setPreviewOpen(false);
+                    setPreviewPage(1);
+                    setPreviewPages([1]);
+                    setPreviewSnippet(null);
+                    setPreviewSnippetPage(null);
+                    setPreviewBboxes([]);
+                  }}
+                  onClick={() => !loading && fileInputRef.current?.click()}
+                >
+                  <span className="drop-zone-label">
+                    {selectedFile
+                      ? selectedFile.name
+                      : "拖拽文件到此处，或点击选择"}
+                  </span>
+                  <span className="drop-zone-hint">支持 PDF、TXT、Markdown</span>
+                </div>
                 <input
                   data-testid="file-input"
                   ref={fileInputRef}
                   type="file"
                   accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
                   disabled={loading}
+                  style={{ display: "none" }}
                   onChange={(event) => {
                     const file = event.target.files?.[0] ?? null;
                     setSelectedFile(file);
