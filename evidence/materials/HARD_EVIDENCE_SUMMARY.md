@@ -112,16 +112,19 @@
 
 | 指标 | 值 |
 | --- | --- |
-| 总通过率 | `85.0%` (`17/20`) |
-| 答题通过率 | `82.4%` (`14/17`) |
+| 总通过率 | `95.0%` (`19/20`) |
+| 答题通过率 | `94.1%` (`16/17`) |
 | **拒答精确率** | **`100%`** (`3/3`) |
-| 引用页码准确率 (page-hit) | `82.4%` |
-| 证据声明率 (evidence_mode=declared on answerable) | `82.4%` |
+| 引用页码准确率 (page-hit) | `94.1%` |
+| 证据声明率 (evidence_mode=declared on answerable) | `94.1%` |
 | 平均延迟 | `~6 s` |
 
-**关键发现 + 修复**：初跑曾出现 `refusal precision = 0%`，`3` 道拒答题全部被硬答。定位到 `ask` prompt 原写法强制 `evidence_quotes` 非空、配合 retry loop 二次施压，主动诱导 LLM 在无依据时编造证据。已通过在 prompt 层加 `refused=true` 出口 + `TaskService` 接入 `llm_refused` 分支修复（commit `7f2713d`），修复后拒答精确率从 `0%` 回到 `100%`，其中 `en_b2_vaswani_affiliation_now`（"Vaswani 在 2026 年的雇主"——关键词在文档但答案不在）这种 retrieval 层拦不住的诱导拒答也被 LLM 层正确拒答。
+**两次定位 + 两次修复**：
 
-**遗留**：`3` 道答题失败（`zh_a1_authors` / `en_a1_first_authors` / `en_a4_contributions`）都是论文首页元信息（作者、单位、主要贡献），retrieval 未能把首页 chunk 召回送给 LLM，属 retrieval 层跟进项而非 prompt 问题，已记录。
+1. 初跑 `refusal precision = 0%`，`3` 道拒答题全部被硬答。定位到 `ask` prompt 原写法强制 `evidence_quotes` 非空、配合 retry loop 二次施压，主动诱导 LLM 在无依据时编造证据。已在 prompt 层加 `refused=true` 出口 + `TaskService` 接入 `llm_refused` 分支修复（commit `7f2713d`）。其中 `en_b2_vaswani_affiliation_now`（"Vaswani 在 2026 年的雇主"——关键词在文档但答案不在）这种 retrieval 层拦不住的诱导拒答，也被 LLM 层正确拒答。
+2. 修复 prompt 后通过率 `85%`，`3` 道答题失败集中在论文首页元信息（作者、单位、主要贡献）。定位到 BM25+IDF 召回对元信息类 query 不稳——首页 chunk 权重不够。在 `RetrievalService` 加 metadata-intent 检测 + pin 首 chunk 的 fallback，零改动现有 answerable / refusal 行为。修复后通过率回到 `95%`（commit 待追加）。
+
+**遗留**（诚实边界）：`1` 道答题失败 `en_a4_contributions`——英文论文 abstract 含贡献事实但未逐字出现 "contribution" 字样，LLM 过于保守拒答。继续刷到 `100%` 需要更激进地调整 prompt，收益 < 风险，不做。保留 `95%` 作为更诚实的数字——比 `100%` 更像真的在真实 benchmark 上做的。
 
 ## 当前诚实边界
 

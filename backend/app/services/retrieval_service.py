@@ -54,6 +54,32 @@ class RetrievalService:
         "结论": ["conclusion"],
     }
 
+    metadata_intent_terms = (
+        "作者",
+        "第一作者",
+        "通讯作者",
+        "单位",
+        "高校",
+        "学校",
+        "机构",
+        "来自",
+        "贡献",
+        "主要贡献",
+        "标题",
+        "题目",
+        "摘要",
+        "author",
+        "authors",
+        "affiliation",
+        "affiliations",
+        "institution",
+        "university",
+        "contribution",
+        "contributions",
+        "title",
+        "abstract",
+    )
+
     def __init__(
         self,
         *,
@@ -117,6 +143,12 @@ class RetrievalService:
             selected.append(chunk)
             current_chars += chunk.char_count
 
+        if self._has_metadata_intent(query) and chunked_document.chunks:
+            head_chunk = chunked_document.chunks[0]
+            selected_ids = {chunk.chunk_id for chunk in selected}
+            if head_chunk.chunk_id not in selected_ids:
+                selected.append(head_chunk)
+
         return RetrievalResult(
             chunks=selected,
             top_score=top_score,
@@ -124,6 +156,10 @@ class RetrievalService:
             term_coverage=term_coverage,
             confident=confident,
         )
+
+    def _has_metadata_intent(self, query: str) -> bool:
+        lowered = query.lower()
+        return any(term in lowered for term in self.metadata_intent_terms)
 
     def build_context(self, query: str, chunked_document: ChunkedDocument) -> tuple[list[ParsedChunk], str]:
         selected = self.retrieve(query, chunked_document)
