@@ -2,6 +2,28 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-22 / Claude Code (external review bundle refresh + refusal-card copy fix)
+
+- Summary:
+  - Refreshed the external-AI review bundle so the top-level brief matches the 2026-04-21 runtime state. `PROJECT_CONTEXT.md` / `REVIEW_PROMPT.md` / `REVIEW_BUNDLE_INDEX.md` now disclose the 51-case extended eval (46/51 pass, refusal precision 100%, citation accuracy 88.4%), the strict-G3 quantitative metrics (4 rates at 100%, avg latency 5521 ms), the LLM-layer `refused` escape + `llm_refused` branch, the metadata-intent retrieval fallback, the `predeploy_sanity.py` pre-demo gate, and the frontend UX polish. `scripts/export_review_bundle.ps1` now pulls in the 2026-04-21 artifacts (`quantitative_eval_metrics.md`, `extended_eval_v1_latest.*`, `gold_regression_b6547cc_*`, `EXTENDED_EVAL_V1*`, `EXTENDED_EVAL_SCOPE.md`, 3 new sample docs + `README.md`, `predeploy_sanity.py`, `compute_eval_metrics.py`, `gold_retrieval_regression.py`, `agent_handoff/README.md`) and the generated `BUNDLE_MANIFEST.md` carries a 2026-04-21 snapshot block. Generated `review_bundle_20260422_005142_final_competition_review.zip` (~10 MB) for upload to web-based AI reviewers
+  - External reviewer flagged a high-severity UI copy bug: the refusal card in `ResultPanel.tsx` hard-coded "检索无命中，拒绝回答 / 已在检索阶段拦截，未调用模型生成" even when `route_reason === "llm_refused"` (retrieval did hit, and the model was called and self-refused). Under live judging, a "document-relevant but no direct evidence" probe would have contradicted the backend logs in `call_logs.jsonl`. Fixed by branching the refusal title + reason text on `route_reason`: `llm_refused` now shows "模型判定无直接依据，拒绝回答 / 系统检索到相关片段，但模型判断证据不足以直接支撑回答，主动拒答以避免杜撰。" `retrieval_no_match` keeps the original copy. Also added `data-route-reason` attribute on the card for future test targeting
+- Files touched:
+  - `PROJECT_CONTEXT.md`
+  - `REVIEW_PROMPT.md`
+  - `REVIEW_BUNDLE_INDEX.md`
+  - `scripts/export_review_bundle.ps1`
+  - `frontend/src/components/ResultPanel.tsx`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - review bundle export: `review_bundle_stage_20260422_005142/` + `review_bundle_20260422_005142_final_competition_review.zip` (≈10 MB); `BUNDLE_MANIFEST.md` contains 2026-04-21 snapshot block and lists all new artifacts
+  - frontend: `npm test -- --run` 7/7 passed; `npm run build` clean (tsc + vite, 2.70s)
+  - backend: unchanged, no need to re-run
+- Open risks:
+  - final 3-page native PPT and 5-minute video still teammate TODO
+  - 彩排 on target judging env still pending (fast-path `predeploy_sanity.py` + manual-path `GOLD_SAMPLE_RUNBOOK.md`)
+- Recommended next step:
+  - Push to GitHub after user confirms (2 commits: bundle refresh, then refusal-copy fix)
+
 ## 2026-04-21 / Claude Code (extended eval 3 → 20 → 51, hardened refusal + metadata retrieval)
 
 - Summary:

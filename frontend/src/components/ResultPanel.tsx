@@ -595,6 +595,7 @@ export default function ResultPanel({
               <motion.div
                 className="refusal-card"
                 data-testid="refusal-card"
+                data-route-reason={result.route_reason ?? "unknown"}
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
@@ -603,10 +604,16 @@ export default function ResultPanel({
                   <span /><span /><span />
                 </div>
                 <div className="refusal-body">
-                  <strong>检索无命中，拒绝回答</strong>
+                  <strong>
+                    {result.route_reason === "llm_refused"
+                      ? "模型判定无直接依据，拒绝回答"
+                      : "检索无命中，拒绝回答"}
+                  </strong>
                   <p>{result.result}</p>
                   <span className="refusal-reason">
-                    系统在文档中未找到与该问题相关的片段，已在检索阶段拦截，未调用模型生成。
+                    {result.route_reason === "llm_refused"
+                      ? "系统检索到相关片段，但模型判断证据不足以直接支撑回答，主动拒答以避免杜撰。"
+                      : "系统在文档中未找到与该问题相关的片段，已在检索阶段拦截，未调用模型生成。"}
                   </span>
                 </div>
               </motion.div>
