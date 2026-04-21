@@ -110,7 +110,12 @@ class TaskService:
             context_strategy = planned_context.strategy
             selected_chunks = planned_context.selected_chunks
             if task_type == "ask":
-                retrieval_status = "matched" if selected_chunks else "no_match"
+                if not selected_chunks:
+                    retrieval_status = "no_match"
+                elif not planned_context.retrieval_confident:
+                    retrieval_status = "low_confidence"
+                else:
+                    retrieval_status = "matched"
             elif selected_chunks:
                 retrieval_status = "coverage"
             if selected_chunks:
@@ -133,7 +138,7 @@ class TaskService:
             if task_type == "ask" and selected_chunks:
                 retrieval_applied = True
 
-            if task_type == "ask" and not selected_chunks:
+            if task_type == "ask" and (not selected_chunks or not planned_context.retrieval_confident):
                 latency_ms = int((perf_counter() - started_timer) * 1000)
                 refusal_text = "未在文档中检索到足够依据来回答这个问题。请换一个更贴近文档内容的问题，或上传更相关的文档。"
                 route_tier = "none"

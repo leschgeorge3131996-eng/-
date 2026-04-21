@@ -1,8 +1,19 @@
 from __future__ import annotations
 
+import math
 import re
+from dataclasses import dataclass, field
 
 from ..schemas.document import ChunkedDocument, ParsedChunk
+
+
+@dataclass(slots=True)
+class RetrievalResult:
+    chunks: list[ParsedChunk] = field(default_factory=list)
+    top_score: float = 0.0
+    second_score: float = 0.0
+    term_coverage: float = 0.0
+    confident: bool = True
 
 
 class RetrievalService:
@@ -55,14 +66,20 @@ class RetrievalService:
         self.min_score = min_score
 
     def retrieve(self, query: str, chunked_document: ChunkedDocument) -> list[ParsedChunk]:
+        result = self.retrieve_with_confidence(query, chunked_document)
+        return result.chunks
+
+    def retrieve_with_confidence(self, query: str, chunked_document: ChunkedDocument) -> RetrievalResult:
+        idf = self._build_idf(query, chunked_document)
+
         scored: list[tuple[float, ParsedChunk]] = []
         for chunk in chunked_document.chunks:
-            score = self._score_chunk(query, chunk.text)
+            score = self._score_chunk(query, chunk.text, idf)
             if score >= self.min_score:
                 scored.append((score, chunk))
 
         if not scored:
-            return []
+            return RetrievalResult(confident=False)
 
         scored.sort(
             key=lambda item: (
@@ -71,6 +88,23 @@ class RetrievalService:
                 -item[1].char_count,
             )
         )
+
+        top_score = scored[0][0]
+        second_score = scored[1][0] if len(scored) > 1 else 0.0
+
+        normalized_query = self._normalize_query(query)
+        query_terms = self._dedupe_terms(
+            self._extract_terms(normalized_query) + self._extract_terms(query.lower())
+        )
+        if query_terms:
+            best_text = scored[0][1].text.lower()
+            matched_terms = sum(1 for t in query_terms if t in best_text)
+            term_coverage = matched_terms / len(query_terms)
+        else:
+            term_coverage = 0.0
+
+        confident = top_score >= 2.0 or (top_score >= 1.5 and term_coverage >= 0.3)
+
         selected: list[ParsedChunk] = []
         current_chars = 0
         for _, chunk in scored:
@@ -82,7 +116,14 @@ class RetrievalService:
                 continue
             selected.append(chunk)
             current_chars += chunk.char_count
-        return selected
+
+        return RetrievalResult(
+            chunks=selected,
+            top_score=top_score,
+            second_score=second_score,
+            term_coverage=term_coverage,
+            confident=confident,
+        )
 
     def build_context(self, query: str, chunked_document: ChunkedDocument) -> tuple[list[ParsedChunk], str]:
         selected = self.retrieve(query, chunked_document)
@@ -92,7 +133,7 @@ class RetrievalService:
         )
         return selected, context
 
-    def _score_chunk(self, query: str, text: str) -> float:
+    def _score_chunk(self, query: str, text: str, idf: dict[str, float]) -> float:
         normalized_text = text.lower()
         normalized_query = self._normalize_query(query)
         score = 0.0
@@ -108,12 +149,38 @@ class RetrievalService:
         length_norm = max(1.0, len(text) / 600)
         for term in terms:
             if term in normalized_text:
-                if term in {"recurrent", "convolutional", "rnn", "cnn", "architecture", "method", "results", "background", "conclusion"}:
-                    weight = 4.0
-                else:
-                    weight = 2.0 if len(term) >= 3 else 1.0
+                base_weight = 2.0 if len(term) >= 3 else 1.0
+                term_idf = idf.get(term, 1.0)
+                weight = base_weight * term_idf
                 score += (normalized_text.count(term) * weight) / length_norm
         return score
+
+    def _build_idf(self, query: str, chunked_document: ChunkedDocument) -> dict[str, float]:
+        normalized_query = self._normalize_query(query)
+        normalized_terms = self._extract_terms(normalized_query)
+        raw_terms = self._extract_terms(query.lower())
+        terms = self._dedupe_terms(normalized_terms + raw_terms)
+        if not terms:
+            return {}
+
+        n = len(chunked_document.chunks)
+        if n == 0:
+            return {}
+
+        df: dict[str, int] = {term: 0 for term in terms}
+        for chunk in chunked_document.chunks:
+            lowered = chunk.text.lower()
+            for term in terms:
+                if term in lowered:
+                    df[term] += 1
+
+        idf: dict[str, float] = {}
+        for term, count in df.items():
+            if count == 0:
+                idf[term] = 1.0
+            else:
+                idf[term] = max(0.5, math.log(n / count) + 1.0)
+        return idf
 
     def _normalize_query(self, query: str) -> str:
         return " ".join(self._query_tokens(query))

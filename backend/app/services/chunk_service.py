@@ -19,10 +19,12 @@ class ChunkService:
         target_chunk_chars: int = 900,
         min_chunk_chars: int = 250,
         long_text_step: int = 700,
+        overlap_chars: int = 100,
     ) -> None:
         self.target_chunk_chars = target_chunk_chars
         self.min_chunk_chars = min_chunk_chars
         self.long_text_step = long_text_step
+        self.overlap_chars = overlap_chars
 
     def build_chunks(self, parsed_document: ParsedDocument) -> ChunkedDocument:
         chunks: list[ParsedChunk] = []
@@ -34,6 +36,7 @@ class ChunkService:
                 chunks.extend(self._chunk_from_text(page))
 
         chunks = self._merge_small_chunks(chunks)
+        chunks = self._add_overlap(chunks)
         chunks = [
             chunk.model_copy(
                 update={
@@ -168,6 +171,29 @@ class ChunkService:
             else:
                 merged.append(chunk)
         return merged
+
+    def _add_overlap(self, chunks: list[ParsedChunk]) -> list[ParsedChunk]:
+        if self.overlap_chars <= 0 or len(chunks) < 2:
+            return chunks
+
+        result: list[ParsedChunk] = [chunks[0]]
+        for i in range(1, len(chunks)):
+            prev_text = chunks[i - 1].text
+            tail = prev_text[-self.overlap_chars:]
+            newline_pos = tail.find("\n")
+            if newline_pos >= 0:
+                tail = tail[newline_pos + 1:]
+            if not tail.strip():
+                result.append(chunks[i])
+                continue
+            merged_text = f"{tail.strip()}\n\n{chunks[i].text}"
+            page_numbers = sorted(
+                set(chunks[i - 1].page_numbers) | set(chunks[i].page_numbers)
+            ) if chunks[i - 1].page_numbers != chunks[i].page_numbers else chunks[i].page_numbers
+            result.append(
+                self._make_chunk(merged_text, page_numbers, list(chunks[i].bbox_regions))
+            )
+        return result
 
     def _make_chunk(
         self,

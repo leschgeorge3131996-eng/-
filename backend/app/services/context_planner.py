@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from ..schemas.document import ChunkedDocument, ParsedChunk
 from ..schemas.task import TaskType
-from .retrieval_service import RetrievalService
+from .retrieval_service import RetrievalResult, RetrievalService
 
 
 @dataclass(slots=True)
@@ -13,6 +13,7 @@ class PlannedContext:
     strategy: str
     document_text: str
     selected_chunks: list[ParsedChunk]
+    retrieval_confident: bool = True
 
 
 class ContextPlannerService:
@@ -49,17 +50,23 @@ class ContextPlannerService:
         raw_text: str,
         chunked_document: ChunkedDocument,
     ) -> PlannedContext:
-        selected_chunks, retrieval_context = self.retrieval_service.build_context(query, chunked_document)
-        if not selected_chunks:
+        result = self.retrieval_service.retrieve_with_confidence(query, chunked_document)
+        if not result.chunks:
             return PlannedContext(
                 strategy="no_match",
                 document_text="",
                 selected_chunks=[],
+                retrieval_confident=False,
             )
+        context = "\n\n".join(
+            f"【Chunk {chunk.chunk_id} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
+            for chunk in result.chunks
+        )
         return PlannedContext(
             strategy="retrieval_topk",
-            document_text=retrieval_context,
-            selected_chunks=selected_chunks,
+            document_text=context,
+            selected_chunks=result.chunks,
+            retrieval_confident=result.confident,
         )
 
     def _plan_for_summary(
