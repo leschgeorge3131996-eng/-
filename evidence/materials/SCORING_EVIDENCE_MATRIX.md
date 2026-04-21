@@ -19,7 +19,7 @@
 | --- | --- | --- | --- |
 | 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、真实 request id 与截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹，并保留了模型、请求记录、截图和 replay 证据。 |
 | 产品能力 `40` | 作品是否围绕清晰场景解决真实问题，是否有稳定、可理解的用户价值 | `PROJECT_ONE_PAGER.md`、`PRODUCT_TECHNICAL_WRITEUP.md`、最终 `3` 页 PPT / `5` 分钟视频、四张核心截图 | 我们解决的是“论文/报告阅读时能答、还能回到证据”的问题，不是泛化聊天。 |
-| 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |
+| 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md`、`evidence/reports/extended_eval_v1_latest.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |
 | 现场演示 / 答辩 | 是否能稳、能复现、能扛追问 | `GOLD_SAMPLE_RUNBOOK.md`、`QA_BRIEF.md`、`HARD_EVIDENCE_SUMMARY.md`、最终截图集、最终 `3` 页 PPT / `5` 分钟视频 | 演示不现场 improvisation，只走锁定样例、锁定问题和预定备用路径；追问时按证据页和 runbook 回答。 |
 
 ## 平台使用：评委追问点
@@ -83,8 +83,10 @@
 1. 页级结构化解析保留 `block / line / bbox`
 2. `ask` 先检索再作答，并返回 citation 与 evidence quotes
 3. citation 可回到 PDF 原页做高亮与旁证展示
-4. 检索无命中时显式拒答，而不是编造
-5. 量化指标：证据声明率 `100%`、引用准确率 `100%`、拒答精确率 `100%`、跨轮一致性 `100%`（strict G3 三轮 fresh-upload 评测，详见 `quantitative_eval_metrics.md`）
+4. 检索无命中时显式拒答；关键词命中但无真实依据时 LLM 层二次拒答
+5. 量化指标（双层样本量披露）：
+   - **锁定 `3` 题 strict G3**：证据声明率 `100%`、引用准确率 `100%`、拒答精确率 `100%`、跨轮一致性 `100%`（详见 `quantitative_eval_metrics.md`）
+   - **扩展 `20` 题 seed**：总通过率 `85.0%`、拒答精确率 `100%`、引用页码准确率 `82.4%`、证据声明率 `82.4%`（详见 `extended_eval_v1_latest.md`、范围见 `EXTENDED_EVAL_SCOPE.md`）
 
 ### 追问 2：你们怎么证明不是只会演示一题？
 
@@ -93,12 +95,12 @@
 - `evidence/reports/gold_sample_qa_compare_latest.md`
 - `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - `evidence/experiments/20260419_q2_declared_stability_check.md`
+- `evidence/reports/extended_eval_v1_latest.md`（`20` 题扩展评测，涵盖中英双语论文 × A1-A5 答题 + B1-B2 拒答）
 
 答法：
 
-- 当前最强 judge-facing 证据是锁定题组。
-- 其中不仅有 `2 answerable + 1 refusal`，还有对数值题的单独 fresh rerun。
-- 我们不会把 broader replay 伪装成主证据，但会把它作为次级覆盖说明。
+- 锁定 `3` 题是 judged-demo path 的最强可复现证据；为了回答"`3` 题 `100%` 是不是小样本幻觉"，我们另外跑了 `20` 题扩展评测，总通过率 `85.0%`、拒答精确率 `100%`、引用准确率 `82.4%`。
+- 扩展评测同时暴露了 LLM-layer 的一个真实问题（诱导拒答场景下曾出现 prompt 强制编证据），我们定位并修复了它（commit `7f2713d`），修复后拒答精确率从 `0%` 回到 `100%`。这也是"有实验 + 会复盘 + 会修"的具体佐证。
 
 ## 现场演示与答辩：评委追问点
 
