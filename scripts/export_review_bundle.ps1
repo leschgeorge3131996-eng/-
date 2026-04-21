@@ -69,6 +69,7 @@ $requiredFiles = @(
     "agent_handoff\CURRENT_STATUS_20260418.md",
     "agent_handoff\FREEZE_FACT_SHEET_20260419.md",
     "agent_handoff\PROJECT_HANDOFF.md",
+    "agent_handoff\README.md",
     "agent_handoff\SESSION_LOG.md",
     "agent_handoff\TASK_BOARD.md",
     "docs\DEPLOY_RENDER.md",
@@ -99,6 +100,9 @@ $requiredFiles = @(
     "evidence\materials\SAMPLE_MANIFEST.json",
     "evidence\materials\SAMPLE_SET.md",
     "evidence\materials\STRICT_G3_EXECUTION_PLAN.md",
+    "evidence\materials\EXTENDED_EVAL_V1.json",
+    "evidence\materials\EXTENDED_EVAL_V1_REFUSAL_ONLY.json",
+    "evidence\materials\EXTENDED_EVAL_SCOPE.md",
     "evidence\experiments\20260418_gold_sample_validation.md",
     "evidence\experiments\20260419_q2_declared_stability_check.md",
     "evidence\experiments\20260419_g3_rehearsal_template.md",
@@ -106,6 +110,11 @@ $requiredFiles = @(
     "evidence\reports\gold_sample_replay_real_summary_latest.md",
     "evidence\reports\gold_sample_replay_real_latest.md",
     "evidence\reports\gold_sample_qa_compare_latest.md",
+    "evidence\reports\quantitative_eval_metrics.md",
+    "evidence\reports\extended_eval_v1_latest.md",
+    "evidence\reports\extended_eval_v1_latest.json",
+    "evidence\reports\gold_regression_b6547cc_latest.md",
+    "evidence\reports\gold_regression_b6547cc_summary_latest.md",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_ask_research_focus.json",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_pdf_render.png",
@@ -115,6 +124,10 @@ $requiredFiles = @(
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.png",
     "evidence\screenshots\${latestScreenshotPrefix}_gold_refusal.json",
     "evidence\samples\chinese_llm_spatial_eval.pdf",
+    "evidence\samples\attention_is_all_you_need.pdf",
+    "evidence\samples\paper_report.md",
+    "evidence\samples\research_brief.md",
+    "evidence\samples\README.md",
     "deliverables\competition_kit\README.md",
     "deliverables\competition_kit\deck_3page_final.html",
     "deliverables\competition_kit\deck.html",
@@ -169,7 +182,10 @@ $requiredFiles = @(
     "scripts\run_real_replay.ps1",
     "scripts\export_competition_asset_pack.ps1",
     "scripts\export_competition_pdfs.js",
-    "scripts\export_review_bundle.ps1"
+    "scripts\export_review_bundle.ps1",
+    "scripts\compute_eval_metrics.py",
+    "scripts\predeploy_sanity.py",
+    "scripts\gold_retrieval_regression.py"
 )
 
 $optionalFiles = @(
@@ -277,21 +293,39 @@ state:
 - submission material readiness
 - remaining last-mile risks
 
-## Current Snapshot
+## Current Snapshot (2026-04-21)
 
 - Runtime provider: `Wuwen Xinqiong`
 - Primary QA model: `qwen3-235b-a22b-instruct-2507`
 - Validated fallback: `qwen3-32b`
-- Locked sample: `evidence/samples/chinese_llm_spatial_eval.pdf`
+- Locked gold-sample document: `evidence/samples/chinese_llm_spatial_eval.pdf`
+- Extended eval corpus (4 documents):
+  - `evidence/samples/chinese_llm_spatial_eval.pdf`
+  - `evidence/samples/attention_is_all_you_need.pdf`
+  - `evidence/samples/paper_report.md`
+  - `evidence/samples/research_brief.md`
 - Strongest judged path: `upload -> ask -> citation -> PDF -> refusal`
 - Strict `G3` status: fresh-upload `3 / 3` recorded in
   `evidence/experiments/20260420_g3_strict_rehearsal.md`
+- Quantitative evaluation (2026-04-21):
+  - strict G3 (`9` entries): 4 rates at `100%`, avg latency `5521 ms`
+    - report: `evidence/reports/quantitative_eval_metrics.md`
+  - extended v1 (`51` cases): `46 / 51` pass (`90.2%`), refusal
+    precision `100%`, citation accuracy `88.4%`
+    - report: `evidence/reports/extended_eval_v1_latest.md`
+- Late-stage hardening (2026-04-21):
+  - LLM-layer `refused` escape in ask prompt + `llm_refused` branch
+  - metadata-intent retrieval fallback (first-chunk pin)
+  - `scripts/predeploy_sanity.py` wired as pre-demo must-pass
+  - frontend UX polish: confidence bar / clickable citations / refusal card /
+    drag-drop upload
 - Repo-native final asset baselines now exist:
   - `deliverables/competition_kit/deck_3page_final.pdf`
   - `deliverables/competition_kit/video_subtitles_5min_final.srt`
 - Remaining default open work:
-  - final native `PPT`
-  - final edited `5`-minute video
+  - final native `PPT` (teammate task)
+  - final edited `5`-minute video (teammate task)
+  - full rehearsal on target judging environment
   - screenshot refresh only if target environment changes
 
 ## Included Files
