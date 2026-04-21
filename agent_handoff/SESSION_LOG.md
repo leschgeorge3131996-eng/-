@@ -2,6 +2,28 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-21 / Claude Code (b6547cc gold-sample regression)
+
+- Summary:
+  - Added offline retrieval regression script `scripts/gold_retrieval_regression.py` to validate ChunkService + RetrievalService against the locked gold prompts without any API cost
+  - Ran end-to-end real-API replay of the gold sample set on current HEAD (b6547cc preprocessing strengthening: IDF + chunk overlap + multi-factor refusal)
+  - Confirmed no regression: both answerable prompts returned `declared` evidence with citations; refusal prompt hit `retrieval_no_match` in 9 ms at the retrieval gate
+  - Answerable latency 3371 / 4986 ms, both under the 5521 ms historical avg from `quantitative_eval_metrics`
+- Files touched:
+  - `scripts/gold_retrieval_regression.py` (new)
+  - `evidence/reports/gold_regression_b6547cc_latest.md` (new)
+  - `evidence/reports/gold_regression_b6547cc_summary_latest.md` (new)
+- Verification:
+  - backend tests: 55 passed
+  - offline retrieval regression: 3/3 gold cases pass (p2+p3 / p1 / no_match)
+  - real-API replay: 2 answered + 1 refused, all outcomes match expectation, `clear-cache` in effect so these are cold-call numbers
+  - committed `15b6e52` and pushed to GitHub
+- Open risks:
+  - final 3-page PPT and 5-minute video still to be produced by teammates
+  - 彩排 not yet done; `DEMO_MODE=true` verification on the actual demo environment still pending (deferred to rehearsal day)
+- Recommended next step:
+  - on rehearsal day: clear `data/logs/call_logs.jsonl` on the demo machine, run the gold replay once to warm cache, then start the judged flow; keep `gold_regression_b6547cc_latest.md` on hand as the "preprocessing already verified" evidence
+
 ## 2026-04-21 / Claude Code (frontend UX polish)
 
 - Summary:
