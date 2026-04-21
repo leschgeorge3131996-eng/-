@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "overall_pass_rate": 1.0,
+    "answerable_pass_rate": 0.0,
+    "refusal_precision": 1.0,
+    "citation_accuracy": 0.0,
+    "declaration_rate": 0.0,
+    "avg_latency_ms": 3920,
+    "by_category": {
+      "B1": {
+        "total": 2,
+        "passed": 2,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 4383
+      },
+      "B2": {
+        "total": 1,
+        "passed": 1,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 2993
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "total": 2,
+        "passed": 2,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 4383
+      },
+      "hard": {
+        "total": 1,
+        "passed": 1,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 2993
+      }
+    },
+    "by_doc": {
+      "chinese_llm_spatial_eval": {
+        "total": 1,
+        "passed": 1,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 3237
+      },
+      "attention_is_all_you_need": {
+        "total": 2,
+        "passed": 2,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 4261
+      }
+    }
+  },
+  "records": [
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_b1_quantum",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 3237,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b1_everest",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 5530,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b2_vaswani_affiliation_now",
+      "category": "B2",
+      "difficulty": "hard",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 2993,
+      "error": null
+    }
+  ]
+}

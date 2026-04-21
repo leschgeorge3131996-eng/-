@@ -169,10 +169,14 @@ class ModelClient:
         detail_instruction = self._detail_instruction(response_detail_level, task_type)
         if task_type == "ask":
             system_prompt = (
-                "你是文档问答助手。只能依据给定文档回答，回答要准确、结构清晰。"
-                "你必须只从给定的 Chunk 中选取你实际使用的证据块，并严格返回 JSON。"
-                "Return at least one evidence_quotes item. Each quote must be copied verbatim "
-                "from the corresponding chunk as one contiguous span."
+                "你是文档问答助手。只能依据给定文档回答。"
+                "只要给定 Chunk 中存在直接或间接支持答案的内容（含作者/单位/编号/标题等元信息，"
+                "以及可由多个 chunk 综合得出的贡献、方法、结论），就正常作答。"
+                "仅当问题超出文档范围、用常识也无法从 chunk 中找到支撑时，才返回 refused=true、"
+                "answer=\"无法从文档中找到相关依据回答此问题\"、used_chunk_ids=[]、evidence_quotes=[]。"
+                "不得猜测、不得用文档外的常识补答。"
+                "可以回答时：evidence_quotes 中每一项必须从对应 chunk 逐字拷贝一个连续片段"
+                "（不得改写、不得省略号、不得跨 chunk 拼接）。"
                 f"{detail_instruction}"
             )
             user_prompt = textwrap.dedent(
@@ -185,15 +189,18 @@ class ModelClient:
 
                 请只返回一个 JSON 对象，不要输出额外解释，格式如下：
                 {{
-                  "answer": "你的最终回答",
+                  "refused": false,
+                  "answer": "你的最终回答，或无法回答时的说明",
                   "used_chunk_ids": ["实际使用的 chunk_id"],
                   "evidence_quotes": [
                     {{
                       "chunk_id": "实际使用的 chunk_id",
-                      "quote": "required: copy one contiguous evidence span verbatim from the chunk"
+                      "quote": "逐字拷贝自该 chunk 的一个连续片段"
                     }}
                   ]
                 }}
+
+                若文档中没有依据可回答：refused=true, used_chunk_ids=[], evidence_quotes=[]。
                 """
             ).strip()
         elif task_type == "summary":

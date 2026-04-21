@@ -343,6 +343,7 @@ class TaskService:
             result_content = ""
             used_chunk_ids: list[str] = []
             evidence_quotes: list[EvidenceQuote] = []
+            llm_refused = False
             if task_type == "ask" and selected_chunks:
                 (
                     model_result,
@@ -350,6 +351,7 @@ class TaskService:
                     used_chunk_ids,
                     evidence_quotes,
                     ask_evidence_retry_count,
+                    llm_refused,
                 ) = self._call_ask_model_with_evidence_retry(
                     document_text=document_text,
                     user_input=user_input,
@@ -366,6 +368,78 @@ class TaskService:
                     response_detail_level=response_detail_level,
                 )
                 result_content = model_result.content
+
+            if task_type == "ask" and llm_refused:
+                latency_ms = int((perf_counter() - started_timer) * 1000)
+                refusal_text = (
+                    result_content
+                    or "未在文档中检索到能直接回答该问题的依据。请换一个更贴近文档内容的问题。"
+                )
+                task_result = TaskResult(
+                    request_id=request_id,
+                    task_type=task_type,
+                    file_id=file_id,
+                    document_name=metadata.original_name,
+                    document_fingerprint=metadata.document_fingerprint,
+                    model_name=model_result.model_name,
+                    route_tier=route_tier,
+                    route_model=route_model,
+                    route_reason="llm_refused",
+                    response_detail_level=response_detail_level,
+                    latency_ms=latency_ms,
+                    result=refusal_text,
+                    outcome="refused",
+                    cache_hit=False,
+                    retrieval_status=retrieval_status,
+                    retrieval_message="检索命中但模型判定文档中无直接依据，已拒答。",
+                    retrieval_applied=retrieval_applied,
+                    evidence_mode="none",
+                    retrieved_chunk_count=retrieved_chunk_count,
+                    retrieved_pages=retrieved_pages,
+                    used_chunk_ids=[],
+                    evidence_quotes=[],
+                    citations=[],
+                    candidate_chunks=candidate_chunks,
+                    source_chunks=source_chunks,
+                    source_document_chars=model_result.source_document_chars,
+                    used_document_chars=model_result.used_document_chars,
+                    truncation_message=model_result.truncation_message,
+                    context_truncated=model_result.context_truncated,
+                    token_usage=model_result.token_usage,
+                )
+                self._safe_write_log(
+                    CallLogEntry(
+                        request_id=request_id,
+                        timestamp=started_at,
+                        endpoint=endpoint,
+                        task_type=task_type,
+                        model_name=model_result.model_name,
+                        route_tier=route_tier,
+                        route_model=route_model,
+                        route_reason="llm_refused",
+                        response_detail_level=response_detail_level,
+                        file_id=file_id,
+                        success=True,
+                        outcome="refused",
+                        latency_ms=latency_ms,
+                        prompt_chars=model_result.prompt_chars,
+                        output_chars=len(refusal_text),
+                        cache_hit=False,
+                        retrieval_status=retrieval_status,
+                        retrieval_applied=retrieval_applied,
+                        retrieved_chunk_count=retrieved_chunk_count,
+                        context_truncated=model_result.context_truncated,
+                        extra={
+                            "context_strategy": context_strategy,
+                            "retrieved_pages": retrieved_pages,
+                            "evidence_mode": "none",
+                            "citation_count": 0,
+                            "ask_evidence_retry_count": ask_evidence_retry_count,
+                            "llm_refused": True,
+                        },
+                    )
+                )
+                return task_result
             if task_type == "ask" and selected_chunks:
                 if used_chunk_ids:
                     evidence_mode = "declared"
@@ -620,9 +694,9 @@ class TaskService:
         model_name_override: str | None,
         response_detail_level: ResponseDetailLevel,
         selected_chunks: list[ParsedChunk],
-    ) -> tuple[ModelResult, str, list[str], list[EvidenceQuote], int]:
+    ) -> tuple[ModelResult, str, list[str], list[EvidenceQuote], int, bool]:
         best_rank = -1
-        best_result: tuple[ModelResult, str, list[str], list[EvidenceQuote]] | None = None
+        best_result: tuple[ModelResult, str, list[str], list[EvidenceQuote], bool] | None = None
         performed_retry_count = 0
 
         for attempt in range(self.ASK_EVIDENCE_MAX_ATTEMPTS):
@@ -640,10 +714,25 @@ class TaskService:
                 model_name_override=model_name_override,
                 response_detail_level=response_detail_level,
             )
-            result_content, used_chunk_ids, evidence_quotes = self._extract_ask_evidence(
+            (
+                result_content,
+                used_chunk_ids,
+                evidence_quotes,
+                refused,
+            ) = self._extract_ask_evidence(
                 model_result.content,
                 selected_chunks,
             )
+
+            if refused:
+                return (
+                    model_result,
+                    result_content,
+                    [],
+                    [],
+                    performed_retry_count,
+                    True,
+                )
 
             rank = 0
             if used_chunk_ids:
@@ -658,6 +747,7 @@ class TaskService:
                     result_content,
                     used_chunk_ids,
                     evidence_quotes,
+                    False,
                 )
 
             if rank >= 2:
@@ -666,7 +756,15 @@ class TaskService:
         if best_result is None:
             raise RuntimeError("ask evidence retry produced no model result")
 
-        return (*best_result, performed_retry_count)
+        model_result, result_content, used_chunk_ids, evidence_quotes, refused = best_result
+        return (
+            model_result,
+            result_content,
+            used_chunk_ids,
+            evidence_quotes,
+            performed_retry_count,
+            refused,
+        )
 
     def _build_ask_evidence_retry_input(self, user_input: str | None) -> str:
         base_question = (user_input or "请基于文档回答问题。").strip()
@@ -682,10 +780,10 @@ class TaskService:
         self,
         raw_content: str,
         selected_chunks: list[ParsedChunk],
-    ) -> tuple[str, list[str], list[EvidenceQuote]]:
+    ) -> tuple[str, list[str], list[EvidenceQuote], bool]:
         payload = self._extract_json_payload(raw_content)
         if not payload:
-            return raw_content.strip(), [], []
+            return raw_content.strip(), [], [], False
 
         selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
         allowed_chunk_ids = set(selected_by_id)
@@ -700,7 +798,8 @@ class TaskService:
             used_chunk_ids,
             selected_by_id,
         )
-        return answer, used_chunk_ids, evidence_quotes
+        refused = bool(payload.get("refused"))
+        return answer, used_chunk_ids, evidence_quotes, refused
 
     def _extract_validated_quotes(
         self,
