@@ -2,6 +2,38 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-21 / Claude Code (extended eval 3 → 20 → 51, hardened refusal + metadata retrieval)
+
+- Summary:
+  - Fixed `ask` prompt-layer refusal escape: added `refused: bool` JSON field + explicit "return refused=true on out-of-scope" instruction. Wired `TaskService._call_ask_model_with_evidence_retry` to return 6-tuple with `refused` and bail out of the retry loop when LLM self-refuses. New `run_task` branch emits `outcome=refused / route_reason=llm_refused / evidence_mode=none` while preserving `retrieval_status`. This fixes a root cause where the original prompt forced `evidence_quotes` non-empty and the retry loop re-pressured the LLM into fabrication — refusal precision on the 20-seed extended eval went 0% → 100%
+  - Added metadata-intent fallback in `RetrievalService`: detects author/affiliation/contribution terms (CN+EN) and pins `chunked_document.chunks[0]` when the top-k would otherwise miss first-page metadata. Zero behavior change on existing answerable/refusal paths
+  - Wrote `scripts/predeploy_sanity.py`: one-command archive `call_logs.jsonl` + run the 3 gold cases via real TaskService + emit `predeploy_sanity_<ts>.md` report, exit 0 only on 3/3. Local dry-run 3/3 READY. Added as first pre-demo must-pass in `DEFENSE_DEMO_RISK_CHECKLIST.md`; `GOLD_SAMPLE_RUNBOOK.md` pre-demo warmup split into fast-path (this script) + manual-path (UI verification)
+  - Expanded `EXTENDED_EVAL_V1.json` from 20 → 51 cases: +15 on Chinese SPaCE paper, +10 on Transformer paper, +3 on `paper_report.md`, +3 on `research_brief.md`. First-run 82.4%, fixed 5 manifest page-range bugs (LLM cited neighboring pages that also carried the answer), re-ran to 90.2% / 46 pass. 5 remaining failures are genuine retrieval-miss on table single cells / abstract-implicit contributions / small md files — kept honest rather than prompt-tuned away
+  - Updated quantitative-metrics dual-sample disclosure in `HARD_EVIDENCE_SUMMARY.md` §7 and `SCORING_EVIDENCE_MATRIX.md` 量化指标: `3` strict G3 (100%/100%) + `51` full extended (90.2% / refusal 100% / citation 88.4%)
+- Files touched:
+  - `backend/app/services/model_client.py` (ask prompt rewrite, JSON schema `refused` field)
+  - `backend/app/services/task_service.py` (`_extract_ask_evidence` → 4-tuple, `_call_ask_model_with_evidence_retry` → 6-tuple, `run_task` `llm_refused` branch)
+  - `backend/app/services/retrieval_service.py` (metadata-intent detection + pin-first-chunk)
+  - `scripts/predeploy_sanity.py` (new)
+  - `evidence/materials/EXTENDED_EVAL_V1.json` (20 → 51 cases, 5 page-range fixes)
+  - `evidence/materials/EXTENDED_EVAL_V1_REFUSAL_ONLY.json` (new, 3-case refusal slice)
+  - `evidence/materials/EXTENDED_EVAL_SCOPE.md` (delivered-status note)
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md` (§7 updated to 51-case numbers + 3-step fix narrative)
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md` (量化指标 + 追问 2 narrative)
+  - `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` (predeploy_sanity as first must-pass)
+  - `evidence/materials/GOLD_SAMPLE_RUNBOOK.md` (fast-path + manual-path split)
+  - `evidence/reports/extended_eval_v1_latest.{md,json}` (re-generated)
+- Verification:
+  - predeploy_sanity local dry-run: 3/3 READY, latencies 9036/6086/8 ms (cache cold)
+  - extended eval v1 full: 46/51 pass (90.2%), refusal precision 100%, citation accuracy 88.4%, declaration rate 88.4%, avg latency ~5.2 s
+  - committed `4c0d253` (+ earlier commits in this series); not yet pushed to GitHub — user to confirm
+- Open risks:
+  - Final 3-page PPT and 5-minute video still to be produced by teammates
+  - 彩排 not yet done; `DEMO_MODE=true` verification on the actual demo environment still pending
+- Recommended next step:
+  - Push `4c0d253` + prior to GitHub when user confirms
+  - On rehearsal day: run `scripts/predeploy_sanity.py` on the demo machine as the first step, then follow `GOLD_SAMPLE_RUNBOOK.md` manual path
+
 ## 2026-04-21 / Claude Code (b6547cc gold-sample regression)
 
 - Summary:
