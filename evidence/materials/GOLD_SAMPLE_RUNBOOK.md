@@ -60,7 +60,21 @@ Expected:
 
 ## Pre-Demo Warmup
 
-Before a live judging/demo slot, do this once on the actual demo machine:
+Before a live judging/demo slot, do this once on the actual demo machine.
+
+### Fast path (one command)
+
+```
+.venv/Scripts/python.exe scripts/predeploy_sanity.py
+```
+
+`scripts/predeploy_sanity.py` archives `data/logs/call_logs.jsonl` (so old
+`MODEL_SERVICE_ERROR` rows and long P95 tails don't leak into the stats
+panel), then runs the same `3` gold prompts end-to-end through the real
+`TaskService`, and writes `evidence/reports/predeploy_sanity_<timestamp>.md`.
+Exit code `0` = READY, non-zero = NEEDS ATTENTION.
+
+### Manual path (UI verification)
 
 1. Open the app and upload the locked sample PDF
 2. Run the same fixed prompt order once:

@@ -26,6 +26,10 @@ refuse off-topic asks.`
 
 ## Pre-Demo Must Pass
 
+- [ ] Run `scripts/predeploy_sanity.py` on the demo machine; it archives
+      `data/logs/call_logs.jsonl`, warms caches, and exits `0` only when
+      all `3` gold cases pass end-to-end. Report lands at
+      `evidence/reports/predeploy_sanity_<timestamp>.md`
 - [ ] Run `GOLD_SAMPLE_RUNBOOK.md` once on the actual demo machine
 - [ ] Use the locked sample PDF and the locked prompt set only
 - [ ] Confirm answerable asks show citations and declared evidence
