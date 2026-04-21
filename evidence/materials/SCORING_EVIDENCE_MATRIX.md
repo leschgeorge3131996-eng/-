@@ -86,7 +86,7 @@
 4. 检索无命中时显式拒答；关键词命中但无真实依据时 LLM 层二次拒答
 5. 量化指标（双层样本量披露）：
    - **锁定 `3` 题 strict G3**：证据声明率 `100%`、引用准确率 `100%`、拒答精确率 `100%`、跨轮一致性 `100%`（详见 `quantitative_eval_metrics.md`）
-   - **扩展 `20` 题 seed**：总通过率 `95.0%`、拒答精确率 `100%`、引用页码准确率 `94.1%`、证据声明率 `94.1%`（详见 `extended_eval_v1_latest.md`、范围见 `EXTENDED_EVAL_SCOPE.md`）
+   - **扩展 `51` 题 full**：总通过率 `90.2%`、**拒答精确率 `100%`**、引用页码准确率 `88.4%`、证据声明率 `88.4%`（详见 `extended_eval_v1_latest.md`、范围见 `EXTENDED_EVAL_SCOPE.md`）
 
 ### 追问 2：你们怎么证明不是只会演示一题？
 
@@ -95,15 +95,16 @@
 - `evidence/reports/gold_sample_qa_compare_latest.md`
 - `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - `evidence/experiments/20260419_q2_declared_stability_check.md`
-- `evidence/reports/extended_eval_v1_latest.md`（`20` 题扩展评测，涵盖中英双语论文 × A1-A5 答题 + B1-B2 拒答）
+- `evidence/reports/extended_eval_v1_latest.md`（`51` 题扩展评测，涵盖中英双语论文 + 中文短文档 × A1-A5 答题 + B1-B2 拒答）
 
 答法：
 
-- 锁定 `3` 题是 judged-demo path 的最强可复现证据；为了回答"`3` 题 `100%` 是不是小样本幻觉"，我们另外跑了 `20` 题扩展评测，最终总通过率 `95.0%`、拒答精确率 `100%`、引用准确率 `94.1%`。
-- 扩展评测还暴露并闭环了两个真实问题：
+- 锁定 `3` 题是 judged-demo path 的最强可复现证据；为了回答"`3` 题 `100%` 是不是小样本幻觉"，我们把样本量从 `3` → `20` → 扩到 `51` 题（中英论文 + 中文短文档），最终总通过率 `90.2%`、拒答精确率 `100%`、引用准确率 `88.4%`。
+- 扩展评测暴露并闭环了两个真实问题：
   1. prompt 强制 `evidence_quotes` 非空导致诱导拒答场景下硬答，拒答精确率一度为 `0%`（commit `7f2713d` 修复）
   2. 元信息类 query（作者 / 主要贡献）召回首页 chunk 不稳，曾有 `3` 道题失败（metadata intent fallback 修复）
-- 这是"有实验 + 会复盘 + 会修"的具体佐证，不是"3 题 100%"那种只跑一次就包装的数字。
+- 剩余 `5` 道失败全部落在表格单列数据 / abstract 隐含结论 / 小 markdown 文档上，都是 retrieval 颗粒度真实边界，没有为刷分而二次调 prompt。
+- 这是"有实验 + 会复盘 + 会修 + 留下诚实边界"的具体佐证，不是"3 题 100%"那种只跑一次就包装的数字。
 
 ## 现场演示与答辩：评委追问点
 

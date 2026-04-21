@@ -29,6 +29,8 @@
 
 **综合目标**：整体通过率 ≥ 82%，refusal precision ≥ 90%，citation accuracy ≥ 85%。这个数字放出来比"3 题 100%"有说服力得多。
 
+**实际交付**（`2026-04-21`）：`51` 题（`A1` 15 / `A2` 9 / `A3` 7 / `A4` 7 / `A5` 5 / `B1` 5 / `B2` 3）。total pass `90.2%`，refusal precision `100%`，citation accuracy `88.4%`，全部达标。分布未覆盖到 `B3`，剩余 `5` 道失败集中在表格单列数据 / abstract 隐含结论 / 小 markdown 文档，是 retrieval 颗粒度真实边界，保留不刷分。
+
 ## 文档来源
 
 `evidence/samples/` 内已有文档：
