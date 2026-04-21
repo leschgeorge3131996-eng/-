@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "name": "extended_eval_v1",
+  "description": "Extended evaluation set (seed 20) to close the small-sample gap. Scope: EXTENDED_EVAL_SCOPE.md",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "chinese_llm_spatial_eval",
+      "document_path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+      "language": "zh",
+      "prompts": [
+        {
+          "id": "zh_a1_accuracy",
+          "text": "本研究的总体准确率得分是多少？",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [1, 5, 6],
+          "expected_any_of": ["56.20", "56.2"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "zh_a1_best_model",
+          "text": "在 1-shot 通用提示词策略下，哪一个模型的表现最好？",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [1, 5, 6],
+          "expected_any_of": ["ERNIE-4", "ERNIE"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "zh_a1_authors",
+          "text": "论文的作者来自哪所高校？",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["北京师范大学", "Beijing Normal"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "zh_a2_two_questions",
+          "text": "本研究试图回答的两个核心问题是什么？",
+          "category": "A2",
+          "kind": "answerable",
+          "expected_pages": [2],
+          "expected_any_of": ["理解的程度", "具体分类", "哪些"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "zh_a2_prompt_strategies",
+          "text": "论文中提到了哪几种提示词策略？它们的区别是什么？",
+          "category": "A2",
+          "kind": "answerable",
+          "expected_pages": [1, 5, 6],
+          "expected_any_of": ["通用", "工作流", "思维链"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "zh_a3_subtasks",
+          "text": "SPaCE 2024 数据集包含哪几个子任务？",
+          "category": "A3",
+          "kind": "answerable",
+          "expected_pages": [4],
+          "expected_any_of": ["实体识别", "角色识别", "异常识别", "方位", "同义"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "zh_a4_method_summary",
+          "text": "请简要总结本论文采用的研究方法。",
+          "category": "A4",
+          "kind": "answerable",
+          "expected_pages": [1, 2, 5, 6],
+          "expected_any_of": ["提示词", "大语言模型", "空间语义"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "zh_a4_ranking",
+          "text": "作者团队在比赛中最终取得了什么名次？",
+          "category": "A4",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["第六", "六"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "zh_a5_train_count",
+          "text": "SPaCE 2024 数据集训练集样本总数是多少？",
+          "category": "A5",
+          "kind": "answerable",
+          "expected_pages": [4],
+          "expected_any_of": ["4483"],
+          "difficulty": "hard"
+        },
+        {
+          "id": "zh_b1_quantum",
+          "text": "量子纠缠的物理原理是什么？",
+          "category": "B1",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "doc_id": "attention_is_all_you_need",
+      "document_path": "evidence/samples/attention_is_all_you_need.pdf",
+      "language": "en",
+      "prompts": [
+        {
+          "id": "en_a1_encoder_layers",
+          "text": "How many identical layers does the Transformer encoder consist of?",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [3],
+          "expected_any_of": ["6", "N = 6", "N=6"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "en_a1_first_authors",
+          "text": "Who are the first two listed authors of this paper?",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["Vaswani", "Shazeer"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "en_a1_arxiv_id",
+          "text": "What is the arXiv identifier of this paper?",
+          "category": "A1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["1706.03762"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "en_a2_why_no_recurrence",
+          "text": "Why does the Transformer architecture avoid recurrence entirely?",
+          "category": "A2",
+          "kind": "answerable",
+          "expected_pages": [2, 3],
+          "expected_any_of": ["parallel", "sequential", "long", "dependencies"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "en_a2_scaling_reason",
+          "text": "Why is the dot product scaled by the square root of d_k in scaled dot-product attention?",
+          "category": "A2",
+          "kind": "answerable",
+          "expected_pages": [4],
+          "expected_any_of": ["gradient", "magnitude", "large", "softmax"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "en_a3_complexity_compare",
+          "text": "Compare the per-layer computational complexity of self-attention and recurrent layers as shown in the paper.",
+          "category": "A3",
+          "kind": "answerable",
+          "expected_pages": [6],
+          "expected_any_of": ["n^2", "n2", "O(n", "sequence length"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "en_a4_contributions",
+          "text": "What are the main contributions of this paper?",
+          "category": "A4",
+          "kind": "answerable",
+          "expected_pages": [1, 2, 3],
+          "expected_any_of": ["Transformer", "attention", "sequence"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "en_a5_conv_path_length",
+          "text": "According to Table 1, what is the maximum path length for convolutional layers?",
+          "category": "A5",
+          "kind": "answerable",
+          "expected_pages": [6],
+          "expected_any_of": ["log", "O(log"],
+          "difficulty": "hard"
+        },
+        {
+          "id": "en_b1_everest",
+          "text": "What is the height of Mount Everest?",
+          "category": "B1",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "easy"
+        },
+        {
+          "id": "en_b2_vaswani_affiliation_now",
+          "text": "What is Ashish Vaswani's current employer in 2026?",
+          "category": "B2",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "hard"
+        }
+      ]
+    }
+  ]
+}

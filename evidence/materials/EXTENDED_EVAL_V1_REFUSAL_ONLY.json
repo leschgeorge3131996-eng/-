@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "name": "extended_eval_v1_refusal_only",
+  "description": "Refusal-only slice for validating LLM-layer refusal prompt fix.",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "chinese_llm_spatial_eval",
+      "document_path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+      "language": "zh",
+      "prompts": [
+        {
+          "id": "zh_b1_quantum",
+          "text": "量子纠缠的物理原理是什么？",
+          "category": "B1",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "doc_id": "attention_is_all_you_need",
+      "document_path": "evidence/samples/attention_is_all_you_need.pdf",
+      "language": "en",
+      "prompts": [
+        {
+          "id": "en_b1_everest",
+          "text": "What is the height of Mount Everest?",
+          "category": "B1",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "easy"
+        },
+        {
+          "id": "en_b2_vaswani_affiliation_now",
+          "text": "What is Ashish Vaswani's current employer in 2026?",
+          "category": "B2",
+          "kind": "refusal",
+          "expected_pages": [],
+          "difficulty": "hard"
+        }
+      ]
+    }
+  ]
+}
