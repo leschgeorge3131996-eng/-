@@ -104,6 +104,25 @@
 
 检索利用率 `38%` 说明模型从 `4` 个候选片段中选择性引用了 `1-2` 个最相关片段，而非全盘接受检索结果。
 
+### 7. 扩展评测 V1（`20` 题 seed，真实 API 端到端）
+
+来源：`evidence/reports/extended_eval_v1_latest.md` · 脚本 `scripts/extended_eval.py` · 范围 `evidence/materials/EXTENDED_EVAL_SCOPE.md`
+
+把样本量从 `3` 题扩到 `20` 题（中英双语论文 × A1-A5 答题 + B1-B2 拒答），用可自动判定的代理指标回答"`3` 题的 `100%` 是不是小样本幻觉"。
+
+| 指标 | 值 |
+| --- | --- |
+| 总通过率 | `85.0%` (`17/20`) |
+| 答题通过率 | `82.4%` (`14/17`) |
+| **拒答精确率** | **`100%`** (`3/3`) |
+| 引用页码准确率 (page-hit) | `82.4%` |
+| 证据声明率 (evidence_mode=declared on answerable) | `82.4%` |
+| 平均延迟 | `~6 s` |
+
+**关键发现 + 修复**：初跑曾出现 `refusal precision = 0%`，`3` 道拒答题全部被硬答。定位到 `ask` prompt 原写法强制 `evidence_quotes` 非空、配合 retry loop 二次施压，主动诱导 LLM 在无依据时编造证据。已通过在 prompt 层加 `refused=true` 出口 + `TaskService` 接入 `llm_refused` 分支修复（commit `7f2713d`），修复后拒答精确率从 `0%` 回到 `100%`，其中 `en_b2_vaswani_affiliation_now`（"Vaswani 在 2026 年的雇主"——关键词在文档但答案不在）这种 retrieval 层拦不住的诱导拒答也被 LLM 层正确拒答。
+
+**遗留**：`3` 道答题失败（`zh_a1_authors` / `en_a1_first_authors` / `en_a4_contributions`）都是论文首页元信息（作者、单位、主要贡献），retrieval 未能把首页 chunk 召回送给 LLM，属 retrieval 层跟进项而非 prompt 问题，已记录。
+
 ## 当前诚实边界
 
 1. 当前最强证据是锁定 gold-sample judged-demo path，不是开放域产品泛化证明。
