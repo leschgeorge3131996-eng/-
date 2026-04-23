@@ -1583,3 +1583,33 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - another AI can now understand the project with less guessing and less dependence on a narrow curated slice
   - this bundle is better suited for “full project understanding + final-stage judgment” than the earlier lighter review zips
+
+---
+
+## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
+
+- Summary:
+  - extracted three additional G3 runs from `call_logs.jsonl` (2026-04-21 logs)
+  - created `evidence/experiments/20260423_g3_continuation.md` to record the continuation batch
+  - upgraded all judge-facing materials from "strict 3-run" to "strict 6-run" evidence
+  - updated request ID indexes to include all 6 runs with full traceability
+- Files touched:
+  - `evidence/experiments/20260423_g3_continuation.md`
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/PLATFORM_USAGE_EVIDENCE.md`
+  - `evidence/materials/QA_BRIEF.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - continuation batch shows:
+    - Run 4: `8.0s` span, `file_id=c72ca244f079453bb89d6f2d9eb80a2a`, both answerable `declared`, refusal via `retrieval_gate`
+    - Run 5: `31.3s` span, `file_id=321f67cd8ad742978d443f078659dad0`, both answerable `declared`, refusal via `llm_refused`
+    - Run 6: `63.5s` span, `file_id=bbd3daa797264ecd97e0400f9b875262`, both answerable `declared`, refusal via `llm_refused`
+  - all 6 runs used fresh `file_id`, `cache_hit=false`, no fallback
+  - cumulative G3 evidence now spans:
+    - first batch (2026-04-19): `13.5s`, `12.9s`, `15.8s`
+    - continuation (2026-04-21): `8.0s`, `31.3s`, `63.5s`
+- Practical meaning:
+  - G3 reproducibility evidence is now stronger with 6 independent fresh-upload runs instead of 3
+  - judge-facing口径 can now cite "strict 6-run batch" instead of "strict 3-run batch"
+  - all 18 request IDs (6 runs × 3 prompts) are now indexed in `PLATFORM_USAGE_EVIDENCE.md` for full traceability

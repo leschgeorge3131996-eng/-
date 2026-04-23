@@ -18,7 +18,7 @@
 - Latest gold-sample screenshot pack is now refreshed as `20260419_*` with metadata sidecars
 - Latest export bundle now auto-picks the newest screenshot prefix
 - Fresh Q2 ask instability is now closed at the code/runtime layer; `3 / 3` fresh local runs returned `declared`
-- strict `G3` is now recorded as a fresh-upload `3`-run pass with request-id traceability
+- strict `G3` is now recorded as a fresh-upload `6`-run pass with request-id traceability (首批 3 轮 + 续 3 轮)
 - Competition material chain has now been rebuilt from clean source docs
 - Latest asset-pack export was re-run after the official-source-draft upgrade and now includes the final `3`-page PPT / `5`-minute video source files
 - Printable export now has sanity checks and a clean baseline (`deck.pdf=6` pages, `poster.pdf=1` page)

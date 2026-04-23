@@ -1,5 +1,13 @@
 # 国一答辩硬证据摘要
 
+## 核心差异点
+
+研答通是一个引用可核验的文档问答系统，三个维度的差异：
+
+1. **不是生成后补页码，而是检索-引用-回链的硬链路**：每个回答都先检索、再作答、返回结构化 citation，可以跳转回 PDF 原页证据
+2. **不是小样本演示，而是 51 题真实评测**：覆盖 2 篇英文论文 + 2 篇中文 markdown，通过率 90.2%，引用准确率 100%，拒答精确率 100%
+3. **不是口头声称，而是 request ID 可核验**：每次调用都有 `data/logs/call_logs.jsonl` 留痕，可追溯到无问芯穹平台的真实 request ID
+
 ## 一句话结论
 
 研答通当前最强、最可核验的能力，不是泛化生成，而是已经在无问芯穹真实运行环境里完成多轮留痕验证的：
@@ -51,22 +59,23 @@
   - `evidence_quote_count=2`
   - `citation_count=2`
 
-### 5. 严格版 G3 已完成三轮 fresh-upload 连续通过
+### 5. 严格版 G3 已完成六轮 fresh-upload 连续通过
 
-来源：`evidence/experiments/20260420_g3_strict_rehearsal.md`
+来源：
+- `evidence/experiments/20260420_g3_strict_rehearsal.md` (首批 3 轮)
+- `evidence/experiments/20260423_g3_continuation.md` (续 3 轮)
 
-- `3 / 3` authoritative runs passed
-- 三轮都使用新的 `file_id`，不再复用已加载文档状态
-- 两次 answerable 都保持 `evidence_mode=declared`
-- refusal 都保持 `retrieval_status=no_match`
+- `6 / 6` authoritative runs passed
+- 六轮都使用新的 `file_id`，不再复用已加载文档状态
+- 所有 answerable 都保持 `evidence_mode=declared`
+- 所有 refusal 都走 `retrieval_gate` 或 `llm_refused` 路径
 - log-backed spans：
-  - `13.5s`
-  - `12.9s`
-  - `15.8s`
-- fallback：`0 / 3`
+  - 首批 3 轮：`13.5s`, `12.9s`, `15.8s`
+  - 续 3 轮：`8.0s`, `31.3s`, `63.5s`
+- fallback：`0 / 6`
 
 当前结论：
-- 当前最强 `G3` 证据已经从 earlier warm-state self-rehearsal 升级为 strict three-run batch，可作为更强的 judged-demo reproducibility evidence
+- 当前最强 `G3` 证据已累计 6 轮 strict fresh-upload batch，可作为更强的 judged-demo reproducibility evidence
 
 ## 当前 judge-facing 截图
 
@@ -132,9 +141,9 @@
 ## 当前诚实边界
 
 1. 当前最强证据是锁定 gold-sample judged-demo path，不是开放域产品泛化证明。
-2. 当前 `G3` 最强记录是 strict three-run batch；它证明 judged-demo path 可复现，但仍不是开放域泛化证明。
+2. 当前 `G3` 最强记录是 strict six-run batch；它证明 judged-demo path 可复现，但仍不是开放域泛化证明。
 3. `ask` 是主卖点；`summary / outline` 已支持，但 grounding 语义弱于 `ask`。
 
 ## judge-facing 推荐说法
 
-“我们不是先生成再补页码，而是把答案回到 PDF 原文证据做成了一条硬链路。这条链路已经在无问芯穹真实运行环境里完成双模型验证、fresh rerun 记录和严格版 G3 三连跑记录。”
+“我们不是先生成再补页码，而是把答案回到 PDF 原文证据做成了一条硬链路。这条链路已经在无问芯穹真实运行环境里完成双模型验证、fresh rerun 记录和严格版 G3 六连跑记录。”
