@@ -1704,6 +1704,22 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - demo path is now: upload paper → generate digest → click follow-up → ask with evidence回链
   - this is still frontend-first and low-risk; no backend schema, model routing, or storage migration was changed
 
+---
+
+## 2026-04-24 / Codex (Kimi evaluation working-tree cleanup)
+
+- Summary:
+  - resolved a working-tree口径风险 where `extended_eval_v1_kimi_k2_6.*` had uncommitted rerun output (`44/51`) while the canonical model-selection report uses the committed full replay (`47/51`)
+  - restored both Kimi evidence files to the committed authoritative version to keep the model-selection evidence chain consistent
+- Files checked/restored:
+  - `evidence/reports/extended_eval_v1_kimi_k2_6.json`
+  - `evidence/reports/extended_eval_v1_kimi_k2_6.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `git status --short --branch` was clean after restore, before this handoff note was added
+- Practical meaning:
+  - model-selection口径 remains: current default `qwen3-235b-a22b-instruct-2507` is best default, `kimi-k2.6` is second by score but too slow, and no uncommitted lower Kimi rerun is left to confuse handoff/review
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:
