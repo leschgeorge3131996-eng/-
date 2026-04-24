@@ -70,6 +70,8 @@ class EvalRecord:
     refusal_hit: bool = False
     passed: bool = False
     fail_reason: str = ""
+    failure_type: str = ""
+    failure_stage: str = ""
 
 
 def load_cases(manifest_path: Path) -> list[EvalCase]:
@@ -109,6 +111,7 @@ def score(record: EvalRecord) -> None:
                 f"expected refusal but outcome={record.outcome} "
                 f"retrieval_status={record.retrieval_status}"
             )
+        classify_failure(record)
         return
 
     if case.expected_pages:
@@ -134,6 +137,75 @@ def score(record: EvalRecord) -> None:
         if not record.snippet_hit:
             reasons.append(f"answer missing any of {case.expected_any_of}")
         record.fail_reason = "; ".join(reasons)
+    classify_failure(record)
+
+
+def classify_failure(record: EvalRecord) -> None:
+    if record.passed:
+        record.failure_type = ""
+        record.failure_stage = ""
+        return
+
+    if record.error:
+        record.failure_type = "runtime_error"
+        record.failure_stage = "runtime"
+        return
+
+    if record.case.kind == "refusal":
+        if record.outcome != "refused" and record.retrieval_status != "no_match":
+            record.failure_type = "refusal_escape"
+            record.failure_stage = "safety_gate"
+            return
+        record.failure_type = "refusal_mismatch"
+        record.failure_stage = "safety_gate"
+        return
+
+    if record.retrieval_status == "no_match":
+        record.failure_type = "retrieval_miss"
+        record.failure_stage = "retrieval"
+        return
+
+    if record.retrieval_status == "low_confidence":
+        record.failure_type = "low_confidence"
+        record.failure_stage = "retrieval"
+        return
+
+    if record.outcome == "refused":
+        if record.retrieval_status == "matched" and not record.declared:
+            record.failure_type = "model_refused_after_retrieval"
+            record.failure_stage = "model"
+            return
+        record.failure_type = "unexpected_refusal"
+        record.failure_stage = "model"
+        return
+
+    if not record.page_hit and record.citation_count == 0:
+        record.failure_type = "missing_citation"
+        record.failure_stage = "citation"
+        return
+
+    if not record.page_hit:
+        record.failure_type = "wrong_page"
+        record.failure_stage = "citation"
+        return
+
+    if not record.declared:
+        record.failure_type = "undeclared_evidence"
+        record.failure_stage = "evidence"
+        return
+
+    if record.declared and record.evidence_quote_count == 0:
+        record.failure_type = "missing_evidence_quote"
+        record.failure_stage = "evidence"
+        return
+
+    if not record.snippet_hit:
+        record.failure_type = "answer_missing_expected_term"
+        record.failure_stage = "answer"
+        return
+
+    record.failure_type = "unknown_failure"
+    record.failure_stage = "unknown"
 
 
 def build_eval_settings(base_settings: Settings, *, model_name: str | None = None) -> Settings:
@@ -216,6 +288,8 @@ def aggregate(records: list[EvalRecord]) -> dict:
     by_category: dict[str, dict] = {}
     by_difficulty: dict[str, dict] = {}
     by_doc: dict[str, dict] = {}
+    by_failure_type: dict[str, int] = {}
+    by_failure_stage: dict[str, int] = {}
 
     def _bucket() -> dict:
         return {"total": 0, "passed": 0, "latency": []}
@@ -224,6 +298,14 @@ def aggregate(records: list[EvalRecord]) -> dict:
     refusal = [r for r in records if r.case.kind == "refusal"]
 
     for r in records:
+        if not r.passed:
+            by_failure_type[r.failure_type or "unknown_failure"] = (
+                by_failure_type.get(r.failure_type or "unknown_failure", 0) + 1
+            )
+            by_failure_stage[r.failure_stage or "unknown"] = (
+                by_failure_stage.get(r.failure_stage or "unknown", 0) + 1
+            )
+
         for bucket_map, key in (
             (by_category, r.case.category),
             (by_difficulty, r.case.difficulty),
@@ -266,6 +348,8 @@ def aggregate(records: list[EvalRecord]) -> dict:
         "by_category": by_category,
         "by_difficulty": by_difficulty,
         "by_doc": by_doc,
+        "by_failure_type": by_failure_type,
+        "by_failure_stage": by_failure_stage,
     }
 
 
@@ -318,6 +402,50 @@ def render_markdown(records: list[EvalRecord], summary: dict, manifest_name: str
         lines.append(
             f"| {doc} | {b['total']} | {b['passed']} | {b['pass_rate']*100:.1f}% | {b['avg_latency_ms']} |"
         )
+
+    failed_records = [record for record in records if not record.passed]
+    lines.extend([
+        "",
+        "## Failure Attribution",
+        "",
+        "| Failure type | Count |",
+        "| --- | ---: |",
+    ])
+    if summary["by_failure_type"]:
+        for failure_type, count in sorted(
+            summary["by_failure_type"].items(), key=lambda item: (-item[1], item[0])
+        ):
+            lines.append(f"| {failure_type} | {count} |")
+    else:
+        lines.append("| (none) | 0 |")
+
+    lines.extend([
+        "",
+        "| Failure stage | Count |",
+        "| --- | ---: |",
+    ])
+    if summary["by_failure_stage"]:
+        for failure_stage, count in sorted(
+            summary["by_failure_stage"].items(), key=lambda item: (-item[1], item[0])
+        ):
+            lines.append(f"| {failure_stage} | {count} |")
+    else:
+        lines.append("| (none) | 0 |")
+
+    lines.extend(["", "### Failed Case Triage", ""])
+    if failed_records:
+        lines.extend([
+            "| Case | Failure type | Stage | Reason |",
+            "| --- | --- | --- | --- |",
+        ])
+        for record in failed_records:
+            reason = (record.fail_reason or record.error or "").replace("|", "\\|")
+            lines.append(
+                f"| {record.case.case_id} | {record.failure_type} | {record.failure_stage} | {reason} |"
+            )
+    else:
+        lines.append("No failed cases.")
+
     lines.extend(["", "## Case Detail", ""])
     for r in records:
         status = "PASS" if r.passed else "FAIL"
@@ -330,6 +458,7 @@ def render_markdown(records: list[EvalRecord], summary: dict, manifest_name: str
             f"- Cited pages: {r.cited_pages} | citations: {r.citation_count} | evidence_quotes: {r.evidence_quote_count}",
             f"- Latency: {r.latency_ms} ms",
             f"- Fail reason: {r.fail_reason}" if r.fail_reason else "- Fail reason: (none)",
+            f"- Failure type: {r.failure_type or '(none)'} | stage: {r.failure_stage or '(none)'}",
             f"- Answer snippet: {r.answer_snippet[:200]}",
             f"- Error: {r.error}" if r.error else "- Error: (none)",
             "",
@@ -396,10 +525,17 @@ def main() -> None:
                         "kind": r.case.kind,
                         "passed": r.passed,
                         "fail_reason": r.fail_reason,
+                        "failure_type": r.failure_type,
+                        "failure_stage": r.failure_stage,
+                        "page_hit": r.page_hit,
+                        "declared": r.declared,
+                        "snippet_hit": r.snippet_hit,
                         "outcome": r.outcome,
                         "retrieval_status": r.retrieval_status,
                         "evidence_mode": r.evidence_mode,
                         "cited_pages": r.cited_pages,
+                        "citation_count": r.citation_count,
+                        "evidence_quote_count": r.evidence_quote_count,
                         "latency_ms": r.latency_ms,
                         "error": r.error,
                     }

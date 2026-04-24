@@ -1,4 +1,4 @@
-# Task Board
+﻿# Task Board
 
 ## Now
 
@@ -32,8 +32,9 @@
 - LLM-layer refusal escape landed: `ask` prompt returns `refused=true` on out-of-scope, `TaskService` honors it in a dedicated `llm_refused` branch; extended-eval refusal precision 0% → 100%
 - Retrieval metadata-intent fallback landed: first-page chunk is pinned for author/affiliation/contribution queries; extended-eval overall 85% → 95% on the 20-seed
 - Extended evaluation now at 51 cases (2 papers + 2 Chinese markdown): 46/51 pass (90.2%), refusal precision 100%, citation accuracy 88.4%. Dual-sample disclosure in `HARD_EVIDENCE_SUMMARY.md` §7 and `SCORING_EVIDENCE_MATRIX.md`
-- Model-selection replay is now evidence-backed: 8-model gold quick screen plus 7 completed 51-case full replays show current `qwen3-235b-a22b-instruct-2507` remains the best default QA model (`48/51`, 94.1%, refusal 100%, avg 3401 ms); `qwen3-next-80b-a3b-instruct` is the best fast fallback (`46/51`, avg 2072 ms); details in `evidence/reports/model_selection_evaluation_20260424.md`
+- Model-selection replay is now evidence-backed: 8-model gold quick screen plus 8 completed 51-case full replays show current `qwen3-235b-a22b-instruct-2507` remains the best default QA model (`48/51`, 94.1%, refusal 100%, avg 3401 ms); `kimi-k2.6` is second by score but too slow (`47/51`, avg 61908 ms); `qwen3-next-80b-a3b-instruct` is the best fast fallback (`46/51`, avg 2072 ms); details in `evidence/reports/model_selection_evaluation_20260424.md`
 - Retrieval metadata fallback is now extended to product/name/project-name queries, closing the local `research_brief:rb_a1_name` failure mode without weakening refusal behavior
+- Technical-only optimization roadmap now exists in `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md`: near-term focus is failure attribution, table/parameter retrieval patches, frontend task safety, and expanded predeploy gates; materials/PPT/video work is explicitly out of scope for this technical track
 - `scripts/predeploy_sanity.py` now exists: one-command archive `call_logs.jsonl` + run 3 gold cases + emit markdown report, exit 0 only on 3/3 pass; wired as first pre-demo must-pass in `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
@@ -46,8 +47,9 @@
    - `review_bundle_20260420_141123_final_competition_review.zip`
 3. Use `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze sheet while converting `deck_3page_final.pdf` into the final native PPT and `video_subtitles_5min_final.srt` into the final recorded/edited video
 4. Before judged demo: run `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` together with `GOLD_SAMPLE_RUNBOOK.md`, set `DEMO_MODE=true` on the target env, and verify the opening flow on the target URL
-5. Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo unless a final predeploy sanity run shows live latency trouble; if latency is the blocker, test-switch only QA to `qwen3-next-80b-a3b-instruct`
-6. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
+5. Use `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` as the technical-only next-work guide; first implementation target should be extended-eval failure attribution, not a model switch
+6. Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo unless a final predeploy sanity run shows live latency trouble; if latency is the blocker, test-switch only QA to `qwen3-next-80b-a3b-instruct`
+7. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
 ## Recently Verified
 
@@ -162,3 +164,4 @@
 - The current authoritative strict-run note is:
   - `evidence/experiments/20260420_g3_strict_rehearsal.md`
 - If another AI is asked to review the project now, use this latest bundle first
+

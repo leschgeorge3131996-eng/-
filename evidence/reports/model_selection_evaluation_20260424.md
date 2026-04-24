@@ -40,7 +40,7 @@ Gold quick screen covered:
 - `kimi-k2.6`
 - `minimax-m2.7`
 
-Full 51-case replay completed for 7 models:
+Full 51-case replay completed for 8 models:
 
 - `qwen3-235b-a22b-instruct-2507`
 - `qwen3-next-80b-a3b-instruct`
@@ -48,9 +48,7 @@ Full 51-case replay completed for 7 models:
 - `deepseek-v3.2`
 - `glm-5.1`
 - `deepseek-v3.2-thinking`
-- `minimax-m2.7`
-
-`kimi-k2.6` completed the 3-case quick screen but did not complete the 51-case replay in practical time. It averaged `25235 ms` on the quick screen with a `52135 ms` max latency, so it is not a default-path candidate for the current demo.
+- `minimax-m2.7`\r\n- `kimi-k2.6`\r\n\r\n`kimi-k2.6` eventually completed the full 51-case replay at `47 / 51` (`92.2%`) but averaged `61908 ms`, so it is a quality-capable but impractically slow default-path candidate for the current demo.
 
 ## Gold Quick Screen
 
@@ -79,12 +77,12 @@ Report files are named `evidence/reports/extended_eval_v1_<model>.md` and `.json
 | Rank | Model | Passed | Pass Rate | Answerable | Refusal | Citation | Declaration | Avg Latency (ms) |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | `qwen3-235b-a22b-instruct-2507` | `48 / 51` | `94.1%` | `93.0%` | `100.0%` | `93.0%` | `93.0%` | `3401` |
-| 2 | `qwen3-next-80b-a3b-instruct` | `46 / 51` | `90.2%` | `88.4%` | `100.0%` | `88.4%` | `90.7%` | `2072` |
-| 3 | `deepseek-v3.2` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `90.7%` | `90.7%` | `5047` |
-| 4 | `qwen3-32b` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `5209` |
-| 5 | `glm-5.1` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `8346` |
-| 6 | `deepseek-v3.2-thinking` | `44 / 51` | `86.3%` | `83.7%` | `100.0%` | `86.0%` | `90.7%` | `36305` |
-| 7 | `minimax-m2.7` | `32 / 51` | `62.7%` | `58.1%` | `87.5%` | `58.1%` | `60.5%` | `20121` |
+| 2 | `kimi-k2.6` | `47 / 51` | `92.2%` | `90.7%` | `100.0%` | `90.7%` | `90.7%` | `61908` |`r`n| 3 | `qwen3-next-80b-a3b-instruct` | `46 / 51` | `90.2%` | `88.4%` | `100.0%` | `88.4%` | `90.7%` | `2072` |
+| 4 | `deepseek-v3.2` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `90.7%` | `90.7%` | `5047` |
+| 5 | `qwen3-32b` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `5209` |
+| 6 | `glm-5.1` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `8346` |
+| 7 | `deepseek-v3.2-thinking` | `44 / 51` | `86.3%` | `83.7%` | `100.0%` | `86.0%` | `90.7%` | `36305` |
+| 8 | `minimax-m2.7` | `32 / 51` | `62.7%` | `58.1%` | `87.5%` | `58.1%` | `60.5%` | `20121` |
 
 ## Interpretation
 
@@ -94,7 +92,7 @@ Use `qwen3-235b-a22b-instruct-2507`.
 
 It wins the full suite by a meaningful margin:
 
-- `+2` cases over `qwen3-next-80b-a3b-instruct`
+- `+1` case over `kimi-k2.6` and `+2` cases over `qwen3-next-80b-a3b-instruct`
 - `+3` cases over `deepseek-v3.2`, `qwen3-32b`, and `glm-5.1`
 - far better reliability than `minimax-m2.7`
 
@@ -117,7 +115,7 @@ It is not better than `qwen3-next-80b-a3b-instruct` in this run, but it remains 
 - `deepseek-v3.2-thinking`: too slow for judged demos and lower full-suite score than 235B.
 - `glm-5.1`: acceptable but slower and not more accurate than Qwen alternatives.
 - `minimax-m2.7`: not suitable for the current structured-evidence QA pipeline.
-- `kimi-k2.6`: quick screen passed, but latency is too high and full replay did not complete in practical time.
+- `kimi-k2.6`: quality is second-best (`47/51`) but latency is too high for the default demo path (avg `61908 ms`).
 
 ## Recommended Environment Strategy
 
@@ -135,7 +133,7 @@ If live latency becomes the blocker, switch only QA after a final predeploy sani
 MODEL_QA=qwen3-next-80b-a3b-instruct
 ```
 
-Do not switch to MiniMax or Kimi for the default path without a successful full replay.
+Do not switch to MiniMax for the default path; do not switch to Kimi for the default path unless latency requirements change substantially.
 
 ## Tooling Change
 
@@ -152,3 +150,4 @@ This lets future agents compare model candidates without editing `.env`.
 ## Related Product Fix
 
 This run also includes a retrieval improvement for metadata/name questions: product-name queries such as `这个产品的名字是什么？` now trigger the first chunk as a metadata fallback when lexical overlap is otherwise weak. This closes the prior `research_brief:rb_a1_name` failure mode in the local regression path.
+
