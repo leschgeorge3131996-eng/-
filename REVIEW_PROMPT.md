@@ -4,13 +4,15 @@ Before writing your judgment, read these files first (in this order):
 
 1. `PROJECT_CONTEXT.md`
 2. `REVIEW_BUNDLE_INDEX.md`
-3. `agent_handoff/SESSION_LOG.md` — the top block (2026-04-21) is the most
+3. `agent_handoff/SESSION_LOG.md` — the top block (2026-04-24) is the most
    current truth
 4. `agent_handoff/TASK_BOARD.md`
 5. `agent_handoff/PROJECT_HANDOFF.md`
-6. `evidence/reports/quantitative_eval_metrics.md`
-7. `evidence/reports/extended_eval_v1_latest.md`
-8. `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+6. `evidence/reports/extended_eval_v1_latest.md`
+7. `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md`
+8. `evidence/reports/model_selection_evaluation_20260424.md`
+9. `evidence/reports/quantitative_eval_metrics.md`
+10. `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
 
 ## Background
 
@@ -41,18 +43,19 @@ You should evaluate:
 
 Do not turn this into a generic SaaS roadmap review.
 
-## Important Current Facts (as of 2026-04-21)
+## Important Current Facts (as of 2026-04-24)
 
 ### Runtime
 
 - Runtime provider is already switched to `Wuwen Xinqiong`.
 - Primary QA model: `qwen3-235b-a22b-instruct-2507`
-- Validated fallback: `qwen3-32b`
+- Validated fast fallback: `qwen3-next-80b-a3b-instruct`
 - Locked gold-sample document and prompt triad already exist.
-- Strict `G3` is recorded as a fresh-upload three-run pass:
+- Strict `G3` is recorded as a fresh-upload six-run pass:
   - `evidence/experiments/20260420_g3_strict_rehearsal.md`
+  - `evidence/experiments/20260423_g3_continuation.md`
 
-### Two layers of quantitative evidence now coexist
+### Three quantitative/evaluation layers now coexist
 
 - **Strict G3 / locked gold path** (`3` prompts × `3` runs = `9` entries):
   - 4 rates at `100%` (evidence declaration, citation page accuracy,
@@ -61,33 +64,45 @@ Do not turn this into a generic SaaS roadmap review.
   - chunk utilization `38%`, avg answerable latency `5521 ms`
   - script: `scripts/compute_eval_metrics.py`
   - report: `evidence/reports/quantitative_eval_metrics.md`
-- **Extended eval v1** (`51` cases across `4` documents — `2` English/Chinese
-  papers + `2` Chinese markdown):
-  - `46 / 51` pass (`90.2%`)
-  - refusal precision `100%`, citation accuracy `88.4%`
-  - `5` failures are honestly left as-is rather than prompt-tuned away
-    (genuine retrieval misses on table single cells / abstract-implicit
-    contributions / small md files)
+- **Model-selection replay** (`51` cases across `4` documents):
+  - `qwen3-235b-a22b-instruct-2507` was the best default at `48 / 51`
+  - `kimi-k2.6` reached `47 / 51` but averaged about `61.9s`, too slow for
+    the judged/demo default
+  - report: `evidence/reports/model_selection_evaluation_20260424.md`
+- **Final default-model extended eval v1** (`51` cases across `4` documents):
+  - targeted retrieval/context patch closed the remaining default-model gaps
+  - final pass `51 / 51` (`100.0%`)
+  - refusal precision `100%`, citation page-hit accuracy `100%`, declaration
+    rate `100%`
   - manifest: `evidence/materials/EXTENDED_EVAL_V1.json`
   - scope: `evidence/materials/EXTENDED_EVAL_SCOPE.md`
   - report: `evidence/reports/extended_eval_v1_latest.md`
+  - canonical final report:
+    `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md`
 
-### Recent engineering hardening (2026-04-21)
+### Recent engineering hardening (2026-04-24)
 
 - `ask` prompt now carries a structured `refused` field; `TaskService` has a
   dedicated `llm_refused` branch. This fixed a fabrication root cause.
 - `RetrievalService` pins first-page chunk on author/affiliation/contribution
   queries to recover metadata intent.
+- Targeted retrieval/context patching handles table/parameter queries,
+  neighbor chunks, contribution-head chunks, and one stricter retry for matched
+  retrieval self-refusals.
 - `scripts/predeploy_sanity.py` is the first pre-demo must-pass.
 
-### Frontend UX polish (2026-04-21)
+### Frontend UX / demo hardening (2026-04-24)
 
 - evidence confidence bar (three-dot signal)
 - clickable citation cards
 - dedicated refusal card
 - drag-and-drop upload
 - hero button pulse animation
-- `7 / 7` frontend smoke tests pass; build clean
+- research digest workbench, follow-up chips into evidence-backed `ask`,
+  `国一演示路线`, whitelisted ask/refusal prompts, concise digest fallback,
+  and 90s frontend task timeout fallback
+- `13` frontend tests pass; build clean aside from the existing Vite chunk
+  warning
 
 ### Judged submission assets
 
@@ -117,10 +132,9 @@ If you see stale historical contradictions, distinguish clearly between:
 - stale artifact
 
 Do not over-index on older warm-state-only `G3` language if newer strict `G3`
-evidence is already present in the current bundle. Do not penalize the team
-for keeping `5` extended-eval failures visible — that is an intentional
-honesty choice (see `agent_handoff/SESSION_LOG.md` → memory entry
-"评测诚实优先于刷分").
+evidence is already present in the current bundle. Treat old `46 / 51` reports
+as boundary-finding history, `48 / 51` as model-selection evidence, and the
+final `51 / 51` default-model replay as the current product/evidence口径.
 
 ## What To Review
 
@@ -137,8 +151,9 @@ honesty choice (see `agent_handoff/SESSION_LOG.md` → memory entry
 - Is the evidence-backed `ask` path strong enough to carry the judging story?
 - Are the screenshots, replay reports, quantitative metrics, PDF back-link
   behavior, and refusal behavior convincing?
-- Does the dual-layer evidence (strict G3 100% + extended 90.2%) strengthen
-  or dilute the story? How should it be framed at judging time?
+- Does the three-layer evidence story (strict G3 100%, model-selection 48/51,
+  final default-model 51/51) strengthen or dilute the story? How should it be
+  framed at judging time?
 - Is anything still likely to damage trust in a live review?
 
 ### 3. Code / Architecture Risk

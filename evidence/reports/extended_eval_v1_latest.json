@@ -1,103 +1,105 @@
 {
   "summary": {
     "total": 51,
-    "passed": 46,
-    "overall_pass_rate": 0.9019607843137255,
-    "answerable_pass_rate": 0.8837209302325582,
+    "passed": 51,
+    "overall_pass_rate": 1.0,
+    "answerable_pass_rate": 1.0,
     "refusal_precision": 1.0,
-    "citation_accuracy": 0.8837209302325582,
-    "declaration_rate": 0.8837209302325582,
-    "avg_latency_ms": 5484,
+    "citation_accuracy": 1.0,
+    "declaration_rate": 1.0,
+    "avg_latency_ms": 5697,
     "by_category": {
       "A1": {
         "total": 15,
-        "passed": 13,
-        "pass_rate": 0.8666666666666667,
-        "avg_latency_ms": 5294
+        "passed": 15,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5457
       },
       "A2": {
         "total": 9,
         "passed": 9,
         "pass_rate": 1.0,
-        "avg_latency_ms": 7675
+        "avg_latency_ms": 6605
       },
       "A3": {
         "total": 7,
-        "passed": 6,
-        "pass_rate": 0.8571428571428571,
-        "avg_latency_ms": 6871
+        "passed": 7,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 6904
       },
       "A4": {
         "total": 7,
-        "passed": 6,
-        "pass_rate": 0.8571428571428571,
-        "avg_latency_ms": 5475
+        "passed": 7,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5763
       },
       "A5": {
         "total": 5,
-        "passed": 4,
-        "pass_rate": 0.8,
-        "avg_latency_ms": 4799
+        "passed": 5,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 4905
       },
       "B1": {
         "total": 5,
         "passed": 5,
         "pass_rate": 1.0,
-        "avg_latency_ms": 2318
+        "avg_latency_ms": 3481
       },
       "B2": {
         "total": 3,
         "passed": 3,
         "pass_rate": 1.0,
-        "avg_latency_ms": 3064
+        "avg_latency_ms": 6223
       }
     },
     "by_difficulty": {
       "easy": {
         "total": 24,
-        "passed": 22,
-        "pass_rate": 0.9166666666666666,
-        "avg_latency_ms": 4921
+        "passed": 24,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5034
       },
       "medium": {
         "total": 19,
-        "passed": 17,
-        "pass_rate": 0.8947368421052632,
-        "avg_latency_ms": 6758
+        "passed": 19,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 6661
       },
       "hard": {
         "total": 8,
-        "passed": 7,
-        "pass_rate": 0.875,
-        "avg_latency_ms": 4148
+        "passed": 8,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5399
       }
     },
     "by_doc": {
       "chinese_llm_spatial_eval": {
         "total": 25,
-        "passed": 23,
-        "pass_rate": 0.92,
-        "avg_latency_ms": 6533
+        "passed": 25,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 6207
       },
       "attention_is_all_you_need": {
         "total": 20,
-        "passed": 18,
-        "pass_rate": 0.9,
-        "avg_latency_ms": 5240
+        "passed": 20,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5957
       },
       "paper_report": {
         "total": 3,
         "passed": 3,
         "pass_rate": 1.0,
-        "avg_latency_ms": 2670
+        "avg_latency_ms": 2432
       },
       "research_brief": {
         "total": 3,
-        "passed": 2,
-        "pass_rate": 0.6666666666666666,
-        "avg_latency_ms": 1184
+        "passed": 3,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 2984
       }
-    }
+    },
+    "by_failure_type": {},
+    "by_failure_stage": {}
   },
   "records": [
     {
@@ -107,6 +109,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -114,7 +121,9 @@
         5,
         6
       ],
-      "latency_ms": 5316,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5591,
       "error": null
     },
     {
@@ -124,6 +133,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -131,7 +145,9 @@
         5,
         6
       ],
-      "latency_ms": 5634,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 6049,
       "error": null
     },
     {
@@ -141,13 +157,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 3861,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 6210,
       "error": null
     },
     {
@@ -157,6 +180,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -164,7 +192,9 @@
         1,
         2
       ],
-      "latency_ms": 4359,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5558,
       "error": null
     },
     {
@@ -174,15 +204,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
-        1,
-        5,
-        6
+        1
       ],
-      "latency_ms": 19830,
+      "citation_count": 1,
+      "evidence_quote_count": 0,
+      "latency_ms": 17073,
       "error": null
     },
     {
@@ -192,6 +227,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -199,7 +239,9 @@
         3,
         4
       ],
-      "latency_ms": 9384,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 10335,
       "error": null
     },
     {
@@ -209,6 +251,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -216,7 +263,9 @@
         1,
         2
       ],
-      "latency_ms": 5260,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 7385,
       "error": null
     },
     {
@@ -226,13 +275,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 4207,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4512,
       "error": null
     },
     {
@@ -242,6 +298,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -249,7 +310,9 @@
         3,
         4
       ],
-      "latency_ms": 5596,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4971,
       "error": null
     },
     {
@@ -259,11 +322,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 3175,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 4849,
       "error": null
     },
     {
@@ -273,18 +343,21 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1,
-        2,
-        6,
-        7,
-        8,
-        11
+        2
       ],
-      "latency_ms": 6835,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4620,
       "error": null
     },
     {
@@ -294,13 +367,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         5
       ],
-      "latency_ms": 5159,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4622,
       "error": null
     },
     {
@@ -310,13 +390,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 4936,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4098,
       "error": null
     },
     {
@@ -326,13 +413,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 6289,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5242,
       "error": null
     },
     {
@@ -342,6 +436,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -349,7 +448,9 @@
         5,
         6
       ],
-      "latency_ms": 7750,
+      "citation_count": 2,
+      "evidence_quote_count": 1,
+      "latency_ms": 7200,
       "error": null
     },
     {
@@ -359,6 +460,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -366,7 +472,9 @@
         5,
         6
       ],
-      "latency_ms": 8654,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5419,
       "error": null
     },
     {
@@ -376,6 +484,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -383,7 +496,9 @@
         5,
         6
       ],
-      "latency_ms": 11306,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 10339,
       "error": null
     },
     {
@@ -391,13 +506,23 @@
       "category": "A3",
       "difficulty": "medium",
       "kind": "answerable",
-      "passed": false,
-      "fail_reason": "pages [] ∩ [4, 5, 6] empty; evidence_mode=none; answer missing any of ['Qwen', 'Deepseek']",
-      "outcome": "refused",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
       "retrieval_status": "matched",
-      "evidence_mode": "none",
-      "cited_pages": [],
-      "latency_ms": 3893,
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3,
+        4
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5349,
       "error": null
     },
     {
@@ -407,6 +532,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -414,7 +544,9 @@
         3,
         4
       ],
-      "latency_ms": 7754,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4468,
       "error": null
     },
     {
@@ -424,13 +556,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         5
       ],
-      "latency_ms": 9592,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4051,
       "error": null
     },
     {
@@ -440,6 +579,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -447,7 +591,9 @@
         4,
         5
       ],
-      "latency_ms": 7105,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5294,
       "error": null
     },
     {
@@ -457,6 +603,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -464,7 +615,9 @@
         3,
         4
       ],
-      "latency_ms": 3958,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4971,
       "error": null
     },
     {
@@ -472,13 +625,23 @@
       "category": "A5",
       "difficulty": "hard",
       "kind": "answerable",
-      "passed": false,
-      "fail_reason": "pages [] ∩ [4] empty; evidence_mode=none; answer missing any of ['1210']",
-      "outcome": "refused",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
       "retrieval_status": "matched",
-      "evidence_mode": "none",
-      "cited_pages": [],
-      "latency_ms": 4951,
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3,
+        4
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5420,
       "error": null
     },
     {
@@ -488,13 +651,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         4
       ],
-      "latency_ms": 5143,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4815,
       "error": null
     },
     {
@@ -504,11 +674,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 3382,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 6753,
       "error": null
     },
     {
@@ -518,13 +695,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         3
       ],
-      "latency_ms": 4290,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 9373,
       "error": null
     },
     {
@@ -534,13 +718,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 4941,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4396,
       "error": null
     },
     {
@@ -550,13 +741,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 4246,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 8238,
       "error": null
     },
     {
@@ -566,6 +764,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -573,7 +776,9 @@
         1,
         2
       ],
-      "latency_ms": 7237,
+      "citation_count": 2,
+      "evidence_quote_count": 2,
+      "latency_ms": 5278,
       "error": null
     },
     {
@@ -583,13 +788,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         4
       ],
-      "latency_ms": 5226,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5584,
       "error": null
     },
     {
@@ -599,6 +811,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -606,7 +823,9 @@
         5,
         6
       ],
-      "latency_ms": 5330,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 7023,
       "error": null
     },
     {
@@ -614,13 +833,24 @@
       "category": "A4",
       "difficulty": "medium",
       "kind": "answerable",
-      "passed": false,
-      "fail_reason": "pages [] ∩ [1, 2, 3] empty; evidence_mode=none; answer missing any of ['Transformer', 'attention', 'sequence']",
-      "outcome": "refused",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
       "retrieval_status": "matched",
-      "evidence_mode": "none",
-      "cited_pages": [],
-      "latency_ms": 3174,
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1,
+        8,
+        10
+      ],
+      "citation_count": 3,
+      "evidence_quote_count": 3,
+      "latency_ms": 10232,
       "error": null
     },
     {
@@ -630,6 +860,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -637,7 +872,9 @@
         5,
         6
       ],
-      "latency_ms": 4348,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4351,
       "error": null
     },
     {
@@ -647,11 +884,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 5031,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 5804,
       "error": null
     },
     {
@@ -661,11 +905,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 3914,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 5843,
       "error": null
     },
     {
@@ -675,13 +926,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         3
       ],
-      "latency_ms": 16309,
+      "citation_count": 1,
+      "evidence_quote_count": 0,
+      "latency_ms": 6691,
       "error": null
     },
     {
@@ -689,13 +947,23 @@
       "category": "A1",
       "difficulty": "easy",
       "kind": "answerable",
-      "passed": false,
-      "fail_reason": "pages [] ∩ [4, 5] empty; evidence_mode=none; answer missing any of ['8', 'h = 8', 'h=8']",
-      "outcome": "refused",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
       "retrieval_status": "matched",
-      "evidence_mode": "none",
-      "cited_pages": [],
-      "latency_ms": 4076,
+      "evidence_mode": "declared",
+      "cited_pages": [
+        4,
+        5
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4272,
       "error": null
     },
     {
@@ -705,13 +973,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         8
       ],
-      "latency_ms": 6498,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4217,
       "error": null
     },
     {
@@ -721,13 +996,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         6
       ],
-      "latency_ms": 5493,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5334,
       "error": null
     },
     {
@@ -737,13 +1019,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         7
       ],
-      "latency_ms": 3766,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3705,
       "error": null
     },
     {
@@ -753,6 +1042,11 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
@@ -760,7 +1054,9 @@
         1,
         8
       ],
-      "latency_ms": 6666,
+      "citation_count": 2,
+      "evidence_quote_count": 1,
+      "latency_ms": 7115,
       "error": null
     },
     {
@@ -770,13 +1066,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         7
       ],
-      "latency_ms": 4252,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4120,
       "error": null
     },
     {
@@ -786,13 +1089,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         8
       ],
-      "latency_ms": 4738,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4751,
       "error": null
     },
     {
@@ -802,11 +1112,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 2165,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 7051,
       "error": null
     },
     {
@@ -816,11 +1133,18 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "matched",
       "evidence_mode": "none",
       "cited_pages": [],
-      "latency_ms": 3115,
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 5775,
       "error": null
     },
     {
@@ -830,13 +1154,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 3975,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3506,
       "error": null
     },
     {
@@ -846,13 +1177,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 4034,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3789,
       "error": null
     },
     {
@@ -862,10 +1200,17 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "low_confidence",
       "evidence_mode": "none",
       "cited_pages": [],
+      "citation_count": 0,
+      "evidence_quote_count": 0,
       "latency_ms": 1,
       "error": null
     },
@@ -874,13 +1219,22 @@
       "category": "A1",
       "difficulty": "easy",
       "kind": "answerable",
-      "passed": false,
-      "fail_reason": "pages [] ∩ [1] empty; evidence_mode=none; answer missing any of ['研答通']",
-      "outcome": "refused",
-      "retrieval_status": "no_match",
-      "evidence_mode": "none",
-      "cited_pages": [],
-      "latency_ms": 9,
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3582,
       "error": null
     },
     {
@@ -890,13 +1244,20 @@
       "kind": "answerable",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
       "outcome": "answered",
       "retrieval_status": "matched",
       "evidence_mode": "declared",
       "cited_pages": [
         1
       ],
-      "latency_ms": 3542,
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5371,
       "error": null
     },
     {
@@ -906,10 +1267,17 @@
       "kind": "refusal",
       "passed": true,
       "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
       "outcome": "refused",
       "retrieval_status": "no_match",
       "evidence_mode": "none",
       "cited_pages": [],
+      "citation_count": 0,
+      "evidence_quote_count": 0,
       "latency_ms": 1,
       "error": null
     }

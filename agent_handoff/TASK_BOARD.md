@@ -31,7 +31,7 @@
 - Frontend UX polish landed: confidence bar, clickable citation cards, refusal card, drag-and-drop upload, hero-button pulse
 - LLM-layer refusal escape landed: `ask` prompt returns `refused=true` on out-of-scope, `TaskService` honors it in a dedicated `llm_refused` branch; extended-eval refusal precision 0% → 100%
 - Retrieval metadata-intent fallback landed: first-page chunk is pinned for author/affiliation/contribution queries; extended-eval overall 85% → 95% on the 20-seed
-- Extended evaluation now at 51 cases (2 papers + 2 Chinese markdown): 46/51 pass (90.2%), refusal precision 100%, citation accuracy 88.4%. Dual-sample disclosure in `HARD_EVIDENCE_SUMMARY.md` §7 and `SCORING_EVIDENCE_MATRIX.md`
+- Extended evaluation story is now three-layered: old `46/51` exposed retrieval boundaries, model-selection replay chose the default at `48/51`, and final default-model retrieval/context patch closed the suite at `51/51`
 - Model-selection replay is now evidence-backed: 8-model gold quick screen plus 8 completed 51-case full replays show current `qwen3-235b-a22b-instruct-2507` remains the best default QA model (`48/51`, 94.1%, refusal 100%, avg 3401 ms); `kimi-k2.6` is second by score but too slow (`47/51`, avg 61908 ms); `qwen3-next-80b-a3b-instruct` is the best fast fallback (`46/51`, avg 2072 ms); details in `evidence/reports/model_selection_evaluation_20260424.md`
 - Retrieval metadata fallback is now extended to product/name/project-name queries, closing the local `research_brief:rb_a1_name` failure mode without weakening refusal behavior
 - Technical-only optimization roadmap now exists in `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md`: near-term focus is failure attribution, table/parameter retrieval patches, frontend task safety, and expanded predeploy gates; materials/PPT/video work is explicitly out of scope for this technical track
@@ -42,7 +42,8 @@
 - The digest workflow is now more judge-readable: the workbench card shows `生成速读 → 点击追问 → 查看证据回链`, and digest results show source chunk count, covered page count, and follow-up count
 - Demo hardening landed: a `国一演示路线` button prepares the sample document plus digest task, whitelisted ask/refusal questions are available, and a `精简速读兜底` preset provides a fast fallback when the model/network is slow
 - Frontend task requests now have a `90s` timeout with a productized fallback message that points operators to `精简速读兜底` instead of leaving the UI spinning indefinitely
-- Latest external-AI review bundle was regenerated after the technical/product hardening: `review_bundle_20260424_172006_final_competition_review.zip` with stage dir `review_bundle_stage_20260424_172006/`
+- Latest external-AI review bundle was regenerated after P0口径收敛: `review_bundle_20260424_181957_final_competition_review.zip` with stage dir `review_bundle_stage_20260424_181957/`
+- P0 evidence wording is now frozen around three layers: historical `46/51` boundary-finding, model-selection `48/51`, and final default-model `51/51`; avoid claiming open-domain 100% or every answer has a verbatim quote
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -139,9 +140,9 @@
 - Refusal demos must use prompts that are purely off-topic; prompts that still mention in-document entities can retrieve and answer
 - Current QA recommendation:
   - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
-  - keep `qwen3-32b` as validated fallback if demo/runtime latency becomes tighter
+  - keep `qwen3-next-80b-a3b-instruct` as the best validated fast fallback; `qwen3-32b` remains historical gold-sample fallback only
 
-## Latest Override (`2026-04-21`)
+## Historical Override (`2026-04-21`)
 
 - Quantitative evaluation metrics now exist:
   - script: `scripts/compute_eval_metrics.py`

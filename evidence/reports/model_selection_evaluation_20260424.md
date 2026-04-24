@@ -48,7 +48,10 @@ Full 51-case replay completed for 8 models:
 - `deepseek-v3.2`
 - `glm-5.1`
 - `deepseek-v3.2-thinking`
-- `minimax-m2.7`\r\n- `kimi-k2.6`\r\n\r\n`kimi-k2.6` eventually completed the full 51-case replay at `47 / 51` (`92.2%`) but averaged `61908 ms`, so it is a quality-capable but impractically slow default-path candidate for the current demo.
+- `minimax-m2.7`
+- `kimi-k2.6`
+
+`kimi-k2.6` eventually completed the full 51-case replay at `47 / 51` (`92.2%`) but averaged `61908 ms`, so it is a quality-capable but impractically slow default-path candidate for the current demo.
 
 ## Gold Quick Screen
 
@@ -77,7 +80,8 @@ Report files are named `evidence/reports/extended_eval_v1_<model>.md` and `.json
 | Rank | Model | Passed | Pass Rate | Answerable | Refusal | Citation | Declaration | Avg Latency (ms) |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | `qwen3-235b-a22b-instruct-2507` | `48 / 51` | `94.1%` | `93.0%` | `100.0%` | `93.0%` | `93.0%` | `3401` |
-| 2 | `kimi-k2.6` | `47 / 51` | `92.2%` | `90.7%` | `100.0%` | `90.7%` | `90.7%` | `61908` |`r`n| 3 | `qwen3-next-80b-a3b-instruct` | `46 / 51` | `90.2%` | `88.4%` | `100.0%` | `88.4%` | `90.7%` | `2072` |
+| 2 | `kimi-k2.6` | `47 / 51` | `92.2%` | `90.7%` | `100.0%` | `90.7%` | `90.7%` | `61908` |
+| 3 | `qwen3-next-80b-a3b-instruct` | `46 / 51` | `90.2%` | `88.4%` | `100.0%` | `88.4%` | `90.7%` | `2072` |
 | 4 | `deepseek-v3.2` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `90.7%` | `90.7%` | `5047` |
 | 5 | `qwen3-32b` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `5209` |
 | 6 | `glm-5.1` | `45 / 51` | `88.2%` | `86.0%` | `100.0%` | `86.0%` | `90.7%` | `8346` |

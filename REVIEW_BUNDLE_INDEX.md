@@ -24,14 +24,14 @@ narrowed the story on purpose:
 This bundle should be reviewed as a near-freeze competition project, not as a
 generic SaaS startup.
 
-## Current Snapshot (2026-04-21)
+## Current Snapshot (2026-04-24)
 
 - Runtime provider:
   - `Wuwen Xinqiong`
 - Primary QA model:
   - `qwen3-235b-a22b-instruct-2507`
-- Validated fallback:
-  - `qwen3-32b`
+- Validated fast fallback:
+  - `qwen3-next-80b-a3b-instruct`
 - Locked gold-sample document:
   - `evidence/samples/chinese_llm_spatial_eval.pdf`
 - Extended eval corpus (4 documents):
@@ -40,12 +40,15 @@ generic SaaS startup.
   - `evidence/samples/paper_report.md`
   - `evidence/samples/research_brief.md`
 - Current strongest evidence:
-  - strict `G3` fresh-upload three-run pass at
+  - strict `G3` fresh-upload six-run pass at
     `evidence/experiments/20260420_g3_strict_rehearsal.md`
+    plus `evidence/experiments/20260423_g3_continuation.md`
   - strict G3 quantitative metrics at
     `evidence/reports/quantitative_eval_metrics.md`
-  - extended 51-case eval report at
+  - final extended 51-case eval report at
     `evidence/reports/extended_eval_v1_latest.md`
+  - model-selection report at
+    `evidence/reports/model_selection_evaluation_20260424.md`
 - Current judged-asset source drafts:
   - `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
   - `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
@@ -62,26 +65,36 @@ generic SaaS startup.
 - fresh Q2 evidence regression fixed and rechecked
 - strict `G3` recorded with request-id traceability
 
-### Quantitative evaluation (2026-04-21)
+### Quantitative evaluation and model selection (2026-04-24)
 
 - strict G3 metrics computed: 4 rates at `100%`, refusal precision `100%`,
   cross-run consistency `100%`, chunk utilization `38%`, avg latency
   `5521 ms`
-- extended v1 (`51` cases × 4 docs): `46 / 51` pass (`90.2%`), refusal
-  precision `100%`, citation accuracy `88.4%`
-- `5` remaining failures kept honestly, not prompt-tuned away
+- model-selection full replay (`51` cases × 4 docs): default model chosen at
+  `48 / 51`; `kimi-k2.6` reached `47 / 51` but averaged about `61.9s`, so it
+  is not the demo default
+- final default-model extended v1 (`51` cases × 4 docs): targeted
+  retrieval/context patch closed the suite at `51 / 51`, refusal precision
+  `100%`, citation page-hit accuracy `100%`, declaration rate `100%`
+- older `46 / 51` reports are boundary-finding history, not the current final
+  product口径
 - `scripts/predeploy_sanity.py` wired as pre-demo must-pass
 
-### Late-stage hardening (2026-04-21)
+### Late-stage hardening (2026-04-24)
 
 - LLM-layer refusal escape (`refused=true` JSON contract + dedicated
   `llm_refused` branch in `TaskService`) — refusal precision on extended
   seed `0%` → `100%`
 - metadata-intent retrieval fallback (first-chunk pin on
   author/affiliation/contribution queries) — overall pass `85%` → `95%`
+- table/parameter query expansion, neighboring chunks, contribution-head
+  chunks, and matched-retrieval self-refusal retry closed the final default
+  replay to `51 / 51`
 - frontend UX polish (three-dot confidence bar, clickable citations,
-  dedicated refusal card, drag-and-drop upload, hero pulse); `7 / 7` smoke
-  tests pass; build clean
+  dedicated refusal card, drag-and-drop upload, hero pulse, research digest
+  workbench, follow-up chips, national demo route, concise digest fallback,
+  task timeout fallback); `13` frontend tests pass; build clean aside from the
+  existing Vite chunk warning
 
 ### Judge-facing materials
 
@@ -106,9 +119,8 @@ Only last-mile non-engineering work remains by default:
 
 1. Whole-project credibility, not just one document.
 2. Whether the current evidence-backed story is strong enough for judging.
-3. Whether the dual-layer evaluation (strict-G3 100% + extended 90.2%)
-   strengthens the story or introduces a judging risk that the team should
-   prepare for.
+3. Whether the evaluation story is now clear: strict-G3 100%, model-selection
+   48/51, and final default-model 51/51 after targeted retrieval/context patch.
 4. Whether current docs, deliverables, and code claims are internally
    consistent.
 5. Whether any hidden implementation or presentation risk could still hurt
@@ -128,7 +140,7 @@ Only last-mile non-engineering work remains by default:
 
 1. `PROJECT_CONTEXT.md`
 2. `REVIEW_PROMPT.md`
-3. `agent_handoff/SESSION_LOG.md` (top block = 2026-04-21, the most
+3. `agent_handoff/SESSION_LOG.md` (top block = 2026-04-24, the most
    current truth)
 4. `agent_handoff/TASK_BOARD.md`
 5. `agent_handoff/PROJECT_HANDOFF.md`
@@ -137,11 +149,14 @@ Only last-mile non-engineering work remains by default:
 8. `evidence/materials/SCORING_EVIDENCE_MATRIX.md`
 9. `evidence/reports/quantitative_eval_metrics.md`
 10. `evidence/reports/extended_eval_v1_latest.md`
-11. `evidence/experiments/20260420_g3_strict_rehearsal.md`
-12. `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
-13. `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
-14. current deliverables under `deliverables/competition_kit/`
-15. backend code only when a claim needs to be verified — start at
+11. `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md`
+12. `evidence/reports/model_selection_evaluation_20260424.md`
+13. `evidence/experiments/20260420_g3_strict_rehearsal.md`
+14. `evidence/experiments/20260423_g3_continuation.md`
+15. `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+16. `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+17. current deliverables under `deliverables/competition_kit/`
+18. backend code only when a claim needs to be verified — start at
     `backend/app/services/task_service.py` and
     `backend/app/services/retrieval_service.py`
 

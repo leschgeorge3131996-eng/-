@@ -1800,6 +1800,36 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - hand the zip to another AI first; it now reflects the current demo route, digest workbench, timeout fallback, model choice, and final extended-eval closeout
 
+---
+
+## 2026-04-24 / Codex (P0 evidence口径 freeze)
+
+- Summary:
+  - applied external-review P0 feedback by freezing the evaluation story into three explicit layers: historical `46/51` boundary-finding, model-selection `48/51`, and final default-model `51/51` after targeted retrieval/context patch
+  - updated high-visibility review/material files so `extended_eval_v1_latest.*` now points to the final `51/51` report and older `90.2%` language is clearly historical, not current product口径
+  - corrected the model-selection report Markdown row breaks for `kimi-k2.6`, `minimax-m2.7`, and `qwen3-next-80b-a3b-instruct`
+  - clarified evidence wording: citation/page-hit/declaration are final metrics; verbatim quote validation applies when the model provides quote text, so do not claim every answer has a verbatim quote or open-domain `100%`
+  - updated `scripts/export_review_bundle.ps1` to include `scripts/extended_eval.py`, `backend/tests/test_extended_eval.py`, and `evidence/experiments/20260423_g3_continuation.md`
+- Files touched:
+  - `PROJECT_CONTEXT.md`
+  - `REVIEW_PROMPT.md`
+  - `REVIEW_BUNDLE_INDEX.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md`
+  - `evidence/reports/extended_eval_v1_latest.md`
+  - `evidence/reports/extended_eval_v1_latest.json`
+  - `evidence/reports/model_selection_evaluation_20260424.md`
+  - `scripts/export_review_bundle.ps1`
+- Verification:
+  - scanned high-visibility files for stale current-claim terms like `extended 90.2`, `dual-layer`, `current truth 2026-04-21`, and unsafe quote/open-domain claims
+  - `npm test -- --run` from `frontend`: `13` tests passed across `2` files
+  - regenerated fresh review bundle: `review_bundle_20260424_181957_final_competition_review.zip`
+  - verified the new bundle includes `scripts/extended_eval.py`, `backend/tests/test_extended_eval.py`, `evidence/experiments/20260423_g3_continuation.md`, `extended_eval_v1_latest.md`, `model_selection_evaluation_20260424.md`, and refreshed top-level review files
+- Practical meaning:
+  - this is now the preferred bundle/prompt surface to hand to another AI; older `review_bundle_20260424_172006_*` is superseded
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:

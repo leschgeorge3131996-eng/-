@@ -108,6 +108,7 @@ $requiredFiles = @(
     "evidence\experiments\20260419_q2_declared_stability_check.md",
     "evidence\experiments\20260419_g3_rehearsal_template.md",
     "evidence\experiments\20260420_g3_strict_rehearsal.md",
+    "evidence\experiments\20260423_g3_continuation.md",
     "evidence\reports\gold_sample_replay_real_summary_latest.md",
     "evidence\reports\gold_sample_replay_real_latest.md",
     "evidence\reports\gold_sample_qa_compare_latest.md",
@@ -167,6 +168,7 @@ $requiredFiles = @(
     "backend\app\services\task_service.py",
     "backend\tests\test_api.py",
     "backend\tests\test_config.py",
+    "backend\tests\test_extended_eval.py",
     "backend\tests\test_services.py",
     "frontend\index.html",
     "frontend\package.json",
@@ -189,6 +191,7 @@ $requiredFiles = @(
     "scripts\export_competition_pdfs.js",
     "scripts\export_review_bundle.ps1",
     "scripts\compute_eval_metrics.py",
+    "scripts\extended_eval.py",
     "scripts\predeploy_sanity.py",
     "scripts\gold_retrieval_regression.py"
 )
@@ -313,7 +316,7 @@ state:
 - Strict `G3` status: fresh-upload `6`-run pass recorded across
   `evidence/experiments/20260420_g3_strict_rehearsal.md` and the 2026-04-23
   continuation notes in handoff/materials
-- Quantitative evaluation (2026-04-21):
+- Quantitative evaluation (updated 2026-04-24):
   - strict G3 (`9` entries): 4 rates at `100%`, avg latency `5521 ms`
     - report: `evidence/reports/quantitative_eval_metrics.md`
   - extended v1 (`51` cases): final default-model replay closed at `51 / 51`
