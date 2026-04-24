@@ -58,6 +58,11 @@ class RetrievalService:
         "作者",
         "第一作者",
         "通讯作者",
+        "名称",
+        "名字",
+        "产品名",
+        "项目名",
+        "叫什么",
         "单位",
         "高校",
         "学校",
@@ -77,6 +82,9 @@ class RetrievalService:
         "contribution",
         "contributions",
         "title",
+        "name",
+        "product",
+        "project",
         "abstract",
     )
 
@@ -104,7 +112,16 @@ class RetrievalService:
             if score >= self.min_score:
                 scored.append((score, chunk))
 
+        metadata_intent = self._has_metadata_intent(query)
         if not scored:
+            if metadata_intent and chunked_document.chunks:
+                return RetrievalResult(
+                    chunks=[chunked_document.chunks[0]],
+                    top_score=0.0,
+                    second_score=0.0,
+                    term_coverage=0.0,
+                    confident=True,
+                )
             return RetrievalResult(confident=False)
 
         scored.sort(
@@ -143,7 +160,7 @@ class RetrievalService:
             selected.append(chunk)
             current_chars += chunk.char_count
 
-        if self._has_metadata_intent(query) and chunked_document.chunks:
+        if metadata_intent and chunked_document.chunks:
             head_chunk = chunked_document.chunks[0]
             selected_ids = {chunk.chunk_id for chunk in selected}
             if head_chunk.chunk_id not in selected_ids:

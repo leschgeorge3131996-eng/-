@@ -1,6 +1,44 @@
-# Session Log
+﻿# Session Log
 
 Append-only log for both Codex and Claude Code.
+
+## 2026-04-24 / Codex (model-selection deep evaluation + metadata-name retrieval fix)
+
+- Summary:
+  - Ran an 8-model Wuwen Xinqiong gold quick screen on the locked `GOLD_SAMPLE_CANDIDATE_20260418` (`2` answerable + `1` refusal). All candidates passed the quick screen, but latency separated the field: `qwen3-next-80b-a3b-instruct` avg `1840 ms`, current `qwen3-235b-a22b-instruct-2507` avg `2638 ms`, `kimi-k2.6` avg `25235 ms` / max `52135 ms`.
+  - Added `--model` to `scripts/extended_eval.py` so future agents can override `MODEL_QA` for a single replay without editing `.env`.
+  - Ran completed 51-case `EXTENDED_EVAL_V1` full replays for `7` models: current `qwen3-235b-a22b-instruct-2507` won with `48/51` (`94.1%`, answerable `93.0%`, refusal `100.0%`, citation `93.0%`, declaration `93.0%`, avg `3401 ms`). The fastest serious fallback is `qwen3-next-80b-a3b-instruct` at `46/51` (`90.2%`, avg `2072 ms`). `qwen3-32b`, `deepseek-v3.2`, and `glm-5.1` each landed at `45/51`; `deepseek-v3.2-thinking` was slower and lower (`44/51`, avg `36305 ms`); `minimax-m2.7` is not suitable for the current structured-evidence pipeline (`32/51`, refusal `87.5%`).
+  - Tried to run `kimi-k2.6` on the full 51-case suite after its quick-screen pass, but it did not finish in practical time and was intentionally interrupted; no `extended_eval_v1_kimi_k2_6.*` full report exists. Treat Kimi as not default-path validated.
+  - Fixed a local retrieval miss for small metadata documents: `RetrievalService` now treats product/name/project-name queries (`名字`, `产品名`, `项目名`, `叫什么`, `name`, `product`, `project`) as metadata intent and falls back to the first chunk when there is no lexical match. This closes the `research_brief:rb_a1_name` style failure while preserving refusal behavior for unrelated questions.
+- Files touched:
+  - `backend/app/services/retrieval_service.py`
+  - `backend/tests/test_services.py`
+  - `scripts/extended_eval.py`
+  - `evidence/reports/model_selection_evaluation_20260424.md`
+  - `evidence/reports/gold_sample_qa_compare_8models_latest.{md,json}`
+  - `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507.{md,json}`
+  - `evidence/reports/extended_eval_v1_qwen3_next_80b_a3b_instruct.{md,json}`
+  - `evidence/reports/extended_eval_v1_qwen3_32b.{md,json}`
+  - `evidence/reports/extended_eval_v1_deepseek_v3_2.{md,json}`
+  - `evidence/reports/extended_eval_v1_glm_5_1.{md,json}`
+  - `evidence/reports/extended_eval_v1_deepseek_v3_2_thinking.{md,json}`
+  - `evidence/reports/extended_eval_v1_minimax_m2_7.{md,json}`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `python -m pytest backend/tests/test_services.py -k "metadata_name_question or retrieval_service_uses_head_chunk_for_metadata_name_questions"` -> `2 passed`
+  - `python -m pytest backend/tests/test_services.py -k "metadata_name_question or retrieval_service_uses_head_chunk_for_metadata_name_questions or avoids_fake_citations_on_retrieval_miss"` -> `3 passed`
+  - 8-model gold quick screen report generated successfully
+  - 7 completed full 51-case model reports generated successfully
+- Decision:
+  - Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo.
+  - If live latency becomes the blocker, use `qwen3-next-80b-a3b-instruct` as the best validated fast fallback after a final predeploy sanity run.
+  - Do not switch to `minimax-m2.7`, `deepseek-v3.2-thinking`, or `kimi-k2.6` for the default path based on this evidence.
+- Open risks:
+  - `kimi-k2.6` was not full-suite validated due to runtime; quick-screen latency already argues against it for the default demo path.
+  - This round validates QA model choice only. Summary/outline model downsizing can be evaluated later, but should not block judging/demo.
+- Recommended next step:
+  - Commit and push this evaluation bundle so Claude/teammates can rely on `evidence/reports/model_selection_evaluation_20260424.md` as the canonical model-selection answer.
 
 ## 2026-04-22 / Claude Code (external review bundle refresh + refusal-card copy fix)
 
@@ -1613,3 +1651,4 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - G3 reproducibility evidence is now stronger with 6 independent fresh-upload runs instead of 3
   - judge-facing口径 can now cite "strict 6-run batch" instead of "strict 3-run batch"
   - all 18 request IDs (6 runs × 3 prompts) are now indexed in `PLATFORM_USAGE_EVIDENCE.md` for full traceability
+

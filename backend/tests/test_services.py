@@ -707,6 +707,43 @@ def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
         cleanup_workspace(workspace)
 
 
+def test_task_service_answers_metadata_name_question_without_keyword_overlap() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "research_brief.md",
+            (
+                "# 项目简介\n\n"
+                "研答通是一款面向科研与智能办公场景的个人智能文档助理。\n"
+                "第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。"
+            ).encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="这个产品的名字是什么？",
+        )
+
+        assert result.outcome == "answered"
+        assert result.retrieval_status == "matched"
+        assert result.evidence_mode == "declared"
+        assert "研答通" in result.result
+        assert result.citations
+        assert result.citations[0].page_numbers == [1]
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_summary_uses_chunk_coverage_context() -> None:
     workspace = make_workspace()
     try:
@@ -961,6 +998,29 @@ def test_retrieval_service_handles_filler_words_and_title_bonus() -> None:
 
     assert selected
     assert "first-phase goal" in selected[0].text.lower()
+
+
+def test_retrieval_service_uses_head_chunk_for_metadata_name_questions() -> None:
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=1,
+        chunk_count=1,
+        chunks=[
+            ParsedChunk(
+                chunk_id="intro",
+                chunk_index=0,
+                page_numbers=[1],
+                text="# 项目简介\n\n研答通是一款面向科研与智能办公场景的个人智能文档助理。",
+                char_count=len("# 项目简介\n\n研答通是一款面向科研与智能办公场景的个人智能文档助理。"),
+            )
+        ],
+    )
+    retrieval = RetrievalService()
+
+    result = retrieval.retrieve_with_confidence("这个产品的名字是什么？", chunked)
+
+    assert result.confident is True
+    assert [chunk.chunk_id for chunk in result.chunks] == ["intro"]
 
 
 def test_retrieval_normalize_query_preserves_english_tokens() -> None:

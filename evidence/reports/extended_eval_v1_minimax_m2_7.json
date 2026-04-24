@@ -1,0 +1,884 @@
+{
+  "summary": {
+    "total": 51,
+    "passed": 32,
+    "overall_pass_rate": 0.6274509803921569,
+    "answerable_pass_rate": 0.5813953488372093,
+    "refusal_precision": 0.875,
+    "citation_accuracy": 0.5813953488372093,
+    "declaration_rate": 0.6046511627906976,
+    "avg_latency_ms": 20121,
+    "by_category": {
+      "A1": {
+        "total": 15,
+        "passed": 9,
+        "pass_rate": 0.6,
+        "avg_latency_ms": 14409
+      },
+      "A2": {
+        "total": 9,
+        "passed": 5,
+        "pass_rate": 0.5555555555555556,
+        "avg_latency_ms": 37863
+      },
+      "A3": {
+        "total": 7,
+        "passed": 4,
+        "pass_rate": 0.5714285714285714,
+        "avg_latency_ms": 28117
+      },
+      "A4": {
+        "total": 7,
+        "passed": 5,
+        "pass_rate": 0.7142857142857143,
+        "avg_latency_ms": 14031
+      },
+      "A5": {
+        "total": 5,
+        "passed": 2,
+        "pass_rate": 0.4,
+        "avg_latency_ms": 19144
+      },
+      "B1": {
+        "total": 5,
+        "passed": 5,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5782
+      },
+      "B2": {
+        "total": 3,
+        "passed": 2,
+        "pass_rate": 0.6666666666666666,
+        "avg_latency_ms": 16534
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "total": 24,
+        "passed": 18,
+        "pass_rate": 0.75,
+        "avg_latency_ms": 12765
+      },
+      "medium": {
+        "total": 19,
+        "passed": 10,
+        "pass_rate": 0.5263157894736842,
+        "avg_latency_ms": 30236
+      },
+      "hard": {
+        "total": 8,
+        "passed": 4,
+        "pass_rate": 0.5,
+        "avg_latency_ms": 18165
+      }
+    },
+    "by_doc": {
+      "chinese_llm_spatial_eval": {
+        "total": 25,
+        "passed": 19,
+        "pass_rate": 0.76,
+        "avg_latency_ms": 16696
+      },
+      "attention_is_all_you_need": {
+        "total": 20,
+        "passed": 7,
+        "pass_rate": 0.35,
+        "avg_latency_ms": 29185
+      },
+      "paper_report": {
+        "total": 3,
+        "passed": 3,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5709
+      },
+      "research_brief": {
+        "total": 3,
+        "passed": 3,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 2646
+      }
+    }
+  },
+  "records": [
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1,
+        5,
+        6
+      ],
+      "latency_ms": 9319,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        5,
+        6
+      ],
+      "latency_ms": 10003,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 11548,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1,
+        2
+      ],
+      "latency_ms": 6821,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1, 5, 6] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 56303,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a3_subtasks",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3,
+        4
+      ],
+      "latency_ms": 34801,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a4_method_summary",
+      "category": "A4",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1,
+        2
+      ],
+      "latency_ms": 18445,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a4_ranking",
+      "category": "A4",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 5026,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a5_train_count",
+      "category": "A5",
+      "difficulty": "hard",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3,
+        4
+      ],
+      "latency_ms": 9979,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_b1_quantum",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 10081,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_conf_name",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 46411,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_temperature",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        5
+      ],
+      "latency_ms": 6004,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_author_count",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 16637,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a1_school_department",
+      "category": "A1",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 7505,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a2_ernie_weakness",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        6
+      ],
+      "latency_ms": 14576,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a2_glm4_best",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        4,
+        5,
+        6
+      ],
+      "latency_ms": 14922,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a3_models_count",
+      "category": "A3",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        5,
+        6
+      ],
+      "latency_ms": 28266,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a3_opensource",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [4, 5, 6] empty; evidence_mode=none; answer missing any of ['Qwen', 'Deepseek']",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 12619,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a3_context_max",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3,
+        4
+      ],
+      "latency_ms": 15440,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a4_eval_metric",
+      "category": "A4",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        5
+      ],
+      "latency_ms": 7197,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a4_cot_sample_source",
+      "category": "A4",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        4,
+        5
+      ],
+      "latency_ms": 8820,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a5_test_count",
+      "category": "A5",
+      "difficulty": "hard",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [3] ∩ [4] empty",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        3
+      ],
+      "latency_ms": 21827,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a5_val_count",
+      "category": "A5",
+      "difficulty": "hard",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [4] empty; evidence_mode=none; answer missing any of ['1210']",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 10255,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_a5_study_period",
+      "category": "A5",
+      "difficulty": "hard",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        4
+      ],
+      "latency_ms": 24262,
+      "error": null
+    },
+    {
+      "case_id": "chinese_llm_spatial_eval:zh_b1_weather",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 10341,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [3] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 23308,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 25090,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 10269,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1,
+        2
+      ],
+      "latency_ms": 60883,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [4] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 78123,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a3_complexity_compare",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        5,
+        6
+      ],
+      "latency_ms": 37007,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a4_contributions",
+      "category": "A4",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1, 2, 3] empty; evidence_mode=none; answer missing any of ['Transformer', 'attention', 'sequence']",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 20693,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a5_conv_path_length",
+      "category": "A5",
+      "difficulty": "hard",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [6] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 29401,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b1_everest",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 8490,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b2_vaswani_affiliation_now",
+      "category": "B2",
+      "difficulty": "hard",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 8172,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a1_decoder_layers",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [3] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 24713,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a1_attention_heads",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [4, 5] empty; evidence_mode=none; answer missing any of ['8', 'h = 8', 'h=8']",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 8516,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a2_dropout_rate",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [7, 8] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 24274,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a2_positional_enc",
+      "category": "A2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [5, 6] empty; evidence_mode=candidate; answer missing any of ['sine', 'cosine', 'sinusoid']",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 76625,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a3_training_hardware",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [7] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 21930,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a3_wmt_tasks",
+      "category": "A3",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [1, 7, 8] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 46756,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a4_optimizer",
+      "category": "A4",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        7
+      ],
+      "latency_ms": 20097,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_a4_label_smoothing",
+      "category": "A4",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": false,
+      "fail_reason": "pages [] ∩ [7, 8] empty; evidence_mode=candidate",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 17942,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b2_pytorch_code",
+      "category": "B2",
+      "difficulty": "hard",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 9286,
+      "error": null
+    },
+    {
+      "case_id": "attention_is_all_you_need:en_b3_nobel",
+      "category": "B2",
+      "difficulty": "hard",
+      "kind": "refusal",
+      "passed": false,
+      "fail_reason": "expected refusal but outcome=answered retrieval_status=matched",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "candidate",
+      "cited_pages": [],
+      "latency_ms": 32144,
+      "error": null
+    },
+    {
+      "case_id": "paper_report:pr_a1_scenarios",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 8884,
+      "error": null
+    },
+    {
+      "case_id": "paper_report:pr_a2_pipeline",
+      "category": "A2",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 8243,
+      "error": null
+    },
+    {
+      "case_id": "paper_report:pr_b1_finance",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "low_confidence",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 1,
+      "error": null
+    },
+    {
+      "case_id": "research_brief:rb_a1_name",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 4975,
+      "error": null
+    },
+    {
+      "case_id": "research_brief:rb_a1_upload_types",
+      "category": "A1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "latency_ms": 2963,
+      "error": null
+    },
+    {
+      "case_id": "research_brief:rb_b1_price",
+      "category": "B1",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "outcome": "refused",
+      "retrieval_status": "no_match",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "latency_ms": 1,
+      "error": null
+    }
+  ]
+}

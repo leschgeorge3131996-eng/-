@@ -20,7 +20,7 @@ import argparse
 import json
 import shutil
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from pathlib import Path
 from statistics import mean
@@ -29,7 +29,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from backend.app.core.config import get_settings
+from backend.app.core.config import Settings, get_settings
 from backend.app.services.auth_service import AuthService
 from backend.app.services.file_service import FileService
 from backend.app.services.log_service import LogService
@@ -136,8 +136,16 @@ def score(record: EvalRecord) -> None:
         record.fail_reason = "; ".join(reasons)
 
 
-def run_cases(cases: list[EvalCase], *, clear_cache: bool = True) -> list[EvalRecord]:
-    settings = get_settings()
+def build_eval_settings(base_settings: Settings, *, model_name: str | None = None) -> Settings:
+    if not model_name:
+        return base_settings
+    return replace(base_settings, model_qa=model_name)
+
+
+def run_cases(
+    cases: list[EvalCase], *, clear_cache: bool = True, model_name: str | None = None
+) -> list[EvalRecord]:
+    settings = build_eval_settings(get_settings(), model_name=model_name)
     auth_service = AuthService(settings=settings)
     file_service = FileService(settings=settings)
     log_service = LogService(settings=settings)
@@ -347,6 +355,12 @@ def main() -> None:
         default="evidence/reports/extended_eval_v1_latest.json",
     )
     parser.add_argument("--no-clear-cache", action="store_true")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help="Override MODEL_QA for this run without editing .env.",
+    )
     args = parser.parse_args()
 
     manifest_path = PROJECT_ROOT / args.manifest
@@ -356,7 +370,10 @@ def main() -> None:
         sys.exit(1)
     print(f"Loaded {len(cases)} cases from {manifest_path}")
 
-    records = run_cases(cases, clear_cache=not args.no_clear_cache)
+    if args.model:
+        print(f"Using QA model override: {args.model}")
+
+    records = run_cases(cases, clear_cache=not args.no_clear_cache, model_name=args.model)
     summary = aggregate(records)
 
     output_path = PROJECT_ROOT / args.output
