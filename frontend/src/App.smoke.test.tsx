@@ -329,6 +329,61 @@ describe("App smoke flows", () => {
     expect(screen.getByTestId("recent-result-req-summary")).toBeTruthy();
   });
 
+  it("applies the research digest preset before submitting", async () => {
+    seedSession();
+    const metadata = makeMetadata({
+      file_id: "file-digest",
+      original_name: "paper.md",
+      access_token: "token-digest"
+    });
+    const taskResult = makeTaskResult({
+      request_id: "req-digest",
+      file_id: metadata.file_id,
+      document_name: metadata.original_name,
+      document_fingerprint: metadata.document_fingerprint,
+      response_detail_level: "detailed",
+      result: "digest smoke result"
+    });
+
+    uploadDocumentMock.mockImplementation(async (_file, onProgress) => {
+      onProgress?.(100);
+      return { metadata };
+    });
+    runTaskMock.mockResolvedValue(taskResult);
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["paper content"], "paper.md", { type: "text/markdown" })]
+      }
+    });
+    fireEvent.click(screen.getByTestId("research-digest-preset"));
+
+    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "论文速读工作台"
+    );
+
+    fireEvent.click(screen.getByTestId("submit-task-button"));
+
+    await waitFor(() =>
+      expect(runTaskMock).toHaveBeenCalledWith(
+        "summary",
+        "file-digest",
+        expect.stringContaining("建议追问的 5 个问题"),
+        "detailed",
+        "token-digest"
+      )
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("result-output").textContent).toContain("digest smoke result")
+    );
+  });
+
   it("opens and re-targets PDF preview from ask citations", async () => {
     seedSession();
     const metadata = makeMetadata({

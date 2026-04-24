@@ -89,6 +89,19 @@ const DEMO_ACTIONS = [
   }
 ];
 
+const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读工作台，必须包含：
+1. 研究问题
+2. 核心方法
+3. 主要贡献
+4. 实验结果
+5. 局限与不足
+6. 建议追问的 5 个问题
+
+要求：
+- 每一部分尽量标注对应页码、章节或来源线索。
+- 优先提炼对答辩、复现实验和继续追问最有价值的信息。
+- 输出为清晰的 Markdown。`;
+
 const TASK_LABELS: Record<TaskType, string> = {
   summary: "摘要",
   ask: "问答",
@@ -356,6 +369,10 @@ export default function App() {
     (taskType !== "ask" || Boolean(input.trim()));
   const previewMetadata = uploadedMetadata?.file_type === "pdf" ? uploadedMetadata : null;
   const interactionLocked = loading || authPending || authLoading;
+  const digestPresetActive =
+    taskType === "summary" &&
+    responseDetailLevel === "detailed" &&
+    input.trim() === RESEARCH_DIGEST_PROMPT.trim();
 
   useEffect(() => {
     writeStorage(RECENT_DOCUMENTS_KEY, recentDocuments);
@@ -636,6 +653,14 @@ export default function App() {
       .finally(() => {
         setLoading(false);
       });
+  }
+
+  function applyResearchDigestPreset() {
+    setTaskType("summary");
+    setResponseDetailLevel("detailed");
+    setInput(RESEARCH_DIGEST_PROMPT);
+    setNotice("已切换到论文速读工作台：上传论文后可直接生成结构化速读结果。");
+    setError(null);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1072,6 +1097,25 @@ export default function App() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className={`digest-workbench${digestPresetActive ? " active" : ""}`}>
+                <div>
+                  <span className="digest-kicker">产品化速读</span>
+                  <strong>论文速读工作台</strong>
+                  <p>
+                    一键生成研究问题、方法、贡献、实验、局限和追问清单，适合答辩前快速吃透论文。
+                  </p>
+                </div>
+                <button
+                  className="ghost-button digest-button"
+                  data-testid="research-digest-preset"
+                  type="button"
+                  disabled={interactionLocked}
+                  onClick={applyResearchDigestPreset}
+                >
+                  {digestPresetActive ? "已启用" : "生成论文速读"}
+                </button>
               </div>
 
               <label className="field">

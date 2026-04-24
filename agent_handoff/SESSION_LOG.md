@@ -1663,6 +1663,25 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 
 ---
 
+## 2026-04-24 / Codex (product-level research digest preset)
+
+- Summary:
+  - added a frontend-only `论文速读工作台` preset as the next technical/product highlight after the `51/51` retrieval patch
+  - the preset reuses the stable `summary` endpoint, switches response detail to `detailed`, and injects a structured Markdown prompt for research question, method, contribution, experiment, limitation, and follow-up questions
+  - this is intentionally low-risk: no backend schema, route, model-selection, or storage migration change
+- Files touched:
+  - `frontend/src/App.tsx`
+  - `frontend/src/styles.css`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm test -- --run` from `frontend`: `8` tests passed
+  - `npm run build` from `frontend`: passed; Vite kept the existing large-chunk warning
+- Practical meaning:
+  - judges can now see a concrete product workflow beyond raw摘要/问答/提纲
+  - the feature demonstrates端到端文档理解 value without destabilizing the already-validated backend QA/retrieval stack
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:
