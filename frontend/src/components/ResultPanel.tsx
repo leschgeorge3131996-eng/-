@@ -214,6 +214,47 @@ function buildExportLines(
   return lines;
 }
 
+function cleanFollowUpQuestion(rawLine: string): string {
+  return rawLine
+    .replace(/^\s*(?:[-*•]|\d+[.)、]|[（(]?\d+[）)])\s*/, "")
+    .replace(/^\s*(?:问题|追问)\s*\d*\s*[:：、.-]?\s*/, "")
+    .replace(/\s+$/, "")
+    .trim();
+}
+
+function extractResearchDigestQuestions(result: TaskResult | null): string[] {
+  if (!result || result.task_type !== "summary" || result.outcome === "refused") {
+    return [];
+  }
+
+  const lines = result.result.split(/\r?\n/);
+  const questions: string[] = [];
+  let inFollowUpSection = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const headingText = trimmed.replace(/^#{1,6}\s*/, "");
+    if (/建议追问|追问问题|后续问题|可追问/.test(headingText)) {
+      inFollowUpSection = true;
+      continue;
+    }
+
+    if (inFollowUpSection && /^#{1,6}\s+/.test(trimmed)) {
+      break;
+    }
+
+    const cleaned = cleanFollowUpQuestion(trimmed);
+    const looksLikeQuestion = /[？?]$/.test(cleaned) || /^(为什么|如何|是否|哪些|什么|能否|怎样|哪里|哪一|是否可以)/.test(cleaned);
+    if (inFollowUpSection && looksLikeQuestion && cleaned.length >= 4) {
+      questions.push(cleaned);
+    }
+  }
+
+  return Array.from(new Set(questions)).slice(0, 5);
+}
+
 type ResultPanelProps = {
   activeTaskType: TaskType;
   error: string | null;
@@ -222,6 +263,7 @@ type ResultPanelProps = {
   result: TaskResult | null;
   canOpenPdfPreview?: boolean;
   onOpenPdfPage?: (citation: Citation) => void;
+  onAskFollowUp?: (question: string) => void;
 };
 
 export default function ResultPanel({
@@ -231,7 +273,8 @@ export default function ResultPanel({
   loadMessage,
   result,
   canOpenPdfPreview = false,
-  onOpenPdfPage
+  onOpenPdfPage,
+  onAskFollowUp
 }: ResultPanelProps) {
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
   const [evidenceCopyState, setEvidenceCopyState] = useState<string | null>(null);
@@ -247,6 +290,7 @@ export default function ResultPanel({
   const modelMetaValue = isRetrievalGate
     ? "retrieval_gate（未调用模型）"
     : (result?.model_name ?? "-");
+  const followUpQuestions = extractResearchDigestQuestions(result);
 
   useEffect(() => {
     setCopyState("idle");
@@ -653,6 +697,28 @@ export default function ResultPanel({
                 </div>
               </motion.div>
             )}
+
+            {followUpQuestions.length > 0 && onAskFollowUp ? (
+              <motion.div className="follow-up-panel" {...revealMotion(0.56)}>
+                <div className="follow-up-head">
+                  <span>速读后的下一步</span>
+                  <strong>一键追问并回到原文证据</strong>
+                </div>
+                <div className="follow-up-list">
+                  {followUpQuestions.map((question, index) => (
+                    <button
+                      key={question}
+                      className="follow-up-chip"
+                      data-testid={`follow-up-question-${index}`}
+                      type="button"
+                      onClick={() => onAskFollowUp(question)}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>

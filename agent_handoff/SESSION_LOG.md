@@ -1682,6 +1682,28 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - judges can now see a concrete product workflow beyond raw摘要/问答/提纲
   - the feature demonstrates端到端文档理解 value without destabilizing the already-validated backend QA/retrieval stack
 
+---
+
+## 2026-04-24 / Codex (research digest follow-up loop)
+
+- Summary:
+  - upgraded the `论文速读工作台` from a prompt preset into a visible reading workflow
+  - `ResultPanel` now extracts the digest section named `建议追问 / 追问问题 / 后续问题 / 可追问` and renders up to `5` clickable follow-up chips
+  - clicking a chip switches the main form to `ask`, sets balanced detail, and fills the question so the next submit goes through retrieval, citation, and PDF-preview evidence回链
+- Files touched:
+  - `frontend/src/components/ResultPanel.tsx`
+  - `frontend/src/App.tsx`
+  - `frontend/src/styles.css`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm test -- --run` from `frontend`: `9` tests passed
+  - `npm run build` from `frontend`: passed; Vite kept the existing large-chunk warning
+- Practical meaning:
+  - demo path is now: upload paper → generate digest → click follow-up → ask with evidence回链
+  - this is still frontend-first and low-risk; no backend schema, model routing, or storage migration was changed
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:

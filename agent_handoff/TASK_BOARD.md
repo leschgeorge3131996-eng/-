@@ -38,6 +38,7 @@
 - Default-model extended eval is now closed at `51/51` after targeted retrieval/context patching: parameter/table-like queries get query expansion + neighboring chunks, contribution questions include document-head chunks, and matched-retrieval self-refusals get one stricter retry; see `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md`
 - `scripts/predeploy_sanity.py` now exists: one-command archive `call_logs.jsonl` + run 3 gold cases + emit markdown report, exit 0 only on 3/3 pass; wired as first pre-demo must-pass in `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - Frontend now has a judge-visible `论文速读工作台` preset: one click switches to detailed summary, injects a structured paper-reading prompt, and reuses the stable existing summary endpoint for low-risk end-to-end delivery
+- `论文速读工作台` now has a lightweight end-to-end follow-up loop: generated follow-up questions are extracted into clickable chips, then one click switches to `ask` so the next answer can use the existing retrieval/citation/PDF-preview evidence path
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

@@ -241,23 +241,24 @@ function resolveAskPreviewSnippet(
   return citation?.snippet ?? matchedQuote ?? taskResult.evidence_quotes[0]?.quote ?? null;
 }
 
-function scrollPreviewIntoView(): void {
+function scrollElementIntoView(selector: string): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
-  // Double RAF so React has committed and laid out the (possibly just-mounted)
-  // preview panel before we scroll to it.
+
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
-      const element = document.querySelector<HTMLElement>(
-        '[data-testid="pdf-preview-panel"]'
-      );
+      const element = document.querySelector<HTMLElement>(selector);
       if (!element || typeof element.scrollIntoView !== "function") {
         return;
       }
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
+}
+
+function scrollPreviewIntoView(): void {
+  scrollElementIntoView('[data-testid="pdf-preview-panel"]');
 }
 
 function buildPreviewReference(taskResult: TaskResult): PreviewReference {
@@ -661,6 +662,15 @@ export default function App() {
     setInput(RESEARCH_DIGEST_PROMPT);
     setNotice("已切换到论文速读工作台：上传论文后可直接生成结构化速读结果。");
     setError(null);
+  }
+
+  function applyFollowUpQuestion(question: string) {
+    setTaskType("ask");
+    setResponseDetailLevel("balanced");
+    setInput(question);
+    setNotice("已填入速读追问：点击提交任务后会进入问答与证据回链。");
+    setError(null);
+    scrollElementIntoView('[data-testid="task-input"]');
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1263,6 +1273,7 @@ export default function App() {
               setPreviewOpen(true);
               scrollPreviewIntoView();
             }}
+            onAskFollowUp={applyFollowUpQuestion}
           />
         </section>
 

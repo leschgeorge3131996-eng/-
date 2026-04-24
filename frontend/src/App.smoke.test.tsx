@@ -384,6 +384,84 @@ describe("App smoke flows", () => {
     );
   });
 
+  it("turns research digest follow-up questions into ask prompts", async () => {
+    seedSession();
+    const metadata = makeMetadata({
+      file_id: "file-follow-up",
+      original_name: "paper.md",
+      access_token: "token-follow-up"
+    });
+    const digestResult = makeTaskResult({
+      request_id: "req-follow-up-digest",
+      file_id: metadata.file_id,
+      document_name: metadata.original_name,
+      document_fingerprint: metadata.document_fingerprint,
+      response_detail_level: "detailed",
+      result: `# 论文速读工作台
+
+## 建议追问的 5 个问题
+1. 该方法相比 baseline 的核心优势是什么？
+2. 实验中最关键的消融结论是什么？`
+    });
+    const askResult = makeTaskResult({
+      request_id: "req-follow-up-ask",
+      task_type: "ask",
+      file_id: metadata.file_id,
+      document_name: metadata.original_name,
+      document_fingerprint: metadata.document_fingerprint,
+      result: "follow-up ask result",
+      retrieval_status: "matched",
+      retrieval_applied: true,
+      evidence_mode: "declared",
+      retrieved_chunk_count: 1,
+      retrieved_pages: [2],
+      citations: [makeCitation({ chunk_id: "chunk-follow", page_numbers: [2], snippet: "baseline evidence" })],
+      source_chunks: []
+    });
+
+    uploadDocumentMock.mockImplementation(async (_file, onProgress) => {
+      onProgress?.(100);
+      return { metadata };
+    });
+    runTaskMock.mockResolvedValueOnce(digestResult).mockResolvedValueOnce(askResult);
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["paper content"], "paper.md", { type: "text/markdown" })]
+      }
+    });
+    fireEvent.click(screen.getByTestId("research-digest-preset"));
+    fireEvent.click(screen.getByTestId("submit-task-button"));
+
+    await waitFor(() => expect(screen.getByTestId("follow-up-question-0")).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId("follow-up-question-0"));
+
+    expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-balanced")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toBe(
+      "该方法相比 baseline 的核心优势是什么？"
+    );
+
+    fireEvent.click(screen.getByTestId("submit-task-button"));
+
+    await waitFor(() =>
+      expect(runTaskMock).toHaveBeenLastCalledWith(
+        "ask",
+        "file-follow-up",
+        "该方法相比 baseline 的核心优势是什么？",
+        "balanced",
+        "token-follow-up"
+      )
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("result-output").textContent).toContain("follow-up ask result")
+    );
+  });
+
   it("opens and re-targets PDF preview from ask citations", async () => {
     seedSession();
     const metadata = makeMetadata({
