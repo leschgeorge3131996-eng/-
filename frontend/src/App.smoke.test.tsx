@@ -444,6 +444,39 @@ digest smoke result
     );
   });
 
+  it("shows a concise-digest fallback hint when a task times out", async () => {
+    seedSession();
+    const metadata = makeMetadata({
+      file_id: "file-timeout",
+      original_name: "timeout.md",
+      access_token: "token-timeout"
+    });
+
+    uploadDocumentMock.mockImplementation(async (_file, onProgress) => {
+      onProgress?.(100);
+      return { metadata };
+    });
+    runTaskMock.mockRejectedValue(
+      new ApiRequestError("timeout", "TASK_TIMEOUT", { timeout_ms: 90000 })
+    );
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["timeout content"], "timeout.md", { type: "text/markdown" })]
+      }
+    });
+    fireEvent.click(screen.getByTestId("submit-task-button"));
+
+    await waitFor(() =>
+      expect(screen.getByText(/模型响应较慢/)).toBeInTheDocument()
+    );
+    expect(screen.getByText(/建议先点击“精简速读兜底”/)).toBeInTheDocument();
+  });
+
   it("turns research digest follow-up questions into ask prompts", async () => {
     seedSession();
     const metadata = makeMetadata({

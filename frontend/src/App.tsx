@@ -159,13 +159,16 @@ function writeStorage<T>(key: string, value: T): void {
 
 function describeLoadStage(stage: "idle" | "uploading" | "model"): string {
   if (stage === "uploading") return "正在上传并解析文档...";
-  if (stage === "model") return "模型处理中，首次请求可能需要 10 到 40 秒。";
+  if (stage === "model") return "模型处理中，首次请求可能需要 10 到 40 秒；如现场网络较慢，可改用精简速读兜底。";
   return "";
 }
 
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof ApiRequestError && error.code === "UNAUTHORIZED") {
     return "当前试用会话已失效，请重新登录。";
+  }
+  if (error instanceof ApiRequestError && error.code === "TASK_TIMEOUT") {
+    return "模型响应较慢，已自动停止等待。建议先点击“精简速读兜底”快速跑通演示，或稍后重试当前任务。";
   }
   if (error instanceof ApiRequestError) return error.message;
   if (error instanceof Error) return error.message;

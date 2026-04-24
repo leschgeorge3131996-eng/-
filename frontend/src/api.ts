@@ -13,6 +13,7 @@ import type {
 const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const API_BASE_URL = rawApiBaseUrl ? rawApiBaseUrl.replace(/\/+$/, "") : "/api";
 const AUTH_SESSION_STORAGE_KEY = "yandatong_auth_session";
+const TASK_REQUEST_TIMEOUT_MS = 90_000;
 
 type LoginPayload = {
   session: SessionInfo;
@@ -101,6 +102,37 @@ function buildNonJsonResponseError(status: number, text: string): ApiRequestErro
     status,
     preview
   });
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw new ApiRequestError(
+        "模型响应超过 90 秒。现场演示可先切换“精简速读兜底”，或稍后重试当前任务。",
+        "TASK_TIMEOUT",
+        { timeout_ms: timeoutMs }
+      );
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
@@ -269,14 +301,14 @@ export async function runTask(
           response_detail_level: responseDetailLevel
         };
 
-  const response = await fetch(endpoint, {
+  const response = await fetchWithTimeout(endpoint, {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(payload)
-  });
+  }, TASK_REQUEST_TIMEOUT_MS);
   return parseResponse<TaskResult>(response);
 }
 

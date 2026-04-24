@@ -1761,6 +1761,27 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - primary demo path is now less dependent on ad-hoc operator choices: prepare route → submit digest → click follow-up/whitelist question → show evidence or refusal boundary
 
+---
+
+## 2026-04-24 / Codex (frontend task timeout fallback)
+
+- Summary:
+  - added a `90s` `AbortController` timeout around frontend task requests (`summary` / `ask` / `outline`)
+  - mapped timeout errors to a现场友好 message that recommends `精简速读兜底` or retrying later, avoiding indefinite loading during model/network slowdowns
+  - updated model-loading copy to mention the fallback path before a timeout occurs
+- Files touched:
+  - `frontend/src/api.ts`
+  - `frontend/src/api.test.ts`
+  - `frontend/src/App.tsx`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm test -- --run` from `frontend`: `13` tests passed across `2` files
+  - `npm run build` from `frontend`: passed; Vite kept the existing large-chunk warning
+- Practical meaning:
+  - a slow model call now fails gracefully with a clear operator action instead of leaving the demo stuck on loading
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:
