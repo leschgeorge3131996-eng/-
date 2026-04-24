@@ -1782,6 +1782,24 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - a slow model call now fails gracefully with a clear operator action instead of leaving the demo stuck on loading
 
+---
+
+## 2026-04-24 / Codex (external AI review bundle refreshed)
+
+- Summary:
+  - refreshed `scripts/export_review_bundle.ps1` so the external-review package includes the latest technical/product hardening artifacts and current 2026-04-24 evidence口径
+  - added the technical roadmap, final `51/51` retrieval-patch report, model-selection report, and frontend `api.test.ts` to the generated review bundle surface
+  - regenerated a fresh external AI review bundle for another model to inspect without relying on stale 2026-04-21 context
+- New local artifacts:
+  - stage dir: `review_bundle_stage_20260424_172006/`
+  - zip: `review_bundle_20260424_172006_final_competition_review.zip`
+- Verification:
+  - zip size: about `10.2 MB`
+  - stage file count: `137`
+  - checked key inclusions: `frontend/src/api.test.ts`, `frontend/src/App.tsx`, `frontend/src/components/ResultPanel.tsx`, `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md`, `evidence/reports/model_selection_evaluation_20260424.md`, and `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md`
+- Practical meaning:
+  - hand the zip to another AI first; it now reflects the current demo route, digest workbench, timeout fallback, model choice, and final extended-eval closeout
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:
