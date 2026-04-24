@@ -1741,6 +1741,26 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - judges no longer need to infer the端到端 path; the UI explicitly tells them the intended workflow and backs digest output with visible provenance metrics
 
+---
+
+## 2026-04-24 / Codex (national demo route hardening)
+
+- Summary:
+  - added a `国一演示路线` card in the demo panel that prepares the sample document and detailed digest task in one click
+  - added whitelisted demo questions for two evidence-backed asks plus one refusal-boundary ask, reducing现场自由输入风险
+  - added a `精简速读兜底` preset using concise detail and a shorter digest prompt for slow model/network situations
+- Files touched:
+  - `frontend/src/App.tsx`
+  - `frontend/src/styles.css`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm test -- --run` from `frontend`: `11` tests passed
+  - `npm run build` from `frontend`: passed; Vite kept the existing large-chunk warning
+- Practical meaning:
+  - primary demo path is now less dependent on ad-hoc operator choices: prepare route → submit digest → click follow-up/whitelist question → show evidence or refusal boundary
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:

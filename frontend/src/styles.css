@@ -754,6 +754,89 @@ textarea {
   font-weight: 600;
 }
 
+.national-demo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 14px 0;
+  padding: 16px;
+  border: 1px solid rgba(31, 106, 78, 0.18);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(240, 250, 245, 0.96), rgba(255, 255, 255, 0.9)),
+    radial-gradient(circle at top left, rgba(31, 106, 78, 0.14), transparent 36%);
+  box-shadow: 0 14px 32px rgba(35, 48, 68, 0.07);
+}
+
+.national-demo-card div {
+  display: grid;
+  gap: 5px;
+}
+
+.national-demo-card strong {
+  color: var(--ink-strong);
+  font-size: 16px;
+}
+
+.national-demo-card p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.demo-kicker {
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.national-demo-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.demo-whitelist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.demo-whitelist-chip {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(31, 106, 78, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink-strong);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.demo-whitelist-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(31, 106, 78, 0.28);
+  box-shadow: 0 12px 24px rgba(35, 48, 68, 0.08);
+}
+
+.demo-whitelist-chip strong {
+  font-size: 13px;
+}
+
+.demo-whitelist-chip span {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
 .digest-workbench {
   display: flex;
   align-items: center;
@@ -2354,6 +2437,19 @@ textarea {
 
   .digest-button {
     width: 100%;
+  }
+
+  .national-demo-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .national-demo-button {
+    width: 100%;
+  }
+
+  .demo-whitelist {
+    grid-template-columns: 1fr;
   }
 
   .digest-evidence-card {

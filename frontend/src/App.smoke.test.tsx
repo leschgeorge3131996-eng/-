@@ -399,6 +399,51 @@ digest smoke result
     expect(screen.getByTestId("digest-evidence-card").textContent).toContain("1 个可追问问题");
   });
 
+  it("prepares the national demo route and whitelisted questions", async () => {
+    seedSession();
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByTestId("prepare-national-demo"));
+
+    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "论文速读工作台"
+    );
+    expect(screen.getByTestId("current-document-name").textContent).toContain(
+      "demo_research_brief.md"
+    );
+
+    fireEvent.click(screen.getByTestId("demo-whitelist-2"));
+
+    expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-balanced")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "2028 年全国部署预算"
+    );
+  });
+
+  it("applies the concise digest fallback preset", async () => {
+    seedSession();
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+    fireEvent.click(screen.getByTestId("concise-digest-preset"));
+
+    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-concise")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "精简论文速读"
+    );
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "建议追问的 3 个问题"
+    );
+  });
+
   it("turns research digest follow-up questions into ask prompts", async () => {
     seedSession();
     const metadata = makeMetadata({

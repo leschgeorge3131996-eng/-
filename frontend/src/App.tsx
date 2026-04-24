@@ -102,6 +102,32 @@ const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读工作台，必须包
 - 优先提炼对答辩、复现实验和继续追问最有价值的信息。
 - 输出为清晰的 Markdown。`;
 
+const CONCISE_RESEARCH_DIGEST_PROMPT = `请生成一份精简论文速读，必须包含：
+1. 研究问题
+2. 核心方法
+3. 最关键结论
+4. 建议追问的 3 个问题
+
+要求：每部分不超过 2 条要点，尽量标注页码或来源线索，输出 Markdown。`;
+
+const DEMO_WHITELIST_ACTIONS = [
+  {
+    label: "推荐追问 1",
+    description: "验证证据问答",
+    input: "这个项目的核心能力是什么？"
+  },
+  {
+    label: "推荐追问 2",
+    description: "验证端到端价值",
+    input: "系统为什么强调证据回链？"
+  },
+  {
+    label: "拒答边界",
+    description: "验证不胡编",
+    input: "这篇文档有没有给出 2028 年全国部署预算？"
+  }
+];
+
 const TASK_LABELS: Record<TaskType, string> = {
   summary: "摘要",
   ask: "问答",
@@ -664,6 +690,43 @@ export default function App() {
     setError(null);
   }
 
+  function applyConciseDigestPreset() {
+    setTaskType("summary");
+    setResponseDetailLevel("concise");
+    setInput(CONCISE_RESEARCH_DIGEST_PROMPT);
+    setNotice("已切换到精简速读：适合现场网络慢或需要快速兜底时使用。");
+    setError(null);
+  }
+
+  function prepareNationalDemo() {
+    const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
+      type: "text/markdown"
+    });
+    setSelectedFile(file);
+    setUploadedMetadata(null);
+    setResult(null);
+    setError(null);
+    setPreviewOpen(false);
+    setPreviewPage(1);
+    setPreviewPages([1]);
+    setPreviewSnippet(null);
+    setPreviewSnippetPage(null);
+    setPreviewBboxes([]);
+    setTaskType("summary");
+    setResponseDetailLevel("detailed");
+    setInput(RESEARCH_DIGEST_PROMPT);
+    setNotice("国一演示路线已准备：先提交生成速读，再点击推荐追问或拒答边界。手动上传真实论文时同样适用。");
+  }
+
+  function applyWhitelistedDemoQuestion(question: string) {
+    setTaskType("ask");
+    setResponseDetailLevel("balanced");
+    setInput(question);
+    setNotice("已填入白名单演示问题：点击提交任务后验证证据问答或拒答边界。");
+    setError(null);
+    scrollElementIntoView('[data-testid="task-input"]');
+  }
+
   function applyFollowUpQuestion(question: string) {
     setTaskType("ask");
     setResponseDetailLevel("balanced");
@@ -837,7 +900,38 @@ export default function App() {
             <div className="section-head">
               <h2 className="panel-title">一键演示入口</h2>
             </div>
-            <p className="subtitle compact">先填入示例文档，再切换任务，快速演示完整链路。</p>
+            <p className="subtitle compact">优先走国一演示路线：速读、追问、证据回链、拒答边界一次讲清。</p>
+            <div className="national-demo-card">
+              <div>
+                <span className="demo-kicker">推荐主线</span>
+                <strong>国一演示路线</strong>
+                <p>自动准备示例文档和论文速读任务，再用白名单追问验证证据问答与拒答边界。</p>
+              </div>
+              <button
+                className="hero-button national-demo-button"
+                data-testid="prepare-national-demo"
+                type="button"
+                disabled={!isAuthenticated || interactionLocked}
+                onClick={prepareNationalDemo}
+              >
+                一键准备演示
+              </button>
+            </div>
+            <div className="demo-whitelist" aria-label="演示白名单问题">
+              {DEMO_WHITELIST_ACTIONS.map((action, index) => (
+                <button
+                  key={action.label}
+                  className="demo-whitelist-chip"
+                  data-testid={`demo-whitelist-${index}`}
+                  type="button"
+                  disabled={!isAuthenticated || interactionLocked}
+                  onClick={() => applyWhitelistedDemoQuestion(action.input)}
+                >
+                  <strong>{action.label}</strong>
+                  <span>{action.description}</span>
+                </button>
+              ))}
+            </div>
             <div className="demo-actions">
               <button
                 className="hero-button"
@@ -1130,6 +1224,15 @@ export default function App() {
                   onClick={applyResearchDigestPreset}
                 >
                   {digestPresetActive ? "已启用" : "生成论文速读"}
+                </button>
+                <button
+                  className="ghost-button digest-button"
+                  data-testid="concise-digest-preset"
+                  type="button"
+                  disabled={interactionLocked}
+                  onClick={applyConciseDigestPreset}
+                >
+                  精简速读兜底
                 </button>
               </div>
 
