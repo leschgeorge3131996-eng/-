@@ -725,6 +725,15 @@ class TaskService:
             )
 
             if refused:
+                if attempt + 1 < self.ASK_EVIDENCE_MAX_ATTEMPTS:
+                    best_result = (
+                        model_result,
+                        result_content,
+                        [],
+                        [],
+                        True,
+                    )
+                    continue
                 return (
                     model_result,
                     result_content,
@@ -770,6 +779,10 @@ class TaskService:
         base_question = (user_input or "请基于文档回答问题。").strip()
         retry_instruction = (
             "补充要求：这次必须只返回一个 JSON 对象，不要输出任何额外说明。"
+            "系统已经检索到与问题相关的候选 chunk；请先逐条检查这些 chunk。"
+            "只要 chunk 中存在可直接支持或可综合支持答案的原文片段，就不要拒答，"
+            "而应返回 refused=false 并基于这些片段回答。"
+            "只有所有候选 chunk 都完全没有相关依据时，才允许 refused=true。"
             "used_chunk_ids 必须填写你实际使用的 chunk_id；"
             "evidence_quotes 至少返回 1 条；"
             "quote 必须从对应 chunk 原文连续逐字复制，不得改写、不得省略号、不得合并两段。"

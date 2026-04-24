@@ -341,6 +341,49 @@ class RetryThenStructuredAskModelClient(ModelClient):
         )
 
 
+class RefuseThenStructuredAskModelClient(ModelClient):
+    def __init__(self, settings: Settings) -> None:
+        super().__init__(settings=settings)
+        self.ask_call_count = 0
+
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+        model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
+    ):
+        if task_type == "ask":
+            self.ask_call_count += 1
+            base_result = super().call_model(
+                task_type,
+                document_text,
+                user_input,
+                model_name_override=model_name_override,
+                response_detail_level=response_detail_level,
+            )
+            if self.ask_call_count == 1:
+                refused_payload = (
+                    '{"refused":true,"answer":"无法从文档中找到相关依据回答此问题",'
+                    '"used_chunk_ids":[],"evidence_quotes":[]}'
+                )
+                return base_result.model_copy(
+                    update={
+                        "content": refused_payload,
+                        "output_chars": len(refused_payload),
+                    }
+                )
+            return base_result
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
+        )
+
+
 def test_parse_error_is_normalized() -> None:
     workspace = make_workspace()
     try:
@@ -669,6 +712,41 @@ def test_ask_retries_once_when_structured_evidence_is_missing() -> None:
         assert result.evidence_quotes
         assert result.citations
         assert result.candidate_chunks == []
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_ask_retries_once_when_model_refuses_despite_retrieved_chunks() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        model_client = RefuseThenStructuredAskModelClient(settings=settings)
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+        )
+        upload = file_service.save_upload(
+            "retry-refusal.md",
+            "# Goal\n\nThe first-phase goal is to support upload, summary, ask, and outline generation.".encode("utf-8"),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="What is the first-phase goal?",
+        )
+
+        assert model_client.ask_call_count == 2
+        assert result.outcome == "answered"
+        assert result.route_reason != "llm_refused"
+        assert result.evidence_mode == "declared"
+        assert result.used_chunk_ids
+        assert result.evidence_quotes
+        assert result.citations
     finally:
         cleanup_workspace(workspace)
 
@@ -1021,6 +1099,84 @@ def test_retrieval_service_uses_head_chunk_for_metadata_name_questions() -> None
 
     assert result.confident is True
     assert [chunk.chunk_id for chunk in result.chunks] == ["intro"]
+
+
+def test_retrieval_service_adds_neighbors_for_parameter_questions() -> None:
+    retrieval = RetrievalService(top_k=1, max_context_chars=2000, min_score=0.0)
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=1,
+        chunk_count=3,
+        chunks=[
+            ParsedChunk(
+                chunk_id="before",
+                chunk_index=0,
+                page_numbers=[1],
+                text="The section introduces model configuration.",
+                char_count=len("The section introduces model configuration."),
+            ),
+            ParsedChunk(
+                chunk_id="hit",
+                chunk_index=1,
+                page_numbers=[1],
+                text="The base Transformer uses attention heads.",
+                char_count=len("The base Transformer uses attention heads."),
+            ),
+            ParsedChunk(
+                chunk_id="after",
+                chunk_index=2,
+                page_numbers=[1],
+                text="In this work we employ h = 8 parallel attention layers, or heads.",
+                char_count=len("In this work we employ h = 8 parallel attention layers, or heads."),
+            ),
+        ],
+    )
+
+    result = retrieval.retrieve_with_confidence(
+        "How many attention heads does the base Transformer model use?", chunked
+    )
+
+    assert "hit" in [chunk.chunk_id for chunk in result.chunks]
+    assert "after" in [chunk.chunk_id for chunk in result.chunks]
+
+
+def test_retrieval_service_adds_head_chunks_for_contribution_questions() -> None:
+    retrieval = RetrievalService(top_k=1, max_context_chars=2000, min_score=0.0)
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=2,
+        chunk_count=3,
+        chunks=[
+            ParsedChunk(
+                chunk_id="abstract",
+                chunk_index=0,
+                page_numbers=[1],
+                text="Abstract: We propose the Transformer based entirely on attention.",
+                char_count=len("Abstract: We propose the Transformer based entirely on attention."),
+            ),
+            ParsedChunk(
+                chunk_id="intro",
+                chunk_index=1,
+                page_numbers=[2],
+                text="The model replaces recurrence with self-attention for sequence transduction.",
+                char_count=len("The model replaces recurrence with self-attention for sequence transduction."),
+            ),
+            ParsedChunk(
+                chunk_id="tail-hit",
+                chunk_index=2,
+                page_numbers=[3],
+                text="The contribution discussion includes efficient attention experiments.",
+                char_count=len("The contribution discussion includes efficient attention experiments."),
+            ),
+        ],
+    )
+
+    result = retrieval.retrieve_with_confidence(
+        "What are the main contributions of this paper?", chunked
+    )
+
+    assert "abstract" in [chunk.chunk_id for chunk in result.chunks]
+    assert "intro" in [chunk.chunk_id for chunk in result.chunks]
 
 
 def test_retrieval_normalize_query_preserves_english_tokens() -> None:

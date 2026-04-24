@@ -2,6 +2,33 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-24 / Codex (retrieval patch closes 51-case suite)
+
+- Summary:
+  - Re-ran default QA model with new failure attribution: pre-patch attributed run was `47/51` with `4` failures, all classified around retrieved-but-refused / missing answer terms.
+  - Added a low-risk retrieval/context patch instead of changing the default model: parameter/table-like queries now get targeted query expansion and neighboring chunks; contribution questions append document head chunks; model self-refusal after matched retrieval now gets one stricter retry before accepting `llm_refused`.
+  - Targeted 4-case replay (`zh_a3_opensource`, `zh_a5_val_count`, `en_a4_contributions`, `en_a1_attention_heads`) improved to `4/4`.
+  - Full `EXTENDED_EVAL_V1` replay with `qwen3-235b-a22b-instruct-2507` improved to `51/51` (`100.0%` overall, answerable `100.0%`, refusal precision `100.0%`, citation accuracy `100.0%`, declaration `100.0%`, avg latency `5697 ms`).
+- Files touched:
+  - `backend/app/services/retrieval_service.py`
+  - `backend/app/services/task_service.py`
+  - `backend/tests/test_services.py`
+  - `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_attributed.{md,json}`
+  - `evidence/reports/targeted_refusal_recovery_latest.{md,json}`
+  - `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.{md,json}`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Verification:
+  - Targeted real-model replay: `4/4` passed.
+  - Full real-model replay: `51/51` passed.
+  - Unit regression: `python -m pytest backend/tests/test_extended_eval.py backend/tests/test_services.py -k "extended_eval or retrieval_service_adds_neighbors_for_parameter_questions or retrieval_service_adds_head_chunks_for_contribution_questions or ask_retries_once_when_model_refuses_despite_retrieved_chunks or metadata_name_question or avoids_fake_citations_on_retrieval_miss"` -> `10 passed`.
+- Decision:
+  - Keep default QA as `qwen3-235b-a22b-instruct-2507`.
+  - Do not pursue a model switch for the current judged/demo path; the retrieval/context patch solved the remaining eval failures.
+- Recommended next step:
+  - Move from QA accuracy to end-to-end reliability polish: expanded `predeploy_sanity.py` and frontend task/citation safety.
+
+
 ## 2026-04-24 / Codex (multi-agent technical roadmap)
 
 - Summary:

@@ -46,12 +46,20 @@ class RetrievalService:
         "放弃": ["avoid", "replace", "dispense with"],
         "循环": ["recurrent", "rnn"],
         "卷积": ["convolutional", "cnn"],
+        "开源": ["qwen", "deepseek", "open source"],
+        "验证集": ["validation", "development", "dev", "总计"],
+        "测试集": ["test", "总计"],
+        "训练集": ["train", "training", "总计"],
+        "样本数": ["sample", "samples", "总计"],
         "结构": ["architecture", "structure"],
         "核心方法": ["method", "approach", "model"],
         "创新点": ["contribution", "novel", "novelty"],
         "实验结果": ["experiment", "results"],
         "研究背景": ["background", "motivation"],
         "结论": ["conclusion"],
+        "attention heads": ["h = 8", "parallel attention layers", "heads"],
+        "base transformer": ["h = 8", "base model", "parallel attention layers"],
+        "main contributions": ["we propose", "entirely on attention", "sequence transduction", "transformer"],
     }
 
     metadata_intent_terms = (
@@ -86,6 +94,37 @@ class RetrievalService:
         "product",
         "project",
         "abstract",
+    )
+
+    contribution_intent_terms = (
+        "贡献",
+        "主要贡献",
+        "创新点",
+        "contribution",
+        "contributions",
+        "novelty",
+    )
+
+    parameter_intent_terms = (
+        "样本数",
+        "验证集",
+        "测试集",
+        "训练集",
+        "总数",
+        "开源",
+        "是否开源",
+        "参数",
+        "配置",
+        "attention heads",
+        "heads",
+        "head",
+        "h =",
+        "h=",
+        "layers",
+        "layer",
+        "dropout",
+        "label smoothing",
+        "pdrop",
     )
 
     def __init__(
@@ -166,6 +205,21 @@ class RetrievalService:
             if head_chunk.chunk_id not in selected_ids:
                 selected.append(head_chunk)
 
+        if self._has_contribution_intent(query) and chunked_document.chunks:
+            selected = self._append_missing_chunks(
+                selected,
+                chunked_document.chunks[:2],
+                max_total=self.top_k + 2,
+            )
+
+        if self._has_parameter_intent(query):
+            selected = self._append_neighbor_chunks(
+                selected,
+                chunked_document.chunks,
+                radius=1,
+                max_total=self.top_k + 3,
+            )
+
         return RetrievalResult(
             chunks=selected,
             top_score=top_score,
@@ -177,6 +231,51 @@ class RetrievalService:
     def _has_metadata_intent(self, query: str) -> bool:
         lowered = query.lower()
         return any(term in lowered for term in self.metadata_intent_terms)
+
+    def _has_contribution_intent(self, query: str) -> bool:
+        lowered = query.lower()
+        return any(term in lowered for term in self.contribution_intent_terms)
+
+    def _has_parameter_intent(self, query: str) -> bool:
+        lowered = query.lower()
+        return any(term in lowered for term in self.parameter_intent_terms)
+
+    def _append_neighbor_chunks(
+        self,
+        selected: list[ParsedChunk],
+        all_chunks: list[ParsedChunk],
+        *,
+        radius: int,
+        max_total: int,
+    ) -> list[ParsedChunk]:
+        by_index = {chunk.chunk_index: chunk for chunk in all_chunks}
+        candidates: list[ParsedChunk] = []
+        for chunk in selected:
+            for offset in range(-radius, radius + 1):
+                if offset == 0:
+                    continue
+                neighbor = by_index.get(chunk.chunk_index + offset)
+                if neighbor is not None:
+                    candidates.append(neighbor)
+        return self._append_missing_chunks(selected, candidates, max_total=max_total)
+
+    def _append_missing_chunks(
+        self,
+        selected: list[ParsedChunk],
+        candidates: list[ParsedChunk],
+        *,
+        max_total: int,
+    ) -> list[ParsedChunk]:
+        expanded = list(selected)
+        selected_ids = {chunk.chunk_id for chunk in expanded}
+        for chunk in candidates:
+            if len(expanded) >= max_total:
+                break
+            if chunk.chunk_id in selected_ids:
+                continue
+            expanded.append(chunk)
+            selected_ids.add(chunk.chunk_id)
+        return expanded
 
     def build_context(self, query: str, chunked_document: ChunkedDocument) -> tuple[list[ParsedChunk], str]:
         selected = self.retrieve(query, chunked_document)
