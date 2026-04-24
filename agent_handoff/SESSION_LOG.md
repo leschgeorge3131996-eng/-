@@ -1720,6 +1720,27 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - model-selection口径 remains: current default `qwen3-235b-a22b-instruct-2507` is best default, `kimi-k2.6` is second by score but too slow, and no uncommitted lower Kimi rerun is left to confuse handoff/review
 
+---
+
+## 2026-04-24 / Codex (digest demo path and evidence cue polish)
+
+- Summary:
+  - made the `论文速读工作台` workflow easier to understand at a glance by showing `生成速读 → 点击追问 → 查看证据回链` directly in the workbench card
+  - added a digest evidence cue card in result output showing source chunk count, covered page count, and extracted follow-up count
+  - kept the implementation frontend-only and reused existing source chunks / follow-up extraction, with no backend behavior change
+- Files touched:
+  - `frontend/src/App.tsx`
+  - `frontend/src/components/ResultPanel.tsx`
+  - `frontend/src/styles.css`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `npm test -- --run` from `frontend`: `9` tests passed
+  - `npm run build` from `frontend`: passed; Vite kept the existing large-chunk warning
+- Practical meaning:
+  - judges no longer need to infer the端到端 path; the UI explicitly tells them the intended workflow and backs digest output with visible provenance metrics
+
 ## 2026-04-23 / Codex (G3 continuation: 6-run strict batch completed)
 
 - Summary:

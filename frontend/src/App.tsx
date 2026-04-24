@@ -1116,6 +1116,11 @@ export default function App() {
                   <p>
                     一键生成研究问题、方法、贡献、实验、局限和追问清单，适合答辩前快速吃透论文。
                   </p>
+                  <ol className="digest-flow" aria-label="论文速读演示路径">
+                    <li>生成速读</li>
+                    <li>点击追问</li>
+                    <li>查看证据回链</li>
+                  </ol>
                 </div>
                 <button
                   className="ghost-button digest-button"

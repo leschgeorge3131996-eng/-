@@ -342,7 +342,16 @@ describe("App smoke flows", () => {
       document_name: metadata.original_name,
       document_fingerprint: metadata.document_fingerprint,
       response_detail_level: "detailed",
-      result: "digest smoke result"
+      result: `# 论文速读工作台
+
+digest smoke result
+
+## 建议追问的 5 个问题
+1. 这个方法的核心创新是什么？`,
+      source_chunks: [
+        makeCitation({ chunk_id: "digest-source-1", page_numbers: [1], snippet: "source one" }),
+        makeCitation({ chunk_id: "digest-source-2", page_numbers: [2], snippet: "source two" })
+      ]
     });
 
     uploadDocumentMock.mockImplementation(async (_file, onProgress) => {
@@ -362,6 +371,9 @@ describe("App smoke flows", () => {
     });
     fireEvent.click(screen.getByTestId("research-digest-preset"));
 
+    expect(screen.getByText("生成速读")).toBeInTheDocument();
+    expect(screen.getByText("点击追问")).toBeInTheDocument();
+    expect(screen.getByText("查看证据回链")).toBeInTheDocument();
     expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
     expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
@@ -382,6 +394,9 @@ describe("App smoke flows", () => {
     await waitFor(() =>
       expect(screen.getByTestId("result-output").textContent).toContain("digest smoke result")
     );
+    expect(screen.getByTestId("digest-evidence-card").textContent).toContain("2 个来源片段");
+    expect(screen.getByTestId("digest-evidence-card").textContent).toContain("覆盖 2 页");
+    expect(screen.getByTestId("digest-evidence-card").textContent).toContain("1 个可追问问题");
   });
 
   it("turns research digest follow-up questions into ask prompts", async () => {

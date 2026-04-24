@@ -39,6 +39,7 @@
 - `scripts/predeploy_sanity.py` now exists: one-command archive `call_logs.jsonl` + run 3 gold cases + emit markdown report, exit 0 only on 3/3 pass; wired as first pre-demo must-pass in `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - Frontend now has a judge-visible `论文速读工作台` preset: one click switches to detailed summary, injects a structured paper-reading prompt, and reuses the stable existing summary endpoint for low-risk end-to-end delivery
 - `论文速读工作台` now has a lightweight end-to-end follow-up loop: generated follow-up questions are extracted into clickable chips, then one click switches to `ask` so the next answer can use the existing retrieval/citation/PDF-preview evidence path
+- The digest workflow is now more judge-readable: the workbench card shows `生成速读 → 点击追问 → 查看证据回链`, and digest results show source chunk count, covered page count, and follow-up count
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

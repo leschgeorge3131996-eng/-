@@ -255,6 +255,13 @@ function extractResearchDigestQuestions(result: TaskResult | null): string[] {
   return Array.from(new Set(questions)).slice(0, 5);
 }
 
+function isResearchDigestResult(result: TaskResult | null, followUpQuestions: string[]): boolean {
+  if (!result || result.task_type !== "summary" || result.outcome === "refused") {
+    return false;
+  }
+  return result.result.includes("论文速读工作台") || followUpQuestions.length > 0;
+}
+
 type ResultPanelProps = {
   activeTaskType: TaskType;
   error: string | null;
@@ -291,6 +298,8 @@ export default function ResultPanel({
     ? "retrieval_gate（未调用模型）"
     : (result?.model_name ?? "-");
   const followUpQuestions = extractResearchDigestQuestions(result);
+  const showDigestEvidenceCard = isResearchDigestResult(result, followUpQuestions);
+  const sourcePageCount = new Set(evidenceItems.flatMap((item) => item.page_numbers)).size;
 
   useEffect(() => {
     setCopyState("idle");
@@ -631,6 +640,20 @@ export default function ResultPanel({
                   {(result.evidence_quotes ?? []).map((quote, index) =>
                     renderEvidenceQuote(quote, index, result.request_id, 0.48)
                   )}
+                </div>
+              </motion.div>
+            ) : null}
+
+            {showDigestEvidenceCard ? (
+              <motion.div className="digest-evidence-card" data-testid="digest-evidence-card" {...revealMotion(0.46)}>
+                <div>
+                  <span>速读可信度提示</span>
+                  <strong>已保留来源片段，可继续追问回链</strong>
+                </div>
+                <div className="digest-evidence-metrics">
+                  <span>{evidenceItems.length} 个来源片段</span>
+                  <span>{sourcePageCount > 0 ? `覆盖 ${sourcePageCount} 页` : "页码待补充"}</span>
+                  <span>{followUpQuestions.length} 个可追问问题</span>
                 </div>
               </motion.div>
             ) : null}
