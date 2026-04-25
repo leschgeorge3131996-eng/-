@@ -444,21 +444,30 @@ digest smoke result
     );
   });
 
-  it("shows a concise-digest fallback hint when a task times out", async () => {
+  it("shows a concise-digest fallback hint and lets the operator retry", async () => {
     seedSession();
     const metadata = makeMetadata({
       file_id: "file-timeout",
       original_name: "timeout.md",
       access_token: "token-timeout"
     });
+    const retryResult = makeTaskResult({
+      request_id: "req-timeout-retry",
+      file_id: metadata.file_id,
+      document_name: metadata.original_name,
+      document_fingerprint: metadata.document_fingerprint,
+      result: "retry succeeded"
+    });
 
     uploadDocumentMock.mockImplementation(async (_file, onProgress) => {
       onProgress?.(100);
       return { metadata };
     });
-    runTaskMock.mockRejectedValue(
-      new ApiRequestError("timeout", "TASK_TIMEOUT", { timeout_ms: 90000 })
-    );
+    runTaskMock
+      .mockRejectedValueOnce(
+        new ApiRequestError("timeout", "TASK_TIMEOUT", { timeout_ms: 90000 })
+      )
+      .mockResolvedValueOnce(retryResult);
 
     render(<App />);
 
@@ -475,6 +484,14 @@ digest smoke result
       expect(screen.getByText(/模型响应较慢/)).toBeInTheDocument()
     );
     expect(screen.getByText(/建议先点击“精简速读兜底”/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("retry-task-button"));
+
+    await waitFor(() => expect(runTaskMock).toHaveBeenCalledTimes(2));
+    expect(uploadDocumentMock).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.getByTestId("result-output").textContent).toContain("retry succeeded")
+    );
   });
 
   it("turns research digest follow-up questions into ask prompts", async () => {

@@ -2,6 +2,32 @@
 
 Append-only log for both Codex and Claude Code.
 
+## 2026-04-25 / Codex (predeploy risk gate + frontend retry safety)
+
+- Background / goal reconfirmed:
+  - YanDatong remains a competition-focused evidence-backed document QA demo for paper/report reading and defense prep.
+  - The judged story should stay on the locked path: upload PDF -> ask -> citation -> PDF page -> refusal, with `qwen3-235b-a22b-instruct-2507` as the default QA model.
+  - Do not broaden into generic SaaS/product discovery before judging; the technical track should favor demo reliability, diagnosability, and low-risk recovery.
+- Summary:
+  - Expanded `scripts/predeploy_sanity.py` from a 3 gold-case runner into a proper pre-demo risk light. It now reports `READY` only when both the gold prompts and surrounding gates pass: runtime config, writable data dirs, gold PDF presence, parsed metadata, page text fetch, answerable citation presence, PDF page render, and recent log summary.
+  - Added markdown report rows for gate checks and switched the final status wording from `NEEDS ATTENTION` to `BLOCKED` when any gate fails.
+  - Added a frontend retry affordance on task failure. Timeout/error states now show `重试当前任务` when the current document/input are still valid; retry reuses the uploaded metadata instead of uploading the same file again. A ref-level in-flight guard now blocks double-submit races before React disables the button.
+- Files touched:
+  - `scripts/predeploy_sanity.py`
+  - `backend/tests/test_predeploy_sanity.py`
+  - `frontend/src/App.tsx`
+  - `frontend/src/components/ResultPanel.tsx`
+  - `frontend/src/styles.css`
+  - `frontend/src/App.smoke.test.tsx`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Verification:
+  - `npm test -- --run` -> `13 passed`
+  - `npm run build` -> passed with the existing large-chunk warning
+  - `.venv\Scripts\python.exe -m pytest backend/tests` -> `67 passed`
+- Recommended next step:
+  - On the actual demo machine, run `.venv\Scripts\python.exe scripts\predeploy_sanity.py` as the first rehearsal gate. If it returns `BLOCKED`, use the gate row to decide whether the issue is env/data-dir/PDF render/logging/model path rather than re-debugging the whole stack.
+
 ## 2026-04-24 / Codex (retrieval patch closes 51-case suite)
 
 - Summary:

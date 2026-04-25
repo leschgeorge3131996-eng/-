@@ -2004,6 +2004,19 @@ textarea {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.result-error-card {
+  display: grid;
+  gap: 12px;
+  align-items: start;
+}
+
+.result-retry-button {
+  width: fit-content;
+  color: var(--error);
+  border-color: rgba(177, 53, 26, 0.22);
+  background: rgba(255, 246, 244, 0.86);
+}
+
 .token-usage {
   padding: 10px 12px;
   border-radius: 14px;

@@ -385,6 +385,7 @@ export default function App() {
   const [statsExpanded, setStatsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hadStoredSessionRef = useRef(Boolean(readStoredSession()));
+  const taskInFlightRef = useRef(false);
   const [dragOver, setDragOver] = useState(false);
 
   const isAuthenticated = Boolean(session);
@@ -739,12 +740,16 @@ export default function App() {
     scrollElementIntoView('[data-testid="task-input"]');
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function submitCurrentTask() {
+    if (taskInFlightRef.current) {
+      return;
+    }
+    taskInFlightRef.current = true;
     setLoading(true);
     setLoadStage("idle");
     setError(null);
     setNotice(null);
+    let uploadedSelectedFile = false;
 
     try {
       let metadata = uploadedMetadata;
@@ -758,6 +763,7 @@ export default function App() {
         fileId = nextMetadata.file_id;
         setUploadedMetadata(nextMetadata);
         setSelectedFile(null);
+        uploadedSelectedFile = true;
         setRecentDocuments((current) => upsertRecentDocument(current, nextMetadata));
       }
 
@@ -798,13 +804,19 @@ export default function App() {
       setError(normalizeErrorMessage(submitError));
       setResult(null);
     } finally {
+      taskInFlightRef.current = false;
       setLoading(false);
       setLoadStage("idle");
       setUploadProgress(0);
-      if (fileInputRef.current && !selectedFile) {
+      if (fileInputRef.current && (uploadedSelectedFile || !selectedFile)) {
         fileInputRef.current.value = "";
       }
     }
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await submitCurrentTask();
   }
 
   return (
@@ -1372,6 +1384,7 @@ export default function App() {
             loadMessage={describeLoadStage(loadStage)}
             result={result}
             canOpenPdfPreview={Boolean(previewMetadata)}
+            canRetry={canSubmit}
             onOpenPdfPage={(citation) => {
               const nextPages = normalizePreviewPages(citation.page_numbers);
               const nextPrimaryPage = nextPages[0] ?? 1;
@@ -1385,6 +1398,7 @@ export default function App() {
               scrollPreviewIntoView();
             }}
             onAskFollowUp={applyFollowUpQuestion}
+            onRetry={() => void submitCurrentTask()}
           />
         </section>
 

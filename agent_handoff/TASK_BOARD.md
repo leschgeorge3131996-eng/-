@@ -44,6 +44,8 @@
 - Frontend task requests now have a `90s` timeout with a productized fallback message that points operators to `精简速读兜底` instead of leaving the UI spinning indefinitely
 - Latest external-AI review bundle was regenerated after P0口径收敛: `review_bundle_20260424_181957_final_competition_review.zip` with stage dir `review_bundle_stage_20260424_181957/`
 - P0 evidence wording is now frozen around three layers: historical `46/51` boundary-finding, model-selection `48/51`, and final default-model `51/51`; avoid claiming open-domain 100% or every answer has a verbatim quote
+- `scripts/predeploy_sanity.py` now emits a full `READY` / `BLOCKED` pre-demo risk light: gold cases plus runtime config, writable data dirs, gold PDF presence, parsed metadata, cited-page fetch, PDF render, citation presence, and recent log summary gates
+- Frontend task failure states now expose an operator-visible `重试当前任务` action when the current document/input are still valid; retry reuses uploaded metadata instead of re-uploading the same file, with a ref-level guard against rapid double submits
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -55,7 +57,7 @@
    - `review_bundle_20260420_141123_final_competition_review.zip`
 3. Use `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze sheet while converting `deck_3page_final.pdf` into the final native PPT and `video_subtitles_5min_final.srt` into the final recorded/edited video
 4. Before judged demo: run `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` together with `GOLD_SAMPLE_RUNBOOK.md`, set `DEMO_MODE=true` on the target env, and verify the opening flow on the target URL
-5. Use `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` as the technical-only next-work guide; failure attribution and table/parameter retrieval patch are done, so next target is expanded predeploy sanity plus frontend task/citation safety
+5. Use `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` as the technical-only next-work guide; failure attribution, table/parameter retrieval patch, expanded predeploy sanity, and frontend retry safety are now done, so the next technical target should be actual-demo-machine rehearsal and only then small citation/PDF-preview polish if a rehearsal exposes it
 6. Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo unless a final predeploy sanity run shows live latency trouble; if latency is the blocker, test-switch only QA to `qwen3-next-80b-a3b-instruct`
 7. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 

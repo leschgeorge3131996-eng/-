@@ -269,8 +269,10 @@ type ResultPanelProps = {
   loadMessage: string;
   result: TaskResult | null;
   canOpenPdfPreview?: boolean;
+  canRetry?: boolean;
   onOpenPdfPage?: (citation: Citation) => void;
   onAskFollowUp?: (question: string) => void;
+  onRetry?: () => void;
 };
 
 export default function ResultPanel({
@@ -280,8 +282,10 @@ export default function ResultPanel({
   loadMessage,
   result,
   canOpenPdfPreview = false,
+  canRetry = false,
   onOpenPdfPage,
-  onAskFollowUp
+  onAskFollowUp,
+  onRetry
 }: ResultPanelProps) {
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
   const [evidenceCopyState, setEvidenceCopyState] = useState<string | null>(null);
@@ -438,16 +442,26 @@ export default function ResultPanel({
       </div>
       <AnimatePresence mode="wait" initial={false}>
         {error ? (
-          <motion.p
+          <motion.div
             key={stateKey}
-            className="error status-card"
+            className="error status-card result-error-card"
             exit={{ opacity: 0, y: -10 }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, ease: MOTION_EASE }}
           >
-            {error}
-          </motion.p>
+            <span>{error}</span>
+            {canRetry && onRetry ? (
+              <button
+                className="ghost-button result-retry-button"
+                data-testid="retry-task-button"
+                type="button"
+                onClick={onRetry}
+              >
+                重试当前任务
+              </button>
+            ) : null}
+          </motion.div>
         ) : loading ? (
           <motion.div
             key={stateKey}

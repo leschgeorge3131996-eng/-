@@ -1,6 +1,6 @@
 """Pre-demo sanity script — run this ~30 min before a judged slot.
 
-Does three things that humans tend to forget in the last 30 minutes:
+Does four things that humans tend to forget in the last 30 minutes:
 
 1. Archive and truncate `data/logs/call_logs.jsonl` so old
    `MODEL_SERVICE_ERROR` entries and long P95 tails don't haunt the
@@ -8,9 +8,11 @@ Does three things that humans tend to forget in the last 30 minutes:
 2. Run the 3 gold-sample prompts (2 answerable + 1 refusal) against the
    real TaskService so caches are warm and the current HEAD is
    end-to-end verified.
-3. Emit a single-page markdown report the operator can glance at —
+3. Check the surrounding demo gates: runtime config, writable data dirs,
+   parsed metadata, cited-page fetch, PDF page render, and log summary.
+4. Emit a single-page markdown report the operator can glance at —
    PASS / FAIL per case plus whether anything needs attention — and exit
-   0 only on 3/3 pass.
+   0 only when every gold case and gate passes.
 
 Zero-arg run:
     .venv/Scripts/python.exe scripts/predeploy_sanity.py
@@ -75,6 +77,13 @@ class CaseResult:
     reason: str
 
 
+@dataclass
+class GateCheck:
+    name: str
+    passed: bool
+    detail: str
+
+
 def archive_call_logs(logs_dir: Path, timestamp: str) -> Path | None:
     log_file = logs_dir / "call_logs.jsonl"
     if not log_file.exists() or log_file.stat().st_size == 0:
@@ -85,6 +94,57 @@ def archive_call_logs(logs_dir: Path, timestamp: str) -> Path | None:
     shutil.copy2(log_file, archive_path)
     log_file.write_text("", encoding="utf-8")
     return archive_path
+
+
+def markdown_cell(value: object) -> str:
+    return str(value).replace("\n", " ").replace("|", "\\|")
+
+
+def run_preflight_checks(settings, timestamp: str) -> list[GateCheck]:
+    checks: list[GateCheck] = []
+
+    if settings.use_mock_model:
+        model_ready = True
+        model_detail = f"mock provider enabled; qa={settings.model_qa}"
+    else:
+        missing = []
+        if not settings.wuqiong_base_url:
+            missing.append("WUQIONG_BASE_URL")
+        if not settings.wuqiong_api_key:
+            missing.append("WUQIONG_API_KEY")
+        if not settings.model_qa:
+            missing.append("MODEL_QA")
+        model_ready = not missing
+        model_detail = (
+            f"provider={settings.model_provider}; qa={settings.model_qa}"
+            if model_ready
+            else f"missing {', '.join(missing)}"
+        )
+    checks.append(GateCheck("runtime_config", model_ready, model_detail))
+
+    for name, path in (
+        ("uploads_dir_writable", settings.uploads_dir),
+        ("parsed_dir_writable", settings.parsed_dir),
+        ("logs_dir_writable", settings.logs_dir),
+        ("cache_dir_writable", settings.cache_dir),
+    ):
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            probe = path / f".predeploy_probe_{timestamp}.tmp"
+            probe.write_text("ok", encoding="utf-8")
+            probe.unlink(missing_ok=True)
+            checks.append(GateCheck(name, True, str(path)))
+        except Exception as exc:
+            checks.append(GateCheck(name, False, f"{type(exc).__name__}: {exc}"))
+
+    checks.append(
+        GateCheck(
+            "gold_pdf_present",
+            GOLD_PDF.exists() and GOLD_PDF.stat().st_size > 0,
+            f"{GOLD_PDF} ({GOLD_PDF.stat().st_size if GOLD_PDF.exists() else 0} bytes)",
+        )
+    )
+    return checks
 
 
 def run_gold_cases(task_service: TaskService, session_id: str, upload) -> list[CaseResult]:
@@ -164,18 +224,128 @@ def run_gold_cases(task_service: TaskService, session_id: str, upload) -> list[C
     return results
 
 
+def run_postflight_checks(
+    file_service: FileService,
+    log_service: LogService,
+    upload,
+    results: list[CaseResult],
+    session_id: str,
+) -> list[GateCheck]:
+    checks: list[GateCheck] = []
+    access_token = upload.access_token
+
+    try:
+        metadata = file_service.get_document_metadata(
+            upload.file_id,
+            access_token=access_token,
+            session_id=session_id,
+        )
+        parsed_ok = (
+            metadata.parse_status == "parsed"
+            and metadata.page_count > 0
+            and metadata.chunk_count > 0
+            and metadata.text_chars > 0
+        )
+        checks.append(
+            GateCheck(
+                "upload_parse_metadata",
+                parsed_ok,
+                (
+                    f"status={metadata.parse_status}; pages={metadata.page_count}; "
+                    f"chunks={metadata.chunk_count}; chars={metadata.text_chars}"
+                ),
+            )
+        )
+    except Exception as exc:
+        checks.append(GateCheck("upload_parse_metadata", False, f"{type(exc).__name__}: {exc}"))
+
+    try:
+        page = file_service.get_document_page(
+            upload.file_id,
+            1,
+            access_token=access_token,
+            session_id=session_id,
+        )
+        checks.append(
+            GateCheck(
+                "page_text_fetch",
+                page.page_number == 1 and page.char_count > 0,
+                f"page={page.page_number}; chars={page.char_count}",
+            )
+        )
+    except Exception as exc:
+        checks.append(GateCheck("page_text_fetch", False, f"{type(exc).__name__}: {exc}"))
+
+    answerable_results = [result for result in results if result.kind == "answerable"]
+    cited_pages = sorted({page for result in answerable_results for page in result.cited_pages})
+    checks.append(
+        GateCheck(
+            "answerable_citation_presence",
+            len(cited_pages) > 0 and all(result.cited_pages for result in answerable_results),
+            f"answerable_cases={len(answerable_results)}; cited_pages={cited_pages}",
+        )
+    )
+
+    first_cited_page = cited_pages[0] if cited_pages else 1
+    try:
+        png_bytes = file_service.render_document_page(
+            upload.file_id,
+            first_cited_page,
+            access_token=access_token,
+            session_id=session_id,
+        )
+        checks.append(
+            GateCheck(
+                "pdf_page_render",
+                png_bytes.startswith(b"\x89PNG") and len(png_bytes) > 1000,
+                f"page={first_cited_page}; bytes={len(png_bytes)}",
+            )
+        )
+    except Exception as exc:
+        checks.append(GateCheck("pdf_page_render", False, f"{type(exc).__name__}: {exc}"))
+
+    try:
+        summary = log_service.summarize_logs(limit=len(results))
+        log_ok = (
+            summary.get("total_requests", 0) >= len(results)
+            and summary.get("error_count", 0) == 0
+            and summary.get("by_task", {}).get("ask", 0) >= len(results)
+        )
+        checks.append(
+            GateCheck(
+                "recent_log_summary",
+                log_ok,
+                (
+                    f"total={summary.get('total_requests')}; "
+                    f"errors={summary.get('error_count')}; "
+                    f"p95={summary.get('p95_latency_ms')}ms"
+                ),
+            )
+        )
+    except Exception as exc:
+        checks.append(GateCheck("recent_log_summary", False, f"{type(exc).__name__}: {exc}"))
+
+    return checks
+
+
 def render_report(
     results: list[CaseResult],
+    checks: list[GateCheck],
     archive_path: Path | None,
     timestamp: str,
 ) -> str:
     passed = sum(1 for r in results if r.passed)
     total = len(results)
-    overall = "READY" if passed == total else "NEEDS ATTENTION"
+    passed_checks = sum(1 for check in checks if check.passed)
+    total_checks = len(checks)
+    overall = "READY" if passed == total and passed_checks == total_checks else "BLOCKED"
     lines = [
         f"# Predeploy Sanity Report — {timestamp}",
         "",
-        f"**Status:** {overall} ({passed}/{total} gold cases passed)",
+        f"**Status:** {overall}",
+        "",
+        f"- Gold cases: `{passed}/{total}` passed",
+        f"- Risk checks: `{passed_checks}/{total_checks}` passed",
         "",
         "## Log hygiene",
         "",
@@ -192,11 +362,23 @@ def render_report(
     ]
     for r in results:
         mark = "PASS" if r.passed else "FAIL"
-        note = r.error or r.reason or "-"
+        note = markdown_cell(r.error or r.reason or "-")
         lines.append(
-            f"| {r.case_id} | {r.kind} | {mark} | {r.outcome} | "
+            f"| {markdown_cell(r.case_id)} | {r.kind} | {mark} | {r.outcome} | "
             f"{r.retrieval_status} | {r.evidence_mode} | {r.cited_pages} | "
             f"{r.latency_ms} | {note} |"
+        )
+    lines.extend([
+        "",
+        "## Risk checks",
+        "",
+        "| Check | Pass | Detail |",
+        "| --- | --- | --- |",
+    ])
+    for check in checks:
+        lines.append(
+            f"| {markdown_cell(check.name)} | {'PASS' if check.passed else 'FAIL'} | "
+            f"{markdown_cell(check.detail)} |"
         )
     lines.extend([
         "",
@@ -211,7 +393,7 @@ def render_report(
             "",
         ])
     lines.extend([
-        "## What to do if status is NEEDS ATTENTION",
+        "## What to do if status is BLOCKED",
         "",
         "1. Check backend env: `WUQIONG_BASE_URL` / `WUQIONG_API_KEY` / `MODEL_QA`.",
         "2. Re-run this script after fixing env vars.",
@@ -242,6 +424,7 @@ def main() -> None:
     print(f"[predeploy-sanity] starting at {timestamp}")
 
     settings = get_settings()
+    checks = run_preflight_checks(settings, timestamp)
 
     archive_path: Path | None = None
     if not args.skip_log_archive:
@@ -272,15 +455,20 @@ def main() -> None:
     print(f"[predeploy-sanity] gold PDF uploaded as file_id={upload.file_id}")
 
     results = run_gold_cases(task_service, session_id, upload)
+    checks.extend(run_postflight_checks(file_service, log_service, upload, results, session_id))
     passed = sum(1 for r in results if r.passed)
+    passed_checks = sum(1 for check in checks if check.passed)
     for r in results:
         mark = "PASS" if r.passed else "FAIL"
         print(
             f"[{mark}] {r.case_id} outcome={r.outcome} retrieval={r.retrieval_status} "
             f"evidence={r.evidence_mode} latency={r.latency_ms}ms"
         )
+    for check in checks:
+        mark = "PASS" if check.passed else "FAIL"
+        print(f"[{mark}] gate={check.name} {check.detail}")
 
-    report_text = render_report(results, archive_path, timestamp)
+    report_text = render_report(results, checks, archive_path, timestamp)
     output_dir = PROJECT_ROOT / args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     report_path = output_dir / f"predeploy_sanity_{timestamp}.md"
@@ -288,10 +476,11 @@ def main() -> None:
     print(f"[predeploy-sanity] report written to {report_path}")
 
     print(
-        f"\n[predeploy-sanity] {passed}/{len(results)} passed — "
-        f"{'READY' if passed == len(results) else 'NEEDS ATTENTION'}"
+        f"\n[predeploy-sanity] gold={passed}/{len(results)} "
+        f"gates={passed_checks}/{len(checks)} — "
+        f"{'READY' if passed == len(results) and passed_checks == len(checks) else 'BLOCKED'}"
     )
-    sys.exit(0 if passed == len(results) else 1)
+    sys.exit(0 if passed == len(results) and passed_checks == len(checks) else 1)
 
 
 if __name__ == "__main__":
