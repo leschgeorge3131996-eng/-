@@ -1969,13 +1969,37 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - `agent_handoff/SESSION_LOG.md`
   - `agent_handoff/TASK_BOARD.md`
 - Commits (local, pushed at end of round):
-  - `<HEAD>` Polish meta chips and history cards with elevation tokens
+  - `3a54b8a` Polish meta chips and history cards with elevation tokens
 - Verification:
   - `npm run build` -> passed; CSS now `~40 kB` (no measurable size regression vs the previous polish commit)
   - `npm test -- --run` -> `13 passed`
 - Practical meaning:
   - judges glancing at the result meta panel see column-aligned numbers — improves perceived precision without changing any number
   - history sidebar now reads as "stack of clickable tiles" instead of "list of borders against the page background"
+
+## 2026-04-27 / Claude (visual polish track — drop zone receiving state + hero flow breathing)
+
+- Background:
+  - User said "继续" again. Targeted two more judge-visible rest-state surfaces: the upload `.drop-zone` (its dragover state was just a color swap with no "actively receiving" cue) and the four `.flow-step` pills under the brandmark (rest state was static after we polished the hover earlier). User also expanded autonomy this round ("有问题你自己优化就行，中间不用停下来问我") so judgement calls happen without stopping for confirmation.
+- Decision recorded:
+  - Did **not** rewire the four hero flow pills into a stateful "current step" indicator. The pills are decorative — there is no real four-step state machine driven by `loadStage` / upload / result. Adding state would be a feature, not first-glance polish, and would push beyond the polish remit.
+- What changed (still pure CSS, still no DOM/component change):
+  - `.drop-zone-active` now uses a radial-gradient ground + double-ring outer glow + inset highlight, plus a `-1px` rise on dragover — reads "actively receiving" instead of "color swapped"
+  - new `.drop-zone-active::before` shows a small bouncing ↓ arrow at the top-right corner only while dragging (cleared as soon as the drag leaves)
+  - `.flow-step` now carries a 4.8s `flowBreath` animation with staggered `animation-delay` of `0s / 0.6s / 1.2s / 1.8s` across the four pills — the strip reads "alive" at idle without competing with content
+  - `@media (prefers-reduced-motion: reduce)` kills the breathing animation for users with the system motion-reduction preference (covers无障碍 / 演示机疲劳防控)
+- Files touched:
+  - `frontend/src/styles.css`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Commits (local, then pushed):
+  - `<HEAD>` Polish drop zone receiving state and hero flow breathing
+- Verification:
+  - `npm run build` -> passed; CSS still around `40 kB`
+  - `npm test -- --run` -> `13 passed`
+- Practical meaning:
+  - the dragover state now visibly "welcomes" the file rather than just changing colors, which读起来像 Linear/Notion-grade upload zones
+  - the hero flow strip no longer goes dead between interactions; rest state subtly breathes so the page never looks frozen even when the operator pauses to talk to the judges
 
 
 
