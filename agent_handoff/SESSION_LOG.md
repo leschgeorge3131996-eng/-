@@ -1885,4 +1885,29 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - all 18 request IDs (6 runs × 3 prompts) are now indexed in `PLATFORM_USAGE_EVIDENCE.md` for full traceability
 
 
+## 2026-04-27 / Claude (freeze fact sheet refresh)
+
+- Background:
+  - User asked to "继续优化". Code-side freeze still in effect per `project_demo_prep.md`; the only verified open risk surface was `agent_handoff/FREEZE_FACT_SHEET_20260419.md` whose body was still pinned to the `2026-04-19` state and was now contradicted by the predeploy gate / retrieval patch / `51/51` / `6`-run G3 / retry button / 4-24 review bundle work that landed since.
+  - Filename is referenced by 9 in-repo files; renaming was rejected to avoid breaking cross-references. Refreshed the body in place with a `Last refreshed: 2026-04-27` marker.
+- Summary:
+  - Updated runtime facts (current fast fallback `qwen3-next-80b-a3b-instruct`, demo-mode bypass note)
+  - Updated verification facts to current HEAD (frontend `13 passed`, backend `67 passed`, build clean)
+  - Updated `G3` from "strict three-run" to "strict six-run" with the actual span numbers and request-id index pointer
+  - Added a "Quantitative Evaluation Facts" section with the three-layer eval story (`46/51` -> `48/51` -> `51/51`) and the strict-G3 metrics, plus the wording rule against open-domain `100%` claims
+  - Added a "Demo Hardening Facts" section covering frontend UX polish, refusal escape, retrieval safety nets, demo-day operator features (digest workbench, national demo route, fallback preset, timeout, retry), and the expanded predeploy gate
+  - Updated latest review bundle pointer from `2026-04-20` to `2026-04-24`
+  - Added an "Operator Control Sheets" section pointing at `FINAL_SUBMISSION_CHECKLIST.md`, `DEFENSE_DEMO_RISK_CHECKLIST.md`, and the predeploy sanity script
+  - Made the closing "What Still Matters" item explicitly call out that remaining work is deployment hygiene plus rehearsal, not code
+- Files touched:
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - `.venv\Scripts\python.exe -m pytest backend\tests` -> `67 passed`
+  - `npm test -- --run` from `frontend` -> `13 passed`
+  - `npm run build` from `frontend` -> passed (existing large-chunk warning unchanged)
+  - `git status --short` was clean before this refresh
+- Practical meaning:
+  - the canonical "quickest authoritative reference" sheet now matches what an operator will actually see on HEAD; another AI handed only this sheet plus `PROJECT_CONTEXT.md` will not have to reconcile stale `2026-04-19` numbers with refreshed bundle/material pointers
+
 
