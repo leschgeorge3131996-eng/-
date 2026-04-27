@@ -42,7 +42,7 @@
 - The digest workflow is now more judge-readable: the workbench card shows `生成速读 → 点击追问 → 查看证据回链`, and digest results show source chunk count, covered page count, and follow-up count
 - Demo hardening landed: a `国一演示路线` button prepares the sample document plus digest task, whitelisted ask/refusal questions are available, and a `精简速读兜底` preset provides a fast fallback when the model/network is slow
 - Frontend task requests now have a `90s` timeout with a productized fallback message that points operators to `精简速读兜底` instead of leaving the UI spinning indefinitely
-- Latest external-AI review bundle was regenerated after P0口径收敛: `review_bundle_20260424_181957_final_competition_review.zip` with stage dir `review_bundle_stage_20260424_181957/`
+- Latest external-AI review bundle was regenerated after the visual polish track: `review_bundle_20260427_213721_final_competition_review.zip` with stage dir `review_bundle_stage_20260427_213721/` (supersedes the `2026-04-24` bundle)
 - P0 evidence wording is now frozen around three layers: historical `46/51` boundary-finding, model-selection `48/51`, and final default-model `51/51`; avoid claiming open-domain 100% or every answer has a verbatim quote
 - `scripts/predeploy_sanity.py` now emits a full `READY` / `BLOCKED` pre-demo risk light: gold cases plus runtime config, writable data dirs, gold PDF presence, parsed metadata, cited-page fetch, PDF render, citation presence, and recent log summary gates
 - Frontend task failure states now expose an operator-visible `重试当前任务` action when the current document/input are still valid; retry reuses uploaded metadata instead of re-uploading the same file, with a ref-level guard against rapid double submits
@@ -53,9 +53,9 @@
 
 1. Use `agent_handoff/FREEZE_FACT_SHEET_20260419.md` as the first reference for any further external review or operator handoff
 2. Use the latest local handoff/export artifacts as the default judged-material baseline:
-   - `evidence/exports/competition_asset_pack_20260420_173101/`
-   - `review_bundle_stage_20260420_141123/`
-   - `review_bundle_20260420_141123_final_competition_review.zip`
+   - `evidence/exports/competition_asset_pack_20260427_213711/`
+   - `review_bundle_stage_20260427_213721/`
+   - `review_bundle_20260427_213721_final_competition_review.zip`
 3. Use `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze sheet while converting `deck_3page_final.pdf` into the final native PPT and `video_subtitles_5min_final.srt` into the final recorded/edited video
 4. Before judged demo: run `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` together with `GOLD_SAMPLE_RUNBOOK.md`, set `DEMO_MODE=true` on the target env, and verify the opening flow on the target URL
 5. Use `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` as the technical-only next-work guide; failure attribution, table/parameter retrieval patch, expanded predeploy sanity, and frontend retry safety are now done, so the next technical target should be actual-demo-machine rehearsal and only then small citation/PDF-preview polish if a rehearsal exposes it

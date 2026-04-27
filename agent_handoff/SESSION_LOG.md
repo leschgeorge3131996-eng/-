@@ -2001,5 +2001,31 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - the dragover state now visibly "welcomes" the file rather than just changing colors, which读起来像 Linear/Notion-grade upload zones
   - the hero flow strip no longer goes dead between interactions; rest state subtly breathes so the page never looks frozen even when the operator pauses to talk to the judges
 
+## 2026-04-27 / Claude (handoff bundle refresh)
+
+- Background:
+  - User asked "还有别的什么方向能优化吗" after the polish track. Looked at the technical roadmap (`agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md`) and confirmed P0–P4 are done and M1–M4 are explicit non-priorities. The one remaining real-value action: handoff bundles were 7 days stale.
+  - Latest competition asset pack on disk was `competition_asset_pack_20260420_173101/` (`2026-04-20`) and latest external review bundle was `review_bundle_20260424_181957/` (`2026-04-24`). Neither captured the `2026-04-25` predeploy-gate expansion / retry-button work or any of the `2026-04-27` visual polish track. An operator or external AI given those bundles would be reading a 7-day-old snapshot.
+- What changed:
+  - Re-ran `scripts/export_competition_asset_pack.ps1` -> `evidence/exports/competition_asset_pack_20260427_213711/`
+  - Re-ran `scripts/export_review_bundle.ps1` -> `review_bundle_stage_20260427_213721/` plus `review_bundle_20260427_213721_final_competition_review.zip`
+  - Updated `agent_handoff/FREEZE_FACT_SHEET_20260419.md` to point at the new bundles (was pointing at the `2026-04-20` / `2026-04-24` ones)
+  - Updated `agent_handoff/TASK_BOARD.md` "Now" line and "Next Best Tasks" item 2 to point at the new bundles
+- Files touched:
+  - `evidence/exports/competition_asset_pack_20260427_213711/` (new)
+  - `review_bundle_stage_20260427_213721/` (new)
+  - `review_bundle_20260427_213721_final_competition_review.zip` (new)
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Verification:
+  - Both export scripts ran clean and reported their output paths.
+  - `git status` confirms only the doc edits are staged for commit; the bundle directories themselves stay out of git per the existing convention (older bundles are not committed either).
+- Practical meaning:
+  - the canonical "latest export pack" and "latest review bundle" pointers now match the actual HEAD instead of trailing it by 7 days
+  - another AI handed the new review bundle will see the predeploy gate expansion, retry button, and the full visual polish track in source form
+  - this is a handoff-hygiene action, not a code change — no tests run, no build run; the underlying code was unchanged this round
+
+
 
 

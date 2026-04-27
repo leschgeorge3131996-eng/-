@@ -137,11 +137,11 @@ Use this file as the quickest authoritative reference when another operator or a
   - `20260419_gold_ask_rank_accuracy.json`
   - `20260419_gold_refusal.json`
 - Latest local production handoff bundle:
-  - `evidence/exports/competition_asset_pack_20260420_173101/`
+  - `evidence/exports/competition_asset_pack_20260427_213711/`
   - now also carries `FINAL_SUBMISSION_CHECKLIST.md` and `DEFENSE_DEMO_RISK_CHECKLIST.md`
 - Latest external final-review bundle (preferred when handing to another AI):
-  - `review_bundle_stage_20260424_181957/`
-  - `review_bundle_20260424_181957_final_competition_review.zip`
+  - `review_bundle_stage_20260427_213721/`
+  - `review_bundle_20260427_213721_final_competition_review.zip`
   - root review docs in-repo:
     - `PROJECT_CONTEXT.md`
     - `REVIEW_PROMPT.md`
