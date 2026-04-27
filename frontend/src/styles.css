@@ -15,6 +15,24 @@
   --success: #1f6a4e;
   --warning: #935d11;
   --error: #b1351a;
+  /* Layered elevation tokens — tint (color cast) + ambient (soft spread) + key (directional). */
+  --elev-1:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 1px 2px rgba(35, 48, 68, 0.04),
+    0 4px 10px rgba(35, 48, 68, 0.05);
+  --elev-2:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset,
+    0 2px 4px rgba(35, 48, 68, 0.05),
+    0 10px 22px rgba(35, 48, 68, 0.08);
+  --elev-3:
+    0 1px 0 rgba(255, 255, 255, 0.84) inset,
+    0 2px 6px rgba(35, 48, 68, 0.06),
+    0 14px 30px rgba(35, 48, 68, 0.09),
+    0 28px 60px rgba(28, 38, 51, 0.06);
+  --elev-accent:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 2px 4px rgba(173, 76, 35, 0.06),
+    0 14px 32px rgba(173, 76, 35, 0.1);
   background: linear-gradient(180deg, #f5efe2 0%, #ebeef3 54%, #dde4ea 100%);
   background-attachment: fixed;
   color: var(--ink-strong);
@@ -92,6 +110,20 @@ body {
   margin: 0;
 }
 
+/* Film-grain noise overlay — lifts the flat cream gradient to a "premium matte paper" feel.
+   SVG feTurbulence is the standard CSS-Tricks technique; mix-blend-mode keeps it subtle. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+}
+
 button,
 input,
 select,
@@ -158,10 +190,35 @@ textarea {
     linear-gradient(135deg, rgba(255, 252, 246, 0.78), rgba(247, 241, 232, 0.62));
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
-  box-shadow:
-    0 22px 42px rgba(28, 38, 51, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  box-shadow: var(--elev-3);
   animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Vercel/Linear-style gradient hairline — uses mask-composite to "punch out" the inner area
+   so only a 1px directional gradient border is visible. Warm light top-left, cool shadow bottom-right. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(199, 89, 46, 0.55) 0%,
+    rgba(255, 255, 255, 0.6) 18%,
+    rgba(255, 255, 255, 0) 48%,
+    rgba(19, 34, 56, 0) 70%,
+    rgba(19, 34, 56, 0.32) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .hero::before {
@@ -755,6 +812,7 @@ textarea {
 }
 
 .national-demo-card {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -766,7 +824,31 @@ textarea {
   background:
     linear-gradient(135deg, rgba(240, 250, 245, 0.96), rgba(255, 255, 255, 0.9)),
     radial-gradient(circle at top left, rgba(31, 106, 78, 0.14), transparent 36%);
-  box-shadow: 0 14px 32px rgba(35, 48, 68, 0.07);
+  box-shadow: var(--elev-2);
+}
+
+.national-demo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(31, 106, 78, 0.55) 0%,
+    rgba(255, 255, 255, 0.5) 22%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(19, 34, 56, 0.25) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .national-demo-card div {
@@ -838,6 +920,7 @@ textarea {
 }
 
 .digest-workbench {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -848,12 +931,36 @@ textarea {
   background:
     linear-gradient(135deg, rgba(255, 247, 235, 0.96), rgba(255, 255, 255, 0.9)),
     radial-gradient(circle at top left, rgba(173, 76, 35, 0.16), transparent 34%);
-  box-shadow: 0 14px 32px rgba(35, 48, 68, 0.07);
+  box-shadow: var(--elev-2);
+}
+
+.digest-workbench::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(199, 89, 46, 0.55) 0%,
+    rgba(255, 255, 255, 0.5) 22%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(19, 34, 56, 0.25) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .digest-workbench.active {
   border-color: rgba(173, 76, 35, 0.36);
-  box-shadow: 0 18px 38px rgba(173, 76, 35, 0.12);
+  box-shadow: var(--elev-accent);
 }
 
 .digest-workbench strong {
@@ -1899,9 +2006,7 @@ textarea {
 .citation-card:hover {
   transform: translateY(-2px);
   border-color: rgba(173, 76, 35, 0.32);
-  box-shadow:
-    0 14px 28px rgba(35, 48, 68, 0.09),
-    0 2px 4px rgba(173, 76, 35, 0.06);
+  box-shadow: var(--elev-accent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 237, 0.9));
 }
