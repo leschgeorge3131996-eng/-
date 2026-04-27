@@ -1956,5 +1956,26 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - thecoderashok blog: CSS Gradient Border Glowing Animation
   - awesome-shadcn-ui curated list (used for technique research only; no shadcn/Tailwind dependency added)
 
+## 2026-04-27 / Claude (visual polish track — meta panel + history/demo cards)
+
+- Background:
+  - User said "继续" after seeing the first three polish commits. Continued with surfaces a judge actually sees during demo but had not yet been touched: the `.meta-grid` chips that show 请求 ID / latency / chunk count under each result, and the `.demo-card` / `.history-card` tiles in the sidebar history list.
+- What changed (still pure CSS):
+  - `.meta-chip` now carries `--elev-1` at rest and lifts to `--elev-2` on hover (was: no rest shadow, single soft hover shadow)
+  - `.meta-chip strong` now uses `font-variant-numeric: tabular-nums` plus `letter-spacing: 0.01em` so latency / chunk count / page count digits column-align across the three chips — reads as "professional dashboard" rather than "raw text"
+  - `.demo-card` / `.history-card` (shared selector) now carry `--elev-1` at rest, lift to `--elev-2` on hover with a `-1px` translate plus accent border — gives them rest-state depth instead of looking flat against the panel background
+- Files touched:
+  - `frontend/src/styles.css`
+  - `agent_handoff/SESSION_LOG.md`
+  - `agent_handoff/TASK_BOARD.md`
+- Commits (local, pushed at end of round):
+  - `<HEAD>` Polish meta chips and history cards with elevation tokens
+- Verification:
+  - `npm run build` -> passed; CSS now `~40 kB` (no measurable size regression vs the previous polish commit)
+  - `npm test -- --run` -> `13 passed`
+- Practical meaning:
+  - judges glancing at the result meta panel see column-aligned numbers — improves perceived precision without changing any number
+  - history sidebar now reads as "stack of clickable tiles" instead of "list of borders against the page background"
+
 
 
