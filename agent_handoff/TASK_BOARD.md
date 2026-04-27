@@ -46,6 +46,7 @@
 - P0 evidence wording is now frozen around three layers: historical `46/51` boundary-finding, model-selection `48/51`, and final default-model `51/51`; avoid claiming open-domain 100% or every answer has a verbatim quote
 - `scripts/predeploy_sanity.py` now emits a full `READY` / `BLOCKED` pre-demo risk light: gold cases plus runtime config, writable data dirs, gold PDF presence, parsed metadata, cited-page fetch, PDF render, citation presence, and recent log summary gates
 - Frontend task failure states now expose an operator-visible `重试当前任务` action when the current document/input are still valid; retry reuses uploaded metadata instead of re-uploading the same file, with a ref-level guard against rapid double submits
+- Visual polish track landed (`2026-04-27`, pure CSS, no DOM/component change): `--elev-*` tokens, body film-grain overlay, mask-composite gradient hairlines on hero / digest workbench / national demo card, three-layer PDF paper-float shadow, soft refusal halo, gradient page-tab active state, evidence-snippet ribbon
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

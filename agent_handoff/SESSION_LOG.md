@@ -1910,4 +1910,51 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Practical meaning:
   - the canonical "quickest authoritative reference" sheet now matches what an operator will actually see on HEAD; another AI handed only this sheet plus `PROJECT_CONTEXT.md` will not have to reconcile stale `2026-04-19` numbers with refreshed bundle/material pointers
 
+## 2026-04-27 / Claude (visual polish track — film grain, gradient hairlines, elevation tokens)
+
+- Background:
+  - User asked first to scan technical + UI surface for low-risk polish, then said "去 GitHub 上找找 UI 高级设计的一些方法 ... 能用的可以用在我们的项目上". Treated as a directed search for open-source modern web design techniques to adopt without major UI redesign or new dependencies. Existing `feedback_non_priorities.md` ("major UI redesign" off-limits) and `feedback_ui_polish.md` ("first-glance visible changes > hover polish; CJK brandmark needs positive letter-spacing") still in force.
+- Techniques selected from open-source references:
+  - SVG `feTurbulence` film-grain overlay (CSS-Tricks "Grainy Gradients", Adam Argyle派系) — mix-blend-mode overlay at z-index 9999 with `pointer-events: none`, uses an inline data URL so no new asset
+  - Vercel/Linear-style 1px gradient hairline via `mask-composite: exclude` (Pure CSS Gradient Borders walkthrough) — directional warm-light/cool-shadow rim, no animation cost
+  - Layered elevation tokens (tint + ambient + key) — replaces single `box-shadow` lines in critical cards
+- Techniques explicitly skipped:
+  - Conic-gradient rotating spotlight border: too loud on a light theme, demo distraction risk
+  - 3D card tilt / cursor spotlight: touches core interaction layer, demo risk
+  - CSS Houdini `@property` animations: browser compatibility risk on demo machine
+  - Tailwind / shadcn migration: would constitute major UI redesign
+- Files touched (only `frontend/src/styles.css`):
+  - new `--elev-1`, `--elev-2`, `--elev-3`, `--elev-accent` tokens at `:root`
+  - new `body::before` film-grain noise overlay
+  - `.hero` upgraded to `--elev-3` plus new `.hero::after` gradient hairline
+  - `.national-demo-card` upgraded to `--elev-2` plus new `.national-demo-card::before` gradient hairline
+  - `.digest-workbench` upgraded to `--elev-2` plus new `.digest-workbench::before` gradient hairline; active state now uses `--elev-accent`
+  - `.citation-card:hover` upgraded to `--elev-accent`
+  - `.pdf-render-wrap` flat `#e5ebf2` → radial highlight + linear cool gradient + dual inset shadow
+  - `.pdf-render-inner` single 16px shadow → three-layer paper-float stack with 4px radius
+  - `.refusal-card` added soft red radial halo via `::before` blur, layered shadow, top-left radial overlay; child elements lifted to `z-index: 1`
+  - `.pdf-page-button.active` flat赭色 background → linear gradient + tri-layer inset/outer shadow ("pressed pill" feel)
+  - `.pdf-evidence-snippet` flat 3px solid border-left → gradient ribbon `::before` plus inset top highlight and subtle outer shadow
+- Commits (local, then pushed):
+  - `7c39f3b` Lift visual fidelity with film-grain + gradient hairlines
+  - `48b6eae` Polish PDF render frame and refusal card halo
+  - `<HEAD>` Polish PDF page-tab active state and evidence snippet ribbon
+- Verification:
+  - `npm run build` from `frontend`: passed each round; CSS grew from `36.93 kB` to about `40 kB` (`+~3 kB` for tokens, noise data URL, and added pseudo-elements)
+  - `npm test -- --run` from `frontend`: `13 passed` each round
+  - dev server (`npm run dev`) was kept running on `5173` for visual verification on the operator's machine; no DOM/HTML/component changes — pure CSS-layer refactor
+- Practical meaning:
+  - the cream gradient ground now reads as "matte premium paper" rather than flat slide background
+  - hero / digest workbench / national demo card now carry a Vercel/Linear-grade 1px directional rim that says "high-end product card" without animation distraction
+  - PDF preview area — the longest-dwell judge focus after `ask` — now floats on a real shadow stack instead of a single drop shadow
+  - refusal card reads as "权威 but 克制" (soft halo) rather than aggressive red flash
+  - active page-tab and evidence snippet are now visually distinct enough that a judge can follow the demo path without operator narration
+- References used (open-source / community write-ups):
+  - CSS-Tricks: Grainy Gradients
+  - GitHub: yashrajbharti/Grainy-image
+  - Medium (Lim Joshen): Pure CSS Gradient Borders walkthrough
+  - thecoderashok blog: CSS Gradient Border Glowing Animation
+  - awesome-shadcn-ui curated list (used for technique research only; no shadcn/Tailwind dependency added)
+
+
 

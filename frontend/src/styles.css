@@ -2429,10 +2429,14 @@ textarea {
 }
 
 .pdf-page-button.active {
-  border-color: rgba(173, 76, 35, 0.3);
-  background: rgba(173, 76, 35, 0.12);
+  border-color: rgba(173, 76, 35, 0.45);
+  background: linear-gradient(180deg, rgba(255, 235, 220, 0.95), rgba(255, 220, 200, 0.82));
   color: var(--accent-deep);
   font-weight: 700;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 0 rgba(173, 76, 35, 0.18),
+    0 2px 6px rgba(173, 76, 35, 0.14);
 }
 
 .pdf-page-chip {
@@ -2458,12 +2462,31 @@ textarea {
 }
 
 .pdf-evidence-snippet {
+  position: relative;
   margin: 0;
-  padding: 12px 16px 14px;
+  padding: 12px 16px 14px 18px;
   border-radius: 14px;
   border: 1px solid rgba(173, 76, 35, 0.18);
-  background: rgba(173, 76, 35, 0.06);
-  border-left: 3px solid var(--accent-deep);
+  background:
+    linear-gradient(180deg, rgba(255, 245, 235, 0.7), rgba(173, 76, 35, 0.04)),
+    rgba(173, 76, 35, 0.02);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(173, 76, 35, 0.04);
+  overflow: hidden;
+}
+
+/* Replaces the flat 3px border-left with a directional gradient ribbon
+   that fades top→bottom — reads as "highlighted quote" rather than "system list marker". */
+.pdf-evidence-snippet::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8%;
+  bottom: 8%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep) 60%, transparent);
 }
 
 .pdf-evidence-snippet .snippet-kicker {
