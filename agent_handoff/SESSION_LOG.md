@@ -1,5 +1,32 @@
 ﻿# Session Log
 
+## 2026-04-30 / Codex (contract patch rerun promotes DeepSeek V4 Flash for QA rehearsal)
+
+- Background:
+  - User approved the next step after V6 showed `deepseek-v4-flash` beating Qwen on the harsher `72`-case full holdout.
+  - Implemented a narrow ask-path contract patch rather than broad UI/model-routing changes.
+- Code changes:
+  - `backend/app/services/model_client.py`: ask prompt now requires answer-language following and distinguishes explicit missing fields, unresolved conflict, and true out-of-scope refusal.
+  - `backend/app/services/task_service.py`: ask evidence retry prompt now preserves the same language/conflict/missing-info contract.
+  - `backend/tests/test_services.py`: added regression tests to keep these prompt-contract clauses from being removed accidentally.
+- Verification:
+  - `python -m pytest backend/tests/test_services.py backend/tests/test_extended_eval.py` -> `39 passed`.
+  - Reran frozen V6 full on Qwen and Flash after the patch:
+    - Qwen3 235B: `56 / 72`, refusal `92.3%`, citation/declaration `74.6%`.
+    - DeepSeek V4 Flash: `71 / 72`, refusal `100.0%`, citation/declaration `98.3%`.
+  - Ran predeploy sanity with `MODEL_QA=deepseek-v4-flash`:
+    - gold `3 / 3`
+    - gates `11 / 11`
+    - status `READY`
+    - report `evidence/reports/predeploy_sanity_20260430_010552.md`
+- Decision:
+  - Local `.env` QA default was switched to `MODEL_QA=deepseek-v4-flash`.
+  - `MODEL_SUMMARY` and `MODEL_OUTLINE` remain on `qwen3-235b-a22b-instruct-2507` to limit blast radius.
+  - Qwen remains the rollback fallback.
+- Practical meaning:
+  - For the next rehearsal, QA should run through DeepSeek V4 Flash.
+  - Do not expand to more models until this QA-default switch has been rehearsed on the actual demo flow.
+
 ## 2026-04-29 / Codex (multi-agent model strategy and extreme-test direction)
 
 - Background:
@@ -2052,6 +2079,5 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - the canonical "latest export pack" and "latest review bundle" pointers now match the actual HEAD instead of trailing it by 7 days
   - another AI handed the new review bundle will see the predeploy gate expansion, retry button, and the full visual polish track in source form
   - this is a handoff-hygiene action, not a code change — no tests run, no build run; the underlying code was unchanged this round
-
 
 

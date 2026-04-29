@@ -1187,6 +1187,50 @@ def test_retrieval_normalize_query_preserves_english_tokens() -> None:
     assert normalized == "architecture"
 
 
+def test_ask_prompt_includes_language_and_missing_info_contract() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        client = ModelClient(settings=settings)
+
+        messages = client._build_messages(
+            "ask",
+            "Document says no rollback date is provided.",
+            "What is the rollback date?",
+            response_detail_level="balanced",
+        )
+
+        combined = "\n".join(message["content"] for message in messages)
+        assert "回答语言必须跟随用户问题" in combined
+        assert "不要把英文问题默认翻成中文回答" in combined
+        assert "直接索要缺失字段的具体值" in combined
+        assert "文档存在冲突但没有优先级规则" in combined
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_ask_evidence_retry_keeps_conflict_and_language_contract() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        service = TaskService(
+            file_service=FileService(settings=settings),
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+
+        retry_input = service._build_ask_evidence_retry_input(
+            "Who is the final owner for after-hours taxi approval?"
+        )
+
+        assert "回答语言必须跟随用户问题" in retry_input
+        assert "不要把英文问题默认翻译成中文回答" in retry_input
+        assert "存在互相冲突的信息且没有优先级规则" in retry_input
+        assert "返回 refused=false" in retry_input
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_model_client_retries_transient_urlerror(monkeypatch: pytest.MonkeyPatch) -> None:
     workspace = make_workspace()
     try:
