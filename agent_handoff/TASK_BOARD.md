@@ -146,7 +146,8 @@
   - generic document platform / open trial SaaS framing
 - Refusal demos must use prompts that are purely off-topic; prompts that still mention in-document entities can retrieve and answer
 - Current QA recommendation:
-  - keep `qwen3-235b-a22b-instruct-2507` as default for stronger broad-answer grounding
+  - use `deepseek-v4-flash` as QA rehearsal default after the V6 contract-patch gate
+  - keep `qwen3-235b-a22b-instruct-2507` as rollback fallback and for summary/outline unless separately retested
   - keep `qwen3-next-80b-a3b-instruct` as the best validated fast fallback; `qwen3-32b` remains historical gold-sample fallback only
 
 ## Historical Override (`2026-04-21`)

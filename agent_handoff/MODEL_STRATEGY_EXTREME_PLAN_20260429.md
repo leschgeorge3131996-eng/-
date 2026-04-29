@@ -1,5 +1,24 @@
 # Model strategy and extreme-test plan - 2026-04-29
 
+## 2026-04-30 Override
+
+This document's original recommendation was superseded by the V6 full + contract-patch rerun.
+
+Current QA rehearsal default:
+
+- `MODEL_QA=deepseek-v4-flash`
+- `MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507`
+- `MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507`
+
+Evidence:
+
+- V6 full after contract patch: Flash `71 / 72`, Qwen `56 / 72`.
+- Flash refusal precision: `100.0%`.
+- Flash citation/declaration: `98.3%`.
+- Flash predeploy sanity: gold `3 / 3`, gates `11 / 11`, status `READY`.
+
+Rollback fallback remains `qwen3-235b-a22b-instruct-2507`.
+
 ## Why this exists
 
 The latest V4 holdout changed the model-selection picture. `qwen3-235b-a22b-instruct-2507` and `deepseek-v4-flash` both scored `48 / 50`, so the old framing of "Qwen clearly wins" is no longer accurate. The right next step is to widen the candidate pool and test harsher product risks, not keep repeating short clean-document QA.
@@ -127,4 +146,3 @@ Otherwise keep Qwen default and use the challenger as backup or offline comparis
 ## Next engineering action
 
 Build V5 Extreme Holdout first, then run Stage A. The most valuable code-side fix before or alongside that is normalizing "document does not provide this information" into the same structured missing-information/refusal outcome across models.
-
