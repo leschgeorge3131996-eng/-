@@ -1,0 +1,93 @@
+{
+  "version": 4,
+  "name": "holdout_eval_v4_20260429",
+  "description": "Comprehensive fresh holdout for Qwen vs DeepSeek V4 Flash. Covers simple facts, dates, numeric extraction, arithmetic, cross-section reasoning, negative-boundary answers, and refusal cases. Expected aliases are widened to reduce strict-string false negatives.",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "security_upgrade_v4",
+      "document_path": "evidence/samples/holdout_v4/security_upgrade_notice.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "sec_scope", "text": "本次终端安全升级覆盖哪些组织？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["研发中心", "财务共享中心", "华南销售大区"], "difficulty": "easy"},
+        {"id": "sec_excluded_center", "text": "客服中心是否纳入本次灰度范围？", "category": "V4_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["暂不纳入", "不纳入", "没有纳入"], "difficulty": "easy"},
+        {"id": "sec_second_batch_duration", "text": "第二批升级持续多长时间？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2.5", "2 小时 30 分钟", "2小时30分钟", "两个半小时"], "difficulty": "hard"},
+        {"id": "sec_password_delta", "text": "密码最短长度增加了几位？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["4"], "difficulty": "hard"},
+        {"id": "sec_lock_rule", "text": "连续输错密码多少次后会锁定多久？", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["5 次", "5次", "15 分钟", "15分钟"], "difficulty": "easy"},
+        {"id": "sec_storage_write", "text": "外接存储设备如果需要写入，应如何申请？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["工单系统", "临时授权申请"], "difficulty": "medium"},
+        {"id": "sec_lab_exception", "text": "实验室离线采集设备的暂缓期限到什么时候？", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 7 月 1 日", "2026年7月1日", "2026-07-01"], "difficulty": "easy"},
+        {"id": "sec_demo_whitelist", "text": "销售演示机可以申请多久的临时白名单，需要登记什么？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["7 天", "7天", "设备编号", "责任人"], "difficulty": "medium"},
+        {"id": "sec_total_owner", "text": "本次升级总负责人是谁？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["孟知远"], "difficulty": "easy"},
+        {"id": "sec_vpn_refusal", "text": "通知是否说明了 VPN 价格调整？", "category": "V4_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "grant_rules_v4",
+      "document_path": "evidence/samples/holdout_v4/grant_review_rules.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "grant_types", "text": "青年创新基金分为哪三个方向？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["探索类", "应用类", "交叉类"], "difficulty": "easy"},
+        {"id": "grant_cross_amount", "text": "交叉类项目每项资助多少万元，周期多久？", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["15 万元", "15万元", "24 个月", "24个月"], "difficulty": "easy"},
+        {"id": "grant_amount_gap", "text": "交叉类比探索类多资助多少万元？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["7 万元", "7万元"], "difficulty": "hard"},
+        {"id": "grant_duration_gap", "text": "应用类项目周期比探索类长多久？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["6 个月", "6个月"], "difficulty": "hard"},
+        {"id": "grant_age_rule", "text": "申请人的年龄限制是什么？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不超过 35 周岁", "不超过35周岁"], "difficulty": "easy"},
+        {"id": "grant_duplicate_rule", "text": "已经担任在研校级重点项目负责人还能作为本基金负责人重复申报吗？", "category": "V4_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不能", "不可以", "不能作为"], "difficulty": "medium"},
+        {"id": "grant_score_components", "text": "评分规则中占比最高和最低的指标分别是什么？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["创新性", "经费合理性"], "difficulty": "hard"},
+        {"id": "grant_no_panel_threshold", "text": "总分低于多少分不进入会评？", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["70"], "difficulty": "easy"},
+        {"id": "grant_result_date", "text": "立项名单预计什么时候公布？", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 5 月 20 日", "2026年5月20日", "2026-05-20"], "difficulty": "easy"},
+        {"id": "grant_location_refusal", "text": "学校会评的答辩地点在哪里？", "category": "V4_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "warehouse_rollout_v4",
+      "document_path": "evidence/samples/holdout_v4/warehouse_rollout_plan.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "wh_warehouses", "text": "本次试点覆盖哪些仓库？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["南京一号仓", "武汉二号仓", "西安备件仓"], "difficulty": "easy"},
+        {"id": "wh_excluded", "text": "广州冷链仓为什么不参加本次试点？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["温控系统改造延期"], "difficulty": "easy"},
+        {"id": "wh_stage_order", "text": "三个上线阶段依次是什么？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["盘点机器人部署", "货位推荐算法启用", "异常出库预警启用"], "difficulty": "medium"},
+        {"id": "wh_total_period", "text": "从第一阶段开始到第三阶段结束，整个试点上线跨越哪段日期？", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 8 月 3 日", "2026年8月3日", "2026 年 8 月 24 日", "2026年8月24日"], "difficulty": "medium"},
+        {"id": "wh_pick_time_delta", "text": "平均拣货时长目标相比原来的 11.2 分钟至少要降低多少分钟？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["1.7"], "difficulty": "hard"},
+        {"id": "wh_false_alarm", "text": "异常出库预警误报率上限是多少？", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["4%"], "difficulty": "easy"},
+        {"id": "wh_nanjing_owner", "text": "南京一号仓现场负责人是谁？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["韩予"], "difficulty": "easy"},
+        {"id": "wh_pause_condition", "text": "什么情况下仓库需要暂停进入下一阶段？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["连续两天", "低于 97%", "低于97%"], "difficulty": "hard"},
+        {"id": "wh_uav_refusal", "text": "本计划是否包含无人机巡检内容？", "category": "V4_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["没有包含", "不包含", "未包含"], "difficulty": "medium"},
+        {"id": "wh_budget_refusal", "text": "本计划给出的项目总预算是多少？", "category": "V4_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "api_migration_v4",
+      "document_path": "evidence/samples/holdout_v4/api_migration_note.md",
+      "language": "en",
+      "prompts": [
+        {"id": "api_scope", "text": "Which three request areas are affected by the Atlas API v2 migration?", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["upload", "parse-status", "page-render", "上传", "解析状态", "页面渲染"], "difficulty": "easy"},
+        {"id": "api_not_affected", "text": "Name one area that is not affected by the migration.", "category": "V4_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["billing exports", "user invitation codes", "计费导出", "邀请码"], "difficulty": "easy"},
+        {"id": "api_testing_window", "text": "How long is the partner integration testing window?", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["15", "14", "two weeks", "2 weeks", "两周"], "difficulty": "hard"},
+        {"id": "api_cutover_time", "text": "When is production cutover scheduled?", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026-10-06", "01:00 UTC"], "difficulty": "easy"},
+        {"id": "api_readonly_after", "text": "How long will the v1 endpoint remain read-only after cutover?", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["30 days", "30 天", "30天"], "difficulty": "easy"},
+        {"id": "api_upload_increase", "text": "By how many MB does the maximum upload size increase?", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["30 MB", "30MB"], "difficulty": "hard"},
+        {"id": "api_dpi", "text": "What default DPI value remains unchanged?", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["144"], "difficulty": "easy"},
+        {"id": "api_signature_change", "text": "How do webhook signatures change?", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["SHA-1", "SHA-256"], "difficulty": "medium"},
+        {"id": "api_owner", "text": "Who owns the migration?", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Priya Nair"], "difficulty": "easy"},
+        {"id": "api_rollback_refusal", "text": "What rollback date does the note provide?", "category": "V4_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "quality_metrics_v4",
+      "document_path": "evidence/samples/holdout_v4/quality_metrics_report.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "qm_sample_total", "text": "本月一共抽检了多少条样本？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["1100"], "difficulty": "hard"},
+        {"id": "qm_time_range", "text": "抽检时间范围是什么？", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 2 月 1 日", "2026年2月1日", "2026 年 2 月 28 日", "2026年2月28日"], "difficulty": "easy"},
+        {"id": "qm_queues", "text": "样本来自哪三个队列？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["售前咨询", "售后维修", "投诉处理"], "difficulty": "easy"},
+        {"id": "qm_resolution_gap", "text": "电话工单一次解决率比在线聊天高多少个百分点？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["5.4"], "difficulty": "hard"},
+        {"id": "qm_response_gap", "text": "在线聊天平均响应时间比电话慢多少秒？", "category": "V4_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["13"], "difficulty": "hard"},
+        {"id": "qm_lowest_satisfaction", "text": "满意度最低的是哪个队列，数值是多少？", "category": "V4_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["投诉处理", "88.4%"], "difficulty": "easy"},
+        {"id": "qm_issue_top", "text": "出现次数最多的主要问题是什么，出现了多少次？", "category": "V4_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["维修进度解释不清", "37"], "difficulty": "easy"},
+        {"id": "qm_actions_order", "text": "3 月 10 日前需要完成什么改进动作？", "category": "V4_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["优惠政策知识库统一"], "difficulty": "easy"},
+        {"id": "qm_salary_refusal", "text": "这份月报是否包含客服人员薪酬信息？", "category": "V4_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不包含", "没有包含", "不统计"], "difficulty": "medium"},
+        {"id": "qm_store_refusal", "text": "线下门店服务的一次解决率是多少？", "category": "V4_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"}
+      ]
+    }
+  ]
+}
