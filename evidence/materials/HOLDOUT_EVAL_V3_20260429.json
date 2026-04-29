@@ -1,0 +1,118 @@
+{
+  "version": 3,
+  "name": "holdout_eval_v3_20260429",
+  "description": "Larger pre-registered objective holdout for comparing qwen3-235b-a22b-instruct-2507 and deepseek-v4-flash. Documents and questions were created before model runs; no code or prompt tuning should happen between candidate runs.",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "procurement_policy_v3",
+      "document_path": "evidence/samples/holdout_v3/procurement_policy_2026.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "proc_scope_departments", "text": "本说明适用于哪些业务发起部门？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["研发部", "市场部", "行政部"], "difficulty": "easy"},
+        {"id": "proc_fast_limit", "text": "快速审批流程的单笔金额上限是多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["48000"], "difficulty": "easy"},
+        {"id": "proc_three_quotes", "text": "什么金额区间的采购需要补充三家供应商报价？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["120000"], "difficulty": "medium"},
+        {"id": "proc_fast_sla", "text": "快速审批流程目标完成时间是多少？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2 个工作日", "2个工作日"], "difficulty": "easy"},
+        {"id": "proc_cities", "text": "本轮合规试点覆盖了哪几个城市？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["杭州", "成都", "苏州"], "difficulty": "easy"},
+        {"id": "proc_system_owner", "text": "采购系统配置负责人是谁？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["周岚"], "difficulty": "easy"},
+        {"id": "proc_review_date", "text": "试点复盘报告的提交日期是什么时候？", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 7 月 12 日", "2026年7月12日"], "difficulty": "easy"},
+        {"id": "proc_shenzhen_refusal", "text": "深圳是否进入了本轮合规试点？请只依据文档回答。", "category": "V3_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不", "没有", "未"], "difficulty": "medium"},
+        {"id": "proc_stock_refusal", "text": "根据本说明，哪家供应商的股票会涨？", "category": "V3_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "easy"},
+        {"id": "proc_meal_refusal", "text": "专项评审会是否提供午餐？", "category": "V3_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"},
+        {"id": "proc_90000_route", "text": "如果一笔采购金额为 90000 元，应该走哪类要求？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["三家供应商报价", "补充三家"], "difficulty": "hard"},
+        {"id": "proc_130000_route", "text": "如果采购金额为 130000 元，是否还能只补充三家报价？应该进入什么流程？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["专项评审会", "超过 120000"], "difficulty": "hard"},
+        {"id": "proc_deadline_rule", "text": "专项评审会材料提交截止时间和会议日期之间相隔多久？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["5 个工作日", "5个工作日"], "difficulty": "medium"},
+        {"id": "proc_excluded_major_cities", "text": "北京和上海在本说明中的处理方式与杭州、成都、苏州有什么不同？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["保留原有审批流程", "不进入本轮试点"], "difficulty": "hard"},
+        {"id": "proc_roles_compare", "text": "财务部和法务专员在文档中的角色有什么区别？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["预算复核", "供应商黑名单复核"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "incident_review_v3",
+      "document_path": "evidence/samples/holdout_v3/incident_review_alpha.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "inc_date", "text": "Alpha 服务异常发生在哪一天？", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 3 月 18 日", "2026年3月18日"], "difficulty": "easy"},
+        {"id": "inc_alert_time", "text": "监控在几点发出黄色告警？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["09:47"], "difficulty": "easy"},
+        {"id": "inc_clear_time", "text": "告警解除时间是什么时候？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["10:16"], "difficulty": "easy"},
+        {"id": "inc_affected_queues", "text": "受影响的是哪两个队列？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["PDF 解析队列", "截图生成队列"], "difficulty": "medium"},
+        {"id": "inc_max_queue", "text": "高峰期间最大排队长度是多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["317"], "difficulty": "easy"},
+        {"id": "inc_root_limit_wrong", "text": "误操作后渲染工作池上限被调整成多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["6"], "difficulty": "easy"},
+        {"id": "inc_owner_script", "text": "误用旧参数的值班员是谁？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["罗澈"], "difficulty": "easy"},
+        {"id": "inc_threshold_owner", "text": "谁负责把队列长度阈值从 300 调整到 180？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["沈玥"], "difficulty": "medium"},
+        {"id": "inc_data_loss", "text": "本次事件是否造成用户数据丢失？", "category": "V3_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["没有", "未"], "difficulty": "easy"},
+        {"id": "inc_payment_refusal", "text": "支付系统故障导致了多少笔退款？", "category": "V3_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"},
+        {"id": "inc_alert_duration", "text": "从黄色告警发出到告警解除，大约经过了多少分钟？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["29"], "difficulty": "hard"},
+        {"id": "inc_restore_duration", "text": "从恢复渲染工作池上限到队列恢复到 20 个任务以内，经过了多久？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["14"], "difficulty": "hard"},
+        {"id": "inc_wrong_parameter_delta", "text": "渲染工作池上限被误调后，比正确值少了多少？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["18"], "difficulty": "hard"},
+        {"id": "inc_first_and_last_action", "text": "三个后续动作中，最早截止和最晚截止的负责人分别是谁？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["沈玥", "赵珩"], "difficulty": "hard"},
+        {"id": "inc_unaffected_uploads", "text": "哪些上传链路保持正常，和受影响队列形成对比？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["TXT", "Markdown"], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "lab_experiment_v3",
+      "document_path": "evidence/samples/holdout_v3/lab_experiment_log.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "lab_goal", "text": "本次实验比较了哪两种排序方法？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["baseline", "hybrid-rerank"], "difficulty": "easy"},
+        {"id": "lab_zh_docs", "text": "实验使用了多少份中文制度文档？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["96"], "difficulty": "easy"},
+        {"id": "lab_en_docs", "text": "实验使用了多少份英文技术说明？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["64"], "difficulty": "easy"},
+        {"id": "lab_total_questions", "text": "总问题数是多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["1120"], "difficulty": "easy"},
+        {"id": "lab_rerank_features", "text": "hybrid-rerank 使用了哪些分数？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["BM25", "向量召回", "标题匹配"], "difficulty": "medium"},
+        {"id": "lab_candidates", "text": "重排阶段最多保留多少个候选块？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["12"], "difficulty": "easy"},
+        {"id": "lab_baseline_page_hit", "text": "baseline 的页命中率是多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["87.4"], "difficulty": "easy"},
+        {"id": "lab_hybrid_latency", "text": "hybrid-rerank 的平均延迟是多少毫秒？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2310"], "difficulty": "easy"},
+        {"id": "lab_refusal_precision", "text": "拒答精度提升到了多少？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["96.5"], "difficulty": "easy"},
+        {"id": "lab_asr_refusal", "text": "本次实验评估了语音识别准确率吗？", "category": "V3_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不", "没有", "未"], "difficulty": "medium"},
+        {"id": "lab_total_docs", "text": "实验一共使用了多少份文档？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["160"], "difficulty": "hard"},
+        {"id": "lab_questions_per_doc", "text": "每份文档一共抽取多少个问题？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["7"], "difficulty": "hard"},
+        {"id": "lab_page_hit_gain", "text": "hybrid-rerank 相比 baseline 的页命中率提高了多少个百分点？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["5.7"], "difficulty": "hard"},
+        {"id": "lab_latency_cost", "text": "hybrid-rerank 相比 baseline 平均延迟增加了多少毫秒？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["470"], "difficulty": "hard"},
+        {"id": "lab_bad_network_choice", "text": "如果现场演示网络较差，文档建议临时退回哪种排序？为什么？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["baseline", "更低延迟"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "orion_spec_v3",
+      "document_path": "evidence/samples/holdout_v3/bilingual_product_spec.md",
+      "language": "en",
+      "prompts": [
+        {"id": "orion_positioning", "text": "What kind of assistant is Orion Note?", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["meeting-note", "bilingual"], "difficulty": "easy"},
+        {"id": "orion_pilot_cities", "text": "Which two locations are planned for the first public pilot?", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Singapore", "Taipei"], "difficulty": "easy"},
+        {"id": "orion_mvp_features", "text": "Name one MVP feature from the spec.", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["transcript cleanup", "action-item", "bilingual summary"], "difficulty": "easy"},
+        {"id": "orion_offline_limitation", "text": "What does offline mode not support?", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["speech transcription"], "difficulty": "medium"},
+        {"id": "orion_duration", "text": "What is the maximum meeting duration in the pilot plan?", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["90"], "difficulty": "easy"},
+        {"id": "orion_audio_retention", "text": "After how many days are audio files deleted by default?", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["14"], "difficulty": "easy"},
+        {"id": "orion_beta_date", "text": "When does private beta start?", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026-05-20"], "difficulty": "easy"},
+        {"id": "orion_release_owner", "text": "Who owns the release checklist?", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Mei Tan"], "difficulty": "easy"},
+        {"id": "orion_price", "text": "What is the pilot monthly price per active user?", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["19 USD"], "difficulty": "easy"},
+        {"id": "orion_annual_refusal", "text": "What is the annual contract price?", "category": "V3_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"},
+        {"id": "orion_shortest_retention", "text": "What is the shortest audio retention period users can choose according to the spec?", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["3 days"], "difficulty": "medium"},
+        {"id": "orion_beta_to_pilot_gap", "text": "Roughly how many days are there between private beta start and public pilot start?", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["42"], "difficulty": "hard"},
+        {"id": "orion_education_discount_price", "text": "If the 40% education discount applies to the 19 USD pilot price, what monthly price remains?", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["11.4"], "difficulty": "hard"},
+        {"id": "orion_not_for_high_stakes", "text": "Name one high-stakes use case the product is explicitly not designed for.", "category": "V3_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["medical diagnosis", "legal representation"], "difficulty": "medium"},
+        {"id": "orion_offline_vs_live", "text": "Contrast offline mode with the live transcription capability described in the MVP.", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["saved notes", "speech transcription"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "campus_workshop_v3",
+      "document_path": "evidence/samples/holdout_v3/campus_workshop_notice.md",
+      "language": "zh",
+      "prompts": [
+        {"id": "campus_theme", "text": "本次工作坊主题是什么？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["可信文档问答", "证据回链"], "difficulty": "easy"},
+        {"id": "campus_date", "text": "工作坊日期是哪一天？", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 5 月 14 日", "2026年5月14日"], "difficulty": "easy"},
+        {"id": "campus_room", "text": "活动地点在哪个房间？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["A301"], "difficulty": "easy"},
+        {"id": "campus_deadline", "text": "报名截止时间是什么时候？", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026 年 5 月 10 日 18:00", "2026年5月10日18:00"], "difficulty": "easy"},
+        {"id": "campus_capacity", "text": "名额上限是多少人？", "category": "V3_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["80"], "difficulty": "easy"},
+        {"id": "campus_hands_on_time", "text": "系统实操安排在哪个时间段？", "category": "V3_DATE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["14:20", "15:40"], "difficulty": "easy"},
+        {"id": "campus_browser", "text": "通知建议提前安装什么浏览器？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Chrome"], "difficulty": "easy"},
+        {"id": "campus_contact", "text": "活动联系人是谁？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["林若琪"], "difficulty": "easy"},
+        {"id": "campus_email", "text": "咨询邮箱是什么？", "category": "V3_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["aiworkshop@example.edu.cn"], "difficulty": "easy"},
+        {"id": "campus_meal_refusal", "text": "本通知是否提供餐饮补贴金额？", "category": "V3_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "medium"},
+        {"id": "campus_total_duration", "text": "工作坊从开始到结束总共持续多久？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["3.5", "3 小时 30 分钟", "三个半小时"], "difficulty": "hard"},
+        {"id": "campus_discussion_duration", "text": "分组讨论环节持续多少分钟？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["50"], "difficulty": "hard"},
+        {"id": "campus_after_practice", "text": "系统实操结束后，下一个正式环节是什么，几点开始？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["分组讨论", "15:50"], "difficulty": "medium"},
+        {"id": "campus_privacy_boundary", "text": "通知如何降低参与者上传个人隐私材料的风险？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["提供测试文档", "不要求学生上传个人隐私材料"], "difficulty": "hard"},
+        {"id": "campus_waitlist_condition", "text": "什么情况下报名者会进入候补名单？", "category": "V3_REASONING", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["满额", "候补名单"], "difficulty": "medium"}
+      ]
+    }
+  ]
+}
