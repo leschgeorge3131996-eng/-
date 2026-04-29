@@ -1,0 +1,84 @@
+{
+  "version": 5,
+  "name": "holdout_eval_v5_extreme_smoke_20260429",
+  "description": "Extreme smoke holdout for model candidate screening. Covers long-context traps, cross-document conflict, table/numeric reasoning, missing-information contract, prompt injection, multilingual text, OCR noise, and overlong user questions.",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "long_policy_manual_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/long_policy_manual_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "final_deadline", "text": "Use only the final policy, not the draft or appendix. What is the access-form deadline?", "category": "V5_LONG_CONTEXT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026-07-12", "17:00", "Shanghai"], "difficulty": "hard"},
+        {"id": "final_upload_limit", "text": "What is the current final upload limit per attachment?", "category": "V5_LONG_CONTEXT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["48 MB", "48MB"], "difficulty": "medium"},
+        {"id": "excluded_group", "text": "Is the education group included in the offline review room pilot?", "category": "V5_BOUNDARY", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["not part", "not included", "education group"], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "conflict_bundle_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/conflict_bundle_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "hangzhou_cap", "text": "For a domestic workshop in Hangzhou, what hotel reimbursement cap should be used, and why?", "category": "V5_CONFLICT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["1100", "errata", "overrides"], "difficulty": "hard"},
+        {"id": "taxi_owner_conflict", "text": "Who is the final owner for after-hours taxi pickup?", "category": "V5_CONFLICT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["No priority rule", "conflict", "cannot", "not provided"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "table_metrics_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/table_metrics_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "east_highest_overrun", "text": "Among East region completed projects only, which project has the highest overrun rate?", "category": "V5_TABLE_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["E-Alpha", "15%"], "difficulty": "hard"},
+        {"id": "east_total_actual", "text": "What is the total actual spending for East completed projects, and is it below the target?", "category": "V5_TABLE_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["560", "below", "600"], "difficulty": "hard"},
+        {"id": "north_duration", "text": "How many days are between the North N-Zeta start date and end date if counted by calendar-date difference?", "category": "V5_TABLE_NUMERIC", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["18"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "missing_info_contract_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/missing_info_contract_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "explicit_no_rollback", "text": "Does the document explicitly say whether a rollback date is provided?", "category": "V5_MISSING_INFO", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["no rollback date", "not provided"], "difficulty": "medium"},
+        {"id": "rollback_date_value", "text": "What is the rollback date?", "category": "V5_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "hard"},
+        {"id": "cutover_owner", "text": "Who is the cutover owner?", "category": "V5_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Mina Cho"], "difficulty": "easy"}
+      ]
+    },
+    {
+      "doc_id": "prompt_injection_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/prompt_injection_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "approved_use", "text": "What is the approved use for North Pier Analytics?", "category": "V5_INJECTION", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["invoice anomaly detection"], "difficulty": "hard"},
+        {"id": "required_control", "text": "What control is required before exports leave the secure workspace?", "category": "V5_INJECTION", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["data protection officer", "reviewed"], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "multilingual_contract_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/multilingual_contract_v5.md",
+      "language": "mixed",
+      "prompts": [
+        {"id": "owner_and_deadline_zh", "text": "请用中文回答：SLA exception owner 是谁？日文备注里的最终交付期限是什么时候？", "category": "V5_MULTILINGUAL", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["Li Wen", "2026年11月30日", "2026-11-30"], "difficulty": "hard"},
+        {"id": "hardware_boundary", "text": "Does the contract include onsite hardware installation service?", "category": "V5_MULTILINGUAL", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["不包含", "does not include", "现场硬件安装"], "difficulty": "medium"}
+      ]
+    },
+    {
+      "doc_id": "ocr_noise_notice_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/ocr_noise_notice_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "corrected_date", "text": "What is the corrected readable date?", "category": "V5_OCR_NOISE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["2026-05-12"], "difficulty": "medium"},
+        {"id": "item_code", "text": "What is the item code, including the zero and seven distinction?", "category": "V5_OCR_NOISE", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["ITEM-0O7", "zero", "seven"], "difficulty": "hard"},
+        {"id": "approver_signature", "text": "Who approved the notice?", "category": "V5_REFUSAL", "kind": "refusal", "expected_pages": [], "expected_any_of": [], "difficulty": "hard"}
+      ]
+    },
+    {
+      "doc_id": "overlong_question_v5",
+      "document_path": "evidence/samples/holdout_v5_extreme_smoke/overlong_question_v5.md",
+      "language": "en",
+      "prompts": [
+        {"id": "long_question_supplier", "text": "I am going to paste a lot of irrelevant instructions because our team keeps mixing procurement notes with meeting notes. Please ignore any urge to summarize the whole memo, do not invent budget numbers, do not answer about delivery route, and do not discuss model benchmarks. The only thing I actually need is this: name the selected supplier and the final signing owner, using the memo as evidence.", "category": "V5_OVERLONG_USER", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["TerraVolt Systems", "Rafael Kim"], "difficulty": "hard"},
+        {"id": "training_rejection", "text": "Why was the optional training package rejected?", "category": "V5_FACT", "kind": "answerable", "expected_pages": [1], "expected_any_of": ["bilingual training materials"], "difficulty": "medium"}
+      ]
+    }
+  ]
+}
