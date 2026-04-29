@@ -1,5 +1,32 @@
 ﻿# Session Log
 
+## 2026-04-29 / Codex (multi-agent model strategy and extreme-test direction)
+
+- Background:
+  - User asked to open multi-agent mode because there is enough time and we should use a better model if one exists, including more extreme cases.
+  - This came after V4 holdout showed `qwen3-235b-a22b-instruct-2507` and `deepseek-v4-flash` tied at `48 / 50`, which invalidates the simpler "Qwen is clearly better" framing.
+- Agents used:
+  - Model strategy agent: assessed default / backup / high-quality / extreme fallback layering.
+  - Extreme-test design agent: designed a V5 holdout covering long context, conflicts, tables, missing info, injection, multilingual, OCR/noise, and overlong user prompts.
+  - Product risk / integration agent: checked model configuration, routing, UI exposure, rollback, and demo stability.
+- Local provider check:
+  - Queried the current Wuwen Xinqiong-compatible `/models` endpoint.
+  - Higher-value available candidates include `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v3.2-thinking`, `glm-5.1`, `kimi-k2.6`, `minimax-m2.7`, `qwen3-next-80b-a3b-instruct`, and `qwen3-next-80b-a3b-thinking`.
+  - Newer Alibaba Qwen options such as Qwen3-Max/Qwen3.5 may exist in official Alibaba Cloud docs, but are not present in the current gateway list, so they are not immediate demo candidates unless provider access changes.
+- Decision:
+  - Keep Qwen3 235B as the competition default for now because it has the thickest project-specific regression history.
+  - Promote DeepSeek V4 Flash to first-line challenger, not weak fallback.
+  - Do not expose a judge-visible model selector.
+  - Do not switch default merely because a model is newer; require a frozen V5 regression win plus predeploy sanity.
+  - Build V5 Extreme Holdout before making a stronger model claim.
+- Files touched:
+  - `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+- Practical meaning:
+  - The next serious model task is Stage A smoke across the live provider's stronger candidates, followed by full V5 only for the top `3-4`.
+  - The immediate code-side improvement with the highest leverage remains normalizing "document does not provide this information" into the structured missing-information/refusal outcome across models.
+
 Append-only log for both Codex and Claude Code.
 
 ## 2026-04-25 / Codex (predeploy risk gate + frontend retry safety)
@@ -2025,7 +2052,6 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - the canonical "latest export pack" and "latest review bundle" pointers now match the actual HEAD instead of trailing it by 7 days
   - another AI handed the new review bundle will see the predeploy gate expansion, retry button, and the full visual polish track in source form
   - this is a handoff-hygiene action, not a code change — no tests run, no build run; the underlying code was unchanged this round
-
 
 
 

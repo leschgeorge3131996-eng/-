@@ -47,6 +47,8 @@
 - `scripts/predeploy_sanity.py` now emits a full `READY` / `BLOCKED` pre-demo risk light: gold cases plus runtime config, writable data dirs, gold PDF presence, parsed metadata, cited-page fetch, PDF render, citation presence, and recent log summary gates
 - Frontend task failure states now expose an operator-visible `重试当前任务` action when the current document/input are still valid; retry reuses uploaded metadata instead of re-uploading the same file, with a ref-level guard against rapid double submits
 - Visual polish track landed (`2026-04-27`, pure CSS, no DOM/component change): `--elev-*` tokens, body film-grain overlay, mask-composite gradient hairlines on hero / digest workbench / national demo card, three-layer PDF paper-float shadow, soft refusal halo, gradient page-tab active state, evidence-snippet ribbon, meta-chip tabular-nums + elevation, history/demo card rest-state depth, drop-zone "actively receiving" dragover state with bounce arrow, hero flow-step staggered breathing (with prefers-reduced-motion guard)
+- V4 model holdout now shows `qwen3-235b-a22b-instruct-2507` and `deepseek-v4-flash` tied at `48 / 50`; DeepSeek V4 Flash should be treated as a first-line candidate, not a weak fallback
+- Multi-agent model strategy for a longer optimization window is recorded in `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md`: build V5 Extreme Holdout, widen the candidate pool, and only switch default after a frozen regression win
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks
@@ -59,8 +61,9 @@
 3. Use `evidence/materials/FINAL_SUBMISSION_CHECKLIST.md` as the single freeze sheet while converting `deck_3page_final.pdf` into the final native PPT and `video_subtitles_5min_final.srt` into the final recorded/edited video
 4. Before judged demo: run `evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md` together with `GOLD_SAMPLE_RUNBOOK.md`, set `DEMO_MODE=true` on the target env, and verify the opening flow on the target URL
 5. Use `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` as the technical-only next-work guide; failure attribution, table/parameter retrieval patch, expanded predeploy sanity, and frontend retry safety are now done, so the next technical target should be actual-demo-machine rehearsal and only then small citation/PDF-preview polish if a rehearsal exposes it
-6. Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo unless a final predeploy sanity run shows live latency trouble; if latency is the blocker, test-switch only QA to `qwen3-next-80b-a3b-instruct`
-7. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
+6. If time is available for model work, follow `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md`: create V5 Extreme Holdout, smoke-test the live provider's strongest candidates, then run the top `3-4` through full V5 before changing defaults
+7. Keep `MODEL_QA=qwen3-235b-a22b-instruct-2507` for judging/demo unless a frozen V5 + predeploy sanity stack proves a challenger is better; `deepseek-v4-flash` is now the first-line challenger, and `qwen3-next-80b-a3b-instruct` remains the fastest validated fallback
+8. Keep the broader sample-set replay as secondary reference only; use gold-sample replay as the default judging/demo evidence path
 
 ## Recently Verified
 
