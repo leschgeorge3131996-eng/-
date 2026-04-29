@@ -1,0 +1,146 @@
+{
+  "version": 2,
+  "name": "holdout_eval_v2_20260429",
+  "description": "Fresh holdout QA set for model comparison. This set avoids the main EXTENDED_EVAL_V1 tuning path and focuses on small office/project/report documents plus refusal checks.",
+  "response_detail_level": "balanced",
+  "items": [
+    {
+      "doc_id": "office_notice_holdout",
+      "document_path": "evidence/samples/office_notice.txt",
+      "language": "zh",
+      "prompts": [
+        {
+          "id": "office_leave_normal_process",
+          "text": "普通请假需要提前多久提交申请，谁审批后才生效？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["提前一天", "直属主管"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "office_leave_emergency_makeup",
+          "text": "如果遇到紧急情况，制度要求员工怎么处理请假手续？",
+          "category": "H2",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["电话", "即时通讯", "补交正式申请"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "office_trip_reimbursement_deadline",
+          "text": "出差结束后，报销和总结最迟应在什么时间内完成？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["三个工作日", "3个工作日"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "office_training_owner",
+          "text": "这次制度变化的内部培训由哪个部门组织？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["行政部门"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "office_stock_refusal",
+          "text": "根据这份通知，下周哪只股票会涨？",
+          "category": "H3",
+          "kind": "refusal",
+          "expected_pages": [],
+          "expected_any_of": [],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "doc_id": "paper_report_holdout",
+      "document_path": "evidence/samples/paper_report.md",
+      "language": "zh",
+      "prompts": [
+        {
+          "id": "report_pipeline_steps",
+          "text": "文档里描述的端云协同处理路线包含哪些关键步骤？",
+          "category": "H2",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["页级解析", "分块", "云端模型"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "report_finished_tasks",
+          "text": "固定样例集上，系统已经实现了哪三类任务？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["摘要", "问答", "提纲"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "report_vs_chat_shell",
+          "text": "为什么报告说这个方案比普通聊天壳更适合文档场景？",
+          "category": "H2",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["文档理解", "可解释回答"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "report_weather_refusal",
+          "text": "这份研究报告有没有说明明天会不会下雨？",
+          "category": "H3",
+          "kind": "refusal",
+          "expected_pages": [],
+          "expected_any_of": [],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "doc_id": "research_brief_holdout",
+      "document_path": "evidence/samples/research_brief.md",
+      "language": "zh",
+      "prompts": [
+        {
+          "id": "brief_first_stage_goal",
+          "text": "第一阶段的目标具体覆盖哪些用户动作和任务？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["上传文档", "摘要", "问答", "提纲"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "brief_upload_formats",
+          "text": "当前能力中支持上传哪些文件类型？",
+          "category": "H1",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["TXT", "Markdown", "PDF"],
+          "difficulty": "easy"
+        },
+        {
+          "id": "brief_future_improvements",
+          "text": "下一步计划增强哪些能力？",
+          "category": "H2",
+          "kind": "answerable",
+          "expected_pages": [1],
+          "expected_any_of": ["检索排序", "来源说明", "固定样例集"],
+          "difficulty": "medium"
+        },
+        {
+          "id": "brief_unlisted_price_refusal",
+          "text": "研答通现在的收费价格是多少？",
+          "category": "H3",
+          "kind": "refusal",
+          "expected_pages": [],
+          "expected_any_of": [],
+          "difficulty": "easy"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "summary": {
+    "total": 13,
+    "passed": 13,
+    "overall_pass_rate": 1.0,
+    "answerable_pass_rate": 1.0,
+    "refusal_precision": 1.0,
+    "citation_accuracy": 1.0,
+    "declaration_rate": 1.0,
+    "avg_latency_ms": 6067,
+    "by_category": {
+      "H1": {
+        "total": 6,
+        "passed": 6,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 4344
+      },
+      "H2": {
+        "total": 4,
+        "passed": 4,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 8466
+      },
+      "H3": {
+        "total": 3,
+        "passed": 3,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 6315
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "total": 9,
+        "passed": 9,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5001
+      },
+      "medium": {
+        "total": 4,
+        "passed": 4,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 8466
+      }
+    },
+    "by_doc": {
+      "office_notice_holdout": {
+        "total": 5,
+        "passed": 5,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 3558
+      },
+      "paper_report_holdout": {
+        "total": 4,
+        "passed": 4,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 9394
+      },
+      "research_brief_holdout": {
+        "total": 4,
+        "passed": 4,
+        "pass_rate": 1.0,
+        "avg_latency_ms": 5877
+      }
+    },
+    "by_failure_type": {},
+    "by_failure_stage": {}
+  },
+  "records": [
+    {
+      "case_id": "office_notice_holdout:office_leave_normal_process",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4151,
+      "error": null
+    },
+    {
+      "case_id": "office_notice_holdout:office_leave_emergency_makeup",
+      "category": "H2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4195,
+      "error": null
+    },
+    {
+      "case_id": "office_notice_holdout:office_trip_reimbursement_deadline",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5891,
+      "error": null
+    },
+    {
+      "case_id": "office_notice_holdout:office_training_owner",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3552,
+      "error": null
+    },
+    {
+      "case_id": "office_notice_holdout:office_stock_refusal",
+      "category": "H3",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
+      "outcome": "refused",
+      "retrieval_status": "no_match",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 1,
+      "error": null
+    },
+    {
+      "case_id": "paper_report_holdout:report_pipeline_steps",
+      "category": "H2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5772,
+      "error": null
+    },
+    {
+      "case_id": "paper_report_holdout:report_finished_tasks",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4379,
+      "error": null
+    },
+    {
+      "case_id": "paper_report_holdout:report_vs_chat_shell",
+      "category": "H2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 18314,
+      "error": null
+    },
+    {
+      "case_id": "paper_report_holdout:report_weather_refusal",
+      "category": "H3",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 9111,
+      "error": null
+    },
+    {
+      "case_id": "research_brief_holdout:brief_first_stage_goal",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 4148,
+      "error": null
+    },
+    {
+      "case_id": "research_brief_holdout:brief_upload_formats",
+      "category": "H1",
+      "difficulty": "easy",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 3943,
+      "error": null
+    },
+    {
+      "case_id": "research_brief_holdout:brief_future_improvements",
+      "category": "H2",
+      "difficulty": "medium",
+      "kind": "answerable",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": true,
+      "declared": true,
+      "snippet_hit": true,
+      "outcome": "answered",
+      "retrieval_status": "matched",
+      "evidence_mode": "declared",
+      "cited_pages": [
+        1
+      ],
+      "citation_count": 1,
+      "evidence_quote_count": 1,
+      "latency_ms": 5586,
+      "error": null
+    },
+    {
+      "case_id": "research_brief_holdout:brief_unlisted_price_refusal",
+      "category": "H3",
+      "difficulty": "easy",
+      "kind": "refusal",
+      "passed": true,
+      "fail_reason": "",
+      "failure_type": "",
+      "failure_stage": "",
+      "page_hit": false,
+      "declared": false,
+      "snippet_hit": false,
+      "outcome": "refused",
+      "retrieval_status": "matched",
+      "evidence_mode": "none",
+      "cited_pages": [],
+      "citation_count": 0,
+      "evidence_quote_count": 0,
+      "latency_ms": 9834,
+      "error": null
+    }
+  ]
+}
