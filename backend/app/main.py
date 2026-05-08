@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from .api.routes import router
 from .core.config import get_settings
@@ -53,8 +55,27 @@ def create_app() -> FastAPI:
         )
         return JSONResponse(status_code=500, content=response.model_dump())
 
+    static_dir = settings.project_root / "frontend" / "dist"
+    if static_dir.is_dir():
+        app.mount(
+            "/assets",
+            StaticFiles(directory=static_dir / "assets"),
+            name="assets",
+        )
+        index_path = static_dir / "index.html"
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa_fallback(full_path: str) -> FileResponse:
+            if full_path.startswith("api/"):
+                raise HTTPException(status_code=404)
+            candidate = static_dir / full_path
+            if full_path and candidate.is_file():
+                return FileResponse(candidate)
+            return FileResponse(index_path)
+    else:
+        logger.warning("frontend/dist not found at %s; static serving disabled", static_dir)
+
     return app
 
 
 app = create_app()
-

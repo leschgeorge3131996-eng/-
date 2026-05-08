@@ -1,3 +1,13 @@
+---
+title: 研答通 YanDatong
+emoji: 📄
+colorFrom: yellow
+colorTo: red
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 研答通（MVP）
 
 研答通是一个面向论文与报告阅读、答辩准备的文档助手，核心能力是带证据回链的问答——每一条回答都能跳回 PDF 原文证据。仓库基于 React + TypeScript + Vite 与 FastAPI，当前目标只做最小可用闭环：

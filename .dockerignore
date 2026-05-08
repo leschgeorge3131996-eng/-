@@ -1,0 +1,47 @@
+# Repo metadata
+.git
+.gitignore
+.gitattributes
+
+# Local virtualenvs / build outputs
+.venv
+**/__pycache__
+*.pyc
+*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+
+# Frontend artifacts (we rebuild inside the docker stage)
+frontend/node_modules
+frontend/dist
+frontend/.vite
+frontend/coverage
+
+# Local data — must be regenerated inside the container's /data
+data
+backend/data
+
+# Heavy review/competition payloads — not needed at runtime
+agent_handoff
+deliverables
+evidence
+external_ai_strategy_bundle*
+review_bundle*
+
+# Local IDE / editor
+.vscode
+.idea
+.claude
+
+# Misc
+*.log
+*.zip
+*.tgz
+*.bak
+*.tmp
+
+# Top-level env files (real secrets) — secrets must come from Space variables instead
+.env
+frontend/.env
+frontend/.env.local
