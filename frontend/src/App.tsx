@@ -702,26 +702,6 @@ export default function App() {
     setError(null);
   }
 
-  function prepareNationalDemo() {
-    const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
-      type: "text/markdown"
-    });
-    setSelectedFile(file);
-    setUploadedMetadata(null);
-    setResult(null);
-    setError(null);
-    setPreviewOpen(false);
-    setPreviewPage(1);
-    setPreviewPages([1]);
-    setPreviewSnippet(null);
-    setPreviewSnippetPage(null);
-    setPreviewBboxes([]);
-    setTaskType("summary");
-    setResponseDetailLevel("detailed");
-    setInput(RESEARCH_DIGEST_PROMPT);
-    setNotice("国一演示路线已准备：先提交生成速读，再点击推荐追问或拒答边界。手动上传真实论文时同样适用。");
-  }
-
   function applyWhitelistedDemoQuestion(question: string) {
     setTaskType("ask");
     setResponseDetailLevel("balanced");
@@ -915,23 +895,7 @@ export default function App() {
             <div className="section-head">
               <h2 className="panel-title">一键演示入口</h2>
             </div>
-            <p className="subtitle compact">优先走国一演示路线：速读、追问、证据回链、拒答边界一次讲清。</p>
-            <div className="national-demo-card">
-              <div>
-                <span className="demo-kicker">推荐主线</span>
-                <strong>国一演示路线</strong>
-                <p>自动准备示例文档和论文速读任务，再用白名单追问验证证据问答与拒答边界。</p>
-              </div>
-              <button
-                className="hero-button national-demo-button"
-                data-testid="prepare-national-demo"
-                type="button"
-                disabled={!isAuthenticated || interactionLocked}
-                onClick={prepareNationalDemo}
-              >
-                一键准备演示
-              </button>
-            </div>
+            <p className="subtitle compact">一键填入示例文档与白名单问题，快速验证速读、追问、证据回链与拒答边界。</p>
             <div className="demo-whitelist" aria-label="演示白名单问题">
               {DEMO_WHITELIST_ACTIONS.map((action, index) => (
                 <button

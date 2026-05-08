@@ -399,23 +399,12 @@ digest smoke result
     expect(screen.getByTestId("digest-evidence-card").textContent).toContain("1 个可追问问题");
   });
 
-  it("prepares the national demo route and whitelisted questions", async () => {
+  it("applies a whitelisted demo question to the ask flow", async () => {
     seedSession();
 
     render(<App />);
 
     await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
-
-    fireEvent.click(screen.getByTestId("prepare-national-demo"));
-
-    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
-    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "论文速读工作台"
-    );
-    expect(screen.getByTestId("current-document-name").textContent).toContain(
-      "demo_research_brief.md"
-    );
 
     fireEvent.click(screen.getByTestId("demo-whitelist-2"));
 

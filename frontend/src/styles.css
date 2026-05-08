@@ -846,75 +846,6 @@ textarea {
   font-weight: 600;
 }
 
-.national-demo-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 14px 0;
-  padding: 16px;
-  border: 1px solid rgba(31, 106, 78, 0.18);
-  border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(240, 250, 245, 0.96), rgba(255, 255, 255, 0.9)),
-    radial-gradient(circle at top left, rgba(31, 106, 78, 0.14), transparent 36%);
-  box-shadow: var(--elev-2);
-}
-
-.national-demo-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(31, 106, 78, 0.55) 0%,
-    rgba(255, 255, 255, 0.5) 22%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(19, 34, 56, 0.25) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.national-demo-card div {
-  display: grid;
-  gap: 5px;
-}
-
-.national-demo-card strong {
-  color: var(--ink-strong);
-  font-size: 16px;
-}
-
-.national-demo-card p {
-  margin: 0;
-  color: var(--ink-muted);
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.demo-kicker {
-  color: var(--success);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.national-demo-button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
 .demo-whitelist {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -956,11 +887,11 @@ textarea {
 
 .digest-workbench {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 10px;
+  align-items: start;
+  padding: 18px 18px 16px;
   border: 1px solid rgba(173, 76, 35, 0.18);
   border-radius: 22px;
   background:
@@ -998,17 +929,24 @@ textarea {
   box-shadow: var(--elev-accent);
 }
 
+.digest-workbench > div:first-child {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 6px;
+}
+
 .digest-workbench strong {
   display: block;
-  margin-top: 4px;
+  margin-top: 2px;
   color: var(--ink-strong);
   font-size: 16px;
+  line-height: 1.35;
 }
 
 .digest-workbench p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: var(--ink-muted);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.7;
 }
 
@@ -1020,8 +958,8 @@ textarea {
 }
 
 .digest-button {
-  flex: 0 0 auto;
   white-space: nowrap;
+  justify-content: center;
 }
 
 .digest-flow {
@@ -2674,20 +2612,10 @@ textarea {
   }
 
   .digest-workbench {
-    align-items: stretch;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .digest-button {
-    width: 100%;
-  }
-
-  .national-demo-card {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .national-demo-button {
     width: 100%;
   }
 
