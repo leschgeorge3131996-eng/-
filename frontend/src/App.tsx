@@ -1,4 +1,3 @@
-import { motion } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ApiRequestError,
@@ -37,20 +36,20 @@ const TASK_OPTIONS: Array<{
   placeholder: string;
 }> = [
   {
+    value: "ask",
+    label: "问答",
+    description: "针对内容提问，回答带证据回链",
+    placeholder: "例如：这篇文档的核心方法是什么？"
+  },
+  {
     value: "summary",
     label: "摘要",
     description: "自动归纳背景、方法与结论",
     placeholder: "例如：请突出研究背景、方法和创新点。"
   },
   {
-    value: "ask",
-    label: "问答",
-    description: "先检索证据，再回答问题",
-    placeholder: "例如：这篇文档的核心方法是什么？"
-  },
-  {
     value: "outline",
-    label: "提纲生成",
+    label: "提纲",
     description: "生成汇报或答辩结构",
     placeholder: "例如：请生成 6 页答辩提纲。"
   }
@@ -66,30 +65,28 @@ const DETAIL_OPTIONS: Array<{
   { value: "detailed", label: "详细", description: "补充更多背景与展开" }
 ];
 
-const HERO_PILLS = ["页级结构", "轻量检索", "证据回链", "样例复跑"];
-
 const DEMO_ACTIONS = [
   {
-    label: "示例摘要",
-    description: "快速验证摘要链路",
+    label: "试一试 摘要",
+    description: "用 3 条要点总结这份样例",
     taskType: "summary" as const,
     input: "请用 3 条要点总结这个文档。"
   },
   {
-    label: "示例问答",
-    description: "验证检索与引用",
+    label: "试一试 问答",
+    description: "针对内容提问，看引用回链",
     taskType: "ask" as const,
     input: "这个项目第一阶段要做什么？"
   },
   {
-    label: "示例提纲",
-    description: "验证结构化提纲生成",
+    label: "试一试 提纲",
+    description: "生成一份结构化汇报提纲",
     taskType: "outline" as const,
     input: "请生成一个 5 页汇报提纲。"
   }
 ];
 
-const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读工作台，必须包含：
+const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读，必须包含：
 1. 研究问题
 2. 核心方法
 3. 主要贡献
@@ -102,28 +99,20 @@ const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读工作台，必须包
 - 优先提炼对答辩、复现实验和继续追问最有价值的信息。
 - 输出为清晰的 Markdown。`;
 
-const CONCISE_RESEARCH_DIGEST_PROMPT = `请生成一份精简论文速读，必须包含：
-1. 研究问题
-2. 核心方法
-3. 最关键结论
-4. 建议追问的 3 个问题
-
-要求：每部分不超过 2 条要点，尽量标注页码或来源线索，输出 Markdown。`;
-
 const DEMO_WHITELIST_ACTIONS = [
   {
-    label: "推荐追问 1",
-    description: "验证证据问答",
+    label: "这个项目的核心能力是什么？",
+    description: "针对内容提问",
     input: "这个项目的核心能力是什么？"
   },
   {
-    label: "推荐追问 2",
-    description: "验证端到端价值",
+    label: "系统为什么强调证据回链？",
+    description: "针对内容提问",
     input: "系统为什么强调证据回链？"
   },
   {
-    label: "拒答边界",
-    description: "验证不胡编",
+    label: "这篇文档有没有给出 2028 年全国部署预算？",
+    description: "问个文档没提的事，看会不会瞎编",
     input: "这篇文档有没有给出 2028 年全国部署预算？"
   }
 ];
@@ -136,13 +125,13 @@ const TASK_LABELS: Record<TaskType, string> = {
 
 const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
-const DEMO_DOCUMENT_NAME = "demo_research_brief.md";
+const DEMO_DOCUMENT_NAME = "sample_brief.md";
 const DEMO_DOCUMENT_CONTENT = `# 项目简介
 
 研答通是一个面向论文与报告阅读、答辩准备的文档助手。
 核心能力是带证据回链的问答——每一条回答都能跳回 PDF 原文证据。
 第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
-系统当前采用端云协同路线，优先保证能跑通、能演示、能扩展。`;
+系统当前采用端云协同路线，优先保证能跑通、能扩展。`;
 
 function readStorage<T>(key: string, fallback: T): T {
   try {
@@ -159,7 +148,7 @@ function writeStorage<T>(key: string, value: T): void {
 
 function describeLoadStage(stage: "idle" | "uploading" | "model"): string {
   if (stage === "uploading") return "正在上传并解析文档...";
-  if (stage === "model") return "模型处理中，首次请求可能需要 10 到 40 秒；如现场网络较慢，可改用精简速读兜底。";
+  if (stage === "model") return "模型处理中，首次请求可能需要 10 到 40 秒。";
   return "";
 }
 
@@ -168,7 +157,7 @@ function normalizeErrorMessage(error: unknown): string {
     return "当前试用会话已失效，请重新登录。";
   }
   if (error instanceof ApiRequestError && error.code === "TASK_TIMEOUT") {
-    return "模型响应较慢，已自动停止等待。建议先点击“精简速读兜底”快速跑通演示，或稍后重试当前任务。";
+    return "模型响应较慢，已自动停止等待，请稍后重试当前任务。";
   }
   if (error instanceof ApiRequestError) return error.message;
   if (error instanceof Error) return error.message;
@@ -357,7 +346,7 @@ export default function App() {
   const [displayName, setDisplayName] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
-  const [taskType, setTaskType] = useState<TaskType>("summary");
+  const [taskType, setTaskType] = useState<TaskType>("ask");
   const [responseDetailLevel, setResponseDetailLevel] =
     useState<ResponseDetailLevel>("balanced");
   const [input, setInput] = useState("");
@@ -424,6 +413,18 @@ export default function App() {
   useEffect(() => {
     setAuthLoading(true);
     let cancelled = false;
+
+    async function tryEnsureDemoSession(retriesLeft: number): Promise<AuthSession | null> {
+      try {
+        return await ensureDemoSession();
+      } catch {
+        if (retriesLeft <= 0 || cancelled) return null;
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        if (cancelled) return null;
+        return tryEnsureDemoSession(retriesLeft - 1);
+      }
+    }
+
     void (async () => {
       const isDemo = await fetchDemoMode();
       if (cancelled) return;
@@ -440,15 +441,13 @@ export default function App() {
         if (cancelled) return;
 
         if (isDemo) {
-          try {
-            const demoSession = await ensureDemoSession();
-            if (cancelled) return;
+          const demoSession = await tryEnsureDemoSession(2);
+          if (cancelled) return;
+          if (demoSession) {
             hadStoredSessionRef.current = true;
             setSession(demoSession);
             setAuthError(null);
             return;
-          } catch {
-            // fall through to reset + show error
           }
         }
 
@@ -717,15 +716,7 @@ export default function App() {
     setTaskType("summary");
     setResponseDetailLevel("detailed");
     setInput(RESEARCH_DIGEST_PROMPT);
-    setNotice("已切换到论文速读工作台：上传论文后可直接生成结构化速读结果。");
-    setError(null);
-  }
-
-  function applyConciseDigestPreset() {
-    setTaskType("summary");
-    setResponseDetailLevel("concise");
-    setInput(CONCISE_RESEARCH_DIGEST_PROMPT);
-    setNotice("已切换到精简速读：适合现场网络慢或需要快速兜底时使用。");
+    setNotice("已切换到论文速读：上传论文后可直接生成结构化速读结果。");
     setError(null);
   }
 
@@ -736,8 +727,8 @@ export default function App() {
     setInput(question);
     setNotice(
       insertedDemoDocument
-        ? "已填入示例文档和白名单演示问题：点击提交任务后验证证据问答或拒答边界。"
-        : "已填入白名单演示问题：点击提交任务后验证证据问答或拒答边界。"
+        ? "已载入样例简报和这条问题，点击提交任务即可查看回答与引用。"
+        : "已填入这条问题，点击提交任务即可查看回答与引用。"
     );
     setError(null);
     scrollElementIntoView('[data-testid="task-input"]');
@@ -838,25 +829,18 @@ export default function App() {
           <div className="hero-copy">
             <p className="eyebrow">面向科研与智能办公的文档工作台</p>
             <h1 className="brandmark">研答通</h1>
-            <div className="hero-flow" aria-label="文档任务流程">
-              <span className="flow-step">上传</span>
+            <div className="hero-flow" aria-label="文档任务流程" data-stage={loadStage} data-completed={result ? "true" : "false"}>
+              <span className="flow-step" data-step="1">上传</span>
               <span className="flow-separator" aria-hidden="true" />
-              <span className="flow-step">解析</span>
+              <span className="flow-step" data-step="2">解析</span>
               <span className="flow-separator" aria-hidden="true" />
-              <span className="flow-step">检索</span>
+              <span className="flow-step" data-step="3">检索</span>
               <span className="flow-separator" aria-hidden="true" />
-              <span className="flow-step">生成</span>
+              <span className="flow-step" data-step="4">生成</span>
             </div>
             <p className="subtitle">
               面向论文与报告阅读、答辩准备的文档助手，每一条回答都能跳回 PDF 原文证据。
             </p>
-          </div>
-          <div className="hero-pills">
-            {HERO_PILLS.map((pill) => (
-              <motion.span key={pill} className="hero-pill">
-                {pill}
-              </motion.span>
-            ))}
           </div>
         </section>
 
@@ -925,10 +909,10 @@ export default function App() {
 
           <article className="panel demo-panel">
             <div className="section-head">
-              <h2 className="panel-title">一键演示入口</h2>
+              <h2 className="panel-title">快速体验</h2>
             </div>
-            <p className="subtitle compact">一键填入示例文档与白名单问题，快速验证速读、追问、证据回链与拒答边界。</p>
-            <div className="demo-whitelist" aria-label="演示白名单问题">
+            <p className="subtitle compact">还没有自己的文档？我们准备了一份样例简报，点下面任意一项就能跑通摘要、问答和证据回链。</p>
+            <div className="demo-whitelist" aria-label="样例问题">
               {DEMO_WHITELIST_ACTIONS.map((action, index) => (
                 <button
                   key={action.label}
@@ -950,10 +934,10 @@ export default function App() {
                 disabled={!isAuthenticated || interactionLocked}
                 onClick={() => {
                   selectPendingDocument(createDemoDocumentFile());
-                  setNotice("已填入示例文档：选择任务后可直接提交。");
+                  setNotice("已载入样例简报，选择任务后可直接提交。");
                 }}
               >
-                填充示例文档
+                载入样例简报
               </button>
               {DEMO_ACTIONS.map((action) => (
                 <button
@@ -967,8 +951,8 @@ export default function App() {
                     setInput(action.input);
                     setNotice(
                       insertedDemoDocument
-                        ? `已填入示例文档和${action.label}：点击提交任务即可运行。`
-                        : `已切换到${action.label}：点击提交任务即可运行。`
+                        ? `已载入样例简报并切换到${action.label}，点击提交任务即可运行。`
+                        : `已切换到${action.label}，点击提交任务即可运行。`
                     );
                     setError(null);
                     scrollElementIntoView('[data-testid="task-input"]');
@@ -981,50 +965,44 @@ export default function App() {
             </div>
             {pendingDocument ? (
               <p className="demo-feedback">
-                已填入待处理文档：{pendingDocument.name}。点击“提交任务”后会自动上传并执行。
+                已载入：{pendingDocument.name}。点击“提交任务”后会自动上传并执行。
               </p>
             ) : null}
           </article>
         </section>
 
-        <section className="workspace">
+        <section className={`workspace`}>
           <article className="panel control-panel">
             <div className="section-head">
               <h2 className="panel-title">上传文档并启动任务</h2>
-            </div>
-            <div className="trial-boundary-card">
-              <strong>
-                {demoMode ? "演示模式" : "受控 Alpha"}
-                {session ? ` / ${session.label}` : ""}
-              </strong>
-              <span>
-                {demoMode
-                  ? "当前为演示环境，上传的文档仅用于现场体验，会话过期后会自动清理；请勿使用敏感资料。"
-                  : "当前版本仅面向邀请码试用，上传、检索、预览和删除都会绑定到当前试用会话；请仅使用非敏感文档。"}
-              </span>
-              {session && !demoMode ? (
-                <div className="inline-actions">
-                  <button
-                    className="ghost-button"
-                    data-testid="logout-button"
-                    type="button"
-                    disabled={interactionLocked}
-                    onClick={handleLogout}
-                  >
-                    退出会话
-                  </button>
-                </div>
+              {session ? (
+                <span className="session-chip" data-testid="session-chip">
+                  {demoMode ? "免登录试用" : `已登录 · ${session.label}`}
+                </span>
               ) : null}
             </div>
+            {session && !demoMode ? (
+              <div className="inline-actions trial-inline-actions">
+                <button
+                  className="ghost-button"
+                  data-testid="logout-button"
+                  type="button"
+                  disabled={interactionLocked}
+                  onClick={handleLogout}
+                >
+                  退出会话
+                </button>
+              </div>
+            ) : null}
             {!isAuthenticated ? (
               demoMode ? (
                 <div className="auth-panel-card">
                   {authLoading ? (
-                    <p className="status status-card">正在准备演示环境...</p>
+                    <p className="status status-card">正在准备试用环境...</p>
                   ) : (
                     <>
                       <p className="error status-card" data-testid="auth-error">
-                        {authError ?? "演示会话暂时无法创建，请稍后重试。"}
+                        {authError ?? "试用会话暂时无法创建，请稍后重试。"}
                       </p>
                       <div className="control-actions">
                         <button
@@ -1033,7 +1011,7 @@ export default function App() {
                           disabled={authPending}
                           onClick={handleRetryDemoSession}
                         >
-                          {authPending ? "正在重试..." : "重新进入演示"}
+                          {authPending ? "正在重试..." : "重新进入试用"}
                         </button>
                       </div>
                     </>
@@ -1131,6 +1109,11 @@ export default function App() {
                   </span>
                   <span className="drop-zone-hint">支持 PDF、TXT、Markdown</span>
                 </div>
+                <p className="drop-zone-footnote">
+                  {demoMode
+                    ? "上传的文档仅绑定当前会话，会话过期会自动清理；请勿使用敏感资料。"
+                    : "当前为邀请码试用，上传、检索、预览均绑定当前会话；请仅使用非敏感文档。"}
+                </p>
                 <input
                   data-testid="file-input"
                   ref={fileInputRef}
@@ -1213,12 +1196,12 @@ export default function App() {
 
               <div className={`digest-workbench${digestPresetActive ? " active" : ""}`}>
                 <div>
-                  <span className="digest-kicker">产品化速读</span>
-                  <strong>论文速读工作台</strong>
+                  <span className="digest-kicker">一键操作</span>
+                  <strong>论文速读</strong>
                   <p>
                     一键生成研究问题、方法、贡献、实验、局限和追问清单，适合答辩前快速吃透论文。
                   </p>
-                  <ol className="digest-flow" aria-label="论文速读演示路径">
+                  <ol className="digest-flow" aria-label="论文速读流程">
                     <li>生成速读</li>
                     <li>点击追问</li>
                     <li>查看证据回链</li>
@@ -1232,15 +1215,6 @@ export default function App() {
                   onClick={applyResearchDigestPreset}
                 >
                   {digestPresetActive ? "已启用" : "生成论文速读"}
-                </button>
-                <button
-                  className="ghost-button digest-button"
-                  data-testid="concise-digest-preset"
-                  type="button"
-                  disabled={interactionLocked}
-                  onClick={applyConciseDigestPreset}
-                >
-                  精简速读兜底
                 </button>
               </div>
 
@@ -1265,7 +1239,7 @@ export default function App() {
                 >
                   {loading ? "处理中..." : "提交任务"}
                 </button>
-                <p className="control-hint">建议先用 Demo 模式体验完整链路，再换真实文档。</p>
+                <p className="control-hint">第一次使用？右侧的“快速体验”可以一键试跑。</p>
               </div>
             </form>
 
@@ -1323,7 +1297,7 @@ export default function App() {
                   </div>
                   <div className="meta-chip">
                     <span>来源</span>
-                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "示例文档" : "本地文件"}</strong>
+                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "样例简报" : "本地文件"}</strong>
                   </div>
                   <div className="meta-chip">
                     <span>下一步</span>
@@ -1443,7 +1417,7 @@ export default function App() {
             {!isAuthenticated ? (
               <p className="empty">登录后才会显示当前试用会话下的最近结果。</p>
             ) : recentResults.length === 0 ? (
-              <p className="empty">最近 5 次任务结果会显示在这里，方便回看演示。</p>
+              <p className="empty">最近 5 次任务结果会显示在这里，方便回看。</p>
             ) : (
               <div className="history-list">
                 {recentResults.map((item) => (
@@ -1463,7 +1437,7 @@ export default function App() {
               </div>
             )}
           </article>
-        </section>
+          </section>
       </main>
     </div>
   );

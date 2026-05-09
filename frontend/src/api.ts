@@ -124,7 +124,7 @@ async function fetchWithTimeout(
   } catch (error) {
     if (isAbortError(error)) {
       throw new ApiRequestError(
-        "模型响应超过 90 秒。现场演示可先切换“精简速读兜底”，或稍后重试当前任务。",
+        "模型响应超过 90 秒，请稍后重试当前任务。",
         "TASK_TIMEOUT",
         { timeout_ms: timeoutMs }
       );

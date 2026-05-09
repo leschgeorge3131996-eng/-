@@ -259,7 +259,7 @@ function isResearchDigestResult(result: TaskResult | null, followUpQuestions: st
   if (!result || result.task_type !== "summary" || result.outcome === "refused") {
     return false;
   }
-  return result.result.includes("论文速读工作台") || followUpQuestions.length > 0;
+  return result.result.includes("论文速读") || followUpQuestions.length > 0;
 }
 
 type ResultPanelProps = {

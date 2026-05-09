@@ -308,6 +308,7 @@ describe("App smoke flows", () => {
         files: [new File(["demo content"], "brief.md", { type: "text/markdown" })]
       }
     });
+    fireEvent.click(screen.getByTestId("task-option-summary"));
     fireEvent.click(screen.getByTestId("submit-task-button"));
 
     await waitFor(() => expect(uploadDocumentMock).toHaveBeenCalledTimes(1));
@@ -377,7 +378,7 @@ digest smoke result
     expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
     expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "论文速读工作台"
+      "论文速读"
     );
 
     fireEvent.click(screen.getByTestId("submit-task-button"));
@@ -414,48 +415,30 @@ digest smoke result
       "2028 年全国部署预算"
     );
     expect(screen.getByTestId("current-document-name").textContent).toContain(
-      "demo_research_brief.md"
+      "sample_brief.md"
     );
     expect(screen.getByTestId("submit-task-button")).toBeEnabled();
   });
 
-  it("turns a demo task card into a runnable one-click demo", async () => {
+  it("turns a quickstart task card into a runnable one-click flow", async () => {
     seedSession();
 
     render(<App />);
 
     await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
-    fireEvent.click(screen.getByText("示例问答"));
+    fireEvent.click(screen.getByText("试一试 问答"));
 
     expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
     expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
       "第一阶段"
     );
     expect(screen.getByTestId("current-document-name").textContent).toContain(
-      "demo_research_brief.md"
+      "sample_brief.md"
     );
     expect(screen.getByTestId("submit-task-button")).toBeEnabled();
   });
 
-  it("applies the concise digest fallback preset", async () => {
-    seedSession();
-
-    render(<App />);
-
-    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
-    fireEvent.click(screen.getByTestId("concise-digest-preset"));
-
-    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("detail-option-concise")).toHaveAttribute("aria-pressed", "true");
-    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "精简论文速读"
-    );
-    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "建议追问的 3 个问题"
-    );
-  });
-
-  it("shows a concise-digest fallback hint and lets the operator retry", async () => {
+  it("shows a timeout hint and lets the operator retry", async () => {
     seedSession();
     const metadata = makeMetadata({
       file_id: "file-timeout",
@@ -489,12 +472,12 @@ digest smoke result
         files: [new File(["timeout content"], "timeout.md", { type: "text/markdown" })]
       }
     });
+    fireEvent.click(screen.getByTestId("task-option-summary"));
     fireEvent.click(screen.getByTestId("submit-task-button"));
 
     await waitFor(() =>
       expect(screen.getByText(/模型响应较慢/)).toBeInTheDocument()
     );
-    expect(screen.getByText(/建议先点击“精简速读兜底”/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("retry-task-button"));
 
