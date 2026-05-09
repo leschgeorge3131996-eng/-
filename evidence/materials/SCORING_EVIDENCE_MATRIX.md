@@ -22,6 +22,17 @@
 | 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md`、`evidence/reports/extended_eval_v1_latest.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |
 | 现场演示 / 答辩 | 是否能稳、能复现、能扛追问 | `GOLD_SAMPLE_RUNBOOK.md`、`QA_BRIEF.md`、`HARD_EVIDENCE_SUMMARY.md`、最终截图集、最终 `3` 页 PPT / `5` 分钟视频 | 演示不现场 improvisation，只走锁定样例、锁定问题和预定备用路径；追问时按证据页和 runbook 回答。 |
 
+## 加分项（各 5 分）
+
+来源：赛题指南第 117-118 页。
+
+| 加分项 | 当前命中情况 | 证据 |
+| --- | --- | --- |
+| 平台利用率 `5` | 主 QA 链路 + 记录 + 真实 replay 均跑在无问芯穹平台 | 同"平台使用"一栏 |
+| 商业化潜力 `5` | 面向科研人员论文速读 + 答辩准备场景，需求明确 | `PROJECT_ONE_PAGER.md` |
+| 大模型与智能体能力 `5` | 主链路使用大模型 + prompt-layer 拒答 + retrieval metadata-intent fallback | `ARCHITECTURE.md`、`HARD_EVIDENCE_SUMMARY.md` 第 7 节 |
+| **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `89.1%`，峰值 `93.1%`** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
+
 ## 平台使用：评委追问点
 
 ### 追问 1：你们到底有没有真实用无问芯穹？
@@ -105,6 +116,22 @@
   2. 元信息类 query（作者 / 主要贡献）召回首页 chunk 不稳，曾有 `3` 道题失败（metadata intent fallback 修复）
 - 旧版剩余 `5` 道失败全部落在表格单列数据 / abstract 隐含结论 / 小 markdown 文档上，都是 retrieval 颗粒度真实边界；最终修复选择的是 retrieval/context 工程补丁，而不是更换模型或把 digest 当严格证据。
 - 这是"有实验 + 会复盘 + 会修 + 仍说明边界"的具体佐证，不是"3 题 100%"那种只跑一次就包装的数字。注意：`51/51` 是固定扩展评测集回归，不应表述为开放域任意论文 `100%`。
+
+### 追问 3：你们有做 Token 消耗压缩吗？
+
+优先出示：
+
+- `evidence/reports/token_compression_eval.md`
+- `HARD_EVIDENCE_SUMMARY.md` 第 8 节
+- 脚本 `scripts/eval_token_compression.py`（评委现场可复跑）
+
+答法：
+
+- 我们的预处理是三层流水线：解析归一化 → 结构化切块（`ChunkService` 900 字 target / 100 字 overlap）→ 按任务意图的检索/上下文规划（`ContextPlannerService`，`ask` 走 retrieval、`summary/outline` 走 coverage）
+- 对长文档 `ask` 任务，4 个样本平均节省 **89.1%**，峰值 **93.1%** —— 比如 Attention 论文从 10,263 tokens 压到 704 tokens（6.9%）
+- 短文档场景诚实标注为 `-4%` 左右（单 chunk 加页码/标题 marker 略增），不是所有场景都该压、也不假装都压得动
+- baseline 取"解析后全文塞 prompt" vs 实际走 planner 后的 `document_text`，token 数用 tiktoken `cl100k_base` 做统一尺子；无问芯穹底层 Qwen/DeepSeek BPE 会有 ±10% 偏差，但相对节省比稳健
+- 报告里 1 个走 `no_match` 拒答路径的样本**明确不计入节省统计**，按 `feedback_eval_honesty` 纪律处理
 
 ## 现场演示与答辩：评委追问点
 

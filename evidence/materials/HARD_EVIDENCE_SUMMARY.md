@@ -23,7 +23,7 @@
   2. `作者最终的方法排名和总体准确率分别是多少？`
   3. `木星有几颗卫星？`
 
-## 最重要的五条证据
+## 最重要的证据
 
 ### 1. 真实平台主路径已经切到无问芯穹
 
@@ -138,6 +138,29 @@
 4. 2026-04-24 没有更换默认模型，而是做了针对 retrieval/context 的工程修复：表格/参数 query expansion、neighbor chunks、contribution/head chunks、matched-retrieval self-refusal 的一次严格 retry。最终默认模型回归闭环为 `51/51`。
 
 **诚实边界**：`51/51` 是固定扩展评测集上的最终回归结果，不等于任意文档/任意问题开放域 `100%`。系统核心承诺是：模型声明使用的片段可回链到页码/原文片段；当模型提供逐字 quote 时，后端会做原文子串校验。不要把它表述成“每个回答都有逐字 quote”。
+
+### 8. Token 压缩定量评估（对应加分项 #4）
+
+来源：`evidence/reports/token_compression_eval.md` · 脚本 `scripts/eval_token_compression.py` · 机读 `evidence/reports/token_compression_eval.json`
+
+**对应赛题原文**（PDF 第 117-118 页）：
+> Token 消耗量（5 分）：…… 或有 **Token 消耗压缩技术**（将原始的大量 Token 消耗进行削减）等。
+
+流水线三层压缩：`DocumentParser` → `ChunkService` → `ContextPlannerService`。其中第 3 层按任务意图走 retrieval（ask）或 coverage（summary/outline），是核心节省环节。
+
+**结论（按场景分层）**：
+
+| 场景 | 样本数 | 平均节省 | 峰值 |
+| --- | ---: | ---: | ---: |
+| **长文档（PDF 论文）ask** | 4 | **89.1%** | **93.1%** |
+| **长文档 summary / outline** | 4 | **83.3%** | 89.4% |
+| **短文档（MD / TXT）所有任务** | 23 | -4.2% | — |
+
+- 长文档 2 篇合计 8 个任务平均节省 **86.2%**；峰值出现在 Attention 论文的 `ask What are the experimental results?` — 10,263 → 704 tokens，**压到原文的 6.9%**
+- 短文档 token 本来就少，context_planner 加页码/标题 marker 后略增（-3% 左右）；**诚实标注短文档不是压缩目标场景**
+- 1 个任务样本走 `no_match` 拒答路径，不计入节省统计（遵循 `feedback_eval_honesty` 纪律）
+
+**答辩口径**：对**长文档 ask 任务**（论文速读 / 报告问答的主场景），研答通把 input token 从万级压到千级，**平均节省 89%**，峰值 93%。
 
 ## 当前诚实边界
 

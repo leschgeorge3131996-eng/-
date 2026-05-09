@@ -50,6 +50,7 @@
 - V4 model holdout now shows `qwen3-235b-a22b-instruct-2507` and `deepseek-v4-flash` tied at `48 / 50`; DeepSeek V4 Flash should be treated as a first-line candidate, not a weak fallback
 - Multi-agent model strategy for a longer optimization window is recorded in `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md`: build V5 Extreme Holdout, widen the candidate pool, and only switch default after a frozen regression win
 - V6 full + contract-patch rerun now promotes `deepseek-v4-flash` to QA rehearsal default: after language/missing-info/conflict prompt tightening, Flash scored `71 / 72` vs Qwen `56 / 72`, then passed predeploy sanity `3 / 3` gold and `11 / 11` gates as READY
+- Token 压缩加分项（5 分）定量证据已落地：`scripts/eval_token_compression.py` + `evidence/reports/token_compression_eval.md`。长文档 ask 平均节省 `89.1%`、峰值 `93.1%`；短文档诚实标注 `~-4%`（非目标场景）；证据已同步进 `HARD_EVIDENCE_SUMMARY.md` 第 8 节 与 `SCORING_EVIDENCE_MATRIX.md` 加分项表格
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

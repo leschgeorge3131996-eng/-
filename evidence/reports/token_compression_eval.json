@@ -1,0 +1,432 @@
+{
+  "documents": [
+    {
+      "doc_path": "evidence\\samples\\office_notice.txt",
+      "label": "办公通知 (txt)",
+      "bucket": "短",
+      "file_type": "txt",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 565,
+      "stage0_baseline_tokens": 207,
+      "stage1_parsed_chars": 195,
+      "stage2_chunked_tokens": 207,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 217,
+          "saved_pct_vs_baseline": -4.83,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 217,
+          "saved_pct_vs_baseline": -4.83,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "请说明其中提到的具体数字和指标。",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 222,
+          "saved_pct_vs_baseline": -7.25,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\research_brief.md",
+      "label": "研究简报 (md)",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 729,
+      "stage0_baseline_tokens": 284,
+      "stage1_parsed_chars": 281,
+      "stage2_chunked_tokens": 284,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 294,
+          "saved_pct_vs_baseline": -3.52,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 294,
+          "saved_pct_vs_baseline": -3.52,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "第一阶段要做什么？",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 304,
+          "saved_pct_vs_baseline": -7.04,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\paper_report.md",
+      "label": "论文摘要 (md)",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 605,
+      "stage0_baseline_tokens": 231,
+      "stage1_parsed_chars": 221,
+      "stage2_chunked_tokens": 231,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 241,
+          "saved_pct_vs_baseline": -4.33,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 241,
+          "saved_pct_vs_baseline": -4.33,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "报告里提到的核心方法是什么？",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 251,
+          "saved_pct_vs_baseline": -8.66,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\holdout_v3\\campus_workshop_notice.md",
+      "label": "校园活动通知",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 896,
+      "stage0_baseline_tokens": 364,
+      "stage1_parsed_chars": 427,
+      "stage2_chunked_tokens": 364,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 374,
+          "saved_pct_vs_baseline": -2.75,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 374,
+          "saved_pct_vs_baseline": -2.75,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "报名截止时间是什么时候？",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 383,
+          "saved_pct_vs_baseline": -5.22,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\holdout_v3\\incident_review_alpha.md",
+      "label": "事故复盘报告",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 1138,
+      "stage0_baseline_tokens": 475,
+      "stage1_parsed_chars": 511,
+      "stage2_chunked_tokens": 475,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 485,
+          "saved_pct_vs_baseline": -2.11,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 485,
+          "saved_pct_vs_baseline": -2.11,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "事故的直接原因是什么？",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 494,
+          "saved_pct_vs_baseline": -4.0,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\holdout_v3\\lab_experiment_log.md",
+      "label": "实验日志",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 967,
+      "stage0_baseline_tokens": 365,
+      "stage1_parsed_chars": 468,
+      "stage2_chunked_tokens": 365,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 375,
+          "saved_pct_vs_baseline": -2.74,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 375,
+          "saved_pct_vs_baseline": -2.74,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "请说明其中提到的具体数字和指标。",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 384,
+          "saved_pct_vs_baseline": -5.21,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\holdout_v3\\procurement_policy_2026.md",
+      "label": "采购制度文件",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 990,
+      "stage0_baseline_tokens": 385,
+      "stage1_parsed_chars": 399,
+      "stage2_chunked_tokens": 385,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 395,
+          "saved_pct_vs_baseline": -2.6,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 395,
+          "saved_pct_vs_baseline": -2.6,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "请说明其中提到的具体数字和指标。",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 403,
+          "saved_pct_vs_baseline": -4.68,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\holdout_v3\\bilingual_product_spec.md",
+      "label": "中英双语产品规格",
+      "bucket": "短",
+      "file_type": "md",
+      "page_count": 1,
+      "chunk_count": 1,
+      "raw_bytes": 1058,
+      "stage0_baseline_tokens": 212,
+      "stage1_parsed_chars": 1057,
+      "stage2_chunked_tokens": 212,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 222,
+          "saved_pct_vs_baseline": -4.72,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 1,
+          "stage3_tokens": 222,
+          "saved_pct_vs_baseline": -4.72,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "产品的关键参数有哪些？",
+          "strategy": "no_match",
+          "selected_chunk_count": 0,
+          "stage3_tokens": 0,
+          "saved_pct_vs_baseline": 100.0,
+          "counts_in_summary": false
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\chinese_llm_spatial_eval.pdf",
+      "label": "中文 LLM 空间能力评测论文",
+      "bucket": "长",
+      "file_type": "pdf",
+      "page_count": 11,
+      "chunk_count": 35,
+      "raw_bytes": 1035562,
+      "stage0_baseline_tokens": 16487,
+      "stage1_parsed_chars": 22960,
+      "stage2_chunked_tokens": 18484,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 5,
+          "stage3_tokens": 3530,
+          "saved_pct_vs_baseline": 78.59,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 6,
+          "stage3_tokens": 4009,
+          "saved_pct_vs_baseline": 75.68,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "这份文档的核心内容是什么？",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 2,
+          "stage3_tokens": 1364,
+          "saved_pct_vs_baseline": 91.73,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "请说明其中提到的具体数字和指标。",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 4,
+          "stage3_tokens": 2884,
+          "saved_pct_vs_baseline": 82.51,
+          "counts_in_summary": true
+        }
+      ]
+    },
+    {
+      "doc_path": "evidence\\samples\\attention_is_all_you_need.pdf",
+      "label": "Attention Is All You Need 论文",
+      "bucket": "长",
+      "file_type": "pdf",
+      "page_count": 15,
+      "chunk_count": 57,
+      "raw_bytes": 2215244,
+      "stage0_baseline_tokens": 10263,
+      "stage1_parsed_chars": 40121,
+      "stage2_chunked_tokens": 11133,
+      "tasks": [
+        {
+          "task": "summary",
+          "user_input": "",
+          "strategy": "coverage_summary",
+          "selected_chunk_count": 5,
+          "stage3_tokens": 1092,
+          "saved_pct_vs_baseline": 89.36,
+          "counts_in_summary": true
+        },
+        {
+          "task": "outline",
+          "user_input": "",
+          "strategy": "coverage_outline",
+          "selected_chunk_count": 5,
+          "stage3_tokens": 1092,
+          "saved_pct_vs_baseline": 89.36,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "What is the Transformer architecture?",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 4,
+          "stage3_tokens": 1106,
+          "saved_pct_vs_baseline": 89.22,
+          "counts_in_summary": true
+        },
+        {
+          "task": "ask",
+          "user_input": "What are the experimental results?",
+          "strategy": "retrieval_topk",
+          "selected_chunk_count": 4,
+          "stage3_tokens": 704,
+          "saved_pct_vs_baseline": 93.14,
+          "counts_in_summary": true
+        }
+      ]
+    }
+  ]
+}

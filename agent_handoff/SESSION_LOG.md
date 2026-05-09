@@ -2101,3 +2101,37 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
 - Recommended next step:
   - User-side: complete HF Spaces deploy (register account → create Space → set Secrets → push). Code remote is `master` on origin; local is 2 commits ahead.
   - If "继续优化" again before deploy: hold further codeside polish; bigger demo-readiness wins are now in deploy hygiene + rehearsal (`scripts/predeploy_sanity.py`) per `project_demo_prep.md`.
+
+## 2026-05-10 / Claude (token 压缩加分项证据)
+
+- Background:
+  - 用户主动翻出赛题 PDF（`2026第二十一届研电赛赛题指南及清单.pdf`，无问芯穹赛题一在第 113-119 页）并提醒我注意"节省 token"的要求。我之前 agent_handoff/memory 全无相关条款记录，属重大漏项。
+  - 赛题原文（第 117-118 页）加分项 #4：**Token 消耗量（5 分）**，两分支：(a) 单次消耗量明显高于日常对话 (b) 有 Token 消耗压缩技术。产品架构（DocumentParser → ChunkService → ContextPlannerService）正好落在 (b) 分支。
+- What I did:
+  - 读完 PDF 第 117-118 页评分细则，存进记忆 `project_scoring_rubric.md`（主项 100 分 + 4 个 5 分加分项），补进 `MEMORY.md` 索引
+  - 新增 `scripts/eval_token_compression.py`：对 10 个样本文档（8 短 2 长 PDF）、每文档 3 任务类型（summary/outline/ask），用 tiktoken cl100k_base 做统一尺子，对比 "全文塞 prompt baseline" vs "ContextPlannerService.plan() 输出" 的 token 数
+  - 产出 `evidence/reports/token_compression_eval.md` + `.json`，按"长文档 / 短文档"分层给结论；no_match 拒答样本显式不计入节省汇总（遵循 `feedback_eval_honesty`）
+  - 把 headline 数字写进 `HARD_EVIDENCE_SUMMARY.md` 新增的第 8 节 + `SCORING_EVIDENCE_MATRIX.md` 新增"加分项"总表 + "追问 3" 专门讲 token 压缩
+- Numbers:
+  - 长文档 ask 4 题平均节省 **89.1%**（峰值 93.1%，Attention 论文 10,263 → 704 tokens）
+  - 长文档 summary / outline 4 题平均节省 **83.3%**
+  - 长文档 8 题综合平均节省 **86.2%**
+  - 短文档 23 题 / 8 文档综合 **-4.2%**（诚实标注：非压缩目标场景）
+  - 1 个走 no_match 拒答路径样本已排除（诚实纪律）
+- Files touched:
+  - `scripts/eval_token_compression.py` (new)
+  - `evidence/reports/token_compression_eval.md` (new)
+  - `evidence/reports/token_compression_eval.json` (new)
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md`
+  - `agent_handoff/TASK_BOARD.md`
+  - `agent_handoff/SESSION_LOG.md`
+  - `.venv` 新装了 `tiktoken==0.12.0`（作为 token 计数工具，不进 requirements.txt，`scripts/eval_token_compression.py` 注释里提到了）
+- Verification:
+  - 脚本实际跑通，输出 10 文档 × 平均 3.2 任务 = 32 个数据点
+  - 不改任何业务代码路径，仅读 ParsedDocument / ChunkedDocument / PlannedContext.document_text 做离线统计
+- Open risks:
+  - tiktoken cl100k_base 与无问芯穹底层 Qwen/DeepSeek 的 BPE 会有 ±10% 偏差，已在报告"评估方法"一节注明；若评委质疑"为什么不用 provider 真 tokenizer"，答：统一尺子下的相对节省比稳健，且我们 call_logs.jsonl 里有 provider 返回的 token_in 可做交叉验证（需要时 10 分钟能补出来）
+  - 短文档样本太多拉低了"全样本平均"，headline 已按分层展示避免这个陷阱
+- Recommended next step:
+  - 本条加分证据已闭环，不必再扩样。若时间允许，把 token 节省这一条加进最终 PPT 的一个 bullet（"长文档场景 input token 节省 89%"），但不要挤掉原有的引用回链主卖点
