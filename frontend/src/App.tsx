@@ -686,6 +686,33 @@ export default function App() {
       });
   }
 
+  function selectPendingDocument(file: File) {
+    setSelectedFile(file);
+    setUploadedMetadata(null);
+    setResult(null);
+    setError(null);
+    setPreviewOpen(false);
+    setPreviewPage(1);
+    setPreviewPages([1]);
+    setPreviewSnippet(null);
+    setPreviewSnippetPage(null);
+    setPreviewBboxes([]);
+  }
+
+  function createDemoDocumentFile(): File {
+    return new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
+      type: "text/markdown"
+    });
+  }
+
+  function ensureDemoDocumentReady(): boolean {
+    if (selectedFile || uploadedMetadata) {
+      return false;
+    }
+    selectPendingDocument(createDemoDocumentFile());
+    return true;
+  }
+
   function applyResearchDigestPreset() {
     setTaskType("summary");
     setResponseDetailLevel("detailed");
@@ -703,10 +730,15 @@ export default function App() {
   }
 
   function applyWhitelistedDemoQuestion(question: string) {
+    const insertedDemoDocument = ensureDemoDocumentReady();
     setTaskType("ask");
     setResponseDetailLevel("balanced");
     setInput(question);
-    setNotice("已填入白名单演示问题：点击提交任务后验证证据问答或拒答边界。");
+    setNotice(
+      insertedDemoDocument
+        ? "已填入示例文档和白名单演示问题：点击提交任务后验证证据问答或拒答边界。"
+        : "已填入白名单演示问题：点击提交任务后验证证据问答或拒答边界。"
+    );
     setError(null);
     scrollElementIntoView('[data-testid="task-input"]');
   }
@@ -917,19 +949,8 @@ export default function App() {
                 type="button"
                 disabled={!isAuthenticated || interactionLocked}
                 onClick={() => {
-                  const file = new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
-                    type: "text/markdown"
-                  });
-                  setSelectedFile(file);
-                  setUploadedMetadata(null);
-                  setResult(null);
-                  setError(null);
-                  setPreviewOpen(false);
-                  setPreviewPage(1);
-                  setPreviewPages([1]);
-                  setPreviewSnippet(null);
-                  setPreviewSnippetPage(null);
-                  setPreviewBboxes([]);
+                  selectPendingDocument(createDemoDocumentFile());
+                  setNotice("已填入示例文档：选择任务后可直接提交。");
                 }}
               >
                 填充示例文档
@@ -941,8 +962,14 @@ export default function App() {
                   type="button"
                   disabled={!isAuthenticated || interactionLocked}
                   onClick={() => {
+                    const insertedDemoDocument = ensureDemoDocumentReady();
                     setTaskType(action.taskType);
                     setInput(action.input);
+                    setNotice(
+                      insertedDemoDocument
+                        ? `已填入示例文档和${action.label}：点击提交任务即可运行。`
+                        : `已切换到${action.label}：点击提交任务即可运行。`
+                    );
                   }}
                 >
                   <strong>{action.label}</strong>

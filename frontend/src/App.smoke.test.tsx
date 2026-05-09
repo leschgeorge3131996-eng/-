@@ -413,6 +413,28 @@ digest smoke result
     expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
       "2028 年全国部署预算"
     );
+    expect(screen.getByTestId("current-document-name").textContent).toContain(
+      "demo_research_brief.md"
+    );
+    expect(screen.getByTestId("submit-task-button")).toBeEnabled();
+  });
+
+  it("turns a demo task card into a runnable one-click demo", async () => {
+    seedSession();
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+    fireEvent.click(screen.getByText("示例问答"));
+
+    expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
+      "第一阶段"
+    );
+    expect(screen.getByTestId("current-document-name").textContent).toContain(
+      "demo_research_brief.md"
+    );
+    expect(screen.getByTestId("submit-task-button")).toBeEnabled();
   });
 
   it("applies the concise digest fallback preset", async () => {
