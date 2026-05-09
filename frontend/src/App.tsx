@@ -970,6 +970,8 @@ export default function App() {
                         ? `已填入示例文档和${action.label}：点击提交任务即可运行。`
                         : `已切换到${action.label}：点击提交任务即可运行。`
                     );
+                    setError(null);
+                    scrollElementIntoView('[data-testid="task-input"]');
                   }}
                 >
                   <strong>{action.label}</strong>
