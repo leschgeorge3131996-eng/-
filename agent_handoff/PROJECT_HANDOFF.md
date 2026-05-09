@@ -265,6 +265,43 @@ Operator rehearsal result:
     - `FINAL_SUBMISSION_CHECKLIST.md`
     - `DEFENSE_DEMO_RISK_CHECKLIST.md`
 
+## 2026-05-09 UX Cleanup Pass
+
+- Stripped the demo-jargon vocabulary that had been accumulating on user-facing surfaces:
+  - removed `精简速读兜底` preset (button + prompt + load/timeout copy + test)
+  - demo task cards now seed the sample document automatically when none is loaded and scroll to the task input
+  - default task type flipped `summary` → `ask` so the first thing a visitor lands on is evidence-back-linked QA
+  - `一键演示入口` → `快速体验`; `推荐追问 1/2` / `拒答边界` chips now display the actual question; `示例摘要/问答/提纲` → `试一试 摘要/问答/提纲`
+  - `演示模式/演示环境/演示会话` → `试用模式/试用环境/试用会话`
+  - sample doc renamed `demo_research_brief.md` → `sample_brief.md`
+  - `论文速读工作台` → `论文速读` (kicker, button, prompt, ResultPanel detection — kept backward-compatible)
+- Hero flow strip is now stage-aware: it tracks `loadStage` (uploading → 1+2 brand-accent; model → 3 solid, 4 pulsing; idle+result → soft-green done state); idle keeps the breathing animation
+- Upload-zone 状态卡 folded into a session chip beside the panel title plus a one-line dropzone footnote
+- Demo session bootstrap silently retries twice (800ms each) before surfacing an auth-error card, so first-time visitors no longer see a red error on a transient cold start
+- Commit: `d4b1923` "Strip demo-jargon UI and wire the hero flow to real load stage"
+- Guiding principle captured in memory `feedback_user_first.md`: real-user lens beats judge-lens; demo scaffolding should not bleed into the main UI vocabulary
+
+## 2026-05-10 Token Compression Evidence (Scoring Add-On #4)
+
+- Competition rubric confirmed from 赛题 PDF (`2026第二十一届研电赛赛题指南及清单.pdf`, p.117-118, 无问芯穹赛题一):
+  - main: `平台使用 20` + `产品能力 40` + `技术能力 40`
+  - 4 × 5-point add-ons: `平台利用率`, `商业化潜力`, `大模型与智能体能力`, **`Token 消耗量`** (either high per-task consumption OR compression technique)
+- Preprocessing pipeline (`DocumentParser → ChunkService → ContextPlannerService`) fits the compression branch; evaluation script made it quantitative:
+  - `scripts/eval_token_compression.py`: walks 10 sample docs (8 short md/txt + 2 long PDFs) × 3 task types through the real services, counts tokens with tiktoken `cl100k_base`, compares `ContextPlannerService.plan().document_text` against "raw_text as prompt" baseline
+  - `no_match` refusal-path samples explicitly excluded from headline averages (per `project_eval_honesty`)
+- Numbers (32 task samples total):
+  - long-doc ask: 4 samples, avg **89.1%** saved, peak **93.1%** (Attention paper `10,263 → 704` tokens)
+  - long-doc summary/outline: avg 83.3%
+  - long-doc overall: 86.2%
+  - short-doc overall: -4.2% (honestly flagged as non-target scenario; single-chunk docs get a few wrapper tokens from page/heading markers)
+- Materials synced:
+  - `evidence/reports/token_compression_eval.md` + `.json` (canonical)
+  - `evidence/materials/HARD_EVIDENCE_SUMMARY.md` new section 8
+  - `evidence/materials/SCORING_EVIDENCE_MATRIX.md` new "加分项" table + dedicated follow-up Q&A
+  - `agent_handoff/TASK_BOARD.md` now line-item for the add-on
+- Commit `943b714`, pushed to `origin/master` together with the 2026-05-09 UX pass
+- Tool note: `tiktoken==0.12.0` installed into `.venv` for this evaluator only; main runtime still relies on provider-side `token_in` from `call_logs.jsonl` for real-call truth
+
 ## What Was Added In The Latest Iterations
 
 ### Evidence and PDF chain
@@ -421,14 +458,21 @@ These are the best next steps if work continues:
 
 ### Highest value for judging/demo
 
-1. Start from `evidence/exports/competition_asset_pack_20260419_211551/`
-2. Use the latest final external-review bundle for one more targeted judging-risk review:
+1. Token compression scoring add-on #4 is now closed with evidence — reuse `evidence/reports/token_compression_eval.md` + `HARD_EVIDENCE_SUMMARY.md` §8 verbatim in rehearsal; do not re-run unless the pipeline changes
+2. Start from `evidence/exports/competition_asset_pack_20260419_211551/`
+3. Use the latest final external-review bundle for one more targeted judging-risk review:
    - `review_bundle_stage_20260419_211551/`
    - `review_bundle_20260419_211551_final_competition_review.zip`
    - this version adds `PROJECT_CONTEXT.md`, so another AI sees the project background, target, and scope constraints before judging the current state
-3. Treat `G3` as closed for the current strict fresh-upload judged-demo path; do not reopen Q2 or G3 as default blockers unless the final environment changes or new contrary evidence appears
-4. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
-5. Finalize judged-demo materials and spoken defense wording before doing any new feature work
+4. Treat `G3` as closed for the current strict fresh-upload judged-demo path; do not reopen Q2 or G3 as default blockers unless the final environment changes or new contrary evidence appears
+5. Keep runtime/docs/materials aligned to `Wuwen Xinqiong` + the current primary `MODEL_QA` decision
+6. Finalize judged-demo materials and spoken defense wording before doing any new feature work
+
+### Layout / visual guardrails (important for next operator)
+
+- Warm cream + ember-orange theme is the user-approved aesthetic baseline — do not bulk-swap to "corporate blue / document grey" no matter what external design tools recommend (`feedback_aesthetic`)
+- When changing the workspace layout, the answer (ResultPanel) must not move further down the page than its current position; "left controls + answer stacked / right PDF" is explicitly rejected (`feedback_layout_answer_position`)
+- Demo scaffolding vocabulary (`演示 / 白名单 / 兜底 / 拒答边界 / 推荐追问 1/2`) has been stripped from user-facing surfaces; keep it that way (`feedback_user_first`)
 
 ### Highest value for broader external testing
 
