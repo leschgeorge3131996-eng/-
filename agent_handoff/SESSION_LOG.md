@@ -2081,3 +2081,23 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - this is a handoff-hygiene action, not a code change — no tests run, no build run; the underlying code was unchanged this round
 
 
+
+## 2026-05-09 / Claude (demo card one-click consistency)
+
+- Summary:
+  - User asked "继续优化研答通". HF deploy is halfway and blocked on the user (register HF account / create Space). Code-side per memory is in maintenance — looked for low-risk demo polish.
+  - Working tree had two uncommitted files (`App.tsx`, `App.smoke.test.tsx`) that introduced `selectPendingDocument` / `ensureDemoDocumentReady` helpers so demo task cards seed the demo document automatically when none is loaded, mirroring the whitelisted ask buttons. Verified, then committed.
+  - Followed up with one missing consistency: demo task cards now also scroll to the task input and clear stale errors, same as `applyWhitelistedDemoQuestion`.
+- Files touched:
+  - `frontend/src/App.tsx`
+  - `frontend/src/App.smoke.test.tsx`
+- Verification:
+  - `npm test -- --run` -> `14 passed` (was 13; new test "turns a demo task card into a runnable one-click demo")
+- Commits (local, NOT pushed — awaiting user confirmation):
+  - `9828c13` Auto-fill demo document when demo task cards are clicked
+  - `6994846` Scroll demo cards to task input after one-click fill
+- Open risks:
+  - None — pure UX consistency, no API/contract change
+- Recommended next step:
+  - User-side: complete HF Spaces deploy (register account → create Space → set Secrets → push). Code remote is `master` on origin; local is 2 commits ahead.
+  - If "继续优化" again before deploy: hold further codeside polish; bigger demo-readiness wins are now in deploy hygiene + rehearsal (`scripts/predeploy_sanity.py`) per `project_demo_prep.md`.
