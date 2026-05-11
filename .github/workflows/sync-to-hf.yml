@@ -14,9 +14,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
 
-      - name: Push to Hugging Face Space
+      - name: Strip binary-heavy paths from history (CI-only)
+        env:
+          GIT_AUTHOR_NAME: ci
+          GIT_AUTHOR_EMAIL: ci@local
+          GIT_COMMITTER_NAME: ci
+          GIT_COMMITTER_EMAIL: ci@local
+        run: |
+          pip install --quiet git-filter-repo
+          git filter-repo --force \
+            --path deliverables/ \
+            --path evidence/screenshots/ \
+            --path evidence/samples/ \
+            --invert-paths
+
+      - name: Push cleaned history to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
