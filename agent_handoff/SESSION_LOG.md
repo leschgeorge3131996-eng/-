@@ -2135,3 +2135,27 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - 短文档样本太多拉低了"全样本平均"，headline 已按分层展示避免这个陷阱
 - Recommended next step:
   - 本条加分证据已闭环，不必再扩样。若时间允许，把 token 节省这一条加进最终 PPT 的一个 bullet（"长文档场景 input token 节省 89%"），但不要挤掉原有的引用回链主卖点
+
+## 2026-05-11 / Claude (默认 QA 模型口径漂移修复 — judge-facing material sync)
+
+- Background:
+  - 用户说"看一下 memory 和共同文件，继续优化研答通"。HF 部署仍卡在用户侧、代码侧 per memory `project_demo_prep` 已完。从评委追问视角扫"内部一致性漂移"。
+  - 发现 `.env` 实际 `MODEL_QA=deepseek-v4-flash`（2026-04-30 V6 contract-patch holdout 之后切换），但 `evidence/materials/` 里 12 个文件全在写"默认 QA = qwen3-235b-a22b-instruct-2507"，agent_handoff 里 `FREEZE_FACT_SHEET_20260419.md` / `PROJECT_HANDOFF.md` 顶部的当前态字段也未跟上。评委追问"当前默认 QA 模型是哪个"时，材料和实际部署对不上。
+  - 切换决策本身有证据：`evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`（Flash `71 / 72` vs Qwen `56 / 72`，并通过 predeploy sanity `3 / 3` 与 `11 / 11` 门控 READY），TASK_BOARD line 67 也明确记录。
+- Scope discipline:
+  - 只改"当前态"字段（"当前默认 QA 模型 = …"、"current primary QA model = …"），明确加 rollback fallback / summary / outline 的现状
+  - **不改**历史实验数字：gold-sample `qwen3-235b: 3/3` + `qwen3-32b: 3/3` 是历史 compare 实测结果保留；`STRICT_G3_EXECUTION_PLAN`、`HOLDOUT_EVAL_V3_*.json` 等历史实验记录保留；`PPT_DECK_6SLIDES` / `VIDEO_SHOTLIST_2MIN` 已被 demote 为 baseline-only 保留
+  - 历史 roadmap / plan 文档（`TECHNICAL_OPTIMIZATION_ROADMAP_20260424`、`MODEL_STRATEGY_EXTREME_PLAN_20260429`）正文不动，但 ROADMAP 顶部加 Update banner 指向 V6 切换
+- Files touched:
+  - judge-facing materials synced: `HARD_EVIDENCE_SUMMARY.md`, `PLATFORM_USAGE_EVIDENCE.md`, `SCORING_EVIDENCE_MATRIX.md`, `PRODUCT_TECHNICAL_WRITEUP.md`, `POSTER_COPY.md`, `COMPETITION_ASSET_PACK.md`, `VIDEO_SHOTLIST_5MIN_FINAL.md`, `PPT_DECK_3PAGES_FINAL.md`
+  - handoff side: `agent_handoff/PROJECT_HANDOFF.md`（加 `2026-04-30 Default QA Switch` 与 `2026-04-30 Judge-Facing Material Sync` 两个 entry，并给 04-18 snapshot 加 superseded 注），`agent_handoff/FREEZE_FACT_SHEET_20260419.md`（`MODEL_QA` 字段刷成 Flash + rollback Qwen + summary/outline 说明），`agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md`（顶部加 2026-04-30 Update banner，正文保持快照属性不动），`agent_handoff/SESSION_LOG.md`（本条目），`agent_handoff/TASK_BOARD.md`（同步 line）
+- Verification:
+  - 不改代码、不改实验数字，只改"当前态"字段；无需跑测试。可选 sanity：`grep "当前默认 QA 模型" evidence/materials/` 应只剩 `deepseek-v4-flash`
+- Open risks / 不再做:
+  - 不在这一轮重跑 G3 / gold sample compare 用 Flash 替代 Qwen 跑一遍。原因：a) 历史 Qwen-based gold-sample evidence 仍然成立（它证明的是"平台路径能跑"，不是"Flash 比 Qwen 好"）；b) Flash 的能力比较证据已经在 V6 holdout 报告里；c) 重跑会触发 stale-evidence cascade，违反 `project_demo_prep` 的"代码侧已完"原则
+  - 不动 `MODEL_SUMMARY` / `MODEL_OUTLINE`：V6 holdout 没单独覆盖这两个任务，不要轻易切
+- Commits (local, NOT pushed — 按 `feedback_git_habit` 等用户许可后再 push):
+  - 待 commit
+- Recommended next step:
+  - 用户侧仍是 HF Spaces 部署收尾（注册 / 创 Space / push）
+  - 如果再要"继续优化"且不希望开新代码方向：先跑一遍 `scripts/predeploy_sanity.py` 看本机是否仍是 READY，再判断是否值得重新生成 review bundle / asset pack 把口径漂移修复也打包给评委

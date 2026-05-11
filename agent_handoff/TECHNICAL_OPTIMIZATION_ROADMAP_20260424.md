@@ -1,5 +1,7 @@
 ﻿# Technical Optimization Roadmap — 2026-04-24
 
+> **Update note (2026-04-30):** The "do not switch the default QA model now" line below was written before V5/V6 holdouts existed. After the V6 contract-patch holdout (`evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`), `MODEL_QA` was deliberately switched from `qwen3-235b-a22b-instruct-2507` to `deepseek-v4-flash`, with `qwen3-235b-a22b-instruct-2507` retained as the rollback fallback and `summary` / `outline` kept on `qwen3-235b-a22b-instruct-2507`. Treat the original line below as a 2026-04-24 snapshot, not current guidance. The rest of this roadmap (retrieval ceiling, frontend recovery, predeploy gates, failure attribution) still applies.
+
 Scope: technical / end-to-end product work only. Non-technical materials such as papers, PPT, posters, and demo videos are explicitly out of scope for this roadmap.
 
 ## Consensus

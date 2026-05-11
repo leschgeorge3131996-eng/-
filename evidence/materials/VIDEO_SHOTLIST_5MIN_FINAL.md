@@ -114,13 +114,13 @@
 - 两行对比卡片：
   - `qwen3-235b-a22b-instruct-2507: 3 / 3`
   - `qwen3-32b: 3 / 3`
-- 底部一行：
-  - `default = 235b`
-  - `fallback = 32b`
+- 底部两行：
+  - `default = deepseek-v4-flash`（V6 contract-patch holdout 后切换）
+  - `rollback = qwen3-235b-a22b-instruct-2507`
 
 旁白：
 
-“当前锁定题组已经完成双模型验证。235b 和 32b 都通过了 2 个 answerable 加 1 个 refusal 的题组验证。我们当前默认保留 235b，同时把 32b 作为运行环境更紧时的 fallback。”
+“当前锁定题组已经完成双模型 `3 / 3` 验证，证明平台路径真实可跑。我们在这之后又跑了一轮 V6 contract-patch holdout，`deepseek-v4-flash` 在 `72` 道题上拿到 `71`，超过 `qwen3-235b` 的 `56`，所以当前默认 QA 切到 Flash；`235b` 保留为 rollback fallback，summary 和 outline 仍跑在 `235b`。”
 
 ### 265-290s strict G3 复现证据
 

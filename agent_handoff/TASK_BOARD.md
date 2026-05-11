@@ -51,6 +51,7 @@
 - Multi-agent model strategy for a longer optimization window is recorded in `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md`: build V5 Extreme Holdout, widen the candidate pool, and only switch default after a frozen regression win
 - V6 full + contract-patch rerun now promotes `deepseek-v4-flash` to QA rehearsal default: after language/missing-info/conflict prompt tightening, Flash scored `71 / 72` vs Qwen `56 / 72`, then passed predeploy sanity `3 / 3` gold and `11 / 11` gates as READY
 - Token 压缩加分项（5 分）定量证据已落地：`scripts/eval_token_compression.py` + `evidence/reports/token_compression_eval.md`。长文档 ask 平均节省 `89.1%`、峰值 `93.1%`；短文档诚实标注 `~-4%`（非目标场景）；证据已同步进 `HARD_EVIDENCE_SUMMARY.md` 第 8 节 与 `SCORING_EVIDENCE_MATRIX.md` 加分项表格
+- `2026-05-11`: 默认 QA 模型口径漂移已修复 — `.env` 实际是 `deepseek-v4-flash`（V6 contract-patch holdout 后切换），但 12 份 judge-facing 材料 + `FREEZE_FACT_SHEET_20260419.md` / `PROJECT_HANDOFF.md` 顶部当前态字段都还写着 `qwen3-235b`。这一轮只同步"当前态"字段（默认 QA / rollback fallback / summary-outline 模型），历史金标 `qwen3-235b: 3/3` + `qwen3-32b: 3/3` 实验数字、G3 strict batch 等历史记录全部保留不动；详情见 SESSION_LOG `2026-05-11` 条目
 - If preparing for judging/demo, prioritize final asset production rather than feature work
 
 ## Next Best Tasks

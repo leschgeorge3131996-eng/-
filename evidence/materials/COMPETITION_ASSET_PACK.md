@@ -20,8 +20,12 @@ Do not rebuild the story from scratch each time. Reuse this pack.
 - Locked prompt manifest:
   - `evidence/materials/GOLD_SAMPLE_CANDIDATE_20260418.json`
 - Current primary QA model:
+  - `deepseek-v4-flash` (switched after V6 contract-patch holdout — see `evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`)
+- Current rollback QA fallback:
   - `qwen3-235b-a22b-instruct-2507`
-- Validated fallback QA model:
+- Current summary / outline model:
+  - `qwen3-235b-a22b-instruct-2507`
+- Historical validated fallback QA model:
   - `qwen3-32b`
 - Current authoritative reports:
   - `evidence/reports/gold_sample_qa_compare_latest.md`
@@ -95,12 +99,11 @@ These points should stay word-for-word consistent across PPT, video, poster, and
    - `作者最终的方法排名和总体准确率分别是多少？`
    - `木星有几颗卫星？`
 4. The current QA decision is:
-   - keep `qwen3-235b-a22b-instruct-2507` as default
-   - keep `qwen3-32b` as validated fallback
-5. The comparison result is:
-   - both models pass `2 answerable + 1 refusal`
-   - keep `235b` as the default choice for the current demo path
-   - keep `32b` as the validated fallback if runtime latency becomes tighter
+   - default QA: `deepseek-v4-flash` (V6 contract-patch holdout default; `qwen3-235b-a22b-instruct-2507` is the rollback fallback; `qwen3-32b` remains historical validated fallback)
+   - summary / outline remain on `qwen3-235b-a22b-instruct-2507` (not re-evaluated, so no switch)
+5. The gold-sample comparison result is:
+   - both `qwen3-235b-a22b-instruct-2507` and `qwen3-32b` passed `2 answerable + 1 refusal` on the locked sample
+   - that comparison is historical evidence the platform path works; the current default QA was selected separately via V6 holdout
 
 ## PPT Mapping
 

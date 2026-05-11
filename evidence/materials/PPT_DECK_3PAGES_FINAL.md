@@ -135,10 +135,10 @@
 
 下方左：模型决策
 
-- `qwen3-235b-a22b-instruct-2507`：`3 / 3`
-- `qwen3-32b`：`3 / 3`
-- 当前默认：`235b`
-- 当前 fallback：`32b`
+- 锁定题组双模型 `3 / 3`：`qwen3-235b-a22b-instruct-2507` / `qwen3-32b`
+- 当前默认 QA：`deepseek-v4-flash`（V6 contract-patch holdout 后切换）
+- 当前 rollback：`qwen3-235b-a22b-instruct-2507`
+- summary / outline 仍跑在 `235b`，未单独重测前不切换
 
 下方右：strict `G3`
 

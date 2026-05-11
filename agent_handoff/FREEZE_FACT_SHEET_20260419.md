@@ -34,7 +34,11 @@ Use this file as the quickest authoritative reference when another operator or a
 - Current active provider path:
   - `Wuwen Xinqiong` (`https://cloud.infini-ai.com/maas/v1/chat/completions`)
 - Current default `MODEL_QA`:
-  - `qwen3-235b-a22b-instruct-2507`
+  - `deepseek-v4-flash` (switched after the V6 contract-patch holdout — see `evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`, `71 / 72` vs `56 / 72` for `qwen3-235b-a22b-instruct-2507`)
+- Current rollback `MODEL_QA` fallback:
+  - `qwen3-235b-a22b-instruct-2507` (this is also the model the gold-sample `3 / 3` and strict G3 batches were run on; trusted recovery path)
+- Current `MODEL_SUMMARY` / `MODEL_OUTLINE`:
+  - `qwen3-235b-a22b-instruct-2507` (not re-evaluated in V6; keep until separately retested)
 - Validated fast fallback (test-switch only if live latency is the blocker):
   - `qwen3-next-80b-a3b-instruct`
 - Historical gold-sample fallback (kept for completeness, not the preferred fallback):

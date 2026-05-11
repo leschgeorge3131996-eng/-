@@ -15,7 +15,9 @@
 | --- | --- |
 | 平台 | `Wuwen Xinqiong` |
 | Base URL | `https://cloud.infini-ai.com/maas/v1` |
-| 当前默认 QA 模型 | `qwen3-235b-a22b-instruct-2507` |
+| 当前默认 QA 模型 | `deepseek-v4-flash` |
+| rollback QA fallback | `qwen3-235b-a22b-instruct-2507` |
+| `summary` / `outline` 模型 | `qwen3-235b-a22b-instruct-2507` |
 | 当前 judged-demo 主链路 | `upload -> ask -> citation -> PDF -> refusal` |
 
 说明：
@@ -27,12 +29,14 @@
 ### 1. 平台已经接入真实主链路
 
 - 当前仓库运行配置已经切到 `Wuwen Xinqiong`
-- 当前主 QA 路径使用 `qwen3-235b-a22b-instruct-2507`
+- 当前主 QA 路径使用 `deepseek-v4-flash`（V6 contract-patch holdout 后从 `qwen3-235b-a22b-instruct-2507` 切换为默认，原模型保留为 rollback fallback）
+- `summary` / `outline` 仍跑在 `qwen3-235b-a22b-instruct-2507`，未单独重测前不切换
 
 主证明来源：
 
 - `evidence/reports/gold_sample_replay_real_summary_latest.md`
 - `evidence/reports/gold_sample_qa_compare_latest.md`
+- `evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`（QA 默认切换依据）
 
 ### 2. 锁定 gold-sample 已完成双模型验证
 

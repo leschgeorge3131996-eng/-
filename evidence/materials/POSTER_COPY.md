@@ -73,8 +73,8 @@
 
 正文文案：
 
-- 当前默认 QA：`qwen3-235b-a22b-instruct-2507`
-- 已验证 fallback：`qwen3-32b`
+- 当前默认 QA：`deepseek-v4-flash`
+- rollback fallback：`qwen3-235b-a22b-instruct-2507`
 - 当前最强差异点：证据回链的问答，不是脱离文档的聊天回复
 
 ## 模块五：适用场景

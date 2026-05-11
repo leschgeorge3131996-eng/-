@@ -28,7 +28,10 @@
 ### 1. 真实平台主路径已经切到无问芯穹
 
 - 当前平台：`Wuwen Xinqiong`
-- 当前默认 QA 模型：`qwen3-235b-a22b-instruct-2507`
+- 当前默认 QA 模型：`deepseek-v4-flash`
+- rollback fallback：`qwen3-235b-a22b-instruct-2507`
+- 切换依据：`evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`（contract-patch holdout `71 / 72` vs `56 / 72`，并通过 predeploy sanity `3 / 3` 与 `11 / 11` 门控 READY）
+- `summary` / `outline` 任务仍由 `qwen3-235b-a22b-instruct-2507` 承担，未单独重测前不切换
 
 ### 2. 锁定题组已经完成双模型 `3 / 3` 验证
 

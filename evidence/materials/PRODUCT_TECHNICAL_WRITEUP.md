@@ -37,8 +37,10 @@
 当前路径：
 
 - Base URL：`https://cloud.infini-ai.com/maas/v1`
-- 默认 QA 模型：`qwen3-235b-a22b-instruct-2507`
-- 验证 fallback：`qwen3-32b`
+- 默认 QA 模型：`deepseek-v4-flash`（V6 contract-patch holdout 后从 `qwen3-235b-a22b-instruct-2507` 切换）
+- rollback QA fallback：`qwen3-235b-a22b-instruct-2507`
+- `summary` / `outline` 模型：`qwen3-235b-a22b-instruct-2507`
+- 历史验证 fallback：`qwen3-32b`
 
 平台能力在本作品中的落点：
 

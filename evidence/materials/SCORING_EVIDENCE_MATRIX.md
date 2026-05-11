@@ -45,8 +45,10 @@
 
 补充点：
 
-- 当前默认 QA 模型：`qwen3-235b-a22b-instruct-2507`
-- 已验证 fast fallback：`qwen3-next-80b-a3b-instruct`（`qwen3-32b` 保留为历史 gold-sample fallback）
+- 当前默认 QA 模型：`deepseek-v4-flash`（V6 contract-patch holdout 后切换，详见 `evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`）
+- rollback fallback：`qwen3-235b-a22b-instruct-2507`（gold sample 双模型 `3 / 3` 验证就是用它跑的，仍是受信任的回滚路径）
+- `summary` / `outline` 仍跑在 `qwen3-235b-a22b-instruct-2507`，未单独重测前不切换
+- 历史 fast fallback `qwen3-next-80b-a3b-instruct`、历史金标 fallback `qwen3-32b` 仍保留可用
 - 有真实 request id、截图、replay 结果，而不是只说“接口已经接通”
 
 ### 追问 2：平台使用如何影响作品得分？

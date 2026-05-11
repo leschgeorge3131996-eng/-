@@ -16,7 +16,7 @@
 - Current active provider/runtime is now `Wuwen Xinqiong`
 - Current default interface:
   - `https://cloud.infini-ai.com/maas/v1/chat/completions`
-- Current primary/fallback decision:
+- Current primary/fallback decision (snapshot 2026-04-18, superseded — see 2026-04-30 entry below):
   - primary: `qwen3-235b-a22b-instruct-2507`
   - fallback candidate: `qwen3-32b`
 - Real in-project minimal path now verified on:
@@ -264,6 +264,48 @@ Operator rehearsal result:
   - `PACK_CONTENTS.md` confirms both:
     - `FINAL_SUBMISSION_CHECKLIST.md`
     - `DEFENSE_DEMO_RISK_CHECKLIST.md`
+
+## 2026-04-30 Default QA Switch (post V6 contract-patch holdout)
+
+- After the V6 extreme-full + contract-patch reruns, `MODEL_QA` was deliberately switched from `qwen3-235b-a22b-instruct-2507` to `deepseek-v4-flash`:
+  - V6 contract-patch holdout: `deepseek-v4-flash` `71 / 72` vs `qwen3-235b-a22b-instruct-2507` `56 / 72`
+  - report: `evidence/reports/holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`
+  - the switch then passed `scripts/predeploy_sanity.py` at `3 / 3` gold and `11 / 11` gates as READY
+- Current runtime defaults (matches `.env`):
+  - `MODEL_QA=deepseek-v4-flash`
+  - `MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507`
+  - `MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507`
+- Rollback fallback for QA: `qwen3-235b-a22b-instruct-2507` — this is also the model the locked gold-sample `3 / 3` and the strict G3 6-run batch were originally run against, so it remains a trusted recovery path if the deploy environment behaves unexpectedly
+- Practical implication for judges/defense:
+  - "current default QA model" answer in any answer line should now be `deepseek-v4-flash`
+  - "已验证 fallback" is `qwen3-235b-a22b-instruct-2507`, not `qwen3-32b` (`qwen3-32b` is historical gold-sample fallback only)
+  - the historical `qwen3-235b` `3 / 3` and `qwen3-32b` `3 / 3` numbers in gold-sample compare are still real and still cited as evidence that the platform path works — they were the comparison that locked the gold sample, not the V6 default-selection decision
+- The earlier 2026-04-18 / 2026-04-24 lines that said "keep `qwen3-235b-a22b-instruct-2507` as default" are 2026-04-18 / 2026-04-24 snapshots and are now superseded by this entry; they have been demoted in:
+  - `agent_handoff/PROJECT_HANDOFF.md` (snapshot note added to the 2026-04-18 entry)
+  - `agent_handoff/TECHNICAL_OPTIMIZATION_ROADMAP_20260424.md` (top-of-file update banner)
+  - `agent_handoff/FREEZE_FACT_SHEET_20260419.md` (current `MODEL_QA` field switched)
+  - the judge-facing materials listed in the next section
+
+## 2026-04-30 Judge-Facing Material Sync
+
+The "current default QA model = ..." fields in the actively used judge-facing materials were synced to match the V6 switch. Historical experiment numbers (gold-sample `3 / 3`, strict G3 batch) were preserved untouched as historical evidence. Files updated:
+
+- `evidence/materials/HARD_EVIDENCE_SUMMARY.md`
+- `evidence/materials/PLATFORM_USAGE_EVIDENCE.md`
+- `evidence/materials/SCORING_EVIDENCE_MATRIX.md`
+- `evidence/materials/PRODUCT_TECHNICAL_WRITEUP.md`
+- `evidence/materials/POSTER_COPY.md`
+- `evidence/materials/COMPETITION_ASSET_PACK.md`
+- `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`
+- `evidence/materials/PPT_DECK_3PAGES_FINAL.md`
+
+Intentionally NOT updated (kept as time-stamped baselines or historical experiment records):
+
+- `evidence/materials/PPT_DECK_6SLIDES.md` (already demoted to baseline-only in `MATERIALS_INDEX.md`)
+- `evidence/materials/VIDEO_SHOTLIST_2MIN.md` (already demoted to baseline-only)
+- `evidence/materials/STRICT_G3_EXECUTION_PLAN.md` (G3 was actually run on `qwen3-235b-a22b-instruct-2507`; that is historical fact, not a current-state claim)
+- `evidence/materials/HOLDOUT_EVAL_V3_20260429.json` (a V3 holdout description; historical experiment record)
+- `agent_handoff/MODEL_STRATEGY_EXTREME_PLAN_20260429.md` (the plan that ran the V5/V6 holdouts in the first place; its "stable current default" line is the starting state of that plan)
 
 ## 2026-05-09 UX Cleanup Pass
 
