@@ -114,6 +114,24 @@ refuse off-topic asks.`
 - Recovery:
   - stop the detour and return to the locked gold-sample path
 
+### 7. Cold-Clicking The Live URL
+
+- Risk:
+  - to look "already deployed," the operator opens the Render free-tier URL
+    live; it has slept (15-min idle) and cold-starts in ~30s, spinning in
+    front of judges
+- Why it hurts:
+  - a public URL that hangs reads worse than a clean local demo, and it is a
+    self-inflicted wound for no scoring gain
+- Prevention:
+  - the judged demo runs on the rehearsed local hot path, full stop
+  - treat the live URL as supplementary evidence only ("deployed and
+    reachable"): show it via a pre-warmed screenshot or QR code, and warm it
+    by hitting the URL ~1 minute before any moment you might show it
+- Recovery:
+  - do not wait on the spinner; switch to the local path or the screenshot and
+    keep the spoken story unchanged
+
 ## Live Demo Order
 
 1. Load/upload the locked sample PDF

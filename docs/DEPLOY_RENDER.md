@@ -1,117 +1,81 @@
 # Render Deployment
 
-This repo is prepared for a two-service Render deployment:
+This repo deploys as **one same-origin Docker web service** on Render's free tier.
 
-- `yandatong-web`: static site for the Vite frontend
-- `yandatong-api`: Python web service for the FastAPI backend
+- The `Dockerfile` builds the Vite frontend, then FastAPI serves `frontend/dist`
+  via the SPA fallback in `backend/app/main.py`.
+- Backend and frontend share one origin, so there is no cross-origin CORS, no
+  second build, and no paid plan needed.
 
-## What Was Added
+## What `render.yaml` Declares
 
-- `render.yaml` to create both Render services from one Blueprint
-- `DATA_DIR` support in backend config so uploads, parsed files, logs, and cache can live on a persistent disk
-- `frontend/.env.production.example` to document the production API base URL
-- frontend API base normalization so a trailing slash in `VITE_API_BASE_URL` does not break requests
+- A single `type: web`, `runtime: docker`, `plan: free` service named `yandatong`
+- Health check at `/api/health`
+- All non-secret config inline; secrets / swappable model names left as `sync: false`
 
 ## Before You Deploy
 
-1. Push this repo to GitHub, GitLab, or Bitbucket.
-2. Make sure the branch you want to deploy contains `render.yaml`.
-3. Prepare these backend values:
-   - `CORS_ORIGINS`
-   - `ALPHA_INVITE_CODES`
-   - `MODEL_PROVIDER`
-   - `WUQIONG_BASE_URL`
-   - `WUQIONG_API_KEY`
-   - `MODEL_QA`
-   - `MODEL_SUMMARY`
-   - `MODEL_OUTLINE`
-   - `DOCUMENT_RETENTION_HOURS`
-   - `SESSION_RETENTION_HOURS`
-   - `SESSION_COOKIE_SECURE`
-   - `SESSION_COOKIE_SAMESITE`
-4. Prepare this frontend value:
-   - `VITE_API_BASE_URL`
+1. Push this repo to GitHub (Render reads `render.yaml` from the connected repo).
+2. Make sure the deploy branch contains `render.yaml`.
+3. Have these dashboard values ready (entered during Blueprint creation):
+   - `WUQIONG_API_KEY` — secret, e.g. `sk-...`
+   - `MODEL_QA` — `deepseek-v4-flash`
+   - `MODEL_SUMMARY` — `qwen3-235b-a22b-instruct-2507`
+   - `MODEL_OUTLINE` — `qwen3-235b-a22b-instruct-2507`
 
-Recommended values:
+Everything else (provider, base URL, `DEMO_MODE=true`, limits, `CORS_ORIGINS`)
+is already baked into `render.yaml`.
 
-- `CORS_ORIGINS=https://your-frontend.onrender.com`
-- `ALPHA_INVITE_CODES=share-this-only-with-invited-testers`
-- `MODEL_PROVIDER=infinigence_ai`
-- `WUQIONG_BASE_URL=https://cloud.infini-ai.com/maas/v1`
-- `MODEL_QA=qwen3-235b-a22b-instruct-2507`
-- `MODEL_SUMMARY=qwen3-235b-a22b-instruct-2507`
-- `MODEL_OUTLINE=qwen3-235b-a22b-instruct-2507`
-- `VITE_API_BASE_URL=https://your-api.onrender.com/api`
-- `DOCUMENT_RETENTION_HOURS=72`
-- `SESSION_RETENTION_HOURS=168`
-- `SESSION_COOKIE_SECURE=true`
-- `SESSION_COOKIE_SAMESITE=lax`
+## The One Thing That Will Bite You
 
-If you cut over to a custom domain later, temporarily include both origins in `CORS_ORIGINS` until DNS and TLS are live:
+`backend/app/main.py` mounts `OriginValidationMiddleware`, a CSRF guard that
+**rejects any POST/DELETE whose `Origin` is not in `CORS_ORIGINS`**. On a
+same-origin deploy the browser sends the service's own `*.onrender.com` host as
+the Origin, so `render.yaml` sets:
 
-- `CORS_ORIGINS=https://your-frontend.onrender.com,https://yourdomain.com`
+```
+CORS_ORIGINS=https://*.onrender.com
+```
 
-## Create The Services
+The wildcard (supported by `backend/app/core/csrf.py`) matches whatever
+subdomain Render assigns, so you do not need to know the exact URL ahead of
+time. If you later attach a custom domain, add it here too:
 
-1. In Render, create a new Blueprint and select the repo that contains this project.
-2. Render will read `render.yaml` and propose two services.
-3. Enter the `sync: false` variables during the initial creation flow.
-4. Keep the backend disk attached at `/var/data`.
-5. Deploy.
+```
+CORS_ORIGINS=https://*.onrender.com,https://yourdomain.com
+```
 
-## Service Details
+If you leave `CORS_ORIGINS` empty, uploads and asks return `403 FORBIDDEN_ORIGIN`
+even though the page loads fine — the classic "it opens but the first action
+fails" symptom.
 
-### Backend
+## Create The Service
 
-- Runtime: Python
-- Region: `singapore`
-- Plan: `starter`
-- Root directory: `backend`
-- Health check: `/api/health`
-- Persistent disk mount path: `/var/data`
+1. In Render: **New +** → **Blueprint** → select this repo.
+2. Render reads `render.yaml` and proposes one service.
+3. Fill the four `sync: false` values (`WUQIONG_API_KEY`, `MODEL_QA`,
+   `MODEL_SUMMARY`, `MODEL_OUTLINE`).
+4. Deploy. First Docker build takes ~10 minutes.
+5. Hit `https://<service>.onrender.com/api/health` — expect `200`.
+6. Open the root URL, upload the gold-sample PDF, run an ask, confirm the
+   citation → PDF preview works end-to-end.
 
-The backend now uses `DATA_DIR`, so production writes stay under `/var/data` instead of the ephemeral repo filesystem.
+## Free-Tier Notes
 
-Recommended alpha guardrails:
+- **Sleep:** the service sleeps after 15 minutes idle; the next request cold-starts
+  in ~30s. Before a judged demo, hit the URL once a minute or so ahead of time to
+  keep it warm.
+- **No persistent disk:** `DATA_DIR=/data` is writable but ephemeral — uploads and
+  logs are cleared on restart/redeploy. Acceptable for a demo where each session
+  uploads fresh; do not treat it as durable storage.
+- **512 MB RAM:** the Docker build runs `npm ci` + Vite build in Render's builder,
+  not the runtime, so the small runtime footprint fits. If a build ever OOMs,
+  pre-build `frontend/dist` locally and serve it instead.
+- Users should be told to upload only non-sensitive documents.
 
-- users now need a valid invite code to create a short-lived trial session before they can upload or access documents
-- the session now rides on an `HttpOnly` cookie, so the frontend no longer stores the session token or appends it to PDF preview URLs
-- uploaded documents are bound to the current trial session and still require a per-document access token for preview, metadata, page text, and task execution
-- users should still be told to upload only non-sensitive documents
-- schedule `python scripts/cleanup_expired_documents.py --json` to clear expired files from the persistent disk
+## Demo-Day Reminder
 
-If your frontend and API are deployed on truly cross-site domains, switch the cookie to:
-
-- `SESSION_COOKIE_SECURE=true`
-- `SESSION_COOKIE_SAMESITE=none`
-
-### Frontend
-
-- Runtime: Static site
-- Build command: `cd frontend && npm ci && npm run build`
-- Publish path: `./frontend/dist`
-
-Set `VITE_API_BASE_URL` to the full API prefix, including `/api`.
-
-## Custom Domains
-
-After both services are live:
-
-1. Add your public site domain to `yandatong-web`.
-2. Add your API domain to `yandatong-api`.
-3. Update `VITE_API_BASE_URL` to the final API domain.
-4. Update `CORS_ORIGINS` to include the final frontend origin.
-
-Suggested split:
-
-- `yourdomain.com` -> frontend static site
-- `api.yourdomain.com` -> backend web service
-
-## Operational Notes
-
-- Render persistent disks preserve only files written under the disk mount path.
-- A Render service with a persistent disk cannot scale to multiple instances.
-- Disk-backed deploys are not zero-downtime on Render.
-- Expired document cleanup is not automatic unless you schedule `scripts/cleanup_expired_documents.py`.
-
-Those constraints are acceptable for the current MVP because uploads, parsed outputs, logs, and cache are all local-disk based today.
+The live URL is **supplementary** evidence ("it's deployed and reachable"). The
+judged demo itself should run on the rehearsed local hot path — never cold-click
+the free-tier URL in front of judges and risk a 30s spinner. See
+`evidence/materials/DEFENSE_DEMO_RISK_CHECKLIST.md`.

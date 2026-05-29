@@ -1,62 +1,57 @@
+# Single same-origin Docker web service on Render's free tier.
+#
+# Why one service (not the old api+static split):
+#   - The Dockerfile already builds the Vite frontend and FastAPI serves
+#     frontend/dist via the SPA fallback in backend/app/main.py, so backend
+#     and frontend share one origin. One service = no cross-origin CORS, no
+#     second build, no paid plan.
+#   - CORS_ORIGINS must include the service's own origin, because
+#     OriginValidationMiddleware (CSRF guard) rejects any POST/DELETE whose
+#     Origin is not in the allowlist. The wildcard below matches whatever
+#     *.onrender.com subdomain Render assigns, so uploads/asks are not 403'd.
 services:
   - type: web
-    runtime: python
-    name: yandatong-api
+    runtime: docker
+    name: yandatong
     region: singapore
-    plan: starter
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
-    buildFilter:
-      paths:
-        - backend/**
-        - render.yaml
-    disk:
-      name: yandatong-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: APP_ENV
         value: production
       - key: LOG_LEVEL
         value: INFO
+      # Same-origin deploy: allow the service's own onrender.com host so the
+      # CSRF Origin check passes for browser POST/DELETE. Wildcard avoids
+      # needing to know the exact subdomain ahead of time.
       - key: CORS_ORIGINS
-        sync: false
-      - key: DATA_DIR
-        value: /var/data
+        value: https://*.onrender.com
       - key: MAX_UPLOAD_MB
         value: "20"
       - key: MAX_DOCUMENT_CHARS
         value: "30000"
       - key: REQUEST_TIMEOUT_SECONDS
         value: "60"
+      - key: DEMO_MODE
+        value: "true"
       - key: MODEL_PROVIDER
         value: infinigence_ai
       - key: USE_MOCK_MODEL
         value: "false"
       - key: WUQIONG_BASE_URL
         value: https://cloud.infini-ai.com/maas/v1
+      - key: ROUTE_UPGRADE_CHARS
+        value: "12000"
+      # Secret — enter in the Render dashboard, never commit.
       - key: WUQIONG_API_KEY
         sync: false
+      # Model names are not secret but are set in the dashboard so they can be
+      # swapped without a redeploy. Match .env: QA on deepseek-v4-flash,
+      # summary/outline on qwen3-235b-a22b-instruct-2507.
       - key: MODEL_QA
         sync: false
       - key: MODEL_SUMMARY
         sync: false
       - key: MODEL_OUTLINE
-        sync: false
-      - key: ROUTE_UPGRADE_CHARS
-        value: "12000"
-
-  - type: web
-    runtime: static
-    name: yandatong-web
-    buildCommand: cd frontend && npm ci && npm run build
-    staticPublishPath: ./frontend/dist
-    buildFilter:
-      paths:
-        - frontend/**
-        - render.yaml
-    envVars:
-      - key: VITE_API_BASE_URL
         sync: false
