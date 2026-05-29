@@ -18,7 +18,8 @@
   - stale 修复：`DEMO_SCRIPT_3MIN` 删除已移除的"示例问答"入口提示；G3 three-run→six-run；ONE_PAGER 测试数 55→81。
 - **未做（建议下次在演示机有 MaaS 连通时跑）**：① agentic vs 单轮 RAG 在难例子集的量化对照（rank 6）；② RAG-vs-FullContext baseline 对照报告（rank 7，补 p.264"可量化显著提升 vs 现有方法"，预计 +4-6 分，需 51×2 真实调用）；③ 重跑锁定 3 题生成带 `platform_request_id` 的新鲜调用记录并配控制台并排截图。
 - 待用户拍板的可选项：端云协同的"B 选项"——浏览器侧 TS 端侧预筛组件（`edgePrefilter.ts`，L 工作量，须走隐藏入口避免碰答案区/视觉 guardrail）。本轮按推荐只做了纯 reframe（A）。
-- 未推送 GitHub（按 `feedback_git_habit`，推送前问用户）。
+- 收尾（2026-05-29 晚）：(1) 亲驱动 live app 跑通 upload→ask→answer→PDF，确认"对照锚点"在答案/拒答两态都正确渲染；(2) 修好 stale 的 `capture_gold_sample_screenshots.js`（提交按钮文案 提交任务→开始处理、evidence-mode-card testid、refusal-card 完成判定、stats 选择器最佳努力化），重拍 `20260529_*` 全套金标截图；(3) 用户确认后推 GitHub，push protection 拦出历史里泄露的 HF token，用 `git filter-branch` 在 `5e7a162..HEAD` 抹成 `hf_***REVOKED***`（SHA 重写、删 refs/original、过期 reflog），origin master 推到 `201825f`。
+- **⚠️ 用户仍需去 https://huggingface.co/settings/tokens 撤销 `hf_iuvi…` 那个 token（已泄露）；GitHub→HF 同步 Action 的 HF_TOKEN secret 也是它，撤销后该 Action 会失败，属预期（已弃用 HF）。**
 
 ## 2026-04-30 / Codex (contract patch rerun promotes DeepSeek V4 Flash for QA rehearsal)
 
