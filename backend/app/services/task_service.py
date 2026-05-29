@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 
 class TaskService:
     ASK_EVIDENCE_MAX_ATTEMPTS = 2
+    AGENTIC_ASK_MAX_ITERS = 2
+    AGENTIC_ASK_MAX_CHUNKS = 8
 
     def __init__(
         self,
@@ -78,6 +80,9 @@ class TaskService:
         route_model: str | None = None
         route_reason: str | None = None
         ask_evidence_retry_count = 0
+        agent_iterations = 1
+        query_rewrites: list[str] = []
+        platform_request_id: str | None = None
         low_confidence_review = False
         low_confidence_review_failed = False
 
@@ -288,10 +293,14 @@ class TaskService:
                     truncation_message=cached_result.get("truncation_message"),
                     context_truncated=cached_result.get("context_truncated", False),
                     token_usage=cached_result.get("token_usage"),
+                    platform_request_id=cached_result.get("platform_request_id"),
+                    agent_iterations=cached_result.get("agent_iterations", 1),
+                    query_rewrites=cached_result.get("query_rewrites", []),
                 )
                 self._safe_write_log(
                     CallLogEntry(
                         request_id=request_id,
+                        platform_request_id=cached_result.get("platform_request_id"),
                         timestamp=started_at,
                         endpoint=endpoint,
                         task_type=task_type,
@@ -338,6 +347,8 @@ class TaskService:
                                 "ask_evidence_retry_count",
                                 0,
                             ),
+                            "agent_iterations": cached_result.get("agent_iterations", 1),
+                            "query_rewrites": cached_result.get("query_rewrites", []),
                         },
                     )
                 )
@@ -355,13 +366,26 @@ class TaskService:
                     evidence_quotes,
                     ask_evidence_retry_count,
                     llm_refused,
-                ) = self._call_ask_model_with_evidence_retry(
-                    document_text=document_text,
+                    selected_chunks,
+                    agent_iterations,
+                    query_rewrites,
+                ) = self._run_agentic_ask(
+                    chunked_document=chunked_document,
+                    selected_chunks=selected_chunks,
                     user_input=user_input,
                     model_name_override=resolved_model_name,
                     response_detail_level=response_detail_level,
-                    selected_chunks=selected_chunks,
                 )
+                # agentic re-retrieval may expand the evidence set; refresh telemetry + display chunks
+                retrieved_chunk_count = len(selected_chunks)
+                retrieved_pages = sorted(
+                    {page for chunk in selected_chunks for page in chunk.page_numbers}
+                )
+                candidate_chunks = [
+                    self._build_chunk_ref(chunk)
+                    for chunk in self._select_display_chunks(selected_chunks, limit=3)
+                ]
+                self._attach_line_bboxes(candidate_chunks, pages_index)
                 if low_confidence_review and not llm_refused and not (used_chunk_ids and evidence_quotes):
                     llm_refused = True
                     low_confidence_review_failed = True
@@ -380,6 +404,8 @@ class TaskService:
                     response_detail_level=response_detail_level,
                 )
                 result_content = model_result.content
+
+            platform_request_id = model_result.platform_request_id
 
             if task_type == "ask" and llm_refused:
                 latency_ms = int((perf_counter() - started_timer) * 1000)
@@ -423,10 +449,14 @@ class TaskService:
                     truncation_message=model_result.truncation_message,
                     context_truncated=model_result.context_truncated,
                     token_usage=model_result.token_usage,
+                    platform_request_id=platform_request_id,
+                    agent_iterations=agent_iterations,
+                    query_rewrites=query_rewrites,
                 )
                 self._safe_write_log(
                     CallLogEntry(
                         request_id=request_id,
+                        platform_request_id=platform_request_id,
                         timestamp=started_at,
                         endpoint=endpoint,
                         task_type=task_type,
@@ -452,6 +482,8 @@ class TaskService:
                             "evidence_mode": "none",
                             "citation_count": 0,
                             "ask_evidence_retry_count": ask_evidence_retry_count,
+                            "agent_iterations": agent_iterations,
+                            "query_rewrites": query_rewrites,
                             "llm_refused": True,
                             "low_confidence_review": low_confidence_review,
                             "low_confidence_review_failed": low_confidence_review_failed,
@@ -506,6 +538,9 @@ class TaskService:
                     "truncation_message": model_result.truncation_message,
                     "context_truncated": model_result.context_truncated,
                     "prompt_chars": model_result.prompt_chars,
+                    "platform_request_id": platform_request_id,
+                    "agent_iterations": agent_iterations,
+                    "query_rewrites": query_rewrites,
                     "token_usage": (
                         model_result.token_usage.model_dump()
                         if model_result.token_usage
@@ -528,6 +563,7 @@ class TaskService:
                     success=True,
                     outcome=outcome,
                     latency_ms=latency_ms,
+                    platform_request_id=platform_request_id,
                     prompt_chars=model_result.prompt_chars,
                     output_chars=len(result_content),
                     token_in=(
@@ -562,6 +598,8 @@ class TaskService:
                             "candidate_chunk_count": len(candidate_chunks),
                             "source_chunk_count": len(source_chunks),
                             "ask_evidence_retry_count": ask_evidence_retry_count,
+                            "agent_iterations": agent_iterations,
+                            "query_rewrites": query_rewrites,
                             "low_confidence_review": low_confidence_review,
                         }
                         if retrieved_pages or citations or candidate_chunks or source_chunks
@@ -601,6 +639,9 @@ class TaskService:
                 truncation_message=model_result.truncation_message,
                 context_truncated=model_result.context_truncated,
                 token_usage=model_result.token_usage,
+                platform_request_id=platform_request_id,
+                agent_iterations=agent_iterations,
+                query_rewrites=query_rewrites,
             )
         except AppError as exc:
             latency_ms = int((perf_counter() - started_timer) * 1000)
@@ -707,22 +748,73 @@ class TaskService:
                         break
             citation.bbox_regions = matched
 
-    def _call_ask_model_with_evidence_retry(
+    def _run_agentic_ask(
         self,
         *,
-        document_text: str,
+        chunked_document,
+        selected_chunks: list[ParsedChunk],
         user_input: str | None,
         model_name_override: str | None,
         response_detail_level: ResponseDetailLevel,
-        selected_chunks: list[ParsedChunk],
-    ) -> tuple[ModelResult, str, list[str], list[EvidenceQuote], int, bool]:
+    ) -> tuple[
+        ModelResult,
+        str,
+        list[str],
+        list[EvidenceQuote],
+        int,
+        bool,
+        list[ParsedChunk],
+        int,
+        list[str],
+    ]:
+        """Agentic ask loop: retrieve -> answer + self-assess evidence sufficiency ->
+        if the model judges the evidence insufficient and proposes a followup query,
+        re-retrieve additional chunks (excluding ones already in context) and re-ask.
+
+        Bounded to AGENTIC_ASK_MAX_ITERS model calls and AGENTIC_ASK_MAX_CHUNKS context
+        chunks. The refusal/evidence contract is unchanged: a clean refusal still refuses,
+        only substring-validated quotes count, and when the model never asks for more this
+        behaves exactly like the previous single-context evidence retry.
+
+        Returns the final (possibly expanded) chunk set so the caller can resolve citations
+        against every chunk the model was actually shown, plus agentic telemetry.
+        """
+        accumulated: list[ParsedChunk] = list(selected_chunks)
+        accumulated_ids = {chunk.chunk_id for chunk in accumulated}
         best_rank = -1
         best_result: tuple[ModelResult, str, list[str], list[EvidenceQuote], bool] | None = None
         performed_retry_count = 0
+        agent_iterations = 0
+        query_rewrites: list[str] = []
+        pending_followup: str | None = None
 
-        for attempt in range(self.ASK_EVIDENCE_MAX_ATTEMPTS):
+        for attempt in range(self.AGENTIC_ASK_MAX_ITERS):
             if attempt > 0:
                 performed_retry_count = attempt
+                # Agentic re-retrieval: if the previous turn judged the evidence
+                # insufficient and named a followup query, fetch additional chunks before
+                # re-asking. Falls back to re-prompting the same context when no new
+                # evidence is found (preserves the original retry semantics).
+                if pending_followup and chunked_document is not None:
+                    new_chunks = self.retrieval_service.retrieve(
+                        pending_followup, chunked_document
+                    )
+                    added = [
+                        chunk
+                        for chunk in new_chunks
+                        if chunk.chunk_id not in accumulated_ids
+                    ]
+                    if added:
+                        query_rewrites.append(pending_followup)
+                        for chunk in added:
+                            if len(accumulated) >= self.AGENTIC_ASK_MAX_CHUNKS:
+                                break
+                            accumulated.append(chunk)
+                            accumulated_ids.add(chunk.chunk_id)
+                pending_followup = None
+
+            agent_iterations = attempt + 1
+            document_text = self._render_agentic_context(accumulated)
             current_user_input = (
                 user_input
                 if attempt == 0
@@ -740,20 +832,16 @@ class TaskService:
                 used_chunk_ids,
                 evidence_quotes,
                 refused,
-            ) = self._extract_ask_evidence(
-                model_result.content,
-                selected_chunks,
-            )
+                followup_query,
+                need_more,
+            ) = self._extract_ask_evidence(model_result.content, accumulated)
+
+            converged = bool(used_chunk_ids and evidence_quotes)
+            pending_followup = followup_query if (need_more or not converged) else None
 
             if refused:
-                if attempt + 1 < self.ASK_EVIDENCE_MAX_ATTEMPTS:
-                    best_result = (
-                        model_result,
-                        result_content,
-                        [],
-                        [],
-                        True,
-                    )
+                if attempt + 1 < self.AGENTIC_ASK_MAX_ITERS:
+                    best_result = (model_result, result_content, [], [], True)
                     continue
                 return (
                     model_result,
@@ -762,6 +850,9 @@ class TaskService:
                     [],
                     performed_retry_count,
                     True,
+                    accumulated,
+                    agent_iterations,
+                    query_rewrites,
                 )
 
             rank = 0
@@ -784,7 +875,7 @@ class TaskService:
                 break
 
         if best_result is None:
-            raise RuntimeError("ask evidence retry produced no model result")
+            raise RuntimeError("agentic ask produced no model result")
 
         model_result, result_content, used_chunk_ids, evidence_quotes, refused = best_result
         return (
@@ -794,6 +885,15 @@ class TaskService:
             evidence_quotes,
             performed_retry_count,
             refused,
+            accumulated,
+            agent_iterations,
+            query_rewrites,
+        )
+
+    def _render_agentic_context(self, chunks: list[ParsedChunk]) -> str:
+        return "\n\n".join(
+            f"【Chunk {chunk.chunk_id} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
+            for chunk in chunks
         )
 
     def _build_ask_evidence_retry_input(self, user_input: str | None) -> str:
@@ -819,10 +919,10 @@ class TaskService:
         self,
         raw_content: str,
         selected_chunks: list[ParsedChunk],
-    ) -> tuple[str, list[str], list[EvidenceQuote], bool]:
+    ) -> tuple[str, list[str], list[EvidenceQuote], bool, str | None, bool]:
         payload = self._extract_json_payload(raw_content)
         if not payload:
-            return raw_content.strip(), [], [], False
+            return raw_content.strip(), [], [], False, None, False
 
         selected_by_id = {chunk.chunk_id: chunk for chunk in selected_chunks}
         allowed_chunk_ids = set(selected_by_id)
@@ -838,7 +938,9 @@ class TaskService:
             selected_by_id,
         )
         refused = bool(payload.get("refused"))
-        return answer, used_chunk_ids, evidence_quotes, refused
+        followup_query = str(payload.get("followup_query") or "").strip() or None
+        need_more = bool(payload.get("need_more"))
+        return answer, used_chunk_ids, evidence_quotes, refused, followup_query, need_more
 
     def _extract_validated_quotes(
         self,

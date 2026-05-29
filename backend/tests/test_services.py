@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import json
 import shutil
 import urllib.error
 from datetime import datetime, timedelta
@@ -1444,6 +1445,8 @@ def test_model_client_retries_transient_urlerror(monkeypatch: pytest.MonkeyPatch
         attempts = {"count": 0}
 
         class FakeResponse:
+            headers = {"x-request-id": "req-abc"}
+
             def __enter__(self):
                 return self
 
@@ -1451,7 +1454,7 @@ def test_model_client_retries_transient_urlerror(monkeypatch: pytest.MonkeyPatch
                 return False
 
             def read(self):
-                return b'{"choices":[{"message":{"content":"ok"}}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}'
+                return b'{"id":"chatcmpl-123","choices":[{"message":{"content":"ok"}}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}'
 
         def fake_urlopen(request, timeout):
             attempts["count"] += 1
@@ -1461,10 +1464,202 @@ def test_model_client_retries_transient_urlerror(monkeypatch: pytest.MonkeyPatch
 
         monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
 
-        response = client._call_openai_compatible_api({"model": "x", "messages": []})
+        response, header_request_id = client._call_openai_compatible_api({"model": "x", "messages": []})
 
         assert response["choices"][0]["message"]["content"] == "ok"
+        assert response["id"] == "chatcmpl-123"
+        assert header_request_id == "req-abc"
         assert attempts["count"] == 3
+    finally:
+        cleanup_workspace(workspace)
+
+
+class NeedMoreThenCiteModelClient(ModelClient):
+    """First ask turn asks for more evidence + a followup query; second turn cites a
+    chunk that can only be present if the agentic loop actually re-retrieved it."""
+
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        followup_query: str,
+        cite_chunk_id: str,
+        cite_quote: str,
+    ) -> None:
+        super().__init__(settings=settings)
+        self.ask_call_count = 0
+        self._followup_query = followup_query
+        self._cite_chunk_id = cite_chunk_id
+        self._cite_quote = cite_quote
+        self.second_call_document_text = ""
+
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+        model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
+    ):
+        base = super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
+        )
+        if task_type != "ask":
+            return base
+        self.ask_call_count += 1
+        if self.ask_call_count == 1:
+            payload = json.dumps(
+                {
+                    "refused": False,
+                    "answer": "需要补充检索更多依据。",
+                    "used_chunk_ids": [],
+                    "evidence_quotes": [],
+                    "need_more": True,
+                    "followup_query": self._followup_query,
+                },
+                ensure_ascii=False,
+            )
+        else:
+            self.second_call_document_text = document_text
+            payload = json.dumps(
+                {
+                    "refused": False,
+                    "answer": "已基于补充检索到的片段作答。",
+                    "used_chunk_ids": [self._cite_chunk_id],
+                    "evidence_quotes": [
+                        {"chunk_id": self._cite_chunk_id, "quote": self._cite_quote}
+                    ],
+                },
+                ensure_ascii=False,
+            )
+        return base.model_copy(update={"content": payload, "output_chars": len(payload)})
+
+
+class FixedAskPlanner:
+    def __init__(self, selected_chunks: list[ParsedChunk]) -> None:
+        self.selected_chunks = selected_chunks
+
+    def plan(self, **_kwargs) -> PlannedContext:
+        context = "\n\n".join(
+            f"【Chunk {chunk.chunk_id} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
+            for chunk in self.selected_chunks
+        )
+        return PlannedContext(
+            strategy="retrieval_topk",
+            document_text=context,
+            selected_chunks=self.selected_chunks,
+            retrieval_confident=True,
+        )
+
+
+class FollowupRetrieval(RetrievalService):
+    def __init__(self, followup_chunks: list[ParsedChunk]) -> None:
+        super().__init__()
+        self._followup_chunks = followup_chunks
+
+    def retrieve(self, query, chunked_document):  # type: ignore[override]
+        return list(self._followup_chunks)
+
+
+def test_agentic_ask_reretrieves_with_followup_query() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        upload = file_service.save_upload(
+            "agentic.md",
+            (
+                "# Apple\n\nThe APPLEORCHARD section talks about red fruit.\n\n"
+                "# Zebra\n\nThe ZEBRASTRIPES section talks about stripes."
+            ).encode("utf-8"),
+        )
+        apple_chunk = ParsedChunk(
+            chunk_id="apple-1",
+            chunk_index=0,
+            page_numbers=[1],
+            text="The APPLEORCHARD section talks about red fruit and orchards.",
+            char_count=59,
+        )
+        zebra_chunk = ParsedChunk(
+            chunk_id="zebra-1",
+            chunk_index=1,
+            page_numbers=[1],
+            text="The ZEBRASTRIPES section talks about black and white stripes on the savanna.",
+            char_count=76,
+        )
+        model_client = NeedMoreThenCiteModelClient(
+            settings,
+            followup_query="ZEBRASTRIPES stripes savanna",
+            cite_chunk_id="zebra-1",
+            cite_quote="black and white stripes",
+        )
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+            retrieval_service=FollowupRetrieval([zebra_chunk]),
+            context_planner=FixedAskPlanner([apple_chunk]),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="Tell me about APPLEORCHARD",
+        )
+
+        # the loop made two model calls and re-retrieved a brand-new chunk in between
+        assert model_client.ask_call_count == 2
+        assert result.agent_iterations == 2
+        assert result.query_rewrites == ["ZEBRASTRIPES stripes savanna"]
+        # the re-retrieved chunk reached the model on the second turn
+        assert "ZEBRASTRIPES" in model_client.second_call_document_text
+        # and the final answer cites that newly retrieved chunk with validated evidence
+        assert result.outcome == "answered"
+        assert result.evidence_mode == "declared"
+        assert "zebra-1" in result.used_chunk_ids
+        assert any(citation.chunk_id == "zebra-1" for citation in result.citations)
+        assert result.retrieved_chunk_count == 2
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_validated_quotes_drop_fabricated_text() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        service = TaskService(
+            file_service=FileService(settings=settings),
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+        )
+        chunk = ParsedChunk(
+            chunk_id="c1",
+            chunk_index=0,
+            page_numbers=[1],
+            text="The transformer uses multi-head attention.",
+            char_count=42,
+        )
+        selected_by_id = {"c1": chunk}
+
+        kept = service._extract_validated_quotes(
+            [{"chunk_id": "c1", "quote": "multi-head attention"}],
+            ["c1"],
+            selected_by_id,
+        )
+        assert [quote.quote for quote in kept] == ["multi-head attention"]
+
+        dropped = service._extract_validated_quotes(
+            [{"chunk_id": "c1", "quote": "quantum entanglement engine"}],
+            ["c1"],
+            selected_by_id,
+        )
+        assert dropped == []
     finally:
         cleanup_workspace(workspace)
 

@@ -296,6 +296,7 @@ export default function ResultPanel({
   const evidenceSummary = result ? getEvidenceSummary(result, evidenceMode) : null;
   const confidenceBar = result ? getConfidenceBar(result, evidenceMode) : null;
   const retrievedPages = result?.retrieved_pages ?? [];
+  const citationCount = (result?.citations ?? []).length;
   const isRetrievalGate = result ? isRetrievalGateResult(result) : false;
   const modelMetaLabel = isRetrievalGate ? "执行路径" : "模型";
   const modelMetaValue = isRetrievalGate
@@ -594,6 +595,36 @@ export default function ResultPanel({
                 </div>
               </motion.div>
             )}
+
+            {result.task_type === "ask" ? (
+              <motion.div
+                className="contrast-anchor"
+                data-testid="contrast-anchor"
+                {...revealMotion(0.06)}
+              >
+                <div className="contrast-col contrast-col-plain">
+                  <span className="contrast-kicker">普通问答</span>
+                  <span className="contrast-text">
+                    {result.outcome === "refused"
+                      ? "多半会硬编一个看似合理的答案"
+                      : "只给结论，难核验、可能编造"}
+                  </span>
+                </div>
+                <span className="contrast-arrow" aria-hidden="true">→</span>
+                <div className="contrast-col contrast-col-ours">
+                  <span className="contrast-kicker">研答通</span>
+                  <span className="contrast-text">
+                    {result.outcome === "refused"
+                      ? "检索无依据 → 主动拒答，绝不编造"
+                      : `${citationCount > 0 ? `${citationCount} 条原文引用` : "逐字原文校验"}${
+                          retrievedPages.length > 0
+                            ? ` · 可点回 PDF 第 ${retrievedPages.join("、")} 页`
+                            : ""
+                        } · 离题自动拒答`}
+                  </span>
+                </div>
+              </motion.div>
+            ) : null}
 
             {confidenceBar ? (
               <motion.div

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class CallLogEntry(BaseModel):
     request_id: str
+    platform_request_id: str | None = None
     timestamp: str
     endpoint: str
     task_type: str

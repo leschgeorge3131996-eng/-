@@ -1753,6 +1753,77 @@ textarea {
   border: 1.5px solid transparent;
 }
 
+/* Contrast anchor: makes the "evidence back-linking vs ordinary QA" difference
+   visible at a glance, directly under the answer (answer never moves down). */
+.contrast-anchor {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(173, 76, 35, 0.18);
+  background: linear-gradient(180deg, rgba(255, 251, 244, 0.92), rgba(250, 243, 232, 0.92));
+}
+
+.contrast-col {
+  flex: 1 1 0;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+}
+
+.contrast-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contrast-text {
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.contrast-col-plain {
+  opacity: 0.85;
+}
+
+.contrast-col-plain .contrast-kicker {
+  color: var(--ink-soft);
+}
+
+.contrast-col-plain .contrast-text {
+  color: var(--ink-muted);
+}
+
+.contrast-col-ours .contrast-kicker {
+  color: var(--accent);
+}
+
+.contrast-col-ours .contrast-text {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.contrast-arrow {
+  align-self: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .contrast-anchor {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .contrast-arrow {
+    transform: rotate(90deg);
+  }
+}
+
 .confidence-bar-indicator {
   display: flex;
   flex-direction: column;

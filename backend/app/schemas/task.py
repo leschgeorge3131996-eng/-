@@ -54,6 +54,7 @@ class ModelResult(BaseModel):
     truncation_message: str | None = None
     token_usage: TokenUsage | None = None
     context_truncated: bool = False
+    platform_request_id: str | None = None
 
 
 class TaskResult(BaseModel):
@@ -87,3 +88,6 @@ class TaskResult(BaseModel):
     truncation_message: str | None = None
     context_truncated: bool = False
     token_usage: TokenUsage | None = None
+    platform_request_id: str | None = None
+    agent_iterations: int = 1
+    query_rewrites: list[str] = []

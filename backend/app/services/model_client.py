@@ -88,9 +88,10 @@ class ModelClient:
             ),
             "temperature": 0 if task_type == "ask" else 0.2,
         }
-        response_json = self._call_openai_compatible_api(payload)
+        response_json, header_request_id = self._call_openai_compatible_api(payload)
         content = self._extract_content(response_json)
         usage = response_json.get("usage") or {}
+        platform_request_id = response_json.get("id") or header_request_id
 
         return ModelResult(
             content=content,
@@ -106,6 +107,7 @@ class ModelClient:
                 total_tokens=usage.get("total_tokens"),
             ),
             context_truncated=context_truncated,
+            platform_request_id=platform_request_id,
         )
 
     def resolve_model_name(self, task_type: TaskType) -> str:
@@ -185,6 +187,9 @@ class ModelClient:
                 "不得猜测、不得用文档外的常识补答。"
                 "可以回答时：evidence_quotes 中每一项必须从对应 chunk 逐字拷贝一个连续片段"
                 "（不得改写、不得省略号、不得跨 chunk 拼接）。"
+                "如果你判断当前提供的 Chunk 不足以充分回答问题（例如关键数据、定义或结论可能在未提供的段落），"
+                "可以额外返回 need_more=true 和 followup_query（一个更聚焦的补充检索查询词，中英文均可），"
+                "系统会据此补充检索相关片段后再问你一次；这不改变上述拒答规则。"
                 f"{detail_instruction}"
             )
             user_prompt = textwrap.dedent(
@@ -205,7 +210,9 @@ class ModelClient:
                       "chunk_id": "实际使用的 chunk_id",
                       "quote": "逐字拷贝自该 chunk 的一个连续片段"
                     }}
-                  ]
+                  ],
+                  "need_more": false,
+                  "followup_query": ""
                 }}
 
                 规则补充：
@@ -264,7 +271,7 @@ class ModelClient:
             return " 输出更详细，适当补充背景、方法、依据和展开说明。"
         return " 输出保持适中篇幅，兼顾完整性和可读性。"
 
-    def _call_openai_compatible_api(self, payload: dict) -> dict:
+    def _call_openai_compatible_api(self, payload: dict) -> tuple[dict, str | None]:
         url = self._resolve_chat_url()
         headers = {
             "Authorization": f"Bearer {self.settings.wuqiong_api_key}",
@@ -280,12 +287,18 @@ class ModelClient:
                 method="POST",
             )
 
+            header_request_id: str | None = None
             try:
                 with urllib.request.urlopen(
                     request,
                     timeout=self.settings.request_timeout_seconds,
                 ) as response:
                     raw = response.read().decode("utf-8")
+                    header_request_id = (
+                        response.headers.get("x-request-id")
+                        or response.headers.get("x-ms-request-id")
+                        or response.headers.get("request-id")
+                    )
             except urllib.error.HTTPError as exc:
                 error_body = exc.read().decode("utf-8", errors="ignore")
                 if exc.code == 429 and attempt < 2 and self._is_burst_limit_error(error_body):
@@ -319,7 +332,7 @@ class ModelClient:
                 break
 
             try:
-                return json.loads(raw)
+                return json.loads(raw), header_request_id
             except json.JSONDecodeError as exc:
                 raise ModelServiceError(
                     "云端模型返回了无法解析的 JSON。",
