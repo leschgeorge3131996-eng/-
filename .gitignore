@@ -32,3 +32,9 @@ data/sessions/*
 !data/parsed/.gitkeep
 !data/logs/.gitkeep
 !data/cache/.gitkeep
+
+# one-off source/review artifacts (keep on disk, exclude from tracking)
+2026第二十一届研电赛赛题指南及清单.pdf
+AI_REVIEW_BRIEF.md
+ai-review-package-*/
+yandatong-ai-review-*.zip
