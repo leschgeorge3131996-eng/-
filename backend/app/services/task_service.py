@@ -78,6 +78,8 @@ class TaskService:
         route_model: str | None = None
         route_reason: str | None = None
         ask_evidence_retry_count = 0
+        low_confidence_review = False
+        low_confidence_review_failed = False
 
         try:
             metadata = self.file_service.get_document_metadata(
@@ -114,6 +116,7 @@ class TaskService:
                     retrieval_status = "no_match"
                 elif not planned_context.retrieval_confident:
                     retrieval_status = "low_confidence"
+                    low_confidence_review = True
                 else:
                     retrieval_status = "matched"
             elif selected_chunks:
@@ -138,7 +141,7 @@ class TaskService:
             if task_type == "ask" and selected_chunks:
                 retrieval_applied = True
 
-            if task_type == "ask" and (not selected_chunks or not planned_context.retrieval_confident):
+            if task_type == "ask" and not selected_chunks:
                 latency_ms = int((perf_counter() - started_timer) * 1000)
                 refusal_text = "未在文档中检索到足够依据来回答这个问题。请换一个更贴近文档内容的问题，或上传更相关的文档。"
                 route_tier = "none"
@@ -359,6 +362,15 @@ class TaskService:
                     response_detail_level=response_detail_level,
                     selected_chunks=selected_chunks,
                 )
+                if low_confidence_review and not llm_refused and not (used_chunk_ids and evidence_quotes):
+                    llm_refused = True
+                    low_confidence_review_failed = True
+                    result_content = (
+                        "检索到候选片段，但模型未能返回可验证的逐字原文证据，"
+                        "系统已拒绝回答以避免无依据结论。"
+                    )
+                    used_chunk_ids = []
+                    evidence_quotes = []
             else:
                 model_result = self.model_client.call_model(
                     task_type=task_type,
@@ -374,6 +386,11 @@ class TaskService:
                 refusal_text = (
                     result_content
                     or "未在文档中检索到能直接回答该问题的依据。请换一个更贴近文档内容的问题。"
+                )
+                refusal_retrieval_message = (
+                    "低置信候选片段已交由模型复核，但模型未返回可验证的逐字证据，已拒答。"
+                    if low_confidence_review_failed
+                    else "检索命中但模型判定文档中无直接依据，已拒答。"
                 )
                 task_result = TaskResult(
                     request_id=request_id,
@@ -391,7 +408,7 @@ class TaskService:
                     outcome="refused",
                     cache_hit=False,
                     retrieval_status=retrieval_status,
-                    retrieval_message="检索命中但模型判定文档中无直接依据，已拒答。",
+                    retrieval_message=refusal_retrieval_message,
                     retrieval_applied=retrieval_applied,
                     evidence_mode="none",
                     retrieved_chunk_count=retrieved_chunk_count,
@@ -436,6 +453,8 @@ class TaskService:
                             "citation_count": 0,
                             "ask_evidence_retry_count": ask_evidence_retry_count,
                             "llm_refused": True,
+                            "low_confidence_review": low_confidence_review,
+                            "low_confidence_review_failed": low_confidence_review_failed,
                         },
                     )
                 )
@@ -481,6 +500,7 @@ class TaskService:
                     "candidate_chunks": [chunk.model_dump() for chunk in candidate_chunks],
                     "source_chunks": [chunk.model_dump() for chunk in source_chunks],
                     "ask_evidence_retry_count": ask_evidence_retry_count,
+                    "low_confidence_review": low_confidence_review,
                     "source_document_chars": model_result.source_document_chars,
                     "used_document_chars": model_result.used_document_chars,
                     "truncation_message": model_result.truncation_message,
@@ -542,6 +562,7 @@ class TaskService:
                             "candidate_chunk_count": len(candidate_chunks),
                             "source_chunk_count": len(source_chunks),
                             "ask_evidence_retry_count": ask_evidence_retry_count,
+                            "low_confidence_review": low_confidence_review,
                         }
                         if retrieved_pages or citations or candidate_chunks or source_chunks
                         else None

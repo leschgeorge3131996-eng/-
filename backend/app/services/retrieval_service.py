@@ -105,6 +105,31 @@ class RetrievalService:
         "novelty",
     )
 
+    overview_intent_terms = (
+        "讲了什么",
+        "讲的什么",
+        "说了什么",
+        "主要讲",
+        "主要内容",
+        "最重要的内容",
+        "重要内容",
+        "重点内容",
+        "核心内容",
+        "核心观点",
+        "主要观点",
+        "中心思想",
+        "大概内容",
+        "文章内容",
+        "文档内容",
+        "概括",
+        "总结",
+        "介绍一下",
+        "overview",
+        "summarize",
+        "summary",
+        "about",
+    )
+
     parameter_intent_terms = (
         "样本数",
         "验证集",
@@ -152,7 +177,17 @@ class RetrievalService:
                 scored.append((score, chunk))
 
         metadata_intent = self._has_metadata_intent(query)
+        overview_intent = self._has_overview_intent(query)
         if not scored:
+            if overview_intent and chunked_document.chunks:
+                chunks = self._head_context_chunks(chunked_document)
+                return RetrievalResult(
+                    chunks=chunks,
+                    top_score=0.0,
+                    second_score=0.0,
+                    term_coverage=0.0,
+                    confident=True,
+                )
             if metadata_intent and chunked_document.chunks:
                 return RetrievalResult(
                     chunks=[chunked_document.chunks[0]],
@@ -205,6 +240,14 @@ class RetrievalService:
             if head_chunk.chunk_id not in selected_ids:
                 selected.append(head_chunk)
 
+        if overview_intent and chunked_document.chunks:
+            selected = self._append_missing_chunks(
+                self._head_context_chunks(chunked_document),
+                selected,
+                max_total=self.top_k + 2,
+            )
+            confident = True
+
         if self._has_contribution_intent(query) and chunked_document.chunks:
             selected = self._append_missing_chunks(
                 selected,
@@ -236,9 +279,25 @@ class RetrievalService:
         lowered = query.lower()
         return any(term in lowered for term in self.contribution_intent_terms)
 
+    def _has_overview_intent(self, query: str) -> bool:
+        lowered = query.lower()
+        return any(term in lowered for term in self.overview_intent_terms)
+
     def _has_parameter_intent(self, query: str) -> bool:
         lowered = query.lower()
         return any(term in lowered for term in self.parameter_intent_terms)
+
+    def _head_context_chunks(self, chunked_document: ChunkedDocument) -> list[ParsedChunk]:
+        selected: list[ParsedChunk] = []
+        current_chars = 0
+        for chunk in chunked_document.chunks:
+            if len(selected) >= min(self.top_k, 4):
+                break
+            if current_chars + chunk.char_count > self.max_context_chars and selected:
+                break
+            selected.append(chunk)
+            current_chars += chunk.char_count
+        return selected
 
     def _append_neighbor_chunks(
         self,

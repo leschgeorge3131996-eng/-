@@ -18,6 +18,7 @@ from backend.app.services.chunk_service import ChunkService
 from backend.app.services.file_service import FileService
 from backend.app.services.log_service import LogService
 from backend.app.services.model_client import ModelClient
+from backend.app.services.context_planner import PlannedContext
 from backend.app.services.retrieval_service import RetrievalService
 from backend.app.services.task_service import TaskService
 from backend.app.services.document_parser import DocumentParser
@@ -375,6 +376,63 @@ class RefuseThenStructuredAskModelClient(ModelClient):
                     }
                 )
             return base_result
+        return super().call_model(
+            task_type,
+            document_text,
+            user_input,
+            model_name_override=model_name_override,
+            response_detail_level=response_detail_level,
+        )
+
+
+class FixedLowConfidencePlanner:
+    def __init__(self, selected_chunks: list[ParsedChunk]) -> None:
+        self.selected_chunks = selected_chunks
+
+    def plan(self, **_kwargs) -> PlannedContext:
+        context = "\n\n".join(
+            f"【Chunk {chunk.chunk_id} | Pages {','.join(str(page) for page in chunk.page_numbers)}】\n{chunk.text}"
+            for chunk in self.selected_chunks
+        )
+        return PlannedContext(
+            strategy="retrieval_topk",
+            document_text=context,
+            selected_chunks=self.selected_chunks,
+            retrieval_confident=False,
+        )
+
+
+class NoEvidenceAskModelClient(ModelClient):
+    def __init__(self, settings: Settings) -> None:
+        super().__init__(settings=settings)
+        self.ask_call_count = 0
+
+    def call_model(
+        self,
+        task_type: str,
+        document_text: str,
+        user_input: str | None = None,
+        model_name_override: str | None = None,
+        response_detail_level: ResponseDetailLevel = "balanced",
+    ):
+        if task_type == "ask":
+            self.ask_call_count += 1
+            payload = (
+                '{"refused":false,"answer":"Unsupported answer without validated evidence.",'
+                '"used_chunk_ids":[],"evidence_quotes":[]}'
+            )
+            return super().call_model(
+                task_type,
+                document_text,
+                user_input,
+                model_name_override=model_name_override,
+                response_detail_level=response_detail_level,
+            ).model_copy(
+                update={
+                    "content": payload,
+                    "output_chars": len(payload),
+                }
+            )
         return super().call_model(
             task_type,
             document_text,
@@ -751,6 +809,91 @@ def test_ask_retries_once_when_model_refuses_despite_retrieved_chunks() -> None:
         cleanup_workspace(workspace)
 
 
+def test_low_confidence_ask_candidates_are_reviewed_by_model() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        upload = file_service.save_upload(
+            "low-confidence.md",
+            "# Goal\n\nThe first-phase goal is to support evidence-backed PDF question answering.".encode("utf-8"),
+        )
+        selected_chunk = file_service.get_document_chunks(
+            upload.file_id,
+            access_token=upload.access_token,
+        ).chunks[0]
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=ModelClient(settings=settings),
+            log_service=LogService(settings=settings),
+            context_planner=FixedLowConfidencePlanner([selected_chunk]),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="What is the goal?",
+        )
+
+        assert result.outcome == "answered"
+        assert result.model_name != "retrieval_gate"
+        assert result.retrieval_status == "low_confidence"
+        assert result.retrieval_applied is True
+        assert result.evidence_mode == "declared"
+        assert result.used_chunk_ids
+        assert result.evidence_quotes
+        assert result.citations
+        assert result.candidate_chunks == []
+    finally:
+        cleanup_workspace(workspace)
+
+
+def test_low_confidence_ask_refuses_when_model_returns_no_valid_evidence() -> None:
+    workspace = make_workspace()
+    try:
+        settings = build_settings(workspace)
+        file_service = FileService(settings=settings)
+        model_client = NoEvidenceAskModelClient(settings=settings)
+        upload = file_service.save_upload(
+            "low-confidence-no-evidence.md",
+            "# Goal\n\nThe first-phase goal is to support evidence-backed PDF question answering.".encode("utf-8"),
+        )
+        selected_chunk = file_service.get_document_chunks(
+            upload.file_id,
+            access_token=upload.access_token,
+        ).chunks[0]
+        task_service = TaskService(
+            file_service=file_service,
+            model_client=model_client,
+            log_service=LogService(settings=settings),
+            context_planner=FixedLowConfidencePlanner([selected_chunk]),
+        )
+
+        result = task_service.run_task(
+            task_type="ask",
+            endpoint="/api/ask",
+            file_id=upload.file_id,
+            document_access_token=upload.access_token,
+            user_input="What is the goal?",
+        )
+
+        assert model_client.ask_call_count == 2
+        assert result.outcome == "refused"
+        assert result.route_reason == "llm_refused"
+        assert result.retrieval_status == "low_confidence"
+        assert result.retrieval_applied is True
+        assert result.evidence_mode == "none"
+        assert result.retrieval_message
+        assert result.used_chunk_ids == []
+        assert result.evidence_quotes == []
+        assert result.citations == []
+        assert len(result.candidate_chunks) == 1
+    finally:
+        cleanup_workspace(workspace)
+
+
 def test_task_service_avoids_fake_citations_on_retrieval_miss() -> None:
     workspace = make_workspace()
     try:
@@ -1099,6 +1242,66 @@ def test_retrieval_service_uses_head_chunk_for_metadata_name_questions() -> None
 
     assert result.confident is True
     assert [chunk.chunk_id for chunk in result.chunks] == ["intro"]
+
+
+def test_retrieval_service_uses_head_chunks_for_overview_questions() -> None:
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=1,
+        chunk_count=2,
+        chunks=[
+            ParsedChunk(
+                chunk_id="intro",
+                chunk_index=0,
+                page_numbers=[1],
+                text="# 论文标题\n\n本文研究中文空间语义理解评测，并比较多种大模型表现。",
+                char_count=len("# 论文标题\n\n本文研究中文空间语义理解评测，并比较多种大模型表现。"),
+            ),
+            ParsedChunk(
+                chunk_id="method",
+                chunk_index=1,
+                page_numbers=[1],
+                text="方法部分介绍实验设置、数据集和评价指标。",
+                char_count=len("方法部分介绍实验设置、数据集和评价指标。"),
+            ),
+        ],
+    )
+    retrieval = RetrievalService()
+
+    result = retrieval.retrieve_with_confidence("这篇文章讲了什么", chunked)
+
+    assert result.confident is True
+    assert [chunk.chunk_id for chunk in result.chunks][:2] == ["intro", "method"]
+
+
+def test_retrieval_service_treats_important_content_questions_as_overview() -> None:
+    chunked = ChunkedDocument(
+        file_type="md",
+        page_count=1,
+        chunk_count=2,
+        chunks=[
+            ParsedChunk(
+                chunk_id="intro",
+                chunk_index=0,
+                page_numbers=[1],
+                text="# 论文标题\n\n本文研究中文空间语义理解评测，并比较多种大模型表现。",
+                char_count=len("# 论文标题\n\n本文研究中文空间语义理解评测，并比较多种大模型表现。"),
+            ),
+            ParsedChunk(
+                chunk_id="method",
+                chunk_index=1,
+                page_numbers=[1],
+                text="方法部分介绍实验设置、数据集和评价指标。",
+                char_count=len("方法部分介绍实验设置、数据集和评价指标。"),
+            ),
+        ],
+    )
+    retrieval = RetrievalService()
+
+    result = retrieval.retrieve_with_confidence("这篇文章最重要的内容是什么", chunked)
+
+    assert result.confident is True
+    assert [chunk.chunk_id for chunk in result.chunks][:2] == ["intro", "method"]
 
 
 def test_retrieval_service_adds_neighbors_for_parameter_questions() -> None:
