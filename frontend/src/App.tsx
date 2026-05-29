@@ -5,11 +5,8 @@ import {
   deleteDocument,
   ensureDemoSession,
   fetchCurrentSession,
-  fetchDemoMode,
   fetchDocumentMetadata,
   fetchLogSummary,
-  loginSession,
-  logoutSession,
   readStoredSession,
   runTask,
   uploadDocument
@@ -65,27 +62,6 @@ const DETAIL_OPTIONS: Array<{
   { value: "detailed", label: "详细", description: "补充更多背景与展开" }
 ];
 
-const DEMO_ACTIONS = [
-  {
-    label: "试一试 摘要",
-    description: "用 3 条要点总结这份样例",
-    taskType: "summary" as const,
-    input: "请用 3 条要点总结这个文档。"
-  },
-  {
-    label: "试一试 问答",
-    description: "针对内容提问，看引用回链",
-    taskType: "ask" as const,
-    input: "这个项目第一阶段要做什么？"
-  },
-  {
-    label: "试一试 提纲",
-    description: "生成一份结构化汇报提纲",
-    taskType: "outline" as const,
-    input: "请生成一个 5 页汇报提纲。"
-  }
-];
-
 const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读，必须包含：
 1. 研究问题
 2. 核心方法
@@ -99,24 +75,6 @@ const RESEARCH_DIGEST_PROMPT = `请生成一份论文速读，必须包含：
 - 优先提炼对答辩、复现实验和继续追问最有价值的信息。
 - 输出为清晰的 Markdown。`;
 
-const DEMO_WHITELIST_ACTIONS = [
-  {
-    label: "这个项目的核心能力是什么？",
-    description: "针对内容提问",
-    input: "这个项目的核心能力是什么？"
-  },
-  {
-    label: "系统为什么强调证据回链？",
-    description: "针对内容提问",
-    input: "系统为什么强调证据回链？"
-  },
-  {
-    label: "这篇文档有没有给出 2028 年全国部署预算？",
-    description: "问个文档没提的事，看会不会瞎编",
-    input: "这篇文档有没有给出 2028 年全国部署预算？"
-  }
-];
-
 const TASK_LABELS: Record<TaskType, string> = {
   summary: "摘要",
   ask: "问答",
@@ -125,13 +83,6 @@ const TASK_LABELS: Record<TaskType, string> = {
 
 const RECENT_DOCUMENTS_KEY = "yandatong_recent_documents";
 const RECENT_RESULTS_KEY = "yandatong_recent_results";
-const DEMO_DOCUMENT_NAME = "sample_brief.md";
-const DEMO_DOCUMENT_CONTENT = `# 项目简介
-
-研答通是一个面向论文与报告阅读、答辩准备的文档助手。
-核心能力是带证据回链的问答——每一条回答都能跳回 PDF 原文证据。
-第一阶段目标是支持用户上传文档，完成摘要、问答和提纲生成。
-系统当前采用端云协同路线，优先保证能跑通、能扩展。`;
 
 function readStorage<T>(key: string, fallback: T): T {
   try {
@@ -154,7 +105,7 @@ function describeLoadStage(stage: "idle" | "uploading" | "model"): string {
 
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof ApiRequestError && error.code === "UNAUTHORIZED") {
-    return "当前试用会话已失效，请重新登录。";
+    return "当前试用会话已失效，请刷新页面重新进入。";
   }
   if (error instanceof ApiRequestError && error.code === "TASK_TIMEOUT") {
     return "模型响应较慢，已自动停止等待，请稍后重试当前任务。";
@@ -166,7 +117,7 @@ function normalizeErrorMessage(error: unknown): string {
 
 function normalizeAuthErrorMessage(error: unknown): string {
   if (error instanceof ApiRequestError && error.code === "UNAUTHORIZED") {
-    return error.message || "邀请码无效或试用会话已失效。";
+    return error.message || "试用会话已失效，请重新进入。";
   }
   if (error instanceof ApiRequestError) return error.message;
   if (error instanceof Error) return error.message;
@@ -182,7 +133,7 @@ function normalizeRecordErrorMessage(error: unknown): string {
       return "当前文档访问凭证已失效，无法恢复该记录。";
     }
     if (error.code === "UNAUTHORIZED") {
-      return "当前试用会话已失效，请重新登录后再恢复记录。";
+      return "当前试用会话已失效，请刷新页面后再恢复记录。";
     }
     if (error.code === "NON_JSON_RESPONSE") {
       return "服务返回了异常页面，最近记录恢复失败，请刷新页面或重启本地服务。";
@@ -341,11 +292,7 @@ export default function App() {
   const [session, setSession] = useState<AuthSession | null>(() => readStoredSession());
   const [authLoading, setAuthLoading] = useState(true);
   const [authPending, setAuthPending] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
-  const [inviteCode, setInviteCode] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
-  const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [taskType, setTaskType] = useState<TaskType>("ask");
   const [responseDetailLevel, setResponseDetailLevel] =
     useState<ResponseDetailLevel>("balanced");
@@ -372,6 +319,7 @@ export default function App() {
   );
   const [logSummary, setLogSummary] = useState<LogSummary | null>(null);
   const [statsExpanded, setStatsExpanded] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const hadStoredSessionRef = useRef(Boolean(readStoredSession()));
   const taskInFlightRef = useRef(false);
@@ -426,9 +374,7 @@ export default function App() {
     }
 
     void (async () => {
-      const isDemo = await fetchDemoMode();
       if (cancelled) return;
-      setDemoMode(isDemo);
 
       try {
         const currentSession = await fetchCurrentSession();
@@ -440,15 +386,13 @@ export default function App() {
       } catch (sessionError) {
         if (cancelled) return;
 
-        if (isDemo) {
-          const demoSession = await tryEnsureDemoSession(2);
-          if (cancelled) return;
-          if (demoSession) {
-            hadStoredSessionRef.current = true;
-            setSession(demoSession);
-            setAuthError(null);
-            return;
-          }
+        const demoSession = await tryEnsureDemoSession(2);
+        if (cancelled) return;
+        if (demoSession) {
+          hadStoredSessionRef.current = true;
+          setSession(demoSession);
+          setAuthError(null);
+          return;
         }
 
         clearStoredSession();
@@ -536,32 +480,7 @@ export default function App() {
     }
     clearSessionWorkspace();
     setAuthError(normalizeAuthErrorMessage(error));
-    setAuthNotice(null);
     return true;
-  }
-
-  function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setAuthPending(true);
-    setAuthError(null);
-    setAuthNotice(null);
-
-    void loginSession(inviteCode.trim(), displayName.trim())
-      .then((nextSession) => {
-        setSession(nextSession);
-        setInviteCode("");
-        setDisplayName("");
-        setRecentDocuments([]);
-        setRecentResults([]);
-        clearCurrentDocument();
-        setAuthNotice(`已进入试用会话：${nextSession.label}`);
-      })
-      .catch((loginError) => {
-        setAuthError(normalizeAuthErrorMessage(loginError));
-      })
-      .finally(() => {
-        setAuthPending(false);
-      });
   }
 
   function handleRetryDemoSession() {
@@ -576,19 +495,6 @@ export default function App() {
         setAuthError(normalizeAuthErrorMessage(retryError));
       })
       .finally(() => {
-        setAuthPending(false);
-      });
-  }
-
-  function handleLogout() {
-    setAuthPending(true);
-    setAuthError(null);
-    setAuthNotice(null);
-    void logoutSession()
-      .catch(() => undefined)
-      .finally(() => {
-        clearSessionWorkspace();
-        setAuthNotice("已退出当前试用会话。");
         setAuthPending(false);
       });
   }
@@ -685,53 +591,12 @@ export default function App() {
       });
   }
 
-  function selectPendingDocument(file: File) {
-    setSelectedFile(file);
-    setUploadedMetadata(null);
-    setResult(null);
-    setError(null);
-    setPreviewOpen(false);
-    setPreviewPage(1);
-    setPreviewPages([1]);
-    setPreviewSnippet(null);
-    setPreviewSnippetPage(null);
-    setPreviewBboxes([]);
-  }
-
-  function createDemoDocumentFile(): File {
-    return new File([DEMO_DOCUMENT_CONTENT], DEMO_DOCUMENT_NAME, {
-      type: "text/markdown"
-    });
-  }
-
-  function ensureDemoDocumentReady(): boolean {
-    if (selectedFile || uploadedMetadata) {
-      return false;
-    }
-    selectPendingDocument(createDemoDocumentFile());
-    return true;
-  }
-
   function applyResearchDigestPreset() {
     setTaskType("summary");
     setResponseDetailLevel("detailed");
     setInput(RESEARCH_DIGEST_PROMPT);
     setNotice("已切换到论文速读：上传论文后可直接生成结构化速读结果。");
     setError(null);
-  }
-
-  function applyWhitelistedDemoQuestion(question: string) {
-    const insertedDemoDocument = ensureDemoDocumentReady();
-    setTaskType("ask");
-    setResponseDetailLevel("balanced");
-    setInput(question);
-    setNotice(
-      insertedDemoDocument
-        ? "已载入样例简报和这条问题，点击提交任务即可查看回答与引用。"
-        : "已填入这条问题，点击提交任务即可查看回答与引用。"
-    );
-    setError(null);
-    scrollElementIntoView('[data-testid="task-input"]');
   }
 
   function applyFollowUpQuestion(question: string) {
@@ -842,160 +707,76 @@ export default function App() {
               面向论文与报告阅读、答辩准备的文档助手，每一条回答都能跳回 PDF 原文证据。
             </p>
           </div>
-        </section>
-
-        <section className="dashboard-grid">
-          <article className="panel stats-panel">
-            <div className="section-head stats-head">
-              <h2 className="panel-title">当前系统状态</h2>
-              {logSummary ? (
-                <button
-                  className="ghost-button stats-toggle"
-                  data-testid="stats-toggle"
-                  type="button"
-                  aria-expanded={statsExpanded}
-                  onClick={() => setStatsExpanded((prev) => !prev)}
-                >
-                  {statsExpanded ? "收起 ▴" : "展开详情 ▾"}
-                </button>
-              ) : null}
+          <aside
+            className={`hero-status${logSummary?.error_count ? " has-errors" : ""}${statsExpanded ? " expanded" : ""}`}
+            data-testid="hero-status"
+          >
+            <div className="hero-status-head">
+              <span className="stats-dot" aria-hidden="true" />
+              <strong>运行状态</strong>
             </div>
+            <p>
+              {logSummary
+                ? logSummary.error_count > 0
+                  ? `运行中 · 有效 ${logSummary.answered_count} / 总计 ${logSummary.total_requests}`
+                  : `系统正常 · 已完成 ${logSummary.total_requests} 次任务`
+                : authLoading
+                  ? "正在准备试用环境"
+                  : "等待首次任务"}
+            </p>
             {logSummary ? (
-              <>
-                <div
-                  className={`stats-summary${logSummary.error_count > 0 ? " has-errors" : ""}`}
-                  data-testid="stats-summary"
-                >
-                  <span className="stats-dot" aria-hidden="true" />
-                  <span className="stats-summary-text">
-                    {logSummary.error_count > 0
-                      ? `运行中 · 有效 ${logSummary.answered_count} / 总计 ${logSummary.total_requests}`
-                      : `系统正常 · 已完成 ${logSummary.total_requests} 次任务`}
-                  </span>
-                </div>
-                {statsExpanded ? (
-                  <div className="stats-grid" data-testid="stats-grid">
-                    <div className="stat-card">
-                      <span>总请求数</span>
-                      <strong>{logSummary.total_requests}</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>有效回答数</span>
-                      <strong>{logSummary.answered_count}</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>拒答数</span>
-                      <strong>{logSummary.refused_count}</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>错误数</span>
-                      <strong>{logSummary.error_count}</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>平均延迟</span>
-                      <strong>{logSummary.average_latency_ms} ms</strong>
-                    </div>
-                    <div className="stat-card">
-                      <span>P95 延迟</span>
-                      <strong>{logSummary.p95_latency_ms} ms</strong>
-                    </div>
-                  </div>
-                ) : null}
-              </>
-            ) : (
-              <p className="empty">当前暂无统计数据，完成一次任务后会自动刷新。</p>
-            )}
-          </article>
-
-          <article className="panel demo-panel">
-            <div className="section-head">
-              <h2 className="panel-title">快速体验</h2>
-            </div>
-            <p className="subtitle compact">还没有自己的文档？我们准备了一份样例简报，点下面任意一项就能跑通摘要、问答和证据回链。</p>
-            <div className="demo-whitelist" aria-label="样例问题">
-              {DEMO_WHITELIST_ACTIONS.map((action, index) => (
-                <button
-                  key={action.label}
-                  className="demo-whitelist-chip"
-                  data-testid={`demo-whitelist-${index}`}
-                  type="button"
-                  disabled={!isAuthenticated || interactionLocked}
-                  onClick={() => applyWhitelistedDemoQuestion(action.input)}
-                >
-                  <strong>{action.label}</strong>
-                  <span>{action.description}</span>
-                </button>
-              ))}
-            </div>
-            <div className="demo-actions">
               <button
-                className="hero-button"
+                className="ghost-button stats-toggle"
+                data-testid="stats-toggle"
                 type="button"
-                disabled={!isAuthenticated || interactionLocked}
-                onClick={() => {
-                  selectPendingDocument(createDemoDocumentFile());
-                  setNotice("已载入样例简报，选择任务后可直接提交。");
-                }}
+                aria-expanded={statsExpanded}
+                onClick={() => setStatsExpanded((prev) => !prev)}
               >
-                载入样例简报
+                {statsExpanded ? "收起详情" : "查看详情"}
               </button>
-              {DEMO_ACTIONS.map((action) => (
-                <button
-                  key={action.label}
-                  className="demo-card"
-                  type="button"
-                  disabled={!isAuthenticated || interactionLocked}
-                  onClick={() => {
-                    const insertedDemoDocument = ensureDemoDocumentReady();
-                    setTaskType(action.taskType);
-                    setInput(action.input);
-                    setNotice(
-                      insertedDemoDocument
-                        ? `已载入样例简报并切换到${action.label}，点击提交任务即可运行。`
-                        : `已切换到${action.label}，点击提交任务即可运行。`
-                    );
-                    setError(null);
-                    scrollElementIntoView('[data-testid="task-input"]');
-                  }}
-                >
-                  <strong>{action.label}</strong>
-                  <span>{action.description}</span>
-                </button>
-              ))}
-            </div>
-            {pendingDocument ? (
-              <p className="demo-feedback">
-                已载入：{pendingDocument.name}。点击“提交任务”后会自动上传并执行。
-              </p>
             ) : null}
-          </article>
+            {logSummary && statsExpanded ? (
+              <div className="stats-grid hero-stats-grid" data-testid="stats-grid">
+                <div className="stat-card">
+                  <span>总请求数</span>
+                  <strong>{logSummary.total_requests}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>有效回答数</span>
+                  <strong>{logSummary.answered_count}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>拒答数</span>
+                  <strong>{logSummary.refused_count}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>错误数</span>
+                  <strong>{logSummary.error_count}</strong>
+                </div>
+                <div className="stat-card">
+                  <span>平均延迟</span>
+                  <strong>{logSummary.average_latency_ms} ms</strong>
+                </div>
+                <div className="stat-card">
+                  <span>P95 延迟</span>
+                  <strong>{logSummary.p95_latency_ms} ms</strong>
+                </div>
+              </div>
+            ) : null}
+          </aside>
         </section>
 
-        <section className={`workspace`}>
+        <section className="workspace primary-workspace">
           <article className="panel control-panel">
             <div className="section-head">
-              <h2 className="panel-title">上传文档并启动任务</h2>
+              <h2 className="panel-title">上传文献并提问</h2>
               {session ? (
                 <span className="session-chip" data-testid="session-chip">
-                  {demoMode ? "免登录试用" : `已登录 · ${session.label}`}
+                  免登录试用
                 </span>
               ) : null}
             </div>
-            {session && !demoMode ? (
-              <div className="inline-actions trial-inline-actions">
-                <button
-                  className="ghost-button"
-                  data-testid="logout-button"
-                  type="button"
-                  disabled={interactionLocked}
-                  onClick={handleLogout}
-                >
-                  退出会话
-                </button>
-              </div>
-            ) : null}
             {!isAuthenticated ? (
-              demoMode ? (
                 <div className="auth-panel-card">
                   {authLoading ? (
                     <p className="status status-card">正在准备试用环境...</p>
@@ -1017,67 +798,11 @@ export default function App() {
                     </>
                   )}
                 </div>
-              ) : (
-              <div className="auth-panel-card">
-                <div className="section-head compact-head">
-                  <p className="section-kicker">邀请码登录</p>
-                  <h3>先登录再开始试用</h3>
-                </div>
-                <p className="subtitle compact">
-                  输入邀请码后，系统会创建一个短期试用会话，并把当前浏览器里的文档访问权限绑定到该会话。
-                </p>
-                {authError ? (
-                  <p className="error status-card" data-testid="auth-error">
-                    {authError}
-                  </p>
-                ) : null}
-                {authNotice ? (
-                  <p className="status status-card success-status" data-testid="auth-notice">
-                    {authNotice}
-                  </p>
-                ) : null}
-                {authLoading ? (
-                  <p className="status status-card">正在校验试用会话...</p>
-                ) : null}
-                <form className="form" onSubmit={handleLogin}>
-                  <label className="field">
-                    <span>邀请码</span>
-                    <input
-                      data-testid="invite-code-input"
-                      type="password"
-                      value={inviteCode}
-                      disabled={authPending || authLoading}
-                      onChange={(event) => setInviteCode(event.target.value)}
-                    />
-                  </label>
-                  <label className="field">
-                    <span>显示名称（可选）</span>
-                    <input
-                      data-testid="display-name-input"
-                      type="text"
-                      value={displayName}
-                      disabled={authPending || authLoading}
-                      onChange={(event) => setDisplayName(event.target.value)}
-                    />
-                  </label>
-                  <div className="control-actions">
-                    <button
-                      className="submit"
-                      data-testid="login-submit-button"
-                      type="submit"
-                      disabled={authPending || authLoading || !inviteCode.trim()}
-                    >
-                      {authPending ? "正在登录..." : "登录试用"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-              )
             ) : (
               <>
                 <form className="form" onSubmit={handleSubmit}>
-              <label className="field">
-                <span>上传文档</span>
+              <label className="field upload-field">
+                <span>1. 上传文献</span>
                 <div
                   className={`drop-zone${dragOver ? " drop-zone-active" : ""}${loading ? " drop-zone-disabled" : ""}`}
                   onDragOver={(e) => { e.preventDefault(); if (!loading) setDragOver(true); }}
@@ -1110,9 +835,7 @@ export default function App() {
                   <span className="drop-zone-hint">支持 PDF、TXT、Markdown</span>
                 </div>
                 <p className="drop-zone-footnote">
-                  {demoMode
-                    ? "上传的文档仅绑定当前会话，会话过期会自动清理；请勿使用敏感资料。"
-                    : "当前为邀请码试用，上传、检索、预览均绑定当前会话；请仅使用非敏感文档。"}
+                  上传的文档仅绑定当前会话，会话过期会自动清理；请勿使用敏感资料。
                 </p>
                 <input
                   data-testid="file-input"
@@ -1154,43 +877,96 @@ export default function App() {
                 </div>
               ) : null}
 
-              <div className="field">
-                <span>任务类型</span>
-                <div className="control-option-grid">
-                  {TASK_OPTIONS.map((option) => (
+              <div className={`field question-field${settingsExpanded ? " settings-open" : ""}`}>
+                <div className="question-field-head">
+                  <span>2. 输入你的问题</span>
+                  <div className="question-tools">
                     <button
-                      key={option.value}
-                      data-testid={`task-option-${option.value}`}
-                      aria-pressed={taskType === option.value}
-                      className={`option-card${taskType === option.value ? " active" : ""}`}
+                      className="ghost-button settings-toggle-button"
+                      data-testid="settings-toggle-button"
                       type="button"
-                      disabled={loading}
-                      onClick={() => setTaskType(option.value)}
+                      aria-expanded={settingsExpanded}
+                      onClick={() => setSettingsExpanded((current) => !current)}
                     >
-                      <strong>{option.label}</strong>
-                      <small>{option.description}</small>
+                      {settingsExpanded ? "收起设置" : "处理设置"}
                     </button>
-                  ))}
+                    <button
+                      className="ghost-button clear-question-button"
+                      data-testid="clear-question-button"
+                      type="button"
+                      disabled={loading || !input}
+                      onClick={() => setInput("")}
+                    >
+                      清空问题
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="field">
-                <span>回答粒度</span>
-                <div className="control-detail-grid">
-                  {DETAIL_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      data-testid={`detail-option-${option.value}`}
-                      aria-pressed={responseDetailLevel === option.value}
-                      className={`detail-card${responseDetailLevel === option.value ? " active" : ""}`}
-                      type="button"
-                      disabled={loading}
-                      onClick={() => setResponseDetailLevel(option.value)}
+                <div className="question-input-row">
+                  <textarea
+                    data-testid="task-input"
+                    rows={7}
+                    value={input}
+                    placeholder={currentOption.placeholder}
+                    disabled={loading}
+                    onChange={(event) => setInput(event.target.value)}
+                  />
+                    <aside
+                      className="question-settings"
+                      data-testid="question-settings"
+                      hidden={!settingsExpanded}
                     >
-                      <strong>{option.label}</strong>
-                      <small>{option.description}</small>
-                    </button>
-                  ))}
+                      <div className="field compact-setting-field">
+                        <span>处理方式</span>
+                        <div className="control-option-grid compact-options">
+                          {TASK_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              data-testid={`task-option-${option.value}`}
+                              aria-pressed={taskType === option.value}
+                              className={`option-card${taskType === option.value ? " active" : ""}`}
+                              type="button"
+                              disabled={loading}
+                              onClick={() => setTaskType(option.value)}
+                            >
+                              <strong>{option.label}</strong>
+                              <small>{option.description}</small>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="field compact-setting-field">
+                        <span>回答长度</span>
+                        <div className="control-detail-grid compact-details">
+                          {DETAIL_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              data-testid={`detail-option-${option.value}`}
+                              aria-pressed={responseDetailLevel === option.value}
+                              className={`detail-card${responseDetailLevel === option.value ? " active" : ""}`}
+                              type="button"
+                              disabled={loading}
+                              onClick={() => setResponseDetailLevel(option.value)}
+                            >
+                              <strong>{option.label}</strong>
+                              <small>{option.description}</small>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </aside>
+                </div>
+                <div className="control-actions primary-submit-row">
+                  <button
+                    className="submit"
+                    data-testid="submit-task-button"
+                    type="submit"
+                    disabled={!canSubmit}
+                  >
+                    {loading ? "处理中..." : "开始处理"}
+                  </button>
+                  <p className="control-hint">
+                    当前：{currentOption.label} / {DETAIL_OPTIONS.find((item) => item.value === responseDetailLevel)?.label}
+                  </p>
                 </div>
               </div>
 
@@ -1218,29 +994,6 @@ export default function App() {
                 </button>
               </div>
 
-              <label className="field">
-                <span>问题或指令</span>
-                <textarea
-                  data-testid="task-input"
-                  rows={6}
-                  value={input}
-                  placeholder={currentOption.placeholder}
-                  disabled={loading}
-                  onChange={(event) => setInput(event.target.value)}
-                />
-              </label>
-
-              <div className="control-actions">
-                <button
-                  className="submit"
-                  data-testid="submit-task-button"
-                  type="submit"
-                  disabled={!canSubmit}
-                >
-                  {loading ? "处理中..." : "提交任务"}
-                </button>
-                <p className="control-hint">第一次使用？右侧的“快速体验”可以一键试跑。</p>
-              </div>
             </form>
 
             {notice ? (
@@ -1297,7 +1050,7 @@ export default function App() {
                   </div>
                   <div className="meta-chip">
                     <span>来源</span>
-                    <strong>{pendingDocument.name === DEMO_DOCUMENT_NAME ? "样例简报" : "本地文件"}</strong>
+                    <strong>本地文件</strong>
                   </div>
                   <div className="meta-chip">
                     <span>下一步</span>
@@ -1389,7 +1142,7 @@ export default function App() {
               <h2 className="panel-title">最近文档</h2>
             </div>
             {!isAuthenticated ? (
-              <p className="empty">登录后才会显示当前试用会话下的最近文档。</p>
+              <p className="empty">试用会话准备好后会显示当前会话下的最近文档。</p>
             ) : recentDocuments.length === 0 ? (
               <p className="empty">最近上传的文档会显示在这里，便于复用。</p>
             ) : (
@@ -1415,7 +1168,7 @@ export default function App() {
               <h2 className="panel-title">最近结果</h2>
             </div>
             {!isAuthenticated ? (
-              <p className="empty">登录后才会显示当前试用会话下的最近结果。</p>
+              <p className="empty">试用会话准备好后会显示当前会话下的最近结果。</p>
             ) : recentResults.length === 0 ? (
               <p className="empty">最近 5 次任务结果会显示在这里，方便回看。</p>
             ) : (

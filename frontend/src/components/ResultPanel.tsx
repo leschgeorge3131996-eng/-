@@ -304,6 +304,8 @@ export default function ResultPanel({
   const followUpQuestions = extractResearchDigestQuestions(result);
   const showDigestEvidenceCard = isResearchDigestResult(result, followUpQuestions);
   const sourcePageCount = new Set(evidenceItems.flatMap((item) => item.page_numbers)).size;
+  const showEvidenceSummary =
+    evidenceSummary !== null && (result?.outcome !== "refused" || evidenceItems.length > 0);
 
   useEffect(() => {
     setCopyState("idle");
@@ -530,26 +532,68 @@ export default function ResultPanel({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.32, ease: MOTION_EASE }}
           >
-            <motion.div className="result-badges" {...revealMotion(0.04)}>
-              <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
-              <span className="badge badge-route">{result.route_tier ?? "default"}</span>
-              <span className="badge badge-outcome">{result.outcome}</span>
-              {result.response_detail_level ? (
-                <span className="badge badge-detail">
-                  {RESPONSE_DETAIL_LABELS[result.response_detail_level] ??
-                    result.response_detail_level}
-                </span>
-              ) : null}
-              {result.task_type === "ask" ? (
-                <span
-                  className="badge badge-evidence"
-                  data-testid={`evidence-mode-${evidenceMode}`}
-                  data-evidence-mode={evidenceMode}
-                >
-                  {EVIDENCE_MODE_LABELS[evidenceMode]}
-                </span>
-              ) : null}
-            </motion.div>
+            {result.outcome === "refused" ? (
+              <motion.div
+                className="refusal-card primary-answer-card"
+                data-testid="refusal-card"
+                data-route-reason={result.route_reason ?? "unknown"}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.32, delay: 0.04, ease: MOTION_EASE }}
+              >
+                <div className="refusal-icon" aria-hidden="true">
+                  <span /><span /><span />
+                </div>
+                <div className="refusal-body">
+                  <strong>
+                    {result.route_reason === "llm_refused"
+                      ? "模型判断无直接依据，拒绝回答"
+                      : "检索无命中，拒绝回答"}
+                  </strong>
+                  <p>{result.result}</p>
+                  <span className="refusal-reason">
+                    {result.route_reason === "llm_refused"
+                      ? "系统检索到相关片段，但模型判断证据不足以直接支撑回答。"
+                      : "系统在文档中未找到与该问题相关的片段。"}
+                  </span>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                className="terminal-shell terminal-shell-sweep primary-answer-card"
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.32, delay: 0.04, ease: MOTION_EASE }}
+              >
+                <div className="terminal-head">
+                  <div className="terminal-lights" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className="terminal-actions">
+                    <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
+                    <button className="copy-button" type="button" onClick={handleCopyResult}>
+                      {copyState === "done"
+                        ? "已复制"
+                        : copyState === "error"
+                          ? "复制失败"
+                          : "复制结果"}
+                    </button>
+                    <button className="copy-button" type="button" onClick={handleExportResult}>
+                      {exportState === "done"
+                        ? "已导出"
+                        : exportState === "error"
+                          ? "导出失败"
+                          : "导出 Markdown"}
+                    </button>
+                  </div>
+                </div>
+                <div className="terminal-output markdown-stage" data-testid="result-output">
+                  <MarkdownResult content={result.result} />
+                </div>
+              </motion.div>
+            )}
 
             {confidenceBar ? (
               <motion.div
@@ -569,30 +613,7 @@ export default function ResultPanel({
               </motion.div>
             ) : null}
 
-            <motion.div className="result-meta-grid" {...revealMotion(0.12)}>
-              <div className="result-meta-card">
-                <span>{modelMetaLabel}</span>
-                <strong>{modelMetaValue}</strong>
-              </div>
-              {result.route_reason ? (
-                <div className="result-meta-card">
-                  <span>路由原因</span>
-                  <strong>{result.route_reason}</strong>
-                </div>
-              ) : null}
-              <div className="result-meta-card">
-                <span>耗时</span>
-                <strong>{result.latency_ms} ms</strong>
-              </div>
-              {!isRetrievalGate ? (
-                <div className="result-meta-card">
-                  <span>请求 ID</span>
-                  <strong>{result.request_id}</strong>
-                </div>
-              ) : null}
-            </motion.div>
-
-            {evidenceSummary ? (
+            {showEvidenceSummary && evidenceSummary ? (
               <motion.div
                 className={`evidence-mode-card evidence-mode-${evidenceSummary.tone}`}
                 data-testid={`evidence-mode-card-${evidenceSummary.tone}`}
@@ -602,39 +623,6 @@ export default function ResultPanel({
                 <strong>{evidenceSummary.title}</strong>
                 <span>{evidenceSummary.description}</span>
               </motion.div>
-            ) : null}
-
-            {result.cache_hit ? (
-              <motion.p className="cache-hit" {...revealMotion(0.24)}>
-                本次结果命中本地缓存。
-              </motion.p>
-            ) : null}
-            {result.retrieval_applied ? (
-              <motion.p className="status" {...revealMotion(0.26)}>
-                已从 {result.retrieved_chunk_count} 个片段构造上下文
-                {retrievedPages.length > 0
-                  ? `，涉及页码：${retrievedPages.join(", ")}`
-                  : ""}
-                。
-              </motion.p>
-            ) : null}
-            {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
-              <motion.p className="warning" {...revealMotion(0.26)}>
-                {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
-              </motion.p>
-            ) : null}
-            {result.context_truncated ? (
-              <motion.p className="warning" {...revealMotion(0.28)}>
-                {result.truncation_message ??
-                  `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
-              </motion.p>
-            ) : null}
-            {result.token_usage?.total_tokens !== null &&
-            result.token_usage?.total_tokens !== undefined ? (
-              <motion.p className="status token-usage" {...revealMotion(0.3)}>
-                Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
-                {result.token_usage.completion_tokens ?? 0} / 总计 {result.token_usage.total_tokens}
-              </motion.p>
             ) : null}
 
             {evidenceItems.length > 0 ? (
@@ -672,68 +660,89 @@ export default function ResultPanel({
               </motion.div>
             ) : null}
 
-            {result.outcome === "refused" ? (
-              <motion.div
-                className="refusal-card"
-                data-testid="refusal-card"
-                data-route-reason={result.route_reason ?? "unknown"}
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
-              >
-                <div className="refusal-icon" aria-hidden="true">
-                  <span /><span /><span />
-                </div>
-                <div className="refusal-body">
-                  <strong>
-                    {result.route_reason === "llm_refused"
-                      ? "模型判定无直接依据，拒绝回答"
-                      : "检索无命中，拒绝回答"}
-                  </strong>
-                  <p>{result.result}</p>
-                  <span className="refusal-reason">
-                    {result.route_reason === "llm_refused"
-                      ? "系统检索到相关片段，但模型判断证据不足以直接支撑回答，主动拒答以避免杜撰。"
-                      : "系统在文档中未找到与该问题相关的片段，已在检索阶段拦截，未调用模型生成。"}
+            <details className="result-details" data-testid="result-details">
+              <summary>
+                <span>查看运行细节</span>
+                <small>{`${result.latency_ms} ms`}</small>
+              </summary>
+
+              <motion.div className="result-badges" {...revealMotion(0.04)}>
+                <span className="badge badge-task">{TASK_LABELS[result.task_type]}</span>
+                <span className="badge badge-route">{result.route_tier ?? "default"}</span>
+                <span className="badge badge-outcome">{result.outcome}</span>
+                {result.response_detail_level ? (
+                  <span className="badge badge-detail">
+                    {RESPONSE_DETAIL_LABELS[result.response_detail_level] ??
+                      result.response_detail_level}
                   </span>
-                </div>
+                ) : null}
+                {result.task_type === "ask" ? (
+                  <span
+                    className="badge badge-evidence"
+                    data-testid={`evidence-mode-${evidenceMode}`}
+                    data-evidence-mode={evidenceMode}
+                  >
+                    {EVIDENCE_MODE_LABELS[evidenceMode]}
+                  </span>
+                ) : null}
               </motion.div>
-            ) : (
-              <motion.div
-                className="terminal-shell terminal-shell-sweep"
-                initial={{ opacity: 0, scale: 0.985 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.32, delay: 0.5, ease: MOTION_EASE }}
-              >
-                <div className="terminal-head">
-                  <div className="terminal-lights" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <div className="terminal-actions">
-                    <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
-                    <button className="copy-button" type="button" onClick={handleCopyResult}>
-                      {copyState === "done"
-                        ? "已复制"
-                        : copyState === "error"
-                          ? "复制失败"
-                          : "复制结果"}
-                    </button>
-                    <button className="copy-button" type="button" onClick={handleExportResult}>
-                      {exportState === "done"
-                        ? "已导出"
-                        : exportState === "error"
-                          ? "导出失败"
-                          : "导出 Markdown"}
-                    </button>
-                  </div>
+
+              <motion.div className="result-meta-grid" {...revealMotion(0.12)}>
+                <div className="result-meta-card">
+                  <span>{modelMetaLabel}</span>
+                  <strong>{modelMetaValue}</strong>
                 </div>
-                <div className="terminal-output markdown-stage" data-testid="result-output">
-                  <MarkdownResult content={result.result} />
+                {result.route_reason ? (
+                  <div className="result-meta-card">
+                    <span>路由原因</span>
+                    <strong>{result.route_reason}</strong>
+                  </div>
+                ) : null}
+                <div className="result-meta-card">
+                  <span>耗时</span>
+                  <strong>{result.latency_ms} ms</strong>
                 </div>
+                {!isRetrievalGate ? (
+                  <div className="result-meta-card">
+                    <span>请求 ID</span>
+                    <strong>{result.request_id}</strong>
+                  </div>
+                ) : null}
               </motion.div>
-            )}
+
+              {result.cache_hit ? (
+                <motion.p className="cache-hit" {...revealMotion(0.24)}>
+                  本次结果命中本地缓存。
+                </motion.p>
+              ) : null}
+              {result.retrieval_applied ? (
+                <motion.p className="status" {...revealMotion(0.26)}>
+                  已从 {result.retrieved_chunk_count} 个片段构造上下文
+                  {retrievedPages.length > 0
+                    ? `，涉及页码：${retrievedPages.join(", ")}`
+                    : ""}
+                  。
+                </motion.p>
+              ) : null}
+              {!result.retrieval_applied && result.retrieval_status === "no_match" ? (
+                <motion.p className="warning" {...revealMotion(0.26)}>
+                  {result.retrieval_message ?? "当前问题与文档内容相关性不足，系统已避免无依据回答。"}
+                </motion.p>
+              ) : null}
+              {result.context_truncated ? (
+                <motion.p className="warning" {...revealMotion(0.28)}>
+                  {result.truncation_message ??
+                    `文档内容过长，后端本次仅发送前 ${result.used_document_chars} / ${result.source_document_chars} 字符。`}
+                </motion.p>
+              ) : null}
+              {result.token_usage?.total_tokens !== null &&
+              result.token_usage?.total_tokens !== undefined ? (
+                <motion.p className="status token-usage" {...revealMotion(0.3)}>
+                  Token 用量：输入 {result.token_usage.prompt_tokens ?? 0} / 输出{" "}
+                  {result.token_usage.completion_tokens ?? 0} / 总计 {result.token_usage.total_tokens}
+                </motion.p>
+              ) : null}
+            </details>
 
             {followUpQuestions.length > 0 && onAskFollowUp ? (
               <motion.div className="follow-up-panel" {...revealMotion(0.56)}>

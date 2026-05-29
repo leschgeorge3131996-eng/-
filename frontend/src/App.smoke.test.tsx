@@ -14,13 +14,12 @@ import type {
 import {
   ApiRequestError,
   buildFileContentUrl,
+  ensureDemoSession,
   fetchCurrentSession,
   deleteDocument,
   fetchDocumentMetadata,
   fetchDocumentPage,
   fetchLogSummary,
-  loginSession,
-  logoutSession,
   runTask,
   uploadDocument
 } from "./api";
@@ -53,9 +52,8 @@ vi.mock("./api", async () => {
     ...actual,
     uploadDocument: vi.fn(),
     runTask: vi.fn(),
-    loginSession: vi.fn(),
+    ensureDemoSession: vi.fn(),
     fetchCurrentSession: vi.fn(),
-    logoutSession: vi.fn(),
     fetchLogSummary: vi.fn(),
     fetchDocumentMetadata: vi.fn(),
     fetchDocumentPage: vi.fn(),
@@ -69,9 +67,8 @@ vi.mock("./api", async () => {
 
 const uploadDocumentMock = vi.mocked(uploadDocument);
 const runTaskMock = vi.mocked(runTask);
-const loginSessionMock = vi.mocked(loginSession);
+const ensureDemoSessionMock = vi.mocked(ensureDemoSession);
 const fetchCurrentSessionMock = vi.mocked(fetchCurrentSession);
-const logoutSessionMock = vi.mocked(logoutSession);
 const fetchLogSummaryMock = vi.mocked(fetchLogSummary);
 const fetchDocumentMetadataMock = vi.mocked(fetchDocumentMetadata);
 const fetchDocumentPageMock = vi.mocked(fetchDocumentPage);
@@ -195,9 +192,8 @@ function seedSession(session: AuthSession = makeAuthSession()): AuthSession {
 describe("App smoke flows", () => {
   beforeEach(() => {
     window.localStorage.clear();
-    loginSessionMock.mockReset();
+    ensureDemoSessionMock.mockReset();
     fetchCurrentSessionMock.mockReset();
-    logoutSessionMock.mockReset();
     fetchLogSummaryMock.mockResolvedValue(makeLogSummary());
     uploadDocumentMock.mockReset();
     runTaskMock.mockReset();
@@ -206,63 +202,37 @@ describe("App smoke flows", () => {
     fetchCurrentSessionMock.mockRejectedValue(
       new ApiRequestError("trial session expired", "UNAUTHORIZED")
     );
+    ensureDemoSessionMock.mockResolvedValue(makeAuthSession({ session_id: "demo-session" }));
     deleteDocumentMock.mockResolvedValue({
       deleted: true,
       file_id: "file-1",
       original_name: "alpha.md"
     });
-    logoutSessionMock.mockResolvedValue();
     buildFileContentUrlMock.mockImplementation(
       (fileId: string, accessToken?: string | null, page?: number) =>
         `/mock/${fileId}/content${accessToken ? `?access_token=${accessToken}` : ""}${page ? `#page=${page}` : ""}`
     );
   });
 
-  it("creates a trial session from the invite-code form", async () => {
+  it("creates an automatic trial session without showing invite-code UI", async () => {
     const session = makeAuthSession({
       session_id: "session-login",
       label: "lab-user"
     });
-    loginSessionMock.mockResolvedValue(session);
+    ensureDemoSessionMock.mockResolvedValue(session);
 
     render(<App />);
 
     await waitFor(() =>
-      expect(screen.getByTestId("invite-code-input")).toBeInTheDocument()
-    );
-    fireEvent.change(screen.getByTestId("invite-code-input"), {
-      target: { value: "invite-123" }
-    });
-    fireEvent.change(screen.getByTestId("display-name-input"), {
-      target: { value: "lab-user" }
-    });
-    fireEvent.click(screen.getByTestId("login-submit-button"));
-
-    await waitFor(() =>
-      expect(loginSessionMock).toHaveBeenCalledWith("invite-123", "lab-user")
+      expect(ensureDemoSessionMock).toHaveBeenCalled()
     );
     await waitFor(() =>
-      expect(screen.getByTestId("logout-button")).toBeInTheDocument()
+      expect(screen.getByTestId("file-input")).toBeInTheDocument()
     );
     expect(screen.queryByTestId("invite-code-input")).not.toBeInTheDocument();
   });
 
-  it("logs out and returns to the invite-code screen", async () => {
-    seedSession(makeAuthSession({ session_id: "session-logout" }));
-
-    render(<App />);
-
-    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
-    fireEvent.click(screen.getByTestId("logout-button"));
-
-    await waitFor(() => expect(logoutSessionMock).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(screen.getByTestId("invite-code-input")).toBeInTheDocument()
-    );
-    expect(window.localStorage.getItem("yandatong_auth_session")).toBeNull();
-  });
-
-  it("clears stale local auth state when the cookie session is gone", async () => {
+  it("recovers stale local auth state with an automatic trial session", async () => {
     window.localStorage.setItem(
       "yandatong_auth_session",
       JSON.stringify(makeAuthSession({ session_id: "stale-session" }))
@@ -272,9 +242,9 @@ describe("App smoke flows", () => {
 
     await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
     await waitFor(() =>
-      expect(screen.getByTestId("invite-code-input")).toBeInTheDocument()
+      expect(screen.getByTestId("file-input")).toBeInTheDocument()
     );
-    expect(window.localStorage.getItem("yandatong_auth_session")).toBeNull();
+    expect(ensureDemoSessionMock).toHaveBeenCalled();
   });
 
   it("runs the upload-to-summary happy path and stores recent history", async () => {
@@ -400,42 +370,91 @@ digest smoke result
     expect(screen.getByTestId("digest-evidence-card").textContent).toContain("1 个可追问问题");
   });
 
-  it("applies a whitelisted demo question to the ask flow", async () => {
+  it("keeps uploaded documents waiting for a manual question", async () => {
     seedSession();
 
     render(<App />);
 
     await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByTestId("demo-whitelist-2"));
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["paper content"], "paper.md", { type: "text/markdown" })]
+      }
+    });
 
     expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("detail-option-balanced")).toHaveAttribute("aria-pressed", "true");
+    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toBe("");
+    expect(screen.getByTestId("current-document-name").textContent).toContain(
+      "paper.md"
+    );
+    expect(screen.getByTestId("submit-task-button")).toBeDisabled();
+  });
+
+  it("keeps manual input as the trusted path", async () => {
+    seedSession();
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["paper content"], "paper.md", { type: "text/markdown" })]
+      }
+    });
+    fireEvent.change(screen.getByTestId("task-input"), {
+      target: { value: "这个项目的核心能力是什么？" }
+    });
+
+    expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
     expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "2028 年全国部署预算"
+      "核心能力"
     );
     expect(screen.getByTestId("current-document-name").textContent).toContain(
-      "sample_brief.md"
+      "paper.md"
     );
     expect(screen.getByTestId("submit-task-button")).toBeEnabled();
   });
 
-  it("turns a quickstart task card into a runnable one-click flow", async () => {
+  it("clears a long manual question with one click", async () => {
     seedSession();
 
     render(<App />);
 
     await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
-    fireEvent.click(screen.getByText("试一试 问答"));
+    fireEvent.change(screen.getByTestId("file-input"), {
+      target: {
+        files: [new File(["paper content"], "paper.md", { type: "text/markdown" })]
+      }
+    });
+    fireEvent.change(screen.getByTestId("task-input"), {
+      target: { value: "这是一段很长的问题，用来确认重新提问时不用手动一点点删除。" }
+    });
 
-    expect(screen.getByTestId("task-option-ask")).toHaveAttribute("aria-pressed", "true");
-    expect((screen.getByTestId("task-input") as HTMLTextAreaElement).value).toContain(
-      "第一阶段"
-    );
-    expect(screen.getByTestId("current-document-name").textContent).toContain(
-      "sample_brief.md"
-    );
     expect(screen.getByTestId("submit-task-button")).toBeEnabled();
+    fireEvent.click(screen.getByTestId("clear-question-button"));
+
+    expect(screen.getByTestId("task-input")).toHaveValue("");
+    expect(screen.getByTestId("submit-task-button")).toBeDisabled();
+  });
+
+  it("keeps processing settings collapsed beside the question", async () => {
+    seedSession();
+
+    render(<App />);
+
+    await waitFor(() => expect(fetchCurrentSessionMock).toHaveBeenCalled());
+
+    expect(screen.getByTestId("question-settings")).toHaveAttribute("hidden");
+    fireEvent.click(screen.getByTestId("settings-toggle-button"));
+
+    expect(screen.getByTestId("question-settings")).not.toHaveAttribute("hidden");
+    fireEvent.click(screen.getByTestId("task-option-summary"));
+    fireEvent.click(screen.getByTestId("detail-option-detailed"));
+
+    expect(screen.getByTestId("task-option-summary")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("detail-option-detailed")).toHaveAttribute("aria-pressed", "true");
   });
 
   it("shows a timeout hint and lets the operator retry", async () => {
