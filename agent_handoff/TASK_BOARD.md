@@ -2,6 +2,8 @@
 
 ## Now
 
+- `2026-05-29`: 赛题一 rubric 审计 + 冲国一优化已落地（commits `99261b2` 代码 + `49ae82e` 材料，未推送）。代码侧：`_run_agentic_ask` 真 agentic 检索循环（智能体加分项做实，backend 81 passed）、平台 `platform_request_id` 捕获（决赛对账）、ResultPanel 对照锚点、新增 agentic/quote-fabrication/bbox 单测。材料侧：端云协同 reframe（ARCHITECTURE Edge|近端|Cloud 分层 + 5 份材料命名）、默认模型口径诚实化（51/51 归 qwen3-235b rollback，默认 flash=48/51+V6 71/72）、新增 `COMMERCIALIZATION_CASE.md`、token 诚实重跑（长文 ask 89.1%→86.6%，峰值 93.1% 不变，tiktoken 入 requirements）、订正 PLATFORM_USAGE 失实 id 表述 + 决赛 platform_request_id 对账正解、deck 重渲染、DEMO_SCRIPT/G3 口径 stale 修复。详见 SESSION_LOG `2026-05-29`。
+- `2026-05-29` 待办（建议演示机 MaaS 连通时做）：① agentic vs 单轮 RAG 难例子集量化对照；② RAG-vs-FullContext baseline 对照报告（补 p.264"可量化显著提升 vs 现有方法"，预计 +4-6 分）；③ 重跑锁定 3 题生成带 platform_request_id 的新鲜调用记录 + infini-ai 控制台并排截图（决赛 MaaS 调用记录权威载体）。待用户拍板可选项：端侧 TS 预筛组件 `edgePrefilter.ts`（端云协同 B 方案，须隐藏入口）。
 - No hard engineering blocker is currently open
 - Real Wuwen Xinqiong minimal-path validation is now done in-project
 - A gold-sample candidate PDF plus `2 answerable + 1 refusal` candidate prompts are now locked

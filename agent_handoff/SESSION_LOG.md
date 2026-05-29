@@ -1,5 +1,25 @@
 ﻿# Session Log
 
+## 2026-05-29 / Claude (赛题一 rubric 审计 + 冲国一优化：agentic 循环 / 端云协同 / 平台 id / 商业化)
+
+- 背景：用户要求"结合研电赛赛题指南，针对得分项指出不足并优化，目标国一"。先从赛题 PDF（`2026第二十一届研电赛赛题指南及清单.pdf` p.113-119）抽出**无问芯穹赛题一**一手评分细则（用 PyMuPDF，因无 pdftoppm），跑了一个 8 维审计 workflow（9 agents），再据红队综合执行。
+- 三个战略决策（用户拍板）：① 端云协同 → 纯材料 reframe（A）；② 智能体加分 → 做实 agentic 循环；③ 现场默认模型 → 保持 `deepseek-v4-flash`，口径诚实化。
+- 代码（commit `99261b2`，backend 81 passed / frontend 14 passed / build clean）：
+  - `_run_agentic_ask`：检索→模型自评证据→不足则用 `followup_query` 补检索新片段→2 轮收敛；严格超集旧 evidence-retry，拒答/逐字 quote 校验契约不变；返回扩展后的 chunk 集供 citation 解析；`agent_iterations/query_rewrites` 落日志。prompt 加可选 `need_more/followup_query`。
+  - 平台 request id：`model_client` 捕获 MaaS response `id` + `x-request-id` 头 → `ModelResult.platform_request_id` → `TaskResult`/`CallLogEntry`（决赛对账）。
+  - 前端 `ResultPanel` 答案卡下方加静态"对照锚点"（普通问答 vs 研答通），答案区不下移，暖米白+橙红。
+  - 新测试：`test_agentic_ask_reretrieves_with_followup_query`、`test_validated_quotes_drop_fabricated_text`、`test_bbox_matcher.py`（6 例）。
+- 材料（commit `49ae82e`）：
+  - 端云协同：`ARCHITECTURE.md` 重写为 Edge|近端|Cloud 分层；`PROJECT_ONE_PAGER`/`PRODUCT_TECHNICAL_WRITEUP`/`SCORING_EVIDENCE_MATRIX` 显式命名端云分工，诚实标注 PDF 渲染在服务端。
+  - 模型口径：`51/51` 明确归 rollback `qwen3-235b`；当前默认 `deepseek-v4-flash` 诚实呈现 `48/51` + V6 `71/72`/拒答100%/引用98.3%。`HARD_EVIDENCE` / `MATRIX` / `deck_3page_final`(重渲染仍 3 页) 全部同步。
+  - 商业化：新增 `evidence/materials/COMMERCIALIZATION_CASE.md`（6 段，B 端高校席位为主 + 诚实口径声明）。
+  - Token：诚实重跑 `eval_token_compression.py`，长文 ask `89.1%→86.6%`、长文 8 任务 `86.2%→84.9%`，峰值 `93.1%` 不变；`tiktoken==0.12.0` 入 `requirements.txt`。
+  - 平台使用：订正 `PLATFORM_USAGE_EVIDENCE.md:156` 失实的"id 都能对上"，写清决赛用 `platform_request_id` 控制台对账正解。
+  - stale 修复：`DEMO_SCRIPT_3MIN` 删除已移除的"示例问答"入口提示；G3 three-run→six-run；ONE_PAGER 测试数 55→81。
+- **未做（建议下次在演示机有 MaaS 连通时跑）**：① agentic vs 单轮 RAG 在难例子集的量化对照（rank 6）；② RAG-vs-FullContext baseline 对照报告（rank 7，补 p.264"可量化显著提升 vs 现有方法"，预计 +4-6 分，需 51×2 真实调用）；③ 重跑锁定 3 题生成带 `platform_request_id` 的新鲜调用记录并配控制台并排截图。
+- 待用户拍板的可选项：端云协同的"B 选项"——浏览器侧 TS 端侧预筛组件（`edgePrefilter.ts`，L 工作量，须走隐藏入口避免碰答案区/视觉 guardrail）。本轮按推荐只做了纯 reframe（A）。
+- 未推送 GitHub（按 `feedback_git_habit`，推送前问用户）。
+
 ## 2026-04-30 / Codex (contract patch rerun promotes DeepSeek V4 Flash for QA rehearsal)
 
 - Background:
@@ -2202,3 +2222,25 @@ Follow-up to the same day's 档 1 revert. Built the bbox overlay approach end-to
   - 不要为 Render 重写 cookie / CORS — Render 同样同源部署，FastAPI 已经挂好 SPA fallback
 - 一句话状态:
   - 代码侧 100% ready；部署卡在 HF 免费档对中国大陆不友好；下次切 Render，30 分钟内能拿到稳定上线 URL
+
+## 2026-05-29 / Claude (评分点优化：部署修复 + 未提交改动固化 + sanity 回归)
+
+- Background:
+  - 用户开 ultracode，要求"按比赛实际评分点优化项目"。先跑了一个 7 维度评分桶 workflow（平台/产品完整/产品演示/技术/商业化/智能体/token）做对抗式审计；schema 太严，7 个审计 agent 有 6 个没按格式返回，只有"现场答辩演示"桶深审成功——但它挖到的 render.yaml 三处问题与我独立查证一致，是真问题。
+- 工作树发现一大批未提交改动（+1470/-686，8 文件，未记进交接），核查后确认是成熟工作非半成品：
+  - 后端：低置信检索不再直接拒答，改为交模型复核、模型拿不出逐字证据才拒（task_service + retrieval_service overview-intent 兜底），回应"概览类问题误拒答"
+  - 前端：删掉登录/邀请码表单换成自动试用会话（ensureDemoSession），PDF 预览加 7 档缩放 + 多色矩形高亮；smoke test 已同步改成免登录流
+- 做的事（全部本地 commit，未推 GitHub）:
+  1. `42fedbc` 修 render.yaml：旧版是 plan:starter（付费）+ api/static 双服务跨域 + runtime:python（跳过 Dockerfile 不构建前端）三个会让答辩演示翻车的坑。重写成单 runtime:docker / plan:free 同源服务。**关键修复**：CORS_ORIGINS=https://*.onrender.com —— main.py 的 OriginValidationMiddleware（CSRF 防护）会把 Origin 不在白名单的 POST/DELETE 全挡成 403，旧配置留空会导致"页面能开但上传/提问全 403"。前端 api.ts:14 已确认 VITE_API_BASE_URL 未设时回退 /api 相对路径，同源自洽。同步重写 docs/DEPLOY_RENDER.md，DEFENSE_DEMO_RISK_CHECKLIST.md 加第 7 条"不要临场冷点 sleeping 的 free-tier URL"
+  2. `faf7b8d` 固化后端低置信复核改动（backend tests 39 passed）
+  3. `6b53faf` 固化前端免登录 + PDF 预览改动，顺手修 4 处残留登录文案（"重新登录"/"登录后才会显示"→ 免登录措辞）；vitest 14 passed，build clean
+- Verification:
+  - 后端 pytest test_services.py 39 passed；前端 vitest 14 passed；npm run build clean
+  - **`scripts/predeploy_sanity.py` 真 API 跑通：gold=3/3 gates=11/11 READY**；两道可答均 evidence=declared（非 candidate），拒答 no_match，errors=0 —— 证明低置信复核改动没破坏金标主链路。报告 evidence/reports/predeploy_sanity_20260529_143227.md
+- Open risks / 未决:
+  - **Render 是否真上线仍是最大未知数**：repo 内无 onrender.com 域名。render.yaml 现在是对的，但需用户去 Render New+→Blueprint 连 repo 真部署一次拿稳定 URL（填 4 个 sync:false：WUQIONG_API_KEY/MODEL_QA/MODEL_SUMMARY/MODEL_OUTLINE）
+  - 兜底截图仍是旧 UI（20260418/19）：前端已大改，下次彩排应用新 UI 重拍 4 张 gold 截图（capture_gold_sample_screenshots.js 需本地起 5173+8000）
+  - 三批 commit 都未推 GitHub，等用户许可
+- Recommended next step:
+  - 用户侧：去 Render 真部署一次验证（render.yaml 已修对）；确认要不要 push 这 3 个 commit
+  - 代码侧：基本到位。若再"继续优化"，最高价值是按新 UI 重拍兜底截图（演示资产一致性），其次是商业化加分项 one-pager
