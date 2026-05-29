@@ -82,10 +82,12 @@
 
 ## 当前 judge-facing 截图
 
-1. `20260419_gold_ask_research_focus.png`
-2. `20260419_gold_pdf_render.png`
-3. `20260419_gold_ask_rank_accuracy.png`
-4. `20260419_gold_refusal.png`
+> 当前界面版本（免登录试用 + 多档缩放 PDF 预览 + 答案对照锚点）于 2026-05-29 重拍，旧版 `20260419_*` 为历史界面，已被取代。
+
+1. `20260529_gold_ask_research_focus.png`
+2. `20260529_gold_pdf_render.png`
+3. `20260529_gold_ask_rank_accuracy.png`
+4. `20260529_gold_refusal.png`
 
 ## 当前模型决策
 

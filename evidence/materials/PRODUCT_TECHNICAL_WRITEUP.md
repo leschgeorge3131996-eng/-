@@ -138,10 +138,12 @@
 
 ### 6.5 judge-facing 截图集
 
-1. `20260419_gold_ask_research_focus.png`
-2. `20260419_gold_pdf_render.png`
-3. `20260419_gold_ask_rank_accuracy.png`
-4. `20260419_gold_refusal.png`
+当前界面于 2026-05-29 重拍（旧 `20260419_*` 为历史界面）：
+
+1. `20260529_gold_ask_research_focus.png`
+2. `20260529_gold_pdf_render.png`
+3. `20260529_gold_ask_rank_accuracy.png`
+4. `20260529_gold_refusal.png`
 
 ## 7. 当前产品价值
 

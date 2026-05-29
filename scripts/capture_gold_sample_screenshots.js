@@ -542,16 +542,22 @@ async function waitForOutputChange(cdp, previousText, { requirePdfButton = null,
         const output = document.querySelector('[data-testid="result-output"]');
         const panel = document.querySelector('[data-testid="result-panel"]');
         const submit = document.querySelector('[data-testid="submit-task-button"]');
+        const refusalCard = document.querySelector('[data-testid="refusal-card"]');
         const pdfButtons = document.querySelectorAll('[data-testid^="open-pdf-"]').length;
         return {
           outputText: output ? output.innerText.trim() : '',
           panelText: panel ? panel.innerText.trim() : '',
           submitText: submit ? submit.innerText.trim() : '',
+          refusal: Boolean(refusalCard),
           pdfButtons
         };
       })()`
     );
-    if (!state || !state.outputText || !state.panelText || state.submitText !== "提交任务") {
+    if (!state || !state.panelText || state.submitText !== "开始处理") {
+      return null;
+    }
+    // answered results expose result-output; refusals render a dedicated refusal-card
+    if (!state.outputText && !state.refusal) {
       return null;
     }
     if (state.panelText === previousText) {
@@ -571,9 +577,9 @@ async function readEvidenceMode(cdp) {
   return evaluate(
     cdp,
     `(() => {
-      if (document.querySelector('[data-testid="evidence-mode-declared"]')) return 'declared';
-      if (document.querySelector('[data-testid="evidence-mode-candidate"]')) return 'candidate';
-      if (document.querySelector('[data-testid="evidence-mode-none"]')) return 'none';
+      if (document.querySelector('[data-testid="evidence-mode-card-declared"]')) return 'declared';
+      if (document.querySelector('[data-testid="evidence-mode-card-candidate"]')) return 'candidate';
+      if (document.querySelector('[data-testid="evidence-mode-card-none"]')) return 'none';
       return null;
     })()`
   );
@@ -867,15 +873,23 @@ async function readPdfPreviewProvenance(cdp) {
 }
 
 async function captureStatsPanelIfAvailable(cdp, outputPath) {
-  const hasToggle = await evaluate(
-    cdp,
-    "Boolean(document.querySelector('[data-testid=\"stats-toggle\"]'))"
-  );
-  if (hasToggle) {
+  try {
+    const hasToggle = await evaluate(
+      cdp,
+      "Boolean(document.querySelector('[data-testid=\"stats-toggle\"]'))"
+    );
+    if (!hasToggle) {
+      console.warn("[capture] stats panel skipped: no stats-toggle in current UI");
+      return false;
+    }
     await clickSelector(cdp, '[data-testid="stats-toggle"]');
     await waitForSelector(cdp, '[data-testid="stats-grid"]', 10_000);
+    await captureElementScreenshot(cdp, '[data-testid="stats-grid"]', outputPath);
+    return true;
+  } catch (error) {
+    console.warn(`[capture] stats panel screenshot skipped: ${error.message}`);
+    return false;
   }
-  await captureClosestPanelScreenshot(cdp, '[data-testid="stats-summary"]', outputPath);
 }
 
 async function captureApiDocsScreenshot(cdp, outputPath) {
@@ -974,8 +988,9 @@ async function main() {
     createdPaths.push(refusalPath);
 
     const statsPath = path.join(SCREENSHOT_DIR, `${datePrefix}_stats_panel.png`);
-    await captureStatsPanelIfAvailable(browser.cdp, statsPath);
-    createdPaths.push(statsPath);
+    if (await captureStatsPanelIfAvailable(browser.cdp, statsPath)) {
+      createdPaths.push(statsPath);
+    }
 
     const apiDocsPath = path.join(SCREENSHOT_DIR, `${datePrefix}_api_docs.png`);
     if (await captureApiDocsScreenshotIfAvailable(browser.cdp, apiDocsPath)) {
