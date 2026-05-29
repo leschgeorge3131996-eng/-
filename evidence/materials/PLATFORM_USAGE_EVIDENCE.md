@@ -152,9 +152,16 @@
 | `6` | answerable 2 | `eeac7cd2fbd44bac84c30a479fa0716e` |
 | `6` | refusal | `51be99cceee54d3ab613eaf58d5372b1` |
 
-附录说明：
-- 这些 request id 都能在 `data/logs/call_logs.jsonl` 和对应实验记录中互相对上。
+附录说明（诚实口径）：
+- 上表这些 id 是系统的**本地 request_id**（`task_service` 生成的 `uuid4`），用于在各次实验记录内部交叉追踪，**仅作内部追溯**；它们记录在对应的实验 `.md`（`20260419_q2_*` / `20260420_g3_*` / `20260423_g3_*`）里。
+- `data/logs/call_logs.jsonl` 会随运行滚动归档（最近一次归档于 2026-05-29，见 `data/logs/archive/`），因此历史 id 不保证都在当前 live log 内逐条留存——它们以带时间戳的实验记录为准做交叉佐证，而非以原始 raw log 复核。
 - 首批 3 轮的 refusal 使用 `retrieval_gate`，续 3 轮中 Run 4 使用 `retrieval_gate`，Run 5-6 使用 `llm_refused`。
+
+### 决赛"MaaS API 调用记录"正解（可控台对账）
+
+- 从 2026-05-29 起，每次真实调用都额外捕获**无问芯穹平台返回的 request id**（`platform_request_id`，取自 MaaS response 的 `id`（`chatcmpl-…`）/ `x-request-id` 响应头），与本地 `request_id` 并存写入 `call_logs.jsonl`（代码：`model_client.py` 捕获 → `task_service.py` 落库）。
+- 这个 `platform_request_id` **可在 infini-ai 控制台逐条对账**，是决赛"MaaS API 调用记录等证明材料"应提交的权威载体。
+- 推荐流程：决赛前在演示机按 `GOLD_SAMPLE_RUNBOOK.md` 重跑锁定 3 题 → `call_logs.jsonl` 落下一批带 `platform_request_id` 的新鲜记录 → 用脚本 `scripts/export_log_summary.py` 导出，并对其中 2-3 条配 infini-ai 控制台同一记录的并排截图。这样"用了平台"就从"口说真实"升级为"可现场对账"。
 
 ## judge-facing 截图索引
 

@@ -21,7 +21,8 @@ const JOBS = [
       "upload -&gt; ask -&gt; citation -&gt; PDF -&gt; refusal",
       "strict G3",
       "retrieval_no_match",
-      "qwen3-235b-a22b-instruct-2507",
+      "deepseek-v4-flash",
+      "无问芯穹",
     ],
   },
   {

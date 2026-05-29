@@ -17,7 +17,8 @@
 
 | 评分线 | 评委想看什么 | 当前主证据 | 答辩时怎么讲 |
 | --- | --- | --- | --- |
-| 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、真实 request id 与截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹，并保留了模型、请求记录、截图和 replay 证据。 |
+| **赛题主题：端侧/云端协同** | 作品是否回应赛题一"端侧/云端协同应用"命题，而非纯云端网页 | `ARCHITECTURE.md`（Edge\|近端\|Cloud 分层图）、`evidence/reports/token_compression_eval.md` | 端侧/近端做解析/切块/检索/证据 bbox 定位，云端（无问芯穹 MaaS）只做必要片段推理；Token 压缩（长文 ask 平均省 86.6%）就是协同的量化收益。 |
+| 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl`（含平台 request_id）、`evidence/reports/gold_sample_qa_compare_latest.md`、调用截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹；每次调用都落 token 与**平台 request_id**，可在 infini-ai 控制台逐条对账（本地 request_id 仅作内部追踪）。 |
 | 产品能力 `40` | 作品是否围绕清晰场景解决真实问题，是否有稳定、可理解的用户价值 | `PROJECT_ONE_PAGER.md`、`PRODUCT_TECHNICAL_WRITEUP.md`、最终 `3` 页 PPT / `5` 分钟视频、四张核心截图 | 我们解决的是“论文/报告阅读时能答、还能回到证据”的问题，不是泛化聊天。 |
 | 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md`、`evidence/reports/extended_eval_v1_latest.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |
 | 现场演示 / 答辩 | 是否能稳、能复现、能扛追问 | `GOLD_SAMPLE_RUNBOOK.md`、`QA_BRIEF.md`、`HARD_EVIDENCE_SUMMARY.md`、最终截图集、最终 `3` 页 PPT / `5` 分钟视频 | 演示不现场 improvisation，只走锁定样例、锁定问题和预定备用路径；追问时按证据页和 runbook 回答。 |
@@ -28,10 +29,10 @@
 
 | 加分项 | 当前命中情况 | 证据 |
 | --- | --- | --- |
-| 平台利用率 `5` | 主 QA 链路 + 记录 + 真实 replay 均跑在无问芯穹平台 | 同"平台使用"一栏 |
-| 商业化潜力 `5` | 面向科研人员论文速读 + 答辩准备场景，需求明确 | `PROJECT_ONE_PAGER.md` |
-| 大模型与智能体能力 `5` | 主链路使用大模型 + prompt-layer 拒答 + retrieval metadata-intent fallback | `ARCHITECTURE.md`、`HARD_EVIDENCE_SUMMARY.md` 第 7 节 |
-| **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `89.1%`，峰值 `93.1%`** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
+| 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS，多任务多模型路由（QA=`deepseek-v4-flash` / summary·outline=`qwen3-235b` / 验证 fallback），调用留痕含**平台 request_id** 可在 infini-ai 控制台对账 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl` |
+| 商业化潜力 `5` | 已选定 **B 端高校实验室/课题组席位**为主路径 + C 端答辩季入口，完成市场量级 / 竞品差异 / 单位经济（token 压缩支撑低边际成本）/ 获客论证 | `COMMERCIALIZATION_CASE.md` |
+| 大模型与智能体能力 `5` | 主链路使用无问芯穹大模型 + 单层 **agentic 检索循环**（检索→模型自评证据是否充分→不足则改写 query 补检索→2 轮收敛，`agent_iterations/query_rewrites` 落日志）+ 检索/模型双层拒答 | `ARCHITECTURE.md` 设计点 4、`HARD_EVIDENCE_SUMMARY.md` 第 9 节 |
+| **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `86.6%`，峰值 `93.1%`（Attention 论文 `10,263 → 704` tokens）；同时是端侧/云端协同的量化收益** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
 
 ## 平台使用：评委追问点
 
@@ -99,7 +100,7 @@
 4. 检索无命中时显式拒答；关键词命中但无真实依据时 LLM 层二次拒答
 5. 量化指标（双层样本量披露）：
    - **锁定 `3` 题 strict G3**：证据声明率 `100%`、引用准确率 `100%`、拒答精确率 `100%`、跨轮一致性 `100%`（详见 `quantitative_eval_metrics.md`）
-   - **扩展 `51` 题 full**：旧版 `46/51` 用于暴露边界；最终默认模型 + 定向检索/上下文修复后为 `51/51`，**拒答精确率 `100%`**、引用页码命中率 `100%`、证据声明率 `100%`（详见 `extended_eval_v1_latest.md`、范围见 `EXTENDED_EVAL_SCOPE.md`）
+   - **扩展 `51` 题 full**：旧版 `46/51` 用于暴露边界；rollback 模型 `qwen3-235b-a22b-instruct-2507` 在定向检索/上下文修复后闭环为 `51/51`（拒答精确率/引用页码命中率/证据声明率均 `100%`）。**当前默认 `deepseek-v4-flash` 在同一 51 题固定集为 `48/51`（94.1%）**，并在更难的 V6 extreme holdout 上达 `71/72`、拒答精确率 `100%`、引用准确率 `98.3%`（即"现场实际跑的默认模型"在更严苛集上反而更强；详见 `holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`、`extended_eval_v1_*`，范围见 `EXTENDED_EVAL_SCOPE.md`）
 
 ### 追问 2：你们怎么证明不是只会演示一题？
 
@@ -112,7 +113,7 @@
 
 答法：
 
-- 锁定 `3` 题是 judged-demo path 的最强可复现证据；为了回答"`3` 题 `100%` 是不是小样本幻觉"，我们把样本量从 `3` → `20` → 扩到 `51` 题（中英论文 + 中文短文档）。旧版 `46/51` 暴露 retrieval 边界；最终默认模型在定向检索/上下文修复后闭环为 `51/51`，拒答精确率 `100%`、引用页码命中率 `100%`。
+- 锁定 `3` 题是 judged-demo path 的最强可复现证据；为了回答"`3` 题 `100%` 是不是小样本幻觉"，我们把样本量从 `3` → `20` → 扩到 `51` 题（中英论文 + 中文短文档）。旧版 `46/51` 暴露 retrieval 边界；rollback 模型 `qwen3-235b` 在定向检索/上下文修复后闭环为 `51/51`，拒答精确率 `100%`、引用页码命中率 `100%`；当前默认 `deepseek-v4-flash` 在同集为 `48/51`（94.1%），并在更难的 V6 holdout 上达 `71/72`（拒答 `100%`、引用 `98.3%`）——口径以现场实际模型为准，不把 rollback 的 51/51 说成默认模型成绩。
 - 扩展评测暴露并闭环了两个真实问题：
   1. prompt 强制 `evidence_quotes` 非空导致诱导拒答场景下硬答，拒答精确率一度为 `0%`（commit `7f2713d` 修复）
   2. 元信息类 query（作者 / 主要贡献）召回首页 chunk 不稳，曾有 `3` 道题失败（metadata intent fallback 修复）
@@ -130,7 +131,7 @@
 答法：
 
 - 我们的预处理是三层流水线：解析归一化 → 结构化切块（`ChunkService` 900 字 target / 100 字 overlap）→ 按任务意图的检索/上下文规划（`ContextPlannerService`，`ask` 走 retrieval、`summary/outline` 走 coverage）
-- 对长文档 `ask` 任务，4 个样本平均节省 **89.1%**，峰值 **93.1%** —— 比如 Attention 论文从 10,263 tokens 压到 704 tokens（6.9%）
+- 对长文档 `ask` 任务，4 个样本平均节省 **86.6%**，峰值 **93.1%** —— 比如 Attention 论文从 10,263 tokens 压到 704 tokens（6.9%）；这也是端侧/云端协同的量化收益（端侧只把必要片段上云）
 - 短文档场景诚实标注为 `-4%` 左右（单 chunk 加页码/标题 marker 略增），不是所有场景都该压、也不假装都压得动
 - baseline 取"解析后全文塞 prompt" vs 实际走 planner 后的 `document_text`，token 数用 tiktoken `cl100k_base` 做统一尺子；无问芯穹底层 Qwen/DeepSeek BPE 会有 ±10% 偏差，但相对节省比稳健
 - 报告里 1 个走 `no_match` 拒答路径的样本**明确不计入节省统计**，按 `feedback_eval_honesty` 纪律处理

@@ -52,34 +52,29 @@
 
 - `PLATFORM_USAGE_EVIDENCE.md`
 
-## 4. 系统结构
+## 4. 系统结构（端云分层协同）
 
-### 前端
+研答通是**端云分层协同**架构，正面回应赛题一"端侧/云端协同应用"命题：解析、切块、检索、上下文压缩、证据定位等"重而可本地化"的工作在端侧/近端完成，只把命中任务意图的**必要片段**上云交无问芯穹 MaaS 推理。详见 `ARCHITECTURE.md`（Edge | 近端 | Cloud 分层图）。
 
-- React + TypeScript + Vite
-- 负责：
-  - 会话建立
-  - 文件上传
-  - 结果展示
-  - citation 点击与 PDF 预览
+### 端侧（浏览器，React + TypeScript + Vite）
 
-### 后端
+- 会话建立（HttpOnly cookie 本地态）、文件上传、任务输入、结果展示
+- **PDF 证据渲染层**：citation 点击 → bbox 高亮叠加、坐标映射、缩放翻页
+- **手动标注与标注页导出**（证据呈现 + 交互计算在端侧完成）
 
-- FastAPI
-- 负责：
-  - 文件接收与解析
-  - ask / summary / outline 路由
-  - 检索与上下文组织
-  - 调用无问芯穹平台
-  - 记录 request_id、token、latency、outcome
+### 近端服务（FastAPI 后端，部署节点本地，非云端大模型）
 
-### 本地处理
+- 文件接收与 PDF 解析（PyMuPDF 保留页级 block/line/bbox）
+- 文本分块、词法检索 + 双语 hint + 意图 fallback
+- **上下文规划与 Token 压缩**（按任务意图选片段，是协同的核心节省环节）
+- bbox 子串定位、逐字证据校验、citation 附着
+- 记录本地 request_id、**平台 platform_request_id**、token、latency、outcome 到 JSONL
 
-- 文档解析
-- 文本分块
-- 轻量检索
-- citation / bbox 附着
-- 本地日志与证据目录
+### 云端（无问芯穹 MaaS）
+
+- `ask / summary / outline` 大模型推理；端侧/近端只上送必要片段
+
+> 诚实标注：PDF 页面图像由近端服务用 PyMuPDF 栅格化后下发，端侧负责坐标映射与高亮/标注交互，不夸大为"端侧大模型推理"。协同的量化收益见第 7 节 Token 压缩。
 
 ## 5. 当前主技术链路
 
@@ -88,15 +83,18 @@
 - 支持 `PDF / TXT / Markdown`
 - PDF 解析保留页级结构，供 citation 与 PDF 回链使用
 
-### 5.2 ask 路径
+### 5.2 ask 路径（单层 agentic 检索循环）
 
 1. 用户提问
-2. 后端检索相关 chunk
+2. 近端检索相关 chunk
 3. 组织 ask 上下文
 4. 调用无问芯穹模型
-5. 提取 `used_chunk_ids / evidence_quotes`
-6. 组装 citation
-7. 回到 PDF 页面做证据显示
+5. **模型自评证据是否充分**：若不足，模型给出 `need_more=true` + `followup_query`
+6. **不足则用 `followup_query` 补检索新片段（排除已用 chunk）并再问一次**，最多 2 轮收敛（`agent_iterations / query_rewrites` 落日志）
+7. 提取 `used_chunk_ids / evidence_quotes`，对每条 quote 做原文子串校验（校验不过即丢弃，引用不可伪造）
+8. 组装 citation，回到 PDF 页面做 bbox 证据显示
+
+> 全程不改变拒答与证据契约：干净拒答仍拒答；模型不索要补充时退化为单轮。代码 `task_service.py::_run_agentic_ask`，测试 `test_agentic_ask_reretrieves_with_followup_query`。
 
 ### 5.3 refusal 路径
 
@@ -131,11 +129,11 @@
 
 ### 6.4 judged-demo rehearsal
 
-来源：`evidence/experiments/20260420_g3_strict_rehearsal.md`
+来源：`evidence/experiments/20260420_g3_strict_rehearsal.md`（首批 3 轮）+ `evidence/experiments/20260423_g3_continuation.md`（续 3 轮）
 
-- 已有 `3` 次连续 strict fresh-upload 记录
+- 已累计 `6` 轮连续 strict fresh-upload 记录（`6 / 6` 通过，每轮使用新 `file_id`）
 - 两次 answerable 全部保持 `declared`
-- refusal 全部保持 `retrieval_no_match`
+- refusal 全部保持 `retrieval_gate` 或 `llm_refused`，fallback `0 / 6`
 - 可作为当前更强的 judged-demo reproducibility evidence
 
 ### 6.5 judge-facing 截图集
@@ -156,12 +154,20 @@
 3. 离题问题时，系统显式拒答，避免编造
 4. 对答辩准备场景，citation 与 PDF back-link 的价值高于泛化生成
 
+### 7.1 端云协同与 Token 压缩（加分项 #4）
+
+端侧/近端三层预处理（解析 → 切块 → 按任务意图选片段）让只有必要上下文上云：长文档 `ask` 平均节省 **86.6%** input token、峰值 **93.1%**（Attention 论文 `10,263 → 704` tokens）。脚本 `scripts/eval_token_compression.py` 评委现场可复跑（`tiktoken` 已入 `requirements.txt`）。短文档诚实标注为非压缩目标（约 -4%）。这条既命中 Token 压缩加分项，又是端侧/云端协同的量化收益。详见 `evidence/reports/token_compression_eval.md`。
+
+### 7.2 商业化潜力（加分项 #2）
+
+主打 **B 端高校实验室/课题组席位订阅** + C 端答辩季入口。差异化不是"答得流畅"而是"答得可验证"（bbox 级回链 + 逐字校验 + 离题拒答），契合学术场景"说得出处"的刚需；毛利侧由 token 压缩支撑（每次问答边际推理成本压低近一个数量级）。完整市场量级 / 竞品差异 / 单位经济 / 获客论证见 `COMMERCIALIZATION_CASE.md`。
+
 ## 8. 当前边界与诚实说明
 
 1. 当前最强、最适合比赛主展示的能力是 `ask`，不是 `summary / outline`
 2. `summary / outline` 已支持，但 grounding 语义弱于 `ask`
 3. 当前 judged-demo 最强证据是锁定 gold-sample 路径，不是开放域产品泛化证明
-4. 当前 `G3` 最强记录已升级为 strict three-run batch，但仍不应包装成开放域泛化证明
+4. 当前 `G3` 最强记录已升级为 strict six-run batch（`6 / 6`），但仍不应包装成开放域泛化证明
 
 ## 9. 当前提交物结构
 

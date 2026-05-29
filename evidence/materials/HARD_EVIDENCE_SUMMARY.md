@@ -5,8 +5,8 @@
 研答通是一个引用可核验的文档问答系统，三个维度的差异：
 
 1. **不是生成后补页码，而是检索-引用-回链的硬链路**：每个回答都先检索、再作答、返回结构化 citation，可以跳转回 PDF 原页证据
-2. **不是小样本演示，而是 51 题真实评测**：覆盖中英论文与中文短文档；旧版 46/51 暴露边界，最终默认模型 + 定向检索修复闭环到 51/51，引用页码命中率与拒答精确率均为 100%
-3. **不是口头声称，而是 request ID 可核验**：每次调用都有 `data/logs/call_logs.jsonl` 留痕，可追溯到无问芯穹平台的真实 request ID
+2. **不是小样本演示，而是 51 题真实评测**：覆盖中英论文与中文短文档；旧版 46/51 暴露边界，rollback 模型 `qwen3-235b` 经定向检索修复闭环到 51/51（引用页码命中率与拒答精确率均 100%），当前默认 `deepseek-v4-flash` 在同集 48/51（94.1%）、在更难的 V6 holdout 上 71/72
+3. **不是口头声称，而是平台 request_id 可对账**：每次调用都有 `data/logs/call_logs.jsonl` 留痕，含无问芯穹平台返回的 `platform_request_id`，可在 infini-ai 控制台逐条对账（本地 request_id 仅作内部追踪）
 
 ## 一句话结论
 
@@ -120,18 +120,20 @@
 
 来源：`evidence/reports/extended_eval_v1_latest.md` · canonical final report `evidence/reports/extended_eval_v1_qwen3_235b_a22b_instruct_2507_retrieval_patch.md` · 脚本 `scripts/extended_eval.py` · 范围 `evidence/materials/EXTENDED_EVAL_SCOPE.md`
 
-样本从最初的 `3` 题 gold-sample → `20` 题 seed → 扩到 **`51` 题 full**（中英论文 + 中文短文档 × A1-A5 答题 + B1-B2 拒答），在同一条真实 API 主链路上端到端跑完。旧版 `46/51` 用于暴露 retrieval 边界；最终默认模型在 2026-04-24 定向检索/上下文 patch 后闭环为 `51/51`。
+样本从最初的 `3` 题 gold-sample → `20` 题 seed → 扩到 **`51` 题 full**（中英论文 + 中文短文档 × A1-A5 答题 + B1-B2 拒答），在同一条真实 API 主链路上端到端跑完。旧版 `46/51` 用于暴露 retrieval 边界；**rollback 模型 `qwen3-235b-a22b-instruct-2507`** 在 2026-04-24 定向检索/上下文 patch 后闭环为 `51/51`。
 
-| 指标 | 值 |
+> 口径对齐（重要）：下表 `51/51` 是 **rollback 模型 `qwen3-235b`** 的固定集回归。**当前现场默认 QA 模型是 `deepseek-v4-flash`**：它在同一 51 题集为 `48/51`（94.1%、拒答精确率 100%、声明率 100%），并在更难的 V6 extreme holdout 上达 `71/72`、拒答精确率 100%、引用准确率 98.3%（见 `holdout_eval_v6_contract_patch_qwen_vs_flash_20260430.md`、`evidence/reports/extended_eval_v1_deepseek_v4_flash_20260429.md`）。决赛交 MaaS 调用记录时 model 字段=`deepseek-v4-flash`，与此口径一致；不要把 rollback 的 51/51 说成默认模型成绩。
+
+| 指标（rollback `qwen3-235b`，51 题固定集） | 值 |
 | --- | --- |
-| 最终总通过率 | `100.0%` (`51/51`) |
-| 最终答题通过率 | `100.0%` (`43/43`) |
+| 总通过率 | `100.0%` (`51/51`) |
+| 答题通过率 | `100.0%` (`43/43`) |
 | **拒答精确率** | **`100%`** (`9/9`) |
 | 引用页码准确率 (page-hit) | `100.0%` |
 | 证据声明率 (evidence_mode=declared on answerable) | `100.0%` |
-| 平均延迟 | `5697 ms` |
+| 平均延迟 | `5697 ms`（含 evidence-retry 的端到端口径） |
 
-按文档分层：中文论文、Transformer 论文、研究报告、项目简介四类样本在最终默认模型回归中均通过。
+按文档分层：中文论文、Transformer 论文、研究报告、项目简介四类样本在 rollback 模型回归中均通过；当前默认 `deepseek-v4-flash` 的 3 个未过题集中在表格尾列/隐含结论类难例，属已知 retrieval 颗粒度边界。
 
 **三次定位 + 三次修复**：
 
@@ -155,15 +157,31 @@
 
 | 场景 | 样本数 | 平均节省 | 峰值 |
 | --- | ---: | ---: | ---: |
-| **长文档（PDF 论文）ask** | 4 | **89.1%** | **93.1%** |
-| **长文档 summary / outline** | 4 | **83.3%** | 89.4% |
+| **长文档（PDF 论文）ask** | 4 | **86.6%** | **93.1%** |
+| **长文档 summary / outline** | 4 | **83.2%** | 89.4% |
 | **短文档（MD / TXT）所有任务** | 23 | -4.2% | — |
 
-- 长文档 2 篇合计 8 个任务平均节省 **86.2%**；峰值出现在 Attention 论文的 `ask What are the experimental results?` — 10,263 → 704 tokens，**压到原文的 6.9%**
+- 长文档 2 篇合计 8 个任务平均节省 **84.9%**；峰值出现在 Attention 论文的 `ask What are the experimental results?` — 10,263 → 704 tokens，**压到原文的 6.9%**
 - 短文档 token 本来就少，context_planner 加页码/标题 marker 后略增（-3% 左右）；**诚实标注短文档不是压缩目标场景**
 - 1 个任务样本走 `no_match` 拒答路径，不计入节省统计（遵循 `feedback_eval_honesty` 纪律）
+- 数字以当前代码 `python scripts/eval_token_compression.py` 现场可复跑为准（`tiktoken` 已入 `requirements.txt`）；2026-05-29 复跑后长文 ask 由 89.1%→86.6%（近期 overview 检索改为多 pin 一段 head-context，更稳健但略增 token），峰值 93.1% 不变
 
-**答辩口径**：对**长文档 ask 任务**（论文速读 / 报告问答的主场景），研答通把 input token 从万级压到千级，**平均节省 89%**，峰值 93%。
+**答辩口径**：对**长文档 ask 任务**（论文速读 / 报告问答的主场景），研答通把 input token 从万级压到千级，**平均节省约 87%**，峰值 93%。这同时是**端侧/云端协同**的量化收益——端侧/近端只把必要片段上云推理。
+
+### 9. 单层 Agentic 检索循环（对应加分项 #3 大模型与智能体能力）
+
+来源：`backend/app/services/task_service.py::_run_agentic_ask` · 测试 `backend/tests/test_services.py::test_agentic_ask_reretrieves_with_followup_query`
+
+`ask` 主链路不是单轮 RAG，而是一个**受控 agentic 循环**：
+
+1. 检索 → 把命中片段交模型作答；
+2. **模型自评证据是否充分**：若不足，模型在同一次结构化输出里给出 `need_more=true` 与 `followup_query`（一个更聚焦的补充检索查询词）；
+3. 系统用 `followup_query` **补检索新片段**（排除已展示过的 chunk），把新证据并入上下文**再问一次**；
+4. 最多 `2` 轮收敛；`agent_iterations` 与 `query_rewrites` 落 `call_logs.jsonl`，agent 行为可现场核验。
+
+边界与安全：这是大模型 + agent 技术的有效组合（query 规划 + 证据自评 + 迭代补检索 + 收敛，即 self-RAG 雏形），但**完全不改变拒答与证据回链契约**——干净拒答仍拒答，逐字 quote 仍做原文子串校验，模型不索要补充时退化为单轮（行为与改造前一致）。单测 `test_agentic_ask_reretrieves_with_followup_query` 证明：当首轮证据不足时，系统确实用模型给出的 `followup_query` 检索到一个**全新片段**并在第二轮据其作答；`test_validated_quotes_drop_fabricated_text` 证明伪造 quote 会被丢弃。
+
+**答辩口径**：我们在 `ask` 主链路里做了一个受控的 agentic RAG——检索后让模型自评证据是否充分，不足就改写 query 再检索一轮，最多两轮收敛，全程不破坏拒答和证据回链；`agent_iterations / query_rewrites` 有日志可查，不是口头包装。
 
 ## 当前诚实边界
 

@@ -171,20 +171,20 @@
             <div style="display: grid; gap: 18px;">
               <div class="metric-grid">
                 <div class="metric-card">
-                  <strong>默认 QA</strong>
-                  <span>qwen3-235b-a22b-instruct-2507</span>
+                  <strong>平台 · 无问芯穹 MaaS</strong>
+                  <span>cloud.infini-ai.com/maas · 留痕含 platform_request_id</span>
                 </div>
                 <div class="metric-card">
-                  <strong>Validated fallback</strong>
-                  <span>qwen3-32b</span>
+                  <strong>默认 QA</strong>
+                  <span>deepseek-v4-flash（rollback: qwen3-235b）</span>
                 </div>
                 <div class="metric-card">
                   <strong>strict G3</strong>
-                  <span>fresh-upload 3 / 3</span>
+                  <span>fresh-upload 6 / 6</span>
                 </div>
                 <div class="metric-card">
-                  <strong>Refusal mode</strong>
-                  <span>retrieval_no_match</span>
+                  <strong>端云协同 · Token 压缩</strong>
+                  <span>长文 ask 平均省 86.6% / 峰值 93.1%</span>
                 </div>
               </div>
 
@@ -192,9 +192,9 @@
                 <h2 class="section-title">锁定判断</h2>
                 <ul class="bullet-list">
                   <li>Q2 证明系统不仅会概括，也能把具体数值落回原文。</li>
-                  <li>双模型在锁定题组上都通过 3 / 3，当前默认保持 235b。</li>
-                  <li>strict G3 三轮 fresh-upload 全通过，log-backed spans 为 13.5s / 12.9s / 15.8s。</li>
-                  <li>三轮 refusal 均保持 retrieval_no_match，fallback 为 0 / 3。</li>
+                  <li>主链路真实跑在无问芯穹 MaaS，当前默认 deepseek-v4-flash（V6 holdout 71/72），rollback qwen3-235b 在 51 题集 51/51。</li>
+                  <li>strict G3 六轮 fresh-upload 全通过（首批 spans 13.5s / 12.9s / 15.8s + 续 3 轮），fallback 为 0 / 6。</li>
+                  <li>端侧/近端做解析 / 检索 / 证据定位，云端只推必要片段——Token 压缩即端云协同的量化收益。</li>
                 </ul>
               </div>
 
