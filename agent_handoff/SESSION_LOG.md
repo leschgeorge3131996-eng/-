@@ -1,5 +1,26 @@
 ﻿# Session Log
 
+## 2026-05-30 / Claude (受控对照评测 baseline_compare + 全仓 drift 审计止损)
+
+- 背景：ultracode 开。用户连问"评分项该做的都做了吗 / 还能做什么"。先确认 MaaS 可用（真 id `chatcmpl-21dec832…`），再做两件事。
+- **新增硬证据：检索接地 vs 直接喂全文 受控对照**（命中技术能力 p.264「可量化显著提升+可复现」）：
+  - 新脚本 `scripts/baseline_compare_eval.py`：同一批 22 道长 PDF 可回答题、同一 ask 契约与判分，唯一变量是 document_text（RAG 检索片段 vs 带页码全文）。44 次真实 MaaS 调用，记录真实 `platform_request_id` 可对账。`--report-only` 可从 JSON 重建报告不重跑。
+  - 结果（`evidence/reports/baseline_compare_eval.{md,json}`）：**正确率 22/22 = 22/22 持平**，RAG 用 **4.37×** 更少 input token（49,273 vs 215,113），11/22 全文已被 30k 截断 → 倍数是保守下限。
+  - **诚实口径钉死**：不是"RAG 更准"，是"同等准确度下省 4.37× + 能 scale + 能 bbox 回链"。已折进 `HARD_EVIDENCE_SUMMARY.md §8.1`。
+- **全仓 drift 审计 workflow**（4 维只读扫 → 对抗校验 → 综合，42 agents / 15 confirmed）：核验结论=**无新增分点，全是材料一致性/可复现止损**；但 do_now 6 条里有 3 个评委一动手即穿帮。逐条亲自复核后全部修掉（本地 commit，未推）：
+  1. `compute_eval_metrics.py`：硬编码 G3_REQUEST_IDS 已轮换出 call_logs（13 行 0 匹配），第 237 行 `min(latencies)` 空列表必 traceback。改为 0 匹配优雅退出(exit 0)+docstring 标归档+min/max 兜底。
+  2. `HARD_EVIDENCE_SUMMARY.md:133` 拒答精确率 `9/9`→`8/8`（51 总−43 答题=8，写 9 自相矛盾）。
+  3. `HARD_EVIDENCE_SUMMARY.md` 92-100 行"默认保留 235b"与同文件 127 行"默认 flash"内部打架 → 统一为 flash 默认/235b rollback。
+  4. `poster.html` 默认模型 235b→flash（两处：第 39 metric-card + 122 结论 li）。
+  5. `video_subtitles_5min_final.srt` 第 8 字幕 235b 默认→flash 默认+V6 71/72 vs 56。
+  6. `poster.html`+`deck_3page_final.html` 截图 20260419→20260529（共 8 处；20260529 png 已确认存在）。**注意 `deck.html` 是归档旧 6 页版，故意保留旧口径，未动。**
+- Verification：backend pytest **81 passed**；两脚本 py_compile OK；compute_eval_metrics 实跑 exit 0 不再崩；consistency grep 确认当前提交物再无 20260419 / 9/9 / 默认 235b 残留。
+- Open risks / 未决：
+  - **第 6 条只改了 HTML——真正进评审的 `deck_3page_final.pdf`/`poster.pdf` 需人工浏览器重新打印导出才生效**（NOT Claude 能做）。
+  - 本轮一批改动**未推 GitHub**，等用户许可。
+  - 既有人工移交不变：录 5min 视频 / PPT 转 pptx / Render 真部署 / 撤销泄露 HF token（`hf_iuvi…`，仍需用户去 settings/tokens 撤）。
+- Recommended next step：Claude 侧已真正收口（剩下全是人的活）。用户决定是否 push + 重导 PDF。
+
 ## 2026-05-29 / Claude (赛题一 rubric 审计 + 冲国一优化：agentic 循环 / 端云协同 / 平台 id / 商业化)
 
 - 背景：用户要求"结合研电赛赛题指南，针对得分项指出不足并优化，目标国一"。先从赛题 PDF（`2026第二十一届研电赛赛题指南及清单.pdf` p.113-119）抽出**无问芯穹赛题一**一手评分细则（用 PyMuPDF，因无 pdftoppm），跑了一个 8 维审计 workflow（9 agents），再据红队综合执行。
