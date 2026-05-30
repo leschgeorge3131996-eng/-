@@ -574,14 +574,24 @@ export default function ResultPanel({
                   </div>
                   <div className="terminal-actions">
                     <span className="terminal-label">{TASK_LABELS[result.task_type]}输出</span>
-                    <button className="copy-button" type="button" onClick={handleCopyResult}>
+                    <button
+                      className="copy-button"
+                      data-state={copyState}
+                      type="button"
+                      onClick={handleCopyResult}
+                    >
                       {copyState === "done"
                         ? "已复制"
                         : copyState === "error"
                           ? "复制失败"
                           : "复制结果"}
                     </button>
-                    <button className="copy-button" type="button" onClick={handleExportResult}>
+                    <button
+                      className="copy-button"
+                      data-state={exportState}
+                      type="button"
+                      onClick={handleExportResult}
+                    >
                       {exportState === "done"
                         ? "已导出"
                         : exportState === "error"

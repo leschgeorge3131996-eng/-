@@ -418,7 +418,12 @@ export default function PdfPreviewPanel({
             >
               缩小
             </button>
-            <button className="ghost-button pdf-tool-button pdf-zoom-value" type="button" onClick={resetZoom}>
+            <button
+              className="ghost-button pdf-tool-button pdf-zoom-value"
+              type="button"
+              onClick={resetZoom}
+              aria-label={`当前缩放 ${Math.round(zoom * 100)}%，点击重置`}
+            >
               {Math.round(zoom * 100)}%
             </button>
             <button
