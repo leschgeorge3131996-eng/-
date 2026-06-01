@@ -307,6 +307,20 @@ export default function ResultPanel({
   const sourcePageCount = new Set(evidenceItems.flatMap((item) => item.page_numbers)).size;
   const showEvidenceSummary =
     evidenceSummary !== null && (result?.outcome !== "refused" || evidenceItems.length > 0);
+  // Demo-only 端云协同 ledger, gated behind a hidden `?ledger=1` entrance so real
+  // users never see it. Reads only fields already returned by the backend —
+  // zero new computation. (Near-end vs cloud latency split is intentionally
+  // omitted: agentic ask makes up to 2 cloud calls and cache hits zero latency,
+  // so any subtraction would be misleading.)
+  const ledgerEnabled =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("ledger");
+  const ledgerSourceChars = result?.source_document_chars ?? 0;
+  const ledgerUsedChars = result?.used_document_chars ?? 0;
+  const ledgerUploadPct =
+    ledgerSourceChars > 0 ? (ledgerUsedChars / ledgerSourceChars) * 100 : null;
+  const ledgerPromptTokens = result?.token_usage?.prompt_tokens;
+  const ledgerPlatformId = result?.platform_request_id ?? null;
 
   useEffect(() => {
     setCopyState("idle");
@@ -698,6 +712,56 @@ export default function ResultPanel({
                   <span>{sourcePageCount > 0 ? `覆盖 ${sourcePageCount} 页` : "页码待补充"}</span>
                   <span>{followUpQuestions.length} 个可追问问题</span>
                 </div>
+              </motion.div>
+            ) : null}
+
+            {result.task_type === "ask" && ledgerEnabled ? (
+              <motion.div
+                className="duanyun-ledger"
+                data-testid="duanyun-ledger"
+                {...revealMotion(0.5)}
+              >
+                <div className="duanyun-ledger-head">
+                  <span className="duanyun-ledger-kicker">端云协同 · 本次账本</span>
+                  <strong>近端就近压缩，云端只接收必要上下文</strong>
+                </div>
+                <div className="result-meta-grid">
+                  <div className="result-meta-card">
+                    <span>上下文压缩（按字符）</span>
+                    <strong>
+                      {ledgerUploadPct !== null ? `仅上送 ${ledgerUploadPct.toFixed(1)}%` : "—"}
+                    </strong>
+                  </div>
+                  <div className="result-meta-card">
+                    <span>平台 input token</span>
+                    <strong>
+                      {typeof ledgerPromptTokens === "number"
+                        ? ledgerPromptTokens.toLocaleString()
+                        : "—"}
+                    </strong>
+                  </div>
+                  <div className="result-meta-card">
+                    <span>命中证据</span>
+                    <strong>
+                      {result.retrieved_chunk_count} 片段 / {retrievedPages.length} 页
+                    </strong>
+                  </div>
+                  <div className="result-meta-card">
+                    <span>平台 request id</span>
+                    <strong>{ledgerPlatformId ?? "—"}</strong>
+                  </div>
+                </div>
+                <p className="duanyun-ledger-note">
+                  {ledgerSourceChars > 0
+                    ? `原文 ${ledgerSourceChars.toLocaleString()} 字符 → 实际上送 ${ledgerUsedChars.toLocaleString()} 字符（按字符口径${
+                        ledgerUploadPct !== null
+                          ? `，省约 ${Math.max(0, 100 - ledgerUploadPct).toFixed(1)}%`
+                          : ""
+                      }）。`
+                    : "本次未启用上下文压缩或文档过短。"}
+                  {result.cache_hit ? " 命中本地缓存，本次未实际调用云端。" : ""}
+                  {ledgerPlatformId ? " 平台 request id 可在无问芯穹控制台逐条对账。" : ""}
+                </p>
               </motion.div>
             ) : null}
 

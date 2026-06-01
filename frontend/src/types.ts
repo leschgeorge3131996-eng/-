@@ -107,6 +107,7 @@ export interface TaskResult {
   truncation_message?: string | null;
   context_truncated: boolean;
   token_usage?: TokenUsage | null;
+  platform_request_id?: string | null;
 }
 
 export interface RecentDocument {

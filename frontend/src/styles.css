@@ -1709,6 +1709,41 @@ textarea {
   word-break: break-word;
 }
 
+.duanyun-ledger {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(173, 76, 35, 0.06), rgba(255, 255, 255, 0.6));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.duanyun-ledger-head {
+  display: grid;
+  gap: 3px;
+}
+
+.duanyun-ledger-kicker {
+  color: var(--accent-deep);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.duanyun-ledger-head strong {
+  color: var(--ink-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.duanyun-ledger-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .evidence-mode-card {
   display: grid;
   gap: 6px;
