@@ -11,6 +11,51 @@
         margin: 0;
       }
     </style>
+    <style>
+      /* Page 3 is dense: keep the two columns at their natural height (top-aligned)
+         instead of stretching to match, so the right column's grid + bullets +
+         conclusion never get inflated/pushed off the slide on re-export. */
+      .slide-fit .body-grid.two-col > div {
+        align-self: start;
+        align-content: start;
+      }
+      /* The shared metric-card value font (29px) is oversized for this dense page
+         and forces 3-line wraps; tighten it here only so all four cards + the
+         conclusion fit on one slide. */
+      .slide-fit .metric-grid {
+        gap: 12px;
+      }
+      .slide-fit .metric-card {
+        padding: 14px 18px;
+      }
+      .slide-fit .metric-card span {
+        margin-top: 6px;
+        font-size: 21px;
+        line-height: 1.2;
+      }
+      /* Compress the dense 锁定判断 bullets + conclusion so all four bullets and
+         the closing callout fit without dropping any content. */
+      .slide-fit .card {
+        padding: 16px 20px;
+      }
+      .slide-fit .section-title {
+        font-size: 21px;
+      }
+      .slide-fit .bullet-list {
+        gap: 8px;
+      }
+      .slide-fit .bullet-list li {
+        font-size: 16px;
+        line-height: 1.42;
+      }
+      .slide-fit .callout {
+        padding: 14px 18px;
+      }
+      .slide-fit .callout span {
+        font-size: 16px;
+        line-height: 1.42;
+      }
+    </style>
   </head>
   <body>
     <main class="page-shell">
@@ -130,7 +175,7 @@
         </div>
       </section>
 
-      <section class="slide">
+      <section class="slide slide-fit">
         <div class="slide-inner">
           <div class="eyebrow">Boundary &amp; Reproducibility / Page 3</div>
           <h2 class="section-title">数值能回原文，离题会拒答，strict G3 可复现</h2>
@@ -140,7 +185,7 @@
           </p>
 
           <div class="body-grid two-col">
-            <div style="display: grid; gap: 18px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-self: start;">
               <div class="image-panel">
                 <div class="image-frame">
                   <img
@@ -168,11 +213,11 @@
               </div>
             </div>
 
-            <div style="display: grid; gap: 18px;">
+            <div style="display: grid; gap: 12px;">
               <div class="metric-grid">
                 <div class="metric-card">
                   <strong>平台 · 无问芯穹 MaaS</strong>
-                  <span>cloud.infini-ai.com/maas · 留痕含 platform_request_id</span>
+                  <span>cloud.infini-ai.com/maas · request id 可对账</span>
                 </div>
                 <div class="metric-card">
                   <strong>默认 QA</strong>
@@ -184,7 +229,7 @@
                 </div>
                 <div class="metric-card">
                   <strong>对照「直接喂全文」</strong>
-                  <span>准确率持平 100%，input token 仅 1/4.37</span>
+                  <span>input token 仅 1/4.37（准确率持平）</span>
                 </div>
               </div>
 
@@ -192,15 +237,15 @@
                 <h2 class="section-title">锁定判断</h2>
                 <ul class="bullet-list">
                   <li>Q2 证明系统不仅会概括，也能把具体数值落回原文。</li>
-                  <li>主链路真实跑在无问芯穹 MaaS，当前默认 deepseek-v4-flash（V6 holdout 71/72），rollback qwen3-235b 在 51 题集 51/51。</li>
-                  <li>strict G3 六轮 fresh-upload 全通过（首批 spans 13.5s / 12.9s / 15.8s + 续 3 轮），fallback 为 0 / 6。</li>
-                  <li>端云协同：端侧/近端做解析、检索、证据定位，云端只推必要片段——长文 ask 平均省 86.6%（峰值 93.1%）；同 22 题受控对照下准确率一样是 100%，但 input token 只要“直接喂全文”的 1/4.37（44 次真实调用、平台 id 可对账；全文还有 11/22 题因太长被截断，故 4.37× 为保守下限）。</li>
+                  <li>主链路真实跑在无问芯穹 MaaS，默认 deepseek-v4-flash（71/72），rollback qwen3-235b（51/51）。</li>
+                  <li>strict G3 六轮 fresh-upload 全通过，fallback 为 0 / 6。</li>
+                  <li>端侧/近端做解析 / 检索 / 证据定位，云端只推必要片段——Token 压缩即端云协同的量化收益。</li>
                 </ul>
               </div>
 
               <div class="callout accent">
                 <strong>收束结论</strong>
-                <span>研答通的差异点不是更会聊天，而是把 evidence-backed QA 做成了可演示、可复现、可追溯的闭环。</span>
+                <span>研答通把 evidence-backed QA 做成可演示、可复现、可追溯的闭环。</span>
               </div>
             </div>
           </div>
