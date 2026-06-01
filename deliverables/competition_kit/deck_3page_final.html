@@ -183,8 +183,8 @@
                   <span>fresh-upload 6 / 6</span>
                 </div>
                 <div class="metric-card">
-                  <strong>端云协同 · Token 压缩</strong>
-                  <span>长文 ask 平均省 86.6% / 峰值 93.1%</span>
+                  <strong>对照「直接喂全文」</strong>
+                  <span>准确率持平 100%，input token 仅 1/4.37</span>
                 </div>
               </div>
 
@@ -194,7 +194,7 @@
                   <li>Q2 证明系统不仅会概括，也能把具体数值落回原文。</li>
                   <li>主链路真实跑在无问芯穹 MaaS，当前默认 deepseek-v4-flash（V6 holdout 71/72），rollback qwen3-235b 在 51 题集 51/51。</li>
                   <li>strict G3 六轮 fresh-upload 全通过（首批 spans 13.5s / 12.9s / 15.8s + 续 3 轮），fallback 为 0 / 6。</li>
-                  <li>端侧/近端做解析 / 检索 / 证据定位，云端只推必要片段——Token 压缩即端云协同的量化收益。</li>
+                  <li>端云协同：端侧/近端做解析、检索、证据定位，云端只推必要片段——长文 ask 平均省 86.6%（峰值 93.1%）；同 22 题受控对照下准确率一样是 100%，但 input token 只要“直接喂全文”的 1/4.37（44 次真实调用、平台 id 可对账；全文还有 11/22 题因太长被截断，故 4.37× 为保守下限）。</li>
                 </ul>
               </div>
 
