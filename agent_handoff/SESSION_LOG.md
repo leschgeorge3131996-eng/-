@@ -1,5 +1,14 @@
 ﻿# Session Log
 
+## 2026-06-01 / Claude (端云协同顶一截：deck 补 4.37× + 隐藏入口账本面板；降级评估后缓做)
+
+- 背景：用户问"端云协同能怎么再顶一截"。开 ultracode 跑了 6 视角设计评议盘（14 agents，~73 万 token）+ 红队对抗。结论：①`rubric-proportion` 提案前提造假——材料/PPT 早有"端云协同"逐字话术（`ARCHITECTURE.md:3/35`、`SCORING_EVIDENCE_MATRIX.md:20`、`deck_3page_final.html:186/197`），已证伪 **kill**；②`edge-compute`(浏览器小模型)/`routing`(近端直答) 双 **kill**（撞《不上本地模型》红线 / 纯页数查询适用面≈0 且动冻结主链路）；③真杠杆是把**已成文**的 RAG-vs-FullContext `4.37×` 从证据档搬进 3 页 PPT（`HARD_EVIDENCE_SUMMARY.md §8.1` 已写全，但 deck 里 0 命中）。
+- 做了两件（均本地提交，未推 GitHub）：
+  - **deck 补 4.37×**（commit `7195671`）：`deck_3page_final.html` 第 3 页指标第 4 格由"Token 压缩 86.6%"改为"对照「直接喂全文」：准确率持平 100%，input token 仅 1/4.37"；86.6%/93.1% 压缩值移入"锁定判断" bullet 不丢。重导出 PDF 仍 3 页（脚本自带 sanity 通过 + PyMuPDF 渲染肉眼核对），还原被连带重渲的 `deck.pdf`/`poster.pdf` 保持 diff 干净。数字源 `evidence/reports/baseline_compare_eval.md`（2,240 vs 9,778 input tok，22/22 同 100%，11/22 全文截断=保守下限）。
+  - **隐藏入口账本面板**（commit `4a21e42`）：`?ledger=1` 才显示的"端云协同·本次账本"，真实用户看不到、不挤答案区。纯展示后端已返回字段（字符级压缩 `used/source_document_chars`、真实平台 `prompt_tokens`、命中证据、`platform_request_id` 对账），**零新计算**；按评议盘建议**砍掉**近端/云端耗时拆分（agentic 最多 2 次云调用 + 缓存 latency≈0 会算错）；缓存命中诚实标注"未实际调用云端"。前端 `TaskResult` 补 `platform_request_id`（后端在传、类型漏了）。新增 `ResultPanel.ledger.test.tsx` 3 例；frontend **17/17** + build clean。
+- **#3 云端降级（不白屏）评估后缓做**：读 `model_client.py:302-345` + `run_task` 的 `except AppError`(L646 re-raise)——现状已是"自动重试瞬时错误 → 仍失败则友好中文提示（如 MaaS 限流'请等 10-30 秒重试'）+ 前端错误卡带重试按钮"，**不是白屏**。完整降级需在冻结的 600 行 `run_task` 插 `except ModelServiceError`、catch 时从 `selected_chunks` 重建 `candidate_chunks`，并加前端第三分支 + 压 `contrast-anchor`(:609/:611 否则会在无答案页打印"N 条引用·可点回 PDF")。高风险碰核心 + 收益边际（友好提示→证据片段）→ 按"慎开新方向 / punish over-engineered"缓做，待彩排时间富余再单独评估。
+- 下一步：账本走一次 live 金标彩排截图（`?ledger=1` + 上传 `chinese_llm_spatial_eval.pdf` + 问锁定题），deck 让用户肉眼终审。
+
 ## 2026-05-30 / Claude (受控对照评测 baseline_compare + 全仓 drift 审计止损)
 
 - 背景：ultracode 开。用户连问"评分项该做的都做了吗 / 还能做什么"。先确认 MaaS 可用（真 id `chatcmpl-21dec832…`），再做两件事。
