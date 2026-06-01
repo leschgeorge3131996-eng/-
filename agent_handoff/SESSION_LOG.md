@@ -7,7 +7,10 @@
   - **deck 补 4.37×**（commit `7195671`）：`deck_3page_final.html` 第 3 页指标第 4 格由"Token 压缩 86.6%"改为"对照「直接喂全文」：准确率持平 100%，input token 仅 1/4.37"；86.6%/93.1% 压缩值移入"锁定判断" bullet 不丢。重导出 PDF 仍 3 页（脚本自带 sanity 通过 + PyMuPDF 渲染肉眼核对），还原被连带重渲的 `deck.pdf`/`poster.pdf` 保持 diff 干净。数字源 `evidence/reports/baseline_compare_eval.md`（2,240 vs 9,778 input tok，22/22 同 100%，11/22 全文截断=保守下限）。
   - **隐藏入口账本面板**（commit `4a21e42`）：`?ledger=1` 才显示的"端云协同·本次账本"，真实用户看不到、不挤答案区。纯展示后端已返回字段（字符级压缩 `used/source_document_chars`、真实平台 `prompt_tokens`、命中证据、`platform_request_id` 对账），**零新计算**；按评议盘建议**砍掉**近端/云端耗时拆分（agentic 最多 2 次云调用 + 缓存 latency≈0 会算错）；缓存命中诚实标注"未实际调用云端"。前端 `TaskResult` 补 `platform_request_id`（后端在传、类型漏了）。新增 `ResultPanel.ledger.test.tsx` 3 例；frontend **17/17** + build clean。
 - **#3 云端降级（不白屏）评估后缓做**：读 `model_client.py:302-345` + `run_task` 的 `except AppError`(L646 re-raise)——现状已是"自动重试瞬时错误 → 仍失败则友好中文提示（如 MaaS 限流'请等 10-30 秒重试'）+ 前端错误卡带重试按钮"，**不是白屏**。完整降级需在冻结的 600 行 `run_task` 插 `except ModelServiceError`、catch 时从 `selected_chunks` 重建 `candidate_chunks`，并加前端第三分支 + 压 `contrast-anchor`(:609/:611 否则会在无答案页打印"N 条引用·可点回 PDF")。高风险碰核心 + 收益边际（友好提示→证据片段）→ 按"慎开新方向 / punish over-engineered"缓做，待彩排时间富余再单独评估。
-- 下一步：账本走一次 live 金标彩排截图（`?ledger=1` + 上传 `chinese_llm_spatial_eval.pdf` + 问锁定题），deck 让用户肉眼终审。
+- **Live 验证（驱动真实 app，本机 backend+MaaS）**：upload→ask→answer 跑通，金标问题返回准确金标答案"最终的方法排名第六，总体准确率为56.20%"，每次 `/api/ask` 均 200——证实改 `ResultPanel` 未破坏正常问答。账本在真实 app 渲染出来（真实平台 token 2,042、命中 4 片段/4 页、缓存命中诚实标注"未实际调用云端"）。
+- **Live 逮到并修了一个真 bug**（commit `5b46da6`）：账本"压缩%"分母用错——对 ask，`source_document_chars`==`used_document_chars`（都是检索后大小），恒显示"仅上送 100%"。改为用全文字符数做分母：`App` 把 `documentTotalChars`（`uploadedMetadata.text_chars`）传入 `ResultPanel`，压缩=`used_document_chars/documentTotalChars`（满文 22,960→上送约 2,728 ≈ 仅上送 ~12%/省~88%），带 full>0/sent<=full 守卫 + 未知回退。frontend **18/18** + build clean。
+- **截图未拿到（infra，非代码）**：Preview MCP 渲染 PDF 预览时反复卡死（screenshot 30s 超时）+ dev server 热重载会刷掉 result 状态；控制台**零报错**。功能由单测精确断言 + live 跑通双重确认，仅缺一张干净像素图。
+- 下一步：① 用户用 `scripts/dev.ps1` 开 `http://localhost:5173/?ledger=1` 自查账本一眼（单服务、无 preview 干扰，比本会话稳）；② deck 肉眼终审；③ 这三轮（deck/账本/降级评估）可一并 push GitHub（待用户拍板）。
 
 ## 2026-05-30 / Claude (受控对照评测 baseline_compare + 全仓 drift 审计止损)
 
