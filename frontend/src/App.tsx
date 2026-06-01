@@ -1103,6 +1103,7 @@ export default function App() {
             loading={loading}
             loadMessage={describeLoadStage(loadStage)}
             result={result}
+            documentTotalChars={uploadedMetadata?.text_chars ?? null}
             canOpenPdfPreview={Boolean(previewMetadata)}
             canRetry={canSubmit}
             onOpenPdfPage={(citation) => {

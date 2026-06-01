@@ -268,6 +268,7 @@ type ResultPanelProps = {
   loading: boolean;
   loadMessage: string;
   result: TaskResult | null;
+  documentTotalChars?: number | null;
   canOpenPdfPreview?: boolean;
   canRetry?: boolean;
   onOpenPdfPage?: (citation: Citation) => void;
@@ -281,6 +282,7 @@ export default function ResultPanel({
   loading,
   loadMessage,
   result,
+  documentTotalChars,
   canOpenPdfPreview = false,
   canRetry = false,
   onOpenPdfPage,
@@ -315,10 +317,16 @@ export default function ResultPanel({
   const ledgerEnabled =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).has("ledger");
-  const ledgerSourceChars = result?.source_document_chars ?? 0;
-  const ledgerUsedChars = result?.used_document_chars ?? 0;
-  const ledgerUploadPct =
-    ledgerSourceChars > 0 ? (ledgerUsedChars / ledgerSourceChars) * 100 : null;
+  // Compression is full-document → context actually sent. For ask, source_document_chars
+  // is already the post-retrieval size (== used_document_chars), so the real saving only
+  // shows up against the full-document total, which comes from the upload metadata.
+  const ledgerSentChars = result?.used_document_chars ?? 0;
+  const ledgerFullChars = documentTotalChars ?? 0;
+  const ledgerHasCompression =
+    ledgerFullChars > 0 && ledgerSentChars > 0 && ledgerSentChars <= ledgerFullChars;
+  const ledgerUploadPct = ledgerHasCompression
+    ? (ledgerSentChars / ledgerFullChars) * 100
+    : null;
   const ledgerPromptTokens = result?.token_usage?.prompt_tokens;
   const ledgerPlatformId = result?.platform_request_id ?? null;
 
@@ -752,13 +760,9 @@ export default function ResultPanel({
                   </div>
                 </div>
                 <p className="duanyun-ledger-note">
-                  {ledgerSourceChars > 0
-                    ? `原文 ${ledgerSourceChars.toLocaleString()} 字符 → 实际上送 ${ledgerUsedChars.toLocaleString()} 字符（按字符口径${
-                        ledgerUploadPct !== null
-                          ? `，省约 ${Math.max(0, 100 - ledgerUploadPct).toFixed(1)}%`
-                          : ""
-                      }）。`
-                    : "本次未启用上下文压缩或文档过短。"}
+                  {ledgerHasCompression
+                    ? `原文 ${ledgerFullChars.toLocaleString()} 字符 → 实际上送约 ${ledgerSentChars.toLocaleString()} 字符（按字符口径，省约 ${Math.max(0, 100 - (ledgerUploadPct ?? 0)).toFixed(1)}%）。`
+                    : "本次文档规模未知或未启用上下文压缩。"}
                   {result.cache_hit ? " 命中本地缓存，本次未实际调用云端。" : ""}
                   {ledgerPlatformId ? " 平台 request id 可在无问芯穹控制台逐条对账。" : ""}
                 </p>

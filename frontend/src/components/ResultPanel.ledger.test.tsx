@@ -60,7 +60,7 @@ function makeAskResult(overrides: Partial<TaskResult> = {}): TaskResult {
   };
 }
 
-function renderPanel(result: TaskResult) {
+function renderPanel(result: TaskResult, documentTotalChars: number | null = 10000) {
   return render(
     <ResultPanel
       activeTaskType="ask"
@@ -68,6 +68,7 @@ function renderPanel(result: TaskResult) {
       loading={false}
       loadMessage=""
       result={result}
+      documentTotalChars={documentTotalChars}
     />
   );
 }
@@ -108,5 +109,13 @@ describe("ResultPanel 端云协同 ledger (hidden ?ledger entrance)", () => {
     window.history.replaceState({}, "", "/?ledger=1");
     renderPanel(makeAskResult({ cache_hit: true }));
     expect(screen.getByTestId("duanyun-ledger").textContent).toContain("未实际调用云端");
+  });
+
+  it("falls back gracefully when the full-document size is unknown", () => {
+    window.history.replaceState({}, "", "/?ledger=1");
+    renderPanel(makeAskResult(), null);
+    expect(screen.getByTestId("duanyun-ledger").textContent).toContain(
+      "本次文档规模未知或未启用上下文压缩"
+    );
   });
 });
