@@ -161,8 +161,9 @@
 
 - 从 2026-05-29 起，每次真实调用都额外捕获**无问芯穹平台返回的 request id**（`platform_request_id`，取自 MaaS response 的 `id`（`chatcmpl-…`）/ `x-request-id` 响应头），与本地 `request_id` 并存写入 `call_logs.jsonl`（代码：`model_client.py` 捕获 → `task_service.py` 落库）。
 - 这个 `platform_request_id` **可在 infini-ai 控制台逐条对账**，是决赛"MaaS API 调用记录等证明材料"应提交的权威载体。
-- **现成且已就绪的权威对账载体**：`evidence/reports/baseline_compare_eval.json`（受控对照实验的 **44 次真实调用**，每条都带平台返回的 `chatcmpl-…` request id，且模型字段与现场默认 `deepseek-v4-flash` 自洽）——这是当前**最直接**的"用了平台"铁证，可现场打开与 infini-ai 控制台逐条对账。注：上文 request id 索引里的本地 `uuid4` 仅作内部追溯、非平台对账载体，对账一律以平台 `chatcmpl-…` id 为准。
-- 推荐流程：决赛前在演示机按 `GOLD_SAMPLE_RUNBOOK.md` 重跑锁定题 → `call_logs.jsonl` 落下一批带 `platform_request_id` 的新鲜记录；提交时**直接提供 `call_logs.jsonl` 逐行 + `baseline_compare_eval.json`** 作为对账载体（不要依赖 `export_log_summary.py`，它只产出聚合统计、不含 request id），并对其中 2-3 条配 infini-ai 控制台同一 id 记录的并排截图。这样"用了平台"就从"口说真实"升级为"可现场对账"。
+- **首选对账载体（计到代金券号、最新）**：`evidence/reports/platform_reconciliation_20260602.md`（+ 原始快照 `…_calls.jsonl`）——`2026-06-02` 在**领 200 代金券的那个账号**上跑出的 **10 次真实调用**，每条都带平台 `chatcmpl-…` id，附**北京时间**逐笔表，可直接在该号控制台调用记录/账单里逐条对上（这正是决赛要核的"计费到比赛账号"）。由 `scripts/build_platform_reconciliation.py` 从真实日志生成、未手编数字；其中 **3 笔 `agent_iterations=2`** 即智能体自评-再检索的真实遥测。
+- **更大样本的对账载体（老号、N 更大）**：`evidence/reports/baseline_compare_eval.json`（受控对照实验的 **44 次真实调用**，每条都带 `chatcmpl-…` request id，模型字段与默认 `deepseek-v4-flash` 自洽）——样本量更大的"用了平台"铁证。注：上文 request id 索引里的本地 `uuid4` 仅作内部追溯、非平台对账载体，对账一律以平台 `chatcmpl-…` id 为准。
+- 推荐流程：决赛前在演示机（已用代金券号 key）按 `GOLD_SAMPLE_RUNBOOK.md` 重跑锁定题 → `call_logs.jsonl` 落下一批带 `platform_request_id` 的新鲜记录 → 跑 `scripts/build_platform_reconciliation.py` 一键生成当日对账报告；提交时**直接提供 `platform_reconciliation_<date>.md` + 同名 `_calls.jsonl`**（首选，计费到代金券号）**外加 `baseline_compare_eval.json`**（更大样本）作为对账载体（不要依赖 `export_log_summary.py`，它只产出聚合统计、不含 request id），并对其中 2-3 条配 infini-ai 控制台同一 id 记录的并排截图。这样"用了平台"就从"口说真实"升级为"可现场对账、且账落在比赛账号"。
 
 ## judge-facing 截图索引
 
