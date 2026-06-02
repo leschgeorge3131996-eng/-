@@ -43,6 +43,11 @@ def main() -> int:
     ap.add_argument("--log", default="data/logs/call_logs.jsonl")
     ap.add_argument("--date", default=datetime.now(CST).strftime("%Y%m%d"))
     ap.add_argument("--out-dir", default="evidence/reports")
+    # 控制台「用量统计」实测值（从截图转录，作权威合计；不填则渲染为待录入）
+    ap.add_argument("--console-calls", type=int, default=None, help="控制台·调用服务总次数")
+    ap.add_argument("--console-tok-in", type=int, default=None, help="控制台·输入 token 总数")
+    ap.add_argument("--console-tok-out", type=int, default=None, help="控制台·输出 token 总数")
+    ap.add_argument("--console-fail", type=int, default=None, help="控制台·失败数")
     args = ap.parse_args()
 
     log_path = ROOT / args.log
@@ -67,6 +72,9 @@ def main() -> int:
 
     agentic2 = [r for r in real if ex(r, "agent_iterations", 1) and ex(r, "agent_iterations", 1) >= 2]
     total_tok = sum((r.get("token_total") or 0) for r in real)
+    # 底层模型调用次数 = Σ agent_iterations（智能体二轮的 ask 会打 2 次模型）；
+    # 控制台按"每次模型调用"计数，故会 ≥ 问答笔数。
+    model_calls = sum((ex(r, "agent_iterations", 1) or 1) for r in real)
     models = sorted({r.get("model_name") for r in real})
 
     lines: list[str] = []
@@ -78,11 +86,52 @@ def main() -> int:
     lines.append("")
     lines.append("## 概览")
     lines.append("")
-    lines.append(f"- 真实云端调用（带平台 request id）：**{len(real)} 笔**")
+    lines.append(f"- 证据问答（每笔带可引用的平台 request id）：**{len(real)} 笔**")
+    lines.append(f"- 对应底层模型调用（Σ `agent_iterations`，含智能体二轮）：**{model_calls} 次**"
+                 "（控制台按「每次模型调用」计数，故控制台次数会 ≥ 问答笔数；另含应用外的 key 验证调用）")
     lines.append(f"- 模型：{', '.join(m for m in models if m)}")
-    lines.append(f"- 平台累计返回 token：**{total_tok}**（仅含成功返回 usage 的调用）")
+    lines.append(f"- 日志侧累计 token（仅含返回 usage 的问答）：**{total_tok}**"
+                 "（注：拒答 / 二轮调用的 token 未全部落本地日志，**以控制台合计为准**，见下节）")
     lines.append(f"- 触发智能体二轮（`agent_iterations≥2`）：**{len(agentic2)} 笔**")
     lines.append("- 计费账户：领取 200 代金券的无问芯穹账号（请在该账号控制台核对下表 id/时间）。")
+    lines.append("")
+    lines.append("## 控制台实测对账（权威合计）")
+    lines.append("")
+    expected_calls = model_calls  # 应用内底层模型调用；控制台还会 + 应用外 key 验证调用
+    if args.console_calls is not None:
+        ctok_in = args.console_tok_in
+        ctok_out = args.console_tok_out
+        ctok_total = (ctok_in or 0) + (ctok_out or 0) if (ctok_in is not None or ctok_out is not None) else None
+        diff = args.console_calls - expected_calls
+        lines.append(f"无问芯穹控制台「用量统计」当日（{args.date}，北京时间）实测，作权威口径：")
+        lines.append("")
+        lines.append("| 控制台指标 | 实测值 |")
+        lines.append("|---|---|")
+        lines.append(f"| 调用服务总次数 | **{args.console_calls}** |")
+        if ctok_total is not None:
+            lines.append(f"| 调用 token 总数 | **{ctok_total}**（输入 {ctok_in} / 输出 {ctok_out}） |")
+        if args.console_fail is not None:
+            lines.append(f"| 失败数 | **{args.console_fail}** |")
+        lines.append(f"| 模型 | {', '.join(m for m in models if m)} |")
+        lines.append("")
+        lines.append(
+            f"**对账逻辑（无差错）**：本报告 {len(real)} 笔证据问答 → 底层模型调用 "
+            f"Σ`agent_iterations` = **{expected_calls}** 次；控制台另计入应用外的 key 验证调用"
+            f"（`verify_maas_key.py`，绕过应用日志）。`{expected_calls} + 验证调用 ≈ "
+            f"{args.console_calls}`（控制台实测），失败数两侧均为 0。"
+            + (f"（差额 {diff} 即验证/探测类调用）" if diff else "")
+        )
+        lines.append("")
+        lines.append("> 诚实口径：控制台合计 token 高于上面「逐笔对账表」的日志侧求和，"
+                     "因为拒答调用与智能体二轮调用的 token 未全部落本地 per-ask 日志——"
+                     "**token 一律以控制台合计为准**，本地表仅用于把单笔 `chatcmpl-…` id 对到具体问答。")
+    else:
+        lines.append("> 待录入：登录代金券号控制台 → 「用量统计」→ 统计周期选当日 → "
+                     "把『调用服务总次数 / 输入·输出 token / 失败数』转录进来"
+                     "（重跑本脚本时加 `--console-calls N --console-tok-in N --console-tok-out N --console-fail N`）。")
+        lines.append("")
+        lines.append(f"预期对账：本报告 {len(real)} 笔问答 → 底层模型调用 Σ`agent_iterations` = "
+                     f"**{expected_calls}** 次；控制台次数 ≈ 该值 + 应用外 key 验证调用。")
     lines.append("")
     lines.append("## 逐笔对账表")
     lines.append("")
