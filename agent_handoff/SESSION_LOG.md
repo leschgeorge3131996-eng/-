@@ -1,5 +1,14 @@
 ﻿# Session Log
 
+## 2026-06-02 / Claude (本地端侧语义检索落地 + 冲奖审计 + 两周计划 + 端侧叙事变现 + M2-M7 口径修正)
+
+- **背景**：用户问"还能做什么"。开 ultracode 跑了 (1) 19-agent 冲奖审计盘（对照赛题一评分细则，存 `agent_handoff/reviews/scoring_audit_20260602.json`）→ 预估 91-101/120，最大短板=**端云协同无技术实体**（纯云端 RAG）；(2) 9-agent 两周计划盘（存 `two_week_plan_20260602.json`）。**用户更正"我没说过不上本地模型，怎么有优势怎么来"** → 解锁本地模型（memory 三处已更正：`feedback_non_priorities` / `project_preprocessing_division` / `MEMORY.md`）。离提交 2 周。
+- **端侧实体落地（主线，commit `8de1e34`）**：在后端进程内集成本地 **BGE-small-zh-v1.5 ONNX** 句向量模型（onnxruntime CPU，cp314 wheel 本机实测可装），检索从纯词法升级为词法+稠密**混合**。设计吸收 Codex 独立审阅（codex CLI 0.118 跑的，插件已在 settings.json 启用待重启生效）+ 规划盘纠正：**默认 `EDGE_EMBEDDING_ENABLED=false` 字节级保现状**、chunk_id 内容哈希做索引完整性、首查懒建避上传阻塞、保守融合不动词法主排序（增召回+词法空时语义救援）、模型缺失/失败自动回退纯词法、Windows 限线程、用模型自带 `sentence_embedding` 输出免池化歧义。新增 `embedding_service.py`/`dense_index.py`/`test_dense_retrieval.py`，file_id 顺 task_service→context_planner→retrieval 传。**backend 86 passed 零回归**；模型权重 gitignore。
+- **D7 ablation 诚实结果（关键，`evidence/reports/edge_hybrid_eval.md` + `scripts/edge_hybrid_ablation.py`）**：离线词法 vs 混合，EXTENDED_EVAL_V1 可答 **43/43→43/43**、拒答不过度触发、改写压力 **19/23→19/23**——**零回归但零增益**。诊断：词法被 hint+bigram 调到饱和，bge-small 在难题上把错页排得比对页高（模型上限）。**结论：端侧模型价值是"真端侧 ML 实体（补最大短板）+ 措辞鲁棒补充"，不是"检索显著提升"——绝不吹刷分（评测诚实纪律）。**
+- **端侧叙事变现 + M2-M7 口径修正（commit `b26b0c3`）**：`ARCHITECTURE.md` 写入真实端侧 ML 实体（含诚实"持平非超越"标注）。M2 deck 71/72 vs 51/51 加集合标注（V6 72题集 / 51题固定集，不混比，重导出仍3页）；M3 两份源稿 strict G3 3/3→6/6+旁白三连→六轮；M4 全 materials 旧界面截图 20260419→20260529（59处，HARD_EVIDENCE 历史说明不动）；M5 删 PLATFORM_USAGE 失实的 export_log_summary 承诺；M6 把 baseline_compare_eval 44 真实 chatcmpl id 扶为主对账载体；M7 token ±10%→中文实测~29%+口径区分脚注。
+- **下一步（需依赖）**：① **用户把有代金券那个号的 MaaS API key 填进 `.env`** → 解锁 H2 agentic 真多轮日志 / H4 新 predeploy（带真 platform_request_id）；② H3 控制台对账截图（用户登录）；③ 视频成片（组员）。代金券=模型服务（MaaS）不是算力服务。
+- **演示口径**：现场把 `EDGE_EMBEDDING_ENABLED=true` 打开演端侧实体；端侧权重需在演示机离线下载（`scripts/edge_hybrid_ablation.py` 或 hf-mirror 下 `onnx-community/bge-small-zh-v1.5-ONNX`）。
+
 ## 2026-06-01 / Claude (端云协同顶一截：deck 补 4.37× + 隐藏入口账本面板；降级评估后缓做)
 
 - 背景：用户问"端云协同能怎么再顶一截"。开 ultracode 跑了 6 视角设计评议盘（14 agents，~73 万 token）+ 红队对抗。结论：①`rubric-proportion` 提案前提造假——材料/PPT 早有"端云协同"逐字话术（`ARCHITECTURE.md:3/35`、`SCORING_EVIDENCE_MATRIX.md:20`、`deck_3page_final.html:186/197`），已证伪 **kill**；②`edge-compute`(浏览器小模型)/`routing`(近端直答) 双 **kill**（撞《不上本地模型》红线 / 纯页数查询适用面≈0 且动冻结主链路）；③真杠杆是把**已成文**的 RAG-vs-FullContext `4.37×` 从证据档搬进 3 页 PPT（`HARD_EVIDENCE_SUMMARY.md §8.1` 已写全，但 deck 里 0 命中）。
