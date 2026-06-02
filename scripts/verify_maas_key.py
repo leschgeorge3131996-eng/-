@@ -52,7 +52,12 @@ def main() -> int:
         )
     except Exception as exc:  # noqa: BLE001
         print(f"[FAIL] 调用抛异常：{type(exc).__name__}: {exc}")
-        print("       常见原因：key 错(401)、模型没开通/无权限(404)、网络或 base_url 错。")
+        details = getattr(exc, "details", None)
+        if isinstance(details, dict) and details.get("response"):
+            print(f"       云端原文：{details['response']}")
+        print("       速查：401=key 错 / 404=模型没开通 / 402=账户问题"
+              "（余额不足，或'基础服务不支持 API 调用'=该号未开通 API 能力，以云端原文为准）"
+              " / 其余多为网络或 base_url 错。")
         return 1
 
     if result.model_name.startswith("mock::"):
