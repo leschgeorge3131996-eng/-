@@ -17,7 +17,7 @@
 
 | 评分线 | 评委想看什么 | 当前主证据 | 答辩时怎么讲 |
 | --- | --- | --- | --- |
-| **赛题主题：端侧/云端协同** | 作品是否回应赛题一"端侧/云端协同应用"命题，而非纯云端网页 | `ARCHITECTURE.md`（Edge\|近端\|Cloud 分层图）、`evidence/reports/token_compression_eval.md` | 端侧/近端做解析/切块/检索/证据 bbox 定位，云端（无问芯穹 MaaS）只做必要片段推理；Token 压缩（长文 ask 平均省 86.6%）就是协同的量化收益。 |
+| **赛题主题：端侧/云端协同** | 作品是否回应赛题一"端侧/云端协同应用"命题，而非纯云端网页 | `ARCHITECTURE.md`（Edge\|近端\|Cloud 分层图）、`evidence/reports/edge_hybrid_eval.md`、`evidence/reports/token_compression_eval.md` | 近端跑**本地句向量模型（BGE-small-zh-v1.5 ONNX，纯 CPU、零云依赖）**做语义编码与词法+语义混合检索——这是**真实的端侧 ML 算力实体**（小模型在端理解、大模型在云生成），不是纯云端网页。诚实标注：语义检索与已高度调优的词法**持平、零回归**，价值在实体本身与措辞鲁棒性、非检索刷分。Token 压缩（长文 ask 平均省 86.6%）是协同的另一量化收益。 |
 | 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl`（含平台 request_id）、`evidence/reports/gold_sample_qa_compare_latest.md`、调用截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹；每次调用都落 token 与**平台 request_id**，可在 infini-ai 控制台逐条对账（本地 request_id 仅作内部追踪）。 |
 | 产品能力 `40` | 作品是否围绕清晰场景解决真实问题，是否有稳定、可理解的用户价值 | `PROJECT_ONE_PAGER.md`、`PRODUCT_TECHNICAL_WRITEUP.md`、最终 `3` 页 PPT / `5` 分钟视频、四张核心截图 | 我们解决的是“论文/报告阅读时能答、还能回到证据”的问题，不是泛化聊天。 |
 | 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md`、`evidence/reports/extended_eval_v1_latest.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |

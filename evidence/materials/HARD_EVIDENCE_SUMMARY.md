@@ -101,7 +101,7 @@ rollback fallback：`qwen3-235b-a22b-instruct-2507`
 
 ## 当前诚实边界
 
-### 6. 量化评测指标（strict G3 三轮 fresh-upload）
+### 6. 量化评测指标（strict G3 六轮 fresh-upload）
 
 来源：`evidence/reports/quantitative_eval_metrics.md`
 
