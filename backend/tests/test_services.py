@@ -1561,7 +1561,7 @@ class FollowupRetrieval(RetrievalService):
         super().__init__()
         self._followup_chunks = followup_chunks
 
-    def retrieve(self, query, chunked_document):  # type: ignore[override]
+    def retrieve(self, query, chunked_document, *, file_id=None):  # type: ignore[override]
         return list(self._followup_chunks)
 
 

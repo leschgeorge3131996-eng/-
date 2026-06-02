@@ -91,6 +91,9 @@ class Settings:
     model_summary: str
     model_outline: str
     route_upgrade_chars: int
+    edge_embedding_enabled: bool = False
+    edge_model_dir: Path = Path("models/bge-small-zh-v1.5")
+    vectors_dir: Path = Path("data/vectors")
 
     @property
     def max_upload_bytes(self) -> int:
@@ -104,6 +107,7 @@ class Settings:
             self.sessions_dir,
             self.logs_dir,
             self.cache_dir,
+            self.vectors_dir,
         ):
             path.mkdir(parents=True, exist_ok=True)
 
@@ -156,6 +160,13 @@ def get_settings() -> Settings:
         model_summary=os.getenv("MODEL_SUMMARY", "placeholder-summary-model"),
         model_outline=os.getenv("MODEL_OUTLINE", "placeholder-outline-model"),
         route_upgrade_chars=_to_int(os.getenv("ROUTE_UPGRADE_CHARS"), 12000),
+        edge_embedding_enabled=_to_bool(os.getenv("EDGE_EMBEDDING_ENABLED"), False),
+        edge_model_dir=_to_path(
+            os.getenv("EDGE_MODEL_DIR"),
+            project_root / "models" / "bge-small-zh-v1.5",
+            project_root,
+        ),
+        vectors_dir=data_dir / "vectors",
     )
     settings.ensure_directories()
     return settings

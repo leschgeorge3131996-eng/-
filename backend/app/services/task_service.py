@@ -112,6 +112,7 @@ class TaskService:
                 user_input=user_input,
                 raw_text=raw_document_text,
                 chunked_document=chunked_document,
+                file_id=file_id,
             )
             document_text = planned_context.document_text
             context_strategy = planned_context.strategy
@@ -375,6 +376,7 @@ class TaskService:
                     user_input=user_input,
                     model_name_override=resolved_model_name,
                     response_detail_level=response_detail_level,
+                    file_id=file_id,
                 )
                 # agentic re-retrieval may expand the evidence set; refresh telemetry + display chunks
                 retrieved_chunk_count = len(selected_chunks)
@@ -756,6 +758,7 @@ class TaskService:
         user_input: str | None,
         model_name_override: str | None,
         response_detail_level: ResponseDetailLevel,
+        file_id: str | None = None,
     ) -> tuple[
         ModelResult,
         str,
@@ -797,7 +800,7 @@ class TaskService:
                 # evidence is found (preserves the original retry semantics).
                 if pending_followup and chunked_document is not None:
                     new_chunks = self.retrieval_service.retrieve(
-                        pending_followup, chunked_document
+                        pending_followup, chunked_document, file_id=file_id
                     )
                     added = [
                         chunk

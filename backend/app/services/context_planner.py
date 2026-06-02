@@ -27,20 +27,23 @@ class ContextPlannerService:
         user_input: str | None,
         raw_text: str,
         chunked_document: ChunkedDocument,
+        file_id: str | None = None,
     ) -> PlannedContext:
         if task_type == "ask":
-            return self._plan_for_ask(user_input or "", raw_text, chunked_document)
+            return self._plan_for_ask(user_input or "", raw_text, chunked_document, file_id=file_id)
         if task_type == "summary":
             return self._plan_for_summary(
                 user_input=user_input or "",
                 raw_text=raw_text,
                 chunked_document=chunked_document,
+                file_id=file_id,
             )
         if task_type == "outline":
             return self._plan_for_outline(
                 user_input=user_input or "",
                 raw_text=raw_text,
                 chunked_document=chunked_document,
+                file_id=file_id,
             )
         return PlannedContext(strategy="full_text", document_text=raw_text, selected_chunks=[])
 
@@ -49,8 +52,12 @@ class ContextPlannerService:
         query: str,
         raw_text: str,
         chunked_document: ChunkedDocument,
+        *,
+        file_id: str | None = None,
     ) -> PlannedContext:
-        result = self.retrieval_service.retrieve_with_confidence(query, chunked_document)
+        result = self.retrieval_service.retrieve_with_confidence(
+            query, chunked_document, file_id=file_id
+        )
         if not result.chunks:
             return PlannedContext(
                 strategy="no_match",
@@ -75,6 +82,7 @@ class ContextPlannerService:
         user_input: str,
         raw_text: str,
         chunked_document: ChunkedDocument,
+        file_id: str | None = None,
     ) -> PlannedContext:
         return self._plan_with_intent(
             user_input=user_input,
@@ -84,6 +92,7 @@ class ContextPlannerService:
             target_chunks=6,
             max_context_chars=4200,
             relevant_quota=2,
+            file_id=file_id,
         )
 
     def _plan_for_outline(
@@ -92,6 +101,7 @@ class ContextPlannerService:
         user_input: str,
         raw_text: str,
         chunked_document: ChunkedDocument,
+        file_id: str | None = None,
     ) -> PlannedContext:
         return self._plan_with_intent(
             user_input=user_input,
@@ -101,6 +111,7 @@ class ContextPlannerService:
             target_chunks=7,
             max_context_chars=4500,
             relevant_quota=3,
+            file_id=file_id,
         )
 
     def _plan_with_intent(
@@ -113,13 +124,14 @@ class ContextPlannerService:
         target_chunks: int,
         max_context_chars: int,
         relevant_quota: int,
+        file_id: str | None = None,
     ) -> PlannedContext:
         if not chunked_document.chunks:
             return PlannedContext(strategy="full_text", document_text=raw_text, selected_chunks=[])
 
         coverage_indexes = self._coverage_indexes(chunked_document, target_chunks)
         relevant_chunks = (
-            self.retrieval_service.retrieve(user_input, chunked_document)[:relevant_quota]
+            self.retrieval_service.retrieve(user_input, chunked_document, file_id=file_id)[:relevant_quota]
             if user_input.strip()
             else []
         )

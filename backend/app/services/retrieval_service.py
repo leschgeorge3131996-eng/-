@@ -158,16 +158,31 @@ class RetrievalService:
         top_k: int = 4,
         max_context_chars: int = 3200,
         min_score: float = 1.0,
+        dense_index=None,
+        dense_enabled: bool = False,
+        dense_min_sim: float = 0.40,
+        dense_rescue_sim: float = 0.50,
+        dense_max_extra: int = 3,
     ) -> None:
         self.top_k = top_k
         self.max_context_chars = max_context_chars
         self.min_score = min_score
+        # 端侧/近端语义检索（默认关闭；启用需注入 dense_index）。关闭时本服务行为与纯词法完全一致。
+        self.dense_index = dense_index
+        self.dense_enabled = dense_enabled
+        self.dense_min_sim = dense_min_sim
+        self.dense_rescue_sim = dense_rescue_sim
+        self.dense_max_extra = dense_max_extra
 
-    def retrieve(self, query: str, chunked_document: ChunkedDocument) -> list[ParsedChunk]:
-        result = self.retrieve_with_confidence(query, chunked_document)
+    def retrieve(
+        self, query: str, chunked_document: ChunkedDocument, *, file_id: str | None = None
+    ) -> list[ParsedChunk]:
+        result = self.retrieve_with_confidence(query, chunked_document, file_id=file_id)
         return result.chunks
 
-    def retrieve_with_confidence(self, query: str, chunked_document: ChunkedDocument) -> RetrievalResult:
+    def retrieve_with_confidence(
+        self, query: str, chunked_document: ChunkedDocument, *, file_id: str | None = None
+    ) -> RetrievalResult:
         idf = self._build_idf(query, chunked_document)
 
         scored: list[tuple[float, ParsedChunk]] = []
@@ -178,6 +193,7 @@ class RetrievalService:
 
         metadata_intent = self._has_metadata_intent(query)
         overview_intent = self._has_overview_intent(query)
+        dense_scores = self._dense_scores(query, chunked_document, file_id)
         if not scored:
             if overview_intent and chunked_document.chunks:
                 chunks = self._head_context_chunks(chunked_document)
@@ -191,6 +207,16 @@ class RetrievalService:
             if metadata_intent and chunked_document.chunks:
                 return RetrievalResult(
                     chunks=[chunked_document.chunks[0]],
+                    top_score=0.0,
+                    second_score=0.0,
+                    term_coverage=0.0,
+                    confident=True,
+                )
+            # 词法零命中但语义高度相关（"换个问法"）：稠密救援，避免漏答
+            rescue = self._dense_rescue_chunks(dense_scores, chunked_document)
+            if rescue:
+                return RetrievalResult(
+                    chunks=rescue,
                     top_score=0.0,
                     second_score=0.0,
                     term_coverage=0.0,
@@ -263,12 +289,70 @@ class RetrievalService:
                 max_total=self.top_k + 3,
             )
 
+        # 稠密增召回：把语义相关但词法没排进来的片段补进来（保守，不动主排序与置信度）
+        if dense_scores:
+            selected = self._dense_augment_chunks(selected, dense_scores, chunked_document)
+
         return RetrievalResult(
             chunks=selected,
             top_score=top_score,
             second_score=second_score,
             term_coverage=term_coverage,
             confident=confident,
+        )
+
+    def _dense_active(self) -> bool:
+        return self.dense_enabled and self.dense_index is not None
+
+    def _dense_scores(
+        self, query: str, chunked_document: ChunkedDocument, file_id: str | None
+    ) -> dict[str, float]:
+        if not self._dense_active() or not file_id:
+            return {}
+        try:
+            return self.dense_index.score(query, chunked_document, file_id)
+        except Exception:
+            # 任何稠密侧失败都回退纯词法，绝不影响主链路
+            return {}
+
+    def _dense_rescue_chunks(
+        self, dense_scores: dict[str, float], chunked_document: ChunkedDocument
+    ) -> list[ParsedChunk]:
+        if not dense_scores:
+            return []
+        ranked = sorted(
+            (item for item in dense_scores.items() if item[1] >= self.dense_rescue_sim),
+            key=lambda item: -item[1],
+        )
+        if not ranked:
+            return []
+        by_id = {chunk.chunk_id: chunk for chunk in chunked_document.chunks}
+        selected: list[ParsedChunk] = []
+        current_chars = 0
+        for chunk_id, _ in ranked[: self.top_k]:
+            chunk = by_id.get(chunk_id)
+            if chunk is None:
+                continue
+            if current_chars + chunk.char_count > self.max_context_chars and selected:
+                break
+            selected.append(chunk)
+            current_chars += chunk.char_count
+        return selected
+
+    def _dense_augment_chunks(
+        self,
+        selected: list[ParsedChunk],
+        dense_scores: dict[str, float],
+        chunked_document: ChunkedDocument,
+    ) -> list[ParsedChunk]:
+        ranked = sorted(
+            (item for item in dense_scores.items() if item[1] >= self.dense_min_sim),
+            key=lambda item: -item[1],
+        )
+        by_id = {chunk.chunk_id: chunk for chunk in chunked_document.chunks}
+        candidates = [by_id[chunk_id] for chunk_id, _ in ranked if chunk_id in by_id]
+        return self._append_missing_chunks(
+            selected, candidates, max_total=self.top_k + self.dense_max_extra
         )
 
     def _has_metadata_intent(self, query: str) -> bool:

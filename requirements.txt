@@ -1,7 +1,7 @@
 annotated-types==0.7.0
 anyio==4.13.0
 certifi==2026.2.25
-click==8.3.2
+click==8.4.1
 fastapi==0.116.1
 h11==0.16.0
 httpcore==1.0.9
@@ -23,3 +23,9 @@ typing_extensions==4.15.0
 uvicorn==0.35.0
 watchfiles==1.1.1
 websockets==16.0
+
+# 端侧/近端语义检索：本地 ONNX 句向量（BGE-small-zh-v1.5）。默认关闭，
+# 仅当 EDGE_EMBEDDING_ENABLED=true 时加载；缺失则自动回退纯词法检索。
+numpy==2.4.6
+onnxruntime==1.26.0
+tokenizers==0.23.1

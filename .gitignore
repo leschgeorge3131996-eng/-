@@ -28,10 +28,14 @@ data/parsed/*
 data/logs/*
 data/cache/*
 data/sessions/*
+data/vectors/*
 !data/uploads/.gitkeep
 !data/parsed/.gitkeep
 !data/logs/.gitkeep
 !data/cache/.gitkeep
+
+# 本地端侧嵌入模型权重（离线下载，~91MB，不入库）
+models/
 
 # one-off source/review artifacts (keep on disk, exclude from tracking)
 2026第二十一届研电赛赛题指南及清单.pdf

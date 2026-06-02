@@ -11,6 +11,7 @@ from ..schemas.task import AskRequest, TaskRequest
 from ..services.auth_service import AuthService
 from ..services.file_service import FileService
 from ..services.log_service import LogService
+from ..services.retrieval_service import RetrievalService
 from ..services.task_service import TaskService
 
 router = APIRouter()
@@ -18,7 +19,31 @@ settings = get_settings()
 auth_service = AuthService(settings=settings)
 file_service = FileService(settings=settings)
 log_service = LogService(settings=settings)
-task_service = TaskService(file_service=file_service, log_service=log_service)
+
+
+def _build_retrieval_service() -> RetrievalService:
+    """启用端侧嵌入时注入稠密索引；模型缺失或任何初始化失败都回退纯词法，绝不阻断启动。"""
+    if not settings.edge_embedding_enabled:
+        return RetrievalService()
+    try:
+        from ..services.dense_index import DenseIndex
+        from ..services.embedding_service import EmbeddingService
+
+        embedding_service = EmbeddingService(settings.edge_model_dir)
+        if not embedding_service.is_available():
+            return RetrievalService()
+        embedding_service.warmup()  # 启动预热，避免首问卡顿
+        dense_index = DenseIndex(settings.vectors_dir, embedding_service)
+        return RetrievalService(dense_index=dense_index, dense_enabled=True)
+    except Exception:
+        return RetrievalService()
+
+
+task_service = TaskService(
+    file_service=file_service,
+    log_service=log_service,
+    retrieval_service=_build_retrieval_service(),
+)
 
 
 def resolve_session_token(
