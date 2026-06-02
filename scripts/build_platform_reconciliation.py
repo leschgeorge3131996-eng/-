@@ -167,9 +167,19 @@ def main() -> int:
     lines.append("")
     lines.append("## 怎么核对（H3：控制台截图）")
     lines.append("")
-    lines.append("1. 登录领 200 代金券的无问芯穹账号 → 控制台 → 调用记录 / 用量账单。")
-    lines.append("2. 按上表「北京时间」定位时段，逐条核对 `chatcmpl-...` request id 与 token。")
-    lines.append("3. 截图即为「真实跑在平台 + 计费到代金券号」的决赛对账硬证据。")
+    lines.append("登录代金券号 → 大模型服务平台 → 「用量统计」→ 统计周期选当日，截两张：")
+    lines.append("")
+    lines.append("1. **汇总页**：调用服务总次数、调用/输入/输出 token、失败数、模型名"
+                 "（即上节「控制台实测对账」那组数）。")
+    lines.append("2. **点该模型「详情」的时间序列图**：调用量尖峰集中在 `19:51–20:16` 时段，"
+                 "与上面「逐笔对账表」的北京时间一致——**曲线形状即时段对账**；"
+                 "可顺带截「性能指标」页的延迟，与表中 ~5–30s 延迟印证。")
+    lines.append("")
+    lines.append("> 口径说明（实测）：无问芯穹控制台只展示**聚合 + 时间序列**，"
+                 "**UI 内不逐条暴露 `chatcmpl-…` id**。因此 H3 的正确姿势是"
+                 "「控制台聚合(次数/token/时段/0失败) × 我方持有平台签发的逐条 `chatcmpl-…` id"
+                 "（本报告逐笔表 + `_calls.jsonl` 快照）」两者合证——平台侧确认了量与时段，"
+                 "我方持有平台返回的逐条 id，即足以核验真实计费、且账落在代金券号。")
     lines.append("")
 
     md_path.write_text("\n".join(lines), encoding="utf-8")
