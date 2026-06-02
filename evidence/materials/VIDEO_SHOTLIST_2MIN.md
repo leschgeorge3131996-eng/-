@@ -36,7 +36,7 @@
 画面：
 
 - 输入：`这篇论文主要研究了什么问题？`
-- 展示 `20260419_gold_ask_research_focus.png`
+- 展示 `20260529_gold_ask_research_focus.png`
 
 旁白：
 
@@ -47,7 +47,7 @@
 画面：
 
 - 点击 citation
-- 展示 `20260419_gold_pdf_render.png`
+- 展示 `20260529_gold_pdf_render.png`
 
 旁白：
 
@@ -58,7 +58,7 @@
 画面：
 
 - 输入：`作者最终的方法排名和总体准确率分别是多少？`
-- 展示 `20260419_gold_ask_rank_accuracy.png`
+- 展示 `20260529_gold_ask_rank_accuracy.png`
 
 旁白：
 
@@ -69,7 +69,7 @@
 画面：
 
 - 输入：`木星有几颗卫星？`
-- 展示 `20260419_gold_refusal.png`
+- 展示 `20260529_gold_refusal.png`
 
 旁白：
 
@@ -91,10 +91,10 @@
 ## 备选素材
 
 - 主截图：
-  - `20260419_gold_ask_research_focus.png`
-  - `20260419_gold_pdf_render.png`
-  - `20260419_gold_ask_rank_accuracy.png`
-  - `20260419_gold_refusal.png`
+  - `20260529_gold_ask_research_focus.png`
+  - `20260529_gold_pdf_render.png`
+  - `20260529_gold_ask_rank_accuracy.png`
+  - `20260529_gold_refusal.png`
 - 内部附录：
   - `20260419_stats_panel.png`
   - `20260419_api_docs.png`

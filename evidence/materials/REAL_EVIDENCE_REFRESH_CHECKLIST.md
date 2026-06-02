@@ -49,10 +49,10 @@ Capture at least these:
 
 Latest automated gold-sample capture on `2026-04-19` produced:
 
-- `20260419_gold_ask_research_focus.png`
-- `20260419_gold_pdf_render.png`
-- `20260419_gold_ask_rank_accuracy.png`
-- `20260419_gold_refusal.png`
+- `20260529_gold_ask_research_focus.png`
+- `20260529_gold_pdf_render.png`
+- `20260529_gold_ask_rank_accuracy.png`
+- `20260529_gold_refusal.png`
 - `20260419_stats_panel.png`
 - `20260419_api_docs.png`
 

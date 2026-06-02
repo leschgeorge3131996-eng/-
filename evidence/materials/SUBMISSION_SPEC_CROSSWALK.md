@@ -24,7 +24,7 @@
 | `5 分钟内方案介绍及演示视频` | `evidence/materials/VIDEO_SHOTLIST_5MIN_FINAL.md`、`deliverables/competition_kit/video_subtitles_5min_final.srt`、`evidence/materials/VIDEO_SHOTLIST_2MIN.md`、`deliverables/competition_kit/video_subtitles.srt` | `源稿 + repo-native 节奏基线已就位` | 当前已有正式 `5` 分钟源稿和字幕节奏基线，但还不是最终录制 / 剪辑成片 | 按 `VIDEO_SHOTLIST_5MIN_FINAL.md` 与 `video_subtitles_5min_final.srt` 出正式成片 |
 | `产品及技术文档` | `PROJECT_ONE_PAGER.md`、`ARCHITECTURE.md`、`QA_BRIEF.md`、`PRODUCT_TECHNICAL_WRITEUP.md` | `judge-facing 文档已成型` | 还未导出到最终提交格式，也还未与最终 `3` 页 PPT / `5` 分钟视频完全封板 | 锁定 `PRODUCT_TECHNICAL_WRITEUP.md` 为正式版本并在最终包中单列 |
 | `平台使用证明` | `PLATFORM_USAGE_EVIDENCE.md`、gold-sample 报告、实验记录、`data/logs/call_logs.jsonl` | `judge-facing 可用` | 原始日志混有历史开发数据，不适合直接主呈现 | 以 `PLATFORM_USAGE_EVIDENCE.md` 为主证明，request id 走附录索引 |
-| `最终截图集` | `evidence/screenshots/20260419_gold_*` 四张主截图；`stats_panel` 与 `api_docs` 附录图 | `接近可用` | 仍需与最终提交环境和最终口径对齐 | 最终环境确定后刷新一次截图集 |
+| `最终截图集` | `evidence/screenshots/20260529_gold_*` 四张主截图；`stats_panel` 与 `api_docs` 附录图 | `接近可用` | 仍需与最终提交环境和最终口径对齐 | 最终环境确定后刷新一次截图集 |
 | `决赛平台使用日志 / MaaS API 调用记录` | `data/logs/call_logs.jsonl`、`20260419_q2_declared_stability_check.md`、`20260420_g3_strict_rehearsal.md` | `可交叉核对` | 原始日志仍是全量历史文件 | 以 strict `G3` 和 Q2 fresh rerun 索引作为主附录，原始日志只作备查 |
 | `演示 runbook / 复现证据` | `GOLD_SAMPLE_RUNBOOK.md`、`20260420_g3_strict_rehearsal.md` | `严格版已补齐` | 当前仍需把最终 `3` 页 PPT / `5` 分钟视频与这一口径完全对齐 | 以 strict `G3` 为主附录，旧 warm-state note 降为历史参考 |
 | `海报 / 一页纸` | `POSTER_COPY.md`、`poster.pdf`、`PROJECT_ONE_PAGER.md` | `支持性资产已具备` | 不是官方主要要求，但会影响答辩观感 | 在正式封板时同步统一口径 |

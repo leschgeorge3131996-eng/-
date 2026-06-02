@@ -32,10 +32,10 @@ Do not rebuild the story from scratch each time. Reuse this pack.
   - `evidence/reports/gold_sample_replay_real_summary_latest.md`
   - `evidence/reports/gold_sample_replay_real_latest.md`
 - Current authoritative screenshots:
-  - `evidence/screenshots/20260419_gold_ask_research_focus.png`
-  - `evidence/screenshots/20260419_gold_pdf_render.png`
-  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
-  - `evidence/screenshots/20260419_gold_refusal.png`
+  - `evidence/screenshots/20260529_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260529_gold_pdf_render.png`
+  - `evidence/screenshots/20260529_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260529_gold_refusal.png`
 - Appendix-only supporting screenshots already available:
   - `evidence/screenshots/20260419_stats_panel.png`
   - `evidence/screenshots/20260419_api_docs.png`
@@ -138,7 +138,7 @@ Suggested assets:
 ### Slide 3: Answerable Ask
 
 - Screenshot:
-  - `20260419_gold_ask_research_focus.png`
+  - `20260529_gold_ask_research_focus.png`
 - Talking point:
   - the answer appears together with citations and evidence snippets
   - this is not a chat shell response detached from the document
@@ -146,7 +146,7 @@ Suggested assets:
 ### Slide 4: PDF Evidence Render
 
 - Screenshot:
-  - `20260419_gold_pdf_render.png`
+  - `20260529_gold_pdf_render.png`
 - Talking point:
   - the system can jump back into the cited PDF page
   - evidence is shown visually, not only as a page number
@@ -154,7 +154,7 @@ Suggested assets:
 ### Slide 5: Second Answerable Ask + Model Decision
 
 - Screenshot:
-  - `20260419_gold_ask_rank_accuracy.png`
+  - `20260529_gold_ask_rank_accuracy.png`
 - Talking point:
   - the system can return concrete numeric answers with citations
   - both tested QA models pass, but `235b` remains the primary choice
@@ -166,7 +166,7 @@ Suggested supporting artifacts:
 ### Slide 6: Refusal
 
 - Screenshot:
-  - `20260419_gold_refusal.png`
+  - `20260529_gold_refusal.png`
 - Talking point:
   - if the ask is off-topic, the system refuses instead of fabricating
   - this keeps the demo focused on evidence-backed answers, not generic chat

@@ -94,8 +94,8 @@
 
 ### 推荐配图
 
-- `evidence/screenshots/20260419_gold_ask_research_focus.png`
-- `evidence/screenshots/20260419_gold_pdf_render.png`
+- `evidence/screenshots/20260529_gold_ask_research_focus.png`
+- `evidence/screenshots/20260529_gold_pdf_render.png`
 
 ### 讲述口径
 
@@ -142,11 +142,11 @@
 
 下方右：strict `G3`
 
-- `3 / 3` fresh-upload 连续通过
-- log-backed spans：`13.5s / 12.9s / 15.8s`
+- `6 / 6` fresh-upload 连续通过（双批次：20260420 首 3 轮 + 20260423 续 3 轮）
+- 首批 log-backed spans：`13.5s / 12.9s / 15.8s`（+ 续 3 轮）
 - 两次 answerable 均为 `declared`
 - refusal 均为 `retrieval_no_match`
-- fallback：`0 / 3`
+- fallback：`0 / 6`
 
 收尾结论：
 
@@ -154,12 +154,12 @@
 
 ### 推荐配图
 
-- `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
-- `evidence/screenshots/20260419_gold_refusal.png`
+- `evidence/screenshots/20260529_gold_ask_rank_accuracy.png`
+- `evidence/screenshots/20260529_gold_refusal.png`
 
 ### 讲述口径
 
-“最后一页把边界和可信度讲清楚。数值题说明系统能把明确结论落回原文；拒答图说明它不会编造；底部再用双模型验证和 strict G3 三连跑，把‘能演示一次’升级成‘锁定路径可复现’。”
+“最后一页把边界和可信度讲清楚。数值题说明系统能把明确结论落回原文；拒答图说明它不会编造；底部再用双模型验证和 strict G3 六轮跑，把‘能演示一次’升级成‘锁定路径可复现’。”
 
 ## 删减规则
 

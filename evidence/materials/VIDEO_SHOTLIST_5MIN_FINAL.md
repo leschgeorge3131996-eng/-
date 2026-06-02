@@ -15,10 +15,10 @@
 - 问题 2：`作者最终的方法排名和总体准确率分别是多少？`
 - refusal：`木星有几颗卫星？`
 - 核心截图：
-  - `20260419_gold_ask_research_focus.png`
-  - `20260419_gold_pdf_render.png`
-  - `20260419_gold_ask_rank_accuracy.png`
-  - `20260419_gold_refusal.png`
+  - `20260529_gold_ask_research_focus.png`
+  - `20260529_gold_pdf_render.png`
+  - `20260529_gold_ask_rank_accuracy.png`
+  - `20260529_gold_refusal.png`
 
 ## 分镜脚本
 
@@ -68,7 +68,7 @@
 
 - 展示锁定文档
 - 输入问题 1
-- 切到 `20260419_gold_ask_research_focus.png`
+- 切到 `20260529_gold_ask_research_focus.png`
 
 旁白：
 
@@ -79,7 +79,7 @@
 画面：
 
 - 点击 citation
-- 展示 `20260419_gold_pdf_render.png`
+- 展示 `20260529_gold_pdf_render.png`
 
 旁白：
 
@@ -90,7 +90,7 @@
 画面：
 
 - 输入问题 2
-- 展示 `20260419_gold_ask_rank_accuracy.png`
+- 展示 `20260529_gold_ask_rank_accuracy.png`
 
 旁白：
 
@@ -101,7 +101,7 @@
 画面：
 
 - 输入 refusal 问题
-- 展示 `20260419_gold_refusal.png`
+- 展示 `20260529_gold_refusal.png`
 
 旁白：
 
@@ -127,14 +127,14 @@
 画面：
 
 - 简洁数据页：
-  - `strict G3: 3 / 3`
-  - `fresh-upload`
-  - `13.5s / 12.9s / 15.8s`
-  - `fallback: 0 / 3`
+  - `strict G3: 6 / 6`
+  - `fresh-upload`（双批次：20260420 首 3 轮 + 20260423 续 3 轮）
+  - 首批 `13.5s / 12.9s / 15.8s`
+  - `fallback: 0 / 6`
 
 旁白：
 
-“在锁定样例和锁定题组下，我们还做了 strict G3 三连跑。三轮都是 fresh-upload 条件，三轮全部通过，两次 answerable 都保持 declared，离题都保持 retrieval_no_match，并且没有触发 fallback。”
+“在锁定样例和锁定题组下，我们还做了 strict G3 六轮跑（分两批 fresh-upload）。六轮全部通过，两次 answerable 都保持 declared，离题都保持 retrieval_no_match，并且没有触发 fallback。”
 
 ### 290-300s 收尾
 
@@ -160,10 +160,10 @@
 ## 备用镜头
 
 - 如果 live 录屏延迟明显偏高，优先保留：
-  - `20260419_gold_ask_research_focus.png`
-  - `20260419_gold_pdf_render.png`
-  - `20260419_gold_ask_rank_accuracy.png`
-  - `20260419_gold_refusal.png`
+  - `20260529_gold_ask_research_focus.png`
+  - `20260529_gold_pdf_render.png`
+  - `20260529_gold_ask_rank_accuracy.png`
+  - `20260529_gold_refusal.png`
 - 如果需要补一张可信度页，再使用：
   - `gold_sample_qa_compare_latest.md`
   - `20260420_g3_strict_rehearsal.md`

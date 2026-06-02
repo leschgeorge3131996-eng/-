@@ -61,9 +61,9 @@
 
 配图建议：
 
-- 左：`20260419_gold_ask_research_focus.png`
-- 中：`20260419_gold_pdf_render.png`
-- 右：`20260419_gold_refusal.png`
+- 左：`20260529_gold_ask_research_focus.png`
+- 中：`20260529_gold_pdf_render.png`
+- 右：`20260529_gold_refusal.png`
 
 ## 模块四：当前结论
 

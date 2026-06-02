@@ -161,21 +161,22 @@
 
 - 从 2026-05-29 起，每次真实调用都额外捕获**无问芯穹平台返回的 request id**（`platform_request_id`，取自 MaaS response 的 `id`（`chatcmpl-…`）/ `x-request-id` 响应头），与本地 `request_id` 并存写入 `call_logs.jsonl`（代码：`model_client.py` 捕获 → `task_service.py` 落库）。
 - 这个 `platform_request_id` **可在 infini-ai 控制台逐条对账**，是决赛"MaaS API 调用记录等证明材料"应提交的权威载体。
-- 推荐流程：决赛前在演示机按 `GOLD_SAMPLE_RUNBOOK.md` 重跑锁定 3 题 → `call_logs.jsonl` 落下一批带 `platform_request_id` 的新鲜记录 → 用脚本 `scripts/export_log_summary.py` 导出，并对其中 2-3 条配 infini-ai 控制台同一记录的并排截图。这样"用了平台"就从"口说真实"升级为"可现场对账"。
+- **现成且已就绪的权威对账载体**：`evidence/reports/baseline_compare_eval.json`（受控对照实验的 **44 次真实调用**，每条都带平台返回的 `chatcmpl-…` request id，且模型字段与现场默认 `deepseek-v4-flash` 自洽）——这是当前**最直接**的"用了平台"铁证，可现场打开与 infini-ai 控制台逐条对账。注：上文 request id 索引里的本地 `uuid4` 仅作内部追溯、非平台对账载体，对账一律以平台 `chatcmpl-…` id 为准。
+- 推荐流程：决赛前在演示机按 `GOLD_SAMPLE_RUNBOOK.md` 重跑锁定题 → `call_logs.jsonl` 落下一批带 `platform_request_id` 的新鲜记录；提交时**直接提供 `call_logs.jsonl` 逐行 + `baseline_compare_eval.json`** 作为对账载体（不要依赖 `export_log_summary.py`，它只产出聚合统计、不含 request id），并对其中 2-3 条配 infini-ai 控制台同一 id 记录的并排截图。这样"用了平台"就从"口说真实"升级为"可现场对账"。
 
 ## judge-facing 截图索引
 
 主截图：
 
-1. `evidence/screenshots/20260419_gold_ask_research_focus.png`
-2. `evidence/screenshots/20260419_gold_pdf_render.png`
-3. `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
-4. `evidence/screenshots/20260419_gold_refusal.png`
+1. `evidence/screenshots/20260529_gold_ask_research_focus.png`
+2. `evidence/screenshots/20260529_gold_pdf_render.png`
+3. `evidence/screenshots/20260529_gold_ask_rank_accuracy.png`
+4. `evidence/screenshots/20260529_gold_refusal.png`
 
 附录截图：
 
-1. `evidence/screenshots/20260419_stats_panel.png`
-2. `evidence/screenshots/20260419_api_docs.png`
+1. `evidence/screenshots/20260529_stats_panel.png`
+2. `evidence/screenshots/20260529_api_docs.png`
 
 ## 如何在答辩中使用这一页
 

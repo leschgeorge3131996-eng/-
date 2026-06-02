@@ -68,7 +68,7 @@
 
 建议配图：
 
-- `evidence/screenshots/20260419_gold_ask_research_focus.png`
+- `evidence/screenshots/20260529_gold_ask_research_focus.png`
 
 讲述口径：
 
@@ -88,7 +88,7 @@
 
 建议配图：
 
-- `evidence/screenshots/20260419_gold_pdf_render.png`
+- `evidence/screenshots/20260529_gold_pdf_render.png`
 
 讲述口径：
 
@@ -112,7 +112,7 @@
 
 建议配图：
 
-- `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
+- `evidence/screenshots/20260529_gold_ask_rank_accuracy.png`
 
 辅助材料：
 
@@ -140,7 +140,7 @@
 
 建议配图：
 
-- `evidence/screenshots/20260419_gold_refusal.png`
+- `evidence/screenshots/20260529_gold_refusal.png`
 
 讲述口径：
 

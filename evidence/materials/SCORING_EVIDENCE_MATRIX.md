@@ -67,8 +67,8 @@
 
 - `PROJECT_ONE_PAGER.md`
 - `DEMO_SCRIPT_3MIN.md`
-- `evidence/screenshots/20260419_gold_ask_research_focus.png`
-- `evidence/screenshots/20260419_gold_pdf_render.png`
+- `evidence/screenshots/20260529_gold_ask_research_focus.png`
+- `evidence/screenshots/20260529_gold_pdf_render.png`
 
 答法：
 
@@ -90,7 +90,7 @@
 
 - `ARCHITECTURE.md`
 - `HARD_EVIDENCE_SUMMARY.md`
-- `evidence/screenshots/20260419_gold_refusal.png`
+- `evidence/screenshots/20260529_gold_refusal.png`
 
 答法：
 

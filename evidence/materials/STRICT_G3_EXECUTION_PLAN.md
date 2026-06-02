@@ -82,10 +82,10 @@
 4. 备用模型：
    - `qwen3-32b`
 5. fallback 截图集：
-   - `20260419_gold_ask_research_focus.png`
-   - `20260419_gold_pdf_render.png`
-   - `20260419_gold_ask_rank_accuracy.png`
-   - `20260419_gold_refusal.png`
+   - `20260529_gold_ask_research_focus.png`
+   - `20260529_gold_pdf_render.png`
+   - `20260529_gold_ask_rank_accuracy.png`
+   - `20260529_gold_refusal.png`
 
 如果这些项还在变，就不要开严格版 `G3`。
 

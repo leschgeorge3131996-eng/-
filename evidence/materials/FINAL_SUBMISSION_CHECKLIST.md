@@ -75,10 +75,10 @@ Do not call the package final if any item below is still open.
 ### 3. Screenshots And Demo Evidence
 
 - [ ] The four core screenshots are current or intentionally frozen:
-  - `evidence/screenshots/20260419_gold_ask_research_focus.png`
-  - `evidence/screenshots/20260419_gold_pdf_render.png`
-  - `evidence/screenshots/20260419_gold_ask_rank_accuracy.png`
-  - `evidence/screenshots/20260419_gold_refusal.png`
+  - `evidence/screenshots/20260529_gold_ask_research_focus.png`
+  - `evidence/screenshots/20260529_gold_pdf_render.png`
+  - `evidence/screenshots/20260529_gold_ask_rank_accuracy.png`
+  - `evidence/screenshots/20260529_gold_refusal.png`
 - [ ] If the target demo environment changed, refresh screenshots before final
   export
 - [ ] If screenshots are intentionally reused, keep the spoken story and final

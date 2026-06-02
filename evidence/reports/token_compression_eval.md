@@ -14,8 +14,8 @@
 
 - **基准 (baseline)**：解析后的原文全文 token 数（视作"不预处理直接塞 prompt"）
 - **实际**：经过 `ContextPlannerService.plan()` 输出的 `document_text` token 数
-- **token 计法**：tiktoken `cl100k_base`，与 GPT-4 系列一致；
-  无问芯穹后端（Qwen/DeepSeek）的真实 BPE 会有 ±10% 偏差，但同尺子下的相对节省比稳健
+- **token 计法**：tiktoken `cl100k_base`，与 GPT-4 系列一致；`cl100k_base` 对中文的 token 计数**显著高于**无问芯穹后端（Qwen/DeepSeek）的原生 BPE（本批中文未截断全文实测约高 **29%**，英文偏差小）——但 baseline 与实际两侧都用**同一把尺子**，相对节省比不受影响
+- ⚠️ 口径区分：本报告用 tiktoken **估算**，`baseline_compare_eval` 用**真实平台计数**；两套数各自自洽，但**不可直接相减或混用**
 - **任务覆盖**：每个文档跑 summary / outline / ask 三类任务；
   共 10 个文档，32 个任务样本
 
