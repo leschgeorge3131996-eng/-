@@ -41,22 +41,32 @@ from backend.app.services.retrieval_service import RetrievalService  # noqa: E40
 from backend.app.services.task_service import TaskService  # noqa: E402
 
 
-def build_retrieval(settings, use_edge: bool, rescue_sim: float = 0.50, min_sim: float = 0.40):
+def build_retrieval(settings, use_edge: bool, rescue_sim: float = 0.50, min_sim: float = 0.40, cloud_embed_model: str | None = None):
     """复刻 routes._build_retrieval_service：开端侧则注入稠密索引，缺模型/失败回退纯词法。
-    rescue_sim/min_sim 可调，用于稠密阈值的数据驱动 A/B。"""
+    rescue_sim/min_sim 可调；cloud_embed_model 非空则用云端 embedding（如 bge-m3）替本地 BGE-small 做对照。"""
     if not use_edge:
         return RetrievalService()
     try:
         from backend.app.services.dense_index import DenseIndex
-        from backend.app.services.embedding_service import EmbeddingService
 
-        emb = EmbeddingService(settings.edge_model_dir)
+        if cloud_embed_model:
+            from scripts.cloud_embedding import CloudEmbeddingService
+
+            emb = CloudEmbeddingService(settings, model=cloud_embed_model)
+            tag = f"云端 {cloud_embed_model}"
+        else:
+            from backend.app.services.embedding_service import EmbeddingService
+
+            emb = EmbeddingService(settings.edge_model_dir)
+            tag = "本地 BGE-small"
         if not emb.is_available():
-            print("[edge] 端侧模型不可用 → 回退纯词法")
+            print(f"[edge] {tag} 不可用 → 回退纯词法")
             return RetrievalService()
         emb.warmup()
-        di = DenseIndex(settings.vectors_dir, emb)
-        print(f"[edge] 端侧语义检索已启用（rescue_sim={rescue_sim}, min_sim={min_sim}）")
+        # 云端模型用独立 vectors 子目录，避免与本地 bge-small 索引混淆
+        vdir = settings.vectors_dir / cloud_embed_model.replace("/", "_") if cloud_embed_model else settings.vectors_dir
+        di = DenseIndex(vdir, emb)
+        print(f"[edge] 端侧/稠密检索已启用（{tag}, rescue_sim={rescue_sim}, min_sim={min_sim}）")
         return RetrievalService(dense_index=di, dense_enabled=True, dense_rescue_sim=rescue_sim, dense_min_sim=min_sim)
     except Exception as exc:  # noqa: BLE001
         print(f"[edge] 启用失败 → 回退纯词法：{exc}")
@@ -180,6 +190,7 @@ def main() -> int:
     ap.add_argument("--edge", action="store_true", help="启用端侧语义检索（词法+稠密混合）做 A/B")
     ap.add_argument("--rescue-sim", type=float, default=0.50, help="稠密救援相似度门槛（调严可减少误救陷阱）")
     ap.add_argument("--min-sim", type=float, default=0.40, help="稠密增召回相似度门槛")
+    ap.add_argument("--cloud-embed-model", default=None, help="用云端 embedding（如 bge-m3）替本地 BGE-small 做对照")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -191,7 +202,7 @@ def main() -> int:
     fs = FileService(settings=settings)
     ls = LogService(settings=settings)
     mc = ModelClient(settings=settings)
-    ts = TaskService(file_service=fs, model_client=mc, log_service=ls, retrieval_service=build_retrieval(settings, args.edge, args.rescue_sim, args.min_sim))
+    ts = TaskService(file_service=fs, model_client=mc, log_service=ls, retrieval_service=build_retrieval(settings, args.edge, args.rescue_sim, args.min_sim, args.cloud_embed_model))
     sess = auth.create_session("alpha-demo").session.session_id
 
     cases = load_cases(ROOT / args.manifest)
