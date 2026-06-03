@@ -84,7 +84,7 @@
 - 可打印的 deck / poster HTML 原型说明
 
 28. [../experiments/20260420_g3_strict_rehearsal.md](../experiments/20260420_g3_strict_rehearsal.md)
-- 严格版 `G3` 三轮权威记录，包含 request id、log-backed 时长与 fallback 结论
+- 严格版 `G3` 首批 3 轮记录（与 `20260423_g3_continuation.md` 续 3 轮合为权威**六轮**），含 request id、log-backed 时长与 fallback 结论
 
 29. [PPT_DECK_3PAGES_FINAL.md](./PPT_DECK_3PAGES_FINAL.md)
 - 正式 `3` 页提交版 PPT 源稿

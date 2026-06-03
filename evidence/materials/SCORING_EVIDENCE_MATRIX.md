@@ -31,7 +31,7 @@
 | --- | --- | --- |
 | 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS，多任务多模型路由（QA=`deepseek-v4-flash` / summary·outline=`qwen3-235b` / 验证 fallback），调用留痕含**平台 request_id** 可在 infini-ai 控制台对账 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl` |
 | 商业化潜力 `5` | 已选定 **B 端高校实验室/课题组席位**为主路径 + C 端答辩季入口，完成市场量级 / 竞品差异 / 单位经济（token 压缩支撑低边际成本）/ 获客论证 | `COMMERCIALIZATION_CASE.md` |
-| 大模型与智能体能力 `5` | 主链路使用无问芯穹大模型 + 单层 **agentic 检索循环**（检索→模型自评证据是否充分→不足则改写 query 补检索→2 轮收敛，`agent_iterations/query_rewrites` 落日志）+ 检索/模型双层拒答 | `ARCHITECTURE.md` 设计点 4、`HARD_EVIDENCE_SUMMARY.md` 第 9 节 |
+| 大模型与智能体能力 `5` | 主链路使用无问芯穹大模型 + 单层 **agentic 检索循环**（检索→模型自评证据是否充分→**有界二次重试 `iter≤2`**，需新证据时改写 `followup_query` 补检索）+ 检索/模型双层拒答。诚实口径：改写补检索分支已实现且单测覆盖，固定集上模型多单轮收敛、二轮多为同上下文复核，故 `query_rewrites` 多为空；`agent_iterations` 落日志 | `ARCHITECTURE.md` 设计点 4、`HARD_EVIDENCE_SUMMARY.md` 第 9 节 |
 | **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `86.6%`，峰值 `93.1%`（Attention 论文 `10,263 → 704` tokens）；同时是端侧/云端协同的量化收益** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
 
 ## 平台使用：评委追问点

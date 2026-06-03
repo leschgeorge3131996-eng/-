@@ -91,12 +91,13 @@
 2. 近端检索相关 chunk
 3. 组织 ask 上下文
 4. 调用无问芯穹模型
-5. **模型自评证据是否充分**：若不足，模型给出 `need_more=true` + `followup_query`
-6. **不足则用 `followup_query` 补检索新片段（排除已用 chunk）并再问一次**，最多 2 轮收敛（`agent_iterations / query_rewrites` 落日志）
+5. **模型自评证据是否充分**：若不足，模型给出 `need_more=true`（+ 需要新证据时给 `followup_query`）
+6. **有界二次重试**（`iter≤2`）：需要新证据时用 `followup_query` 补检索新片段（排除已用 chunk）再问一次；`agent_iterations` 落日志
 7. 提取 `used_chunk_ids / evidence_quotes`，对每条 quote 做原文子串校验（校验不过即丢弃，引用不可伪造）
 8. 组装 citation，回到 PDF 页面做 bbox 证据显示
 
 > 全程不改变拒答与证据契约：干净拒答仍拒答；模型不索要补充时退化为单轮。代码 `task_service.py::_run_agentic_ask`，测试 `test_agentic_ask_reretrieves_with_followup_query`。
+> **诚实口径**：改写补检索分支已实现且单测覆盖，但固定 demo 集上模型多单轮收敛、二轮多为同上下文复核，故生产日志 `query_rewrites` 多为空——定位为"有界自评重试"，不当作"现场可逐条核验改写"的卖点。
 
 ### 5.3 refusal 路径
 

@@ -193,11 +193,13 @@ rollback fallback：`qwen3-235b-a22b-instruct-2507`
 1. 检索 → 把命中片段交模型作答；
 2. **模型自评证据是否充分**：若不足，模型在同一次结构化输出里给出 `need_more=true` 与 `followup_query`（一个更聚焦的补充检索查询词）；
 3. 系统用 `followup_query` **补检索新片段**（排除已展示过的 chunk），把新证据并入上下文**再问一次**；
-4. 最多 `2` 轮收敛；`agent_iterations` 与 `query_rewrites` 落 `call_logs.jsonl`，agent 行为可现场核验。
+4. **有界二次重试**（`iter≤2`）：`agent_iterations` 落 `call_logs.jsonl`，真实日志中约 1/4 的 `ask` 触发了二轮自评。
 
-边界与安全：这是大模型 + agent 技术的有效组合（query 规划 + 证据自评 + 迭代补检索 + 收敛，即 self-RAG 雏形），但**完全不改变拒答与证据回链契约**——干净拒答仍拒答，逐字 quote 仍做原文子串校验，模型不索要补充时退化为单轮（行为与改造前一致）。单测 `test_agentic_ask_reretrieves_with_followup_query` 证明：当首轮证据不足时，系统确实用模型给出的 `followup_query` 检索到一个**全新片段**并在第二轮据其作答；`test_validated_quotes_drop_fabricated_text` 证明伪造 quote 会被丢弃。
+边界与安全：这是大模型 + agent 技术的有效组合（证据自评 + 有界重试 + 收敛，self-RAG 雏形），但**完全不改变拒答与证据回链契约**——干净拒答仍拒答，逐字 quote 仍做原文子串校验，模型不索要补充时退化为单轮。改写补检索分支已实现且单测覆盖：`test_agentic_ask_reretrieves_with_followup_query` 证明首轮证据不足时系统用 `followup_query` 检索到**全新片段**并据其再答；`test_validated_quotes_drop_fabricated_text` 证明伪造 quote 被丢弃。
 
-**答辩口径**：我们在 `ask` 主链路里做了一个受控的 agentic RAG——检索后让模型自评证据是否充分，不足就改写 query 再检索一轮，最多两轮收敛，全程不破坏拒答和证据回链；`agent_iterations / query_rewrites` 有日志可查，不是口头包装。
+> **诚实口径（主动说）**：在固定 demo 集上，模型多为**单轮收敛**，触发的二轮也多为**同上下文证据复核**而非改写补检索，故生产日志 `query_rewrites` 多为空。我们把它定位为"**有界自评重试**（机制已实现+单测覆盖）"，**不**宣称"现场可逐条核验 query 改写"，避免把空字段当卖点。
+
+**答辩口径**：`ask` 主链路是受控 agentic RAG——检索后模型自评证据，不足则有界重试(≤2 轮)，全程不破坏拒答与证据回链；`agent_iterations` 有日志可查。诚实说：改写补检索分支已实现+单测覆盖，但固定集上多单轮收敛，`query_rewrites` 多为空，我们不夸成"现场可核验改写"。
 
 ## 当前诚实边界
 

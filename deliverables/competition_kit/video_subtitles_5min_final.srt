@@ -32,7 +32,7 @@
 
 9
 00:04:25,000 --> 00:04:50,000
-在锁定样例和锁定题组下，我们还做了 strict G3 三连跑。三轮都是 fresh-upload 条件，三轮全部通过，两次 answerable 都保持 declared，refusal 都保持 retrieval_no_match，并且没有触发 fallback。
+在锁定样例和锁定题组下，我们还做了 strict G3 六轮 fresh-upload（首批三轮加续三轮）。六轮全部通过，answerable 都保持 declared，refusal 都保持 retrieval_no_match，并且没有触发 fallback，fallback 是零比六。
 
 10
 00:04:50,000 --> 00:05:00,000

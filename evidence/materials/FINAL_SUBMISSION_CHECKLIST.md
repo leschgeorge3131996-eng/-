@@ -66,8 +66,8 @@ Do not call the package final if any item below is still open.
 - [ ] `PRODUCT_TECHNICAL_WRITEUP.md`, `PLATFORM_USAGE_EVIDENCE.md`,
   `HARD_EVIDENCE_SUMMARY.md`, `SCORING_EVIDENCE_MATRIX.md`, the final PPT,
   and the final video all describe the same product positioning
-- [ ] `G3` wording stays at strict fresh-upload `3`-run judged-demo
-  reproducibility, not open-domain generalization
+- [ ] `G3` wording stays at strict fresh-upload `6`-run judged-demo
+  (首批 3 + 续 3，fallback 0/6) reproducibility, not open-domain generalization
 - [ ] The strongest claim remains evidence-backed `ask`, not generic
   `summary` / `outline`
 - [ ] The main story stays `upload -> ask -> citation -> PDF -> refusal`

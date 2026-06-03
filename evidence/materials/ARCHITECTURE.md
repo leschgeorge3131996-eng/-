@@ -70,8 +70,8 @@ flowchart LR
 - 检索命中但模型判定无依据 → LLM 层 `llm_refused` 二次拒答；低置信候选交模型复核，未给可验证证据则拒答
 
 4. **单层 agentic 检索循环**
-- `ask` 在主链路内做受控 agentic RAG：检索 → 模型自评证据是否充分 → 不足则产出 `followup_query`，近端补检索新片段后再问一次，最多 2 轮收敛
-- 全程不破坏拒答与证据回链契约；`agent_iterations / query_rewrites` 落日志，agent 行为可核验
+- `ask` 在主链路内做受控 agentic RAG：检索 → 模型自评证据是否充分 → 不足则**有界二次重试**（`iter≤2`，需要新证据时改写 `followup_query` 补检索）
+- 全程不破坏拒答与证据回链契约；`agent_iterations` 落日志（真实日志中约 1/4 的 `ask` 触发了二轮自评）。**诚实口径**：改写补检索分支已实现且单测覆盖，但固定 demo 集上模型多为单轮收敛、触发的二轮也多为同上下文证据复核，故生产日志 `query_rewrites` 多为空——我们把它定位为"有界自评重试"，不当作"现场可逐条核验改写"的卖点
 
 5. **证据可沉淀 · 平台可对账**
 - 结果进入 JSONL 日志（含 token、本地 request_id 与**无问芯穹平台 request_id**）、统计与 evidence 目录

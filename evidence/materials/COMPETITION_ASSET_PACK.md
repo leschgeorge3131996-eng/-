@@ -157,7 +157,7 @@ Suggested assets:
   - `20260529_gold_ask_rank_accuracy.png`
 - Talking point:
   - the system can return concrete numeric answers with citations
-  - both tested QA models pass, but `235b` remains the primary choice
+  - both tested QA models pass on the locked 3-question set (this only proves the platform path runs); the on-stage **default is `deepseek-v4-flash`** (selected via the harder V6 holdout, 71/72), with `qwen3-235b-a22b-instruct-2507` as the more-stable rollback — consistent with Fixed Demo Fact #4
 
 Suggested supporting artifacts:
 
