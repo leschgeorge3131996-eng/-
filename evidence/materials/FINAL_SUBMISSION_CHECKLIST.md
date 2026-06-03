@@ -105,10 +105,23 @@ Do not call the package final if any item below is still open.
   - `HARD_EVIDENCE_SUMMARY.md`
   - `SCORING_EVIDENCE_MATRIX.md`
   - final screenshot set
+  - **平台对账载体（决赛"MaaS API 调用记录"硬约束，勿漏打包）**：
+    - `evidence/reports/platform_reconciliation_<封板日>.md` + 同名 `_calls.jsonl` 快照
+    - `evidence/reports/baseline_compare_eval.json`（更大样本对账载体）
+    - `evidence/screenshots/<封板日>_console_*.png`（控制台汇总 + 时序两张，按 platform_reconciliation H3 口径在代金券号现截；复用 TASK_BOARD 已追踪的"重跑 3 题→新鲜 id→控制台截图"动作）
 - [ ] Appendix package contains only supporting evidence and does not replace
   the main judged assets
 - [ ] Exported handoff pack still includes the final-source drafts and repo
   baselines for future operators
+
+### 6. 提交包一键验收（codex 复核补：不只查文件在否，还查规格）
+
+- [ ] **3 页 PPT**：文件存在且能在干净机器打开；**页数 ≤ 3**；16:9；封面/版本号不带 `draft`；口径与材料一致（默认 `deepseek-v4-flash`、G3 六轮、4.37×、端侧）
+- [ ] **5 分钟视频**：文件存在且可播放；**时长 ≤ 5:00**；旁白/字幕为 strict G3 **六轮**口径；分辨率清晰可读
+- [ ] **文件命名 / 大小**：主提交物命名稳定、无乱码、大小在平台上限内
+- [ ] **四物口径一致**：PPT / 视频 / 技术文档 / 截图 互不矛盾（模型默认、G3 轮次、token 口径、端侧"持平/补召回"、agentic 不夸"可核验改写"）
+- [ ] **平台对账**：`platform_reconciliation_<封板日>` 逐笔 `chatcmpl-` id 无 `None`；控制台截图与逐笔表北京时间时段一致
+- [ ] **断网/云 API 异常预案**：明确哪些能力可离线展示（上传/解析/端侧检索/PDF 回链）、哪些必须联网（云端生成），现场断网时的降级话术已备
 
 ## Last Pre-Submission Pass
 

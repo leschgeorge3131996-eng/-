@@ -30,6 +30,7 @@ refuse off-topic asks.`
       `data/logs/call_logs.jsonl`, warms caches, and exits `0` only when
       all `3` gold cases pass end-to-end. Report lands at
       `evidence/reports/predeploy_sanity_<timestamp>.md`
+- [ ] **若现场要展示端侧实体**：确认权重在位（`models/bge-small-zh-v1.5/onnx/model.onnx_data` ~90MB，缺则离线下载 `onnx-community/bge-small-zh-v1.5-ONNX`），设 `EDGE_EMBEDDING_ENABLED=true` 跑 `scripts/edge_live_smoke.py`，**全 PASS(14/14) → 现场可放心开端侧**（predeploy 不覆盖端侧路径，这是必跑补充）。任一 FAIL → **降级为"词法+云端跑金标（固定集 A/B 已证开=关同分）+ 端侧走预录截图"**，不在台上硬开。这是 best-effort **软门**，不要让它卡死整场 demo。
 - [ ] Run `GOLD_SAMPLE_RUNBOOK.md` once on the actual demo machine
 - [ ] Use the locked sample PDF and the locked prompt set only
 - [ ] Confirm answerable asks show citations and declared evidence

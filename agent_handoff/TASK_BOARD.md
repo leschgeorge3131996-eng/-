@@ -2,6 +2,12 @@
 
 ## Now
 
+- 🚨 **`2026-06-03` 最高优先·提交硬交付物（组员依赖，不产出=整作品交不出 0 分）**：
+  - **① 3 页 PPT 成片** = 负责人 ＿＿＿ / 截止 `06-10`。源稿 `PPT_DECK_3PAGES_FINAL.md`、可打印基线 `deliverables/competition_kit/deck_3page_final.pdf`（已实测 **3 页 16:9**、含 4.37×/默认 deepseek-v4-flash/strict G3 6/6/端侧/agentic）——**必要时该 PDF 可直接当"PDF 版 PPT"提交，是按时交付的安全网**。
+  - **② 5 分钟演示视频成片(.mp4)** = 负责人 ＿＿＿ / 截止 `06-12`。源稿 `VIDEO_SHOTLIST_5MIN_FINAL.md` + 字幕 `video_subtitles_5min_final.srt`（已统一为 strict G3 六轮）。最小可交路径：字幕 + `20260529_*` 四张金标图 + 本机录屏出最小成片。
+  - **③ 控制台对账截图**（决赛载体）= 用户登代金券号截 `2026-06-02` 当日「用量统计」汇总页 + 详情时序图，存 `evidence/screenshots/20260602_console_*.png`（口径见 `platform_reconciliation_20260602.md` H3）。
+- `2026-06-03`: ultracode 审计（56-agent，39 真实优化点，codex 复核）已落地一批 Claude-doable 修复：诚实口径统一（query_rewrites 降级 / G3 六轮 / 默认模型对齐）、首屏 eyebrow、deck/poster 补 agentic+商业化+token、平台/token/商业化口径。详见 SESSION_LOG `2026-06-03` 与 `evidence/reports/competition_audit_20260603.md`。
+
 - `2026-05-29`: 赛题一 rubric 审计 + 冲国一优化已落地，**已推送 GitHub**（origin master 现为 `201825f`；推送前用 `git filter-branch` 把历史里泄露的 HF token 抹成 `hf_***REVOKED***`，原 commit SHA 已重写，故旧记录里的 99261b2/49ae82e 等 SHA 作废）。**⚠️ 仍需用户去 HF 撤销该 token**（GitHub→HF 同步 Action 用的也是它，撤销后该 Action 会失败，符合预期）。代码侧：`_run_agentic_ask` 真 agentic 检索循环（智能体加分项做实，backend 81 passed）、平台 `platform_request_id` 捕获（决赛对账）、ResultPanel 对照锚点、新增 agentic/quote-fabrication/bbox 单测。材料侧：端云协同 reframe（ARCHITECTURE Edge|近端|Cloud 分层 + 5 份材料命名）、默认模型口径诚实化（51/51 归 qwen3-235b rollback，默认 flash=48/51+V6 71/72）、新增 `COMMERCIALIZATION_CASE.md`、token 诚实重跑（长文 ask 89.1%→86.6%，峰值 93.1% 不变，tiktoken 入 requirements）、订正 PLATFORM_USAGE 失实 id 表述 + 决赛 platform_request_id 对账正解、deck 重渲染、DEMO_SCRIPT/G3 口径 stale 修复。详见 SESSION_LOG `2026-05-29`。
 - `2026-05-29` 待办（建议演示机 MaaS 连通时做）：① agentic vs 单轮 RAG 难例子集量化对照；② RAG-vs-FullContext baseline 对照报告（补 p.264"可量化显著提升 vs 现有方法"，预计 +4-6 分）；③ 重跑锁定 3 题生成带 platform_request_id 的新鲜调用记录 + infini-ai 控制台并排截图（决赛 MaaS 调用记录权威载体）。待用户拍板可选项：端侧 TS 预筛组件 `edgePrefilter.ts`（端云协同 B 方案，须隐藏入口）。
 - No hard engineering blocker is currently open
