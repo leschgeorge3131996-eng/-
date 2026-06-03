@@ -108,6 +108,8 @@ export interface TaskResult {
   context_truncated: boolean;
   token_usage?: TokenUsage | null;
   platform_request_id?: string | null;
+  agent_iterations?: number;
+  query_rewrites?: string[];
 }
 
 export interface RecentDocument {

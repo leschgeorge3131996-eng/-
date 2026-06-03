@@ -758,6 +758,14 @@ export default function ResultPanel({
                     <span>平台 request id</span>
                     <strong>{ledgerPlatformId ?? "—"}</strong>
                   </div>
+                  <div className="result-meta-card">
+                    <span>智能体自评</span>
+                    <strong>
+                      {(result.agent_iterations ?? 1) > 1
+                        ? "二轮（自评证据不足 → 再检索确认）"
+                        : "单轮收敛"}
+                    </strong>
+                  </div>
                 </div>
                 <p className="duanyun-ledger-note">
                   {ledgerHasCompression

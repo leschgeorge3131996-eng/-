@@ -193,7 +193,7 @@ rollback fallback：`qwen3-235b-a22b-instruct-2507`
 1. 检索 → 把命中片段交模型作答；
 2. **模型自评证据是否充分**：若不足，模型在同一次结构化输出里给出 `need_more=true` 与 `followup_query`（一个更聚焦的补充检索查询词）；
 3. 系统用 `followup_query` **补检索新片段**（排除已展示过的 chunk），把新证据并入上下文**再问一次**；
-4. **有界二次重试**（`iter≤2`）：`agent_iterations` 落 `call_logs.jsonl`，真实日志中约 1/4 的 `ask` 触发了二轮自评。
+4. **有界二次重试**（`iter≤2`）：`agent_iterations` 落 `call_logs.jsonl`，真实平台日志 **823 笔 ask、197 笔（约 24%）真实触发了二轮自评**（非 mock）。两个可对账样例：`chatcmpl-2b1a068f…`（自评不足→重试→declared 答出）、`chatcmpl-678cf141…`（自评不足→重试→仍无据→诚实拒答）。详见 `evidence/reports/agentic_telemetry_20260603.md`。
 
 边界与安全：这是大模型 + agent 技术的有效组合（证据自评 + 有界重试 + 收敛，self-RAG 雏形），但**完全不改变拒答与证据回链契约**——干净拒答仍拒答，逐字 quote 仍做原文子串校验，模型不索要补充时退化为单轮。改写补检索分支已实现且单测覆盖：`test_agentic_ask_reretrieves_with_followup_query` 证明首轮证据不足时系统用 `followup_query` 检索到**全新片段**并据其再答；`test_validated_quotes_drop_fabricated_text` 证明伪造 quote 被丢弃。
 
