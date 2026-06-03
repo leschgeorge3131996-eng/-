@@ -29,7 +29,7 @@
 
 | 加分项 | 当前命中情况 | 证据 |
 | --- | --- | --- |
-| 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS，多任务多模型路由（QA=`deepseek-v4-flash` / summary·outline=`qwen3-235b` / 验证 fallback），调用留痕含**平台 request_id** 可在 infini-ai 控制台对账 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl` |
+| 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS：**QA 主链路（`deepseek-v4-flash`）调用留痕含平台 `request_id`，可在 infini-ai 控制台逐条对账**；`summary/outline` 多模型路由（`qwen3-235b`）已在代码 + config 实现、现场主打 ask（诚实口径：非-ask 路径封板前未跑平台留痕，不与"含 request_id 可对账"绑为同一句） | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl` |
 | 商业化潜力 `5` | 已选定 **B 端高校实验室/课题组席位**为主路径 + C 端答辩季入口，完成市场量级 / 竞品差异 / 单位经济（token 压缩支撑低边际成本）/ 获客论证 | `COMMERCIALIZATION_CASE.md` |
 | 大模型与智能体能力 `5` | 主链路使用无问芯穹大模型 + 单层 **agentic 检索循环**（检索→模型自评证据是否充分→**有界二次重试 `iter≤2`**，需新证据时改写 `followup_query` 补检索）+ 检索/模型双层拒答。诚实口径：改写补检索分支已实现且单测覆盖，固定集上模型多单轮收敛、二轮多为同上下文复核，故 `query_rewrites` 多为空；`agent_iterations` 落日志 | `ARCHITECTURE.md` 设计点 4、`HARD_EVIDENCE_SUMMARY.md` 第 9 节 |
 | **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `86.6%`，峰值 `93.1%`（Attention 论文 `10,263 → 704` tokens）；同时是端侧/云端协同的量化收益** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
@@ -139,6 +139,7 @@
 
 - 我们的预处理是三层流水线：解析归一化 → 结构化切块（`ChunkService` 900 字 target / 100 字 overlap）→ 按任务意图的检索/上下文规划（`ContextPlannerService`，`ask` 走 retrieval、`summary/outline` 走 coverage）
 - 对长文档 `ask` 任务，4 个样本平均节省 **86.6%**，峰值 **93.1%** —— 比如 Attention 论文从 10,263 tokens 压到 704 tokens（6.9%）；这也是端侧/云端协同的量化收益（端侧只把必要片段上云）
+- **更硬的口径（真实平台 token，非 tiktoken 估算）**：受控对照 `baseline_compare_eval`——同一批 22 题、同一 ask 契约，唯一变量是检索接地 vs 直接喂全文，**RAG 省 `4.37×` input token（49,273 vs 215,113），准确率持平（22/22 = 22/22）**，44 次调用每条带真实 `chatcmpl-` id 可对账（`evidence/reports/baseline_compare_eval.{md,json}`）。口径是"**同等准确度下省 4.37× + 能 scale + 能 bbox 回链**"，不是"RAG 更准"
 - 短文档场景诚实标注为 `-4%` 左右（单 chunk 加页码/标题 marker 略增），不是所有场景都该压、也不假装都压得动
 - baseline 取"解析后全文塞 prompt" vs 实际走 planner 后的 `document_text`，token 数用 tiktoken `cl100k_base` 做统一尺子；无问芯穹底层 Qwen/DeepSeek BPE 会有 ±10% 偏差，但相对节省比稳健
 - 报告里 1 个走 `no_match` 拒答路径的样本**明确不计入节省统计**，按 `feedback_eval_honesty` 纪律处理
