@@ -46,12 +46,12 @@ services:
       # Secret — enter in the Render dashboard, never commit.
       - key: WUQIONG_API_KEY
         sync: false
-      # Model names are not secret but are set in the dashboard so they can be
-      # swapped without a redeploy. Match .env: QA on deepseek-v4-flash,
-      # summary/outline on qwen3-235b-a22b-instruct-2507.
+      # Model names are not secret. Baked in here (matching .env) so the only
+      # manual dashboard step is pasting WUQIONG_API_KEY. To swap a model,
+      # edit this file and redeploy.
       - key: MODEL_QA
-        sync: false
+        value: deepseek-v4-flash
       - key: MODEL_SUMMARY
-        sync: false
+        value: qwen3-235b-a22b-instruct-2507
       - key: MODEL_OUTLINE
-        sync: false
+        value: qwen3-235b-a22b-instruct-2507
