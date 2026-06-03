@@ -41,8 +41,9 @@ from backend.app.services.retrieval_service import RetrievalService  # noqa: E40
 from backend.app.services.task_service import TaskService  # noqa: E402
 
 
-def build_retrieval(settings, use_edge: bool):
-    """复刻 routes._build_retrieval_service：开端侧则注入稠密索引，缺模型/失败回退纯词法。"""
+def build_retrieval(settings, use_edge: bool, rescue_sim: float = 0.50, min_sim: float = 0.40):
+    """复刻 routes._build_retrieval_service：开端侧则注入稠密索引，缺模型/失败回退纯词法。
+    rescue_sim/min_sim 可调，用于稠密阈值的数据驱动 A/B。"""
     if not use_edge:
         return RetrievalService()
     try:
@@ -55,8 +56,8 @@ def build_retrieval(settings, use_edge: bool):
             return RetrievalService()
         emb.warmup()
         di = DenseIndex(settings.vectors_dir, emb)
-        print("[edge] 端侧语义检索已启用（词法+稠密混合）")
-        return RetrievalService(dense_index=di, dense_enabled=True)
+        print(f"[edge] 端侧语义检索已启用（rescue_sim={rescue_sim}, min_sim={min_sim}）")
+        return RetrievalService(dense_index=di, dense_enabled=True, dense_rescue_sim=rescue_sim, dense_min_sim=min_sim)
     except Exception as exc:  # noqa: BLE001
         print(f"[edge] 启用失败 → 回退纯词法：{exc}")
         return RetrievalService()
@@ -177,6 +178,8 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--judge-model", default="qwen3-235b-a22b-instruct-2507")
     ap.add_argument("--edge", action="store_true", help="启用端侧语义检索（词法+稠密混合）做 A/B")
+    ap.add_argument("--rescue-sim", type=float, default=0.50, help="稠密救援相似度门槛（调严可减少误救陷阱）")
+    ap.add_argument("--min-sim", type=float, default=0.40, help="稠密增召回相似度门槛")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -188,7 +191,7 @@ def main() -> int:
     fs = FileService(settings=settings)
     ls = LogService(settings=settings)
     mc = ModelClient(settings=settings)
-    ts = TaskService(file_service=fs, model_client=mc, log_service=ls, retrieval_service=build_retrieval(settings, args.edge))
+    ts = TaskService(file_service=fs, model_client=mc, log_service=ls, retrieval_service=build_retrieval(settings, args.edge, args.rescue_sim, args.min_sim))
     sess = auth.create_session("alpha-demo").session.session_id
 
     cases = load_cases(ROOT / args.manifest)
