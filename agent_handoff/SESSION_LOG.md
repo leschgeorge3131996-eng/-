@@ -1,5 +1,12 @@
 ﻿# Session Log
 
+## 2026-06-03 / Claude (ultracode 评分审计 + codex 复核 + 一批 Claude-doable 优化落地)
+
+- **审计（commit `2263310`/`d73ef3e`）**：ultracode 起 56-agent workflow，按 10 评分维度并行审计→对抗核验（防把已完成当缺口）→综合。45 发现→**39 真实优化点**（1 P0/24 P1/12 P2/2 P3），报告 `evidence/reports/competition_audit_20260603.md`。**codex 独立复核**（88k token、亲核真实文件带行号）：承重结论全为真（query_rewrites 828 条全空、PPT/视频文件不存在、G3 三轮/六轮 + 默认模型口径打架、控制台截图缺、端侧没进 predeploy）；**抓 1 误报**（"deck token 0 提及"错——`deck:232` 有 4.37×）；把"口径打架"提到近 P0；补 3 漏项（提交验收清单 / 断网预案 / 评委评分映射页）；无刷分红线违规。
+- **已落地的 Claude-doable 修复（commits `5668c66`→`8a18a3a`，已推）**：① **诚实口径统一(近P0)**：agentic `query_rewrites` 全空诚实降级（ARCHITECTURE/SCORING/HARD_EVIDENCE§9/PRODUCT_WRITEUP，删"可现场核验改写"）；G3 三轮→**六轮**（srt/MATERIALS_INDEX/FINAL_CHECKLIST，保留 quantitative_eval 历史三轮子集）；COMPETITION_ASSET_PACK 默认模型自相矛盾对齐。② **可见性**：首屏 eyebrow"智能办公"→"引用可核验·论文/答辩助手"；deck p3 补 1 条 agentic（重导仍 3 页）；poster 补 2 panel（技术亮点端云/token/agentic + 商业化，原 0 提及，重导仍 1 页）。③ **平台/token/商业化口径**：SCORING 追问3 补 4.37× 真实平台 token；多模型路由解绑"含 request_id 可对账"（summary/outline 无真实留痕）；COMMERCIALIZATION 补 token→RMB 换算（带核价红线）。④ **清单加固**：TASK_BOARD 加带截止日的 PPT/视频/截图追踪；DEFENSE_CHECKLIST 加端侧 smoke 软门；FINAL_CHECKLIST 加对账三件套入包 + §6 提交验收清单 + 断网预案。
+- **剩余 Claude-doable（未做，可续）**：P1-E bbox 回链量化报告 / P1-G 端侧延迟实测 / P1-F·M 前端账本端侧+agentic 徽标（小代码）/ 评委评分映射页 / P2 一批 stale 清理（handoff 89.1→86.6 等）。**需组员/用户**：PPT.pptx + 5min视频成片文件、代金券号控制台截图。
+- **未变铁律**：诚实>刷分、交付前两周不动核心检索/回链/拒答。
+
 ## 2026-06-02 / Claude (本地端侧语义检索落地 + 冲奖审计 + 两周计划 + 端侧叙事变现 + M2-M7 口径修正)
 
 - **背景**：用户问"还能做什么"。开 ultracode 跑了 (1) 19-agent 冲奖审计盘（对照赛题一评分细则，存 `agent_handoff/reviews/scoring_audit_20260602.json`）→ 预估 91-101/120，最大短板=**端云协同无技术实体**（纯云端 RAG）；(2) 9-agent 两周计划盘（存 `two_week_plan_20260602.json`）。**用户更正"我没说过不上本地模型，怎么有优势怎么来"** → 解锁本地模型（memory 三处已更正：`feedback_non_priorities` / `project_preprocessing_division` / `MEMORY.md`）。离提交 2 周。
