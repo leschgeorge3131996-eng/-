@@ -332,7 +332,7 @@ Intentionally NOT updated (kept as time-stamped baselines or historical experime
   - `scripts/eval_token_compression.py`: walks 10 sample docs (8 short md/txt + 2 long PDFs) × 3 task types through the real services, counts tokens with tiktoken `cl100k_base`, compares `ContextPlannerService.plan().document_text` against "raw_text as prompt" baseline
   - `no_match` refusal-path samples explicitly excluded from headline averages (per `project_eval_honesty`)
 - Numbers (32 task samples total):
-  - long-doc ask: 4 samples, avg **89.1%** saved, peak **93.1%** (Attention paper `10,263 → 704` tokens)
+  - long-doc ask: 4 samples, avg **86.6%** saved, peak **93.1%** (Attention paper `10,263 → 704` tokens); 真实平台 token 受控对照另省 **4.37×**（`baseline_compare_eval.md`）
   - long-doc summary/outline: avg 83.3%
   - long-doc overall: 86.2%
   - short-doc overall: -4.2% (honestly flagged as non-target scenario; single-chunk docs get a few wrapper tokens from page/heading markers)

@@ -69,7 +69,7 @@ story:
 
 ## Editing Notes
 
-- Screenshot references point to `evidence/screenshots/20260419_*`.
+- Screenshot references point to `evidence/screenshots/20260529_gold_*`（最终金标截图集）。
 - If the locked sample changes, update the source markdown files first, then
   update these HTML files.
 - Keep the main story centered on evidence-backed `ask`; do not reframe this as
