@@ -1,0 +1,298 @@
+{
+ "version": "bge-m3-probe",
+ "name": "over-refusal docs (attention+multilingual)",
+ "response_detail_level": "balanced",
+ "items": [
+  {
+   "doc_id": "attention_is_all_you_need",
+   "document_path": "evidence/samples/attention_is_all_you_need.pdf",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "在Transformer模型中，编码器和解码器各自包含多少层？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "N = 6",
+      "6 identical layers"
+     ],
+     "expected_pages": [
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "论文中提到的用于计算注意力输出的公式（1）是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Attention(Q, K, V ) = softmax(QK^T / √dk)V"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "在WMT 2014英法翻译任务上，该模型达到的BLEU分数是多少，并且训练了多长时间？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "41.8",
+      "3.5 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "根据表1，自注意力层、循环层和卷积层在最大路径长度上的复杂度分别是多少？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "O(1)",
+      "O(n)",
+      "O(logk(n))"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "为什么作者选择使用正弦和余弦函数进行位置编码而不是完全依赖学习的位置嵌入？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "extrapolate to sequence lengths longer",
+      "sinusoidal version"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "多头注意力机制中，每个头的维度dk和dv是如何从d_model推导出来的？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "dk = dv = dmodel/h",
+      "h = 8",
+      "64"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "在解码器的自注意力子层中，如何防止信息从未来位置泄露到当前位置？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "masking out",
+      "setting to −∞",
+      "softmax",
+      "auto-regressive"
+     ],
+     "expected_pages": [
+      3,
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "论文中指出哪位研究人员提出了用自注意力替代RNN的想法并启动了对该想法的评估工作？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Jakob proposed replacing RNNs",
+      "started the effort"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "Transformer模型在中文分词任务上的F1得分是多少？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "论文实验中使用的八块P100 GPU的具体显存容量是多少GB？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "作者Illia Polosukhin在Google Research期间还参与过哪些其他未在致谢中提及的项目？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "multilingual_contract_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/multilingual_contract_v6.md",
+   "language": "mixed",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "根据中文条款，合同明确不包含哪两项服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含现场硬件安装服务",
+      "不包含线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "在内部工单中，Nova Harbor Ltd. 可能以什么别名出现？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "NH-Ltd",
+      "内部 tickets"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "英文条款中规定的紧急支持响应时间必须在多少分钟内？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "35分钟"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "日语备注中的最终交付截止日期是哪一天？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2027年01月15日"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "夜间支持需要哪个团队的预先批准？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "legal",
+      "equipo legal"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "SLA例外事项的所有者是谁？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Chen Rui"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "若某工单系统显示供应商为NH-Ltd，其对应的主供应商全称是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Nova Harbor Ltd."
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "结合文档内容，说明为何不能默认提供线下培训服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "合同不包含线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "Nova Harbor Ltd. 的注册地址是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "紧急支持响应时间是否适用于所有时区？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Chen Rui 的员工编号是多少？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  }
+ ]
+}
