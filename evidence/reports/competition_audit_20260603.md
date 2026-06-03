@@ -258,3 +258,33 @@
 | P1 | 被指定为『统一口径单一来源』的 COMPETITION_ASSET_PACK 自身打架：同文件一处说默认 Flash、另一处说『235b 仍是主选择』 | 现场演示/答辩（追问2：材料口径一致性） | 低/低/中 |
 | P3 | 归档 VIDEO_SHOTLIST_2MIN.md + 仍随包发布的 video_subtitles.srt 残留旧默认 QA『qwen3-235b』 | 平台使用 20 / 材料口径一致 | 低/低/低 |
 | P2 | 拒答路径标签轻微漂移：同一道锁定『木星』拒答，HARD_EVIDENCE_SUMMARY 在 G3 第5-6轮记为 llm_refused，而 demo 材料/代码/金标报告均为 retrieval_no_match | 技术能力 40（拒答闸门可核验性） | 低/低/低 |
+
+---
+
+## Codex 独立复核（2026-06-03，88k token，亲核真实文件）
+
+> 用户要求让 codex 复核本审计。codex 读了真实仓库（带行号）独立 vet：总体可信，但抓出 1 个误报、调了优先级、补了 3 条遗漏。
+
+**亲核为真的承重结论：**
+- `query_rewrites` 全空 ✅：828 条，`agent_iterations={1:620, 2:195, undefined:13}`，`query_rewrites` 非空 **0**（`call_logs.jsonl:620/828` 均 iter=2 空）。
+- 硬交付物缺文件 ✅：全仓无任何 `.pptx/.mp4/.mov/.webm`（`SUBMISSION_SPEC_CROSSWALK.md:43`、`SUBMISSION_PREP_GUIDE.md:71` 确认仍缺）。
+- 口径打架 ✅：`srt:35` 三轮 vs `deck_3page_final.html:241` 六轮；`COMPETITION_ASSET_PACK.md:102`(flash) vs `:160`(235b primary)。
+- 控制台截图缺 ✅；端侧 predeploy 未覆盖 ✅（`predeploy_sanity_20260602_195148.md:24-34` 无 edge）。
+
+**Codex 抓到的误报（不要据此落地）：**
+- ❌ "**deck 对 token 压缩 0 提及**"是**误报**——deck 第3页 `deck_3page_final.html:232` 有 "input token 仅 1/4.37"。（poster 确为 0，P2-e 仍成立；但 deck 这条作废。）
+
+**Codex 的优先级修正：**
+- P0(出 PPTX/视频文件)排对了——是**提交阻断项**，高于一切技术叙事修补。
+- `query_rewrites` **不应高于 P0**：影响 5 分加分+诚实，但非阻断；正确动作是诚实降级、不动核心。
+- **把"G3 三轮/六轮 + 默认模型冲突"从 P1 提到近 P0**：低成本、直接影响评委信任的一致性 stop-ship。
+- 端侧 predeploy 未覆盖：保持 P1 偏高。
+
+**Codex 补的 3 条遗漏：**
+1. **最终提交包"一键验收清单"**：不只查文件在否，还查页数/时长/文件名/大小/可打开/版本一致。
+2. **现场断网/云 API 异常演示预案**：端云协同场景下明确哪些能力可离线展示、哪些必须联网。
+3. **"评委 60 秒评分映射页"**：把主提交物每页/视频每段映射到评分维度，避免好证据散落却没被看到。
+
+**红线检查：** 未发现刷分造假建议；`query_rewrites` 主张是"诚实降级非刷分"。一条提醒：`predeploy_sanity.py` 会归档/截断 `call_logs.jsonl`（清演示日志可以，但**别拿截断后日志冒充全量评测统计**）。不建议赛前实现真 query rewrite 或改核心检索。
+
+**Codex 最终裁决：** 审计总体可信，但别逐条盲落地。**先做 3 件**：① 产出并验收 PPTX/视频成片；② 统一 G3/模型/query_rewrites 诚实口径；③ 补 20260602 控制台截图 + 端侧 smoke 纳入赛前预检。
