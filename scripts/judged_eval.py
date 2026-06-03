@@ -37,7 +37,29 @@ from backend.app.services.auth_service import AuthService  # noqa: E402
 from backend.app.services.file_service import FileService  # noqa: E402
 from backend.app.services.log_service import LogService  # noqa: E402
 from backend.app.services.model_client import ModelClient  # noqa: E402
+from backend.app.services.retrieval_service import RetrievalService  # noqa: E402
 from backend.app.services.task_service import TaskService  # noqa: E402
+
+
+def build_retrieval(settings, use_edge: bool):
+    """复刻 routes._build_retrieval_service：开端侧则注入稠密索引，缺模型/失败回退纯词法。"""
+    if not use_edge:
+        return RetrievalService()
+    try:
+        from backend.app.services.dense_index import DenseIndex
+        from backend.app.services.embedding_service import EmbeddingService
+
+        emb = EmbeddingService(settings.edge_model_dir)
+        if not emb.is_available():
+            print("[edge] 端侧模型不可用 → 回退纯词法")
+            return RetrievalService()
+        emb.warmup()
+        di = DenseIndex(settings.vectors_dir, emb)
+        print("[edge] 端侧语义检索已启用（词法+稠密混合）")
+        return RetrievalService(dense_index=di, dense_enabled=True)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[edge] 启用失败 → 回退纯词法：{exc}")
+        return RetrievalService()
 
 JUDGE_SYS = (
     "你是严格但公正的文档问答评测裁判。判定标准：\n"
@@ -154,6 +176,7 @@ def main() -> int:
     ap.add_argument("--out", default="evidence/reports/judged_eval_20260602")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--judge-model", default="qwen3-235b-a22b-instruct-2507")
+    ap.add_argument("--edge", action="store_true", help="启用端侧语义检索（词法+稠密混合）做 A/B")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -165,7 +188,7 @@ def main() -> int:
     fs = FileService(settings=settings)
     ls = LogService(settings=settings)
     mc = ModelClient(settings=settings)
-    ts = TaskService(file_service=fs, model_client=mc, log_service=ls)
+    ts = TaskService(file_service=fs, model_client=mc, log_service=ls, retrieval_service=build_retrieval(settings, args.edge))
     sess = auth.create_session("alpha-demo").session.session_id
 
     cases = load_cases(ROOT / args.manifest)
@@ -224,6 +247,10 @@ def main() -> int:
         records.append(rec)
         mark = "PASS" if rec["judge_pass"] else "FAIL"
         print(f"[{i}/{len(cases)}] {mark} {c['kind'][:3]} {c['case_id']} — {rec['judge_label']}: {str(rec['judge_reason'])[:60]}")
+        if i % 10 == 0:  # 断点续存：每10题落盘，长跑中途崩了不全丢
+            cp = ROOT / f"{args.out}.json"
+            cp.parent.mkdir(parents=True, exist_ok=True)
+            cp.write_text(json.dumps({"partial_at": i, "total": len(cases), "records": records}, ensure_ascii=False, indent=1), encoding="utf-8")
 
     total = len(records)
     passed = sum(1 for r in records if r["judge_pass"])
