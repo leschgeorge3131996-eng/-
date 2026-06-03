@@ -692,7 +692,7 @@ export default function App() {
       <main className="container">
         <section className="hero">
           <div className="hero-copy">
-            <p className="eyebrow">面向科研与智能办公的文档工作台</p>
+            <p className="eyebrow">引用可核验 · 论文/答辩文档助手</p>
             <h1 className="brandmark">研答通</h1>
             <div className="hero-flow" aria-label="文档任务流程" data-stage={loadStage} data-completed={result ? "true" : "false"}>
               <span className="flow-step" data-step="1">上传</span>

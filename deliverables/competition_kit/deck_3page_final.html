@@ -240,6 +240,7 @@
                   <li>主链路真实跑在无问芯穹 MaaS：默认 deepseek-v4-flash（V6 72题集 71/72），rollback qwen3-235b（51题固定集 51/51）——两个不同评测集，不混比。</li>
                   <li>strict G3 六轮 fresh-upload 全通过，fallback 为 0 / 6。</li>
                   <li>近端真有本地 ML 算力（BGE 句向量编码 + 混合检索、零云依赖），云端只做生成——真端侧/云端协同，非纯云端网页。</li>
+                  <li>ask 主链路是单层 agentic 循环：模型自评证据→不足则有界二次重试，全程不破坏拒答/证据回链。</li>
                 </ul>
               </div>
 
