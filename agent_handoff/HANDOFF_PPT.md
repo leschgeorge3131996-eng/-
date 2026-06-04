@@ -75,5 +75,5 @@
 ## 7. 别碰 / 有问题找谁
 
 - **不要改代码、不要改锁定样例和锁定题、不要改 `evidence/`、`backend/` 里的东西。** 你只产出 PPT 文件。
-- 想确认"某个数字对不对"，看 `evidence/materials/JUDGE_SCORING_MAP.md`（一页对照表）或问负责人。
+- 想确认"某个数字对不对"，看本文档 §4 的口径，或根目录 `submission_requirements.md`，或问负责人。
 - 成片做好放进 `deliverables/competition_kit/`，命名如 `研答通_3页PPT_最终版.pptx`（提交系统若不收中文名，用 `yandatong_3page_final.pptx`）。

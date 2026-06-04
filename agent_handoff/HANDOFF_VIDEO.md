@@ -114,5 +114,5 @@ pwsh scripts/dev.ps1
 ## 9. 别碰 / 找谁
 
 - **不要改代码、锁定样例、锁定题、`evidence/`、`backend/`。** 你只产出视频文件。
-- 对照口径看 `evidence/materials/JUDGE_SCORING_MAP.md`，或问负责人。
+- 对照口径看本文档 §5，或根目录 `submission_requirements.md`，或问负责人。
 - 成片放进 `deliverables/competition_kit/`，命名如 `研答通_5分钟演示_最终版.mp4`（提交系统若不收中文名，用 `yandatong_5min_demo_final.mp4`）。
