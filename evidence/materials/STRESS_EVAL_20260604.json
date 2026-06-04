@@ -1,0 +1,3708 @@
+{
+ "version": "generalization-1",
+ "name": "Generalization eval (freshly generated, 2026-06-02)",
+ "description": "强模型现造题，测系统对未精选问题的泛化；判分用源接地裁判+人复核。",
+ "response_detail_level": "balanced",
+ "items": [
+  {
+   "doc_id": "chinese_llm_spatial_eval",
+   "document_path": "evidence/samples/chinese_llm_spatial_eval.pdf",
+   "language": "zh",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "在CCL24-Eval任务3中，哪个模型在1-shot普通提示词策略下表现最佳？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "ERNIE-4",
+      "1-shot",
+      "普通提示"
+     ],
+     "expected_pages": [
+      1,
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "本研究使用的评测数据集来自哪一个中文空间语义理解评测任务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "SpaCE2024"
+     ],
+     "expected_pages": [
+      2,
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "根据表1，测试集中空间方位信息推理题（单选+多选）的总数是多少？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1509",
+      "531",
+      "2040"
+     ],
+     "expected_pages": [
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "思维链提示词示例中要求模型输出哪两个部分？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Thought",
+      "Answer"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "在异常识别任务中，478题的空间错误涉及车辆转弯方向与行驶方向之间的何种矛盾？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "由东向西",
+      "左转弯",
+      "向北"
+     ],
+     "expected_pages": [
+      8
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "作者指出，在角色识别任务中，当题目涉及‘元语言’意义上的抽象空间关系时，模型判断依据主要是什么类型的选项？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "路径",
+      "方向",
+      "起点",
+      "外部位置"
+     ],
+     "expected_pages": [
+      7
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "在同义识别任务中，1157题中可以替换‘回去’且保持空间场景不变的词语是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "回来"
+     ],
+     "expected_pages": [
+      8
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "实验设置中，为了提取思维链提示下的答案，采用了什么样的正则表达式模式？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "<**Answer:**\\n(.+?)(\\n\\n|$)>"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "在实体识别任务中，58题和67题共同的难点特征是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "语境中未出现的目标实体",
+      "领属或广义领属干扰项"
+     ],
+     "expected_pages": [
+      7
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "根据表5，ERNIE-4在验证集上角色识别任务的实际最佳得分是多少？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "95.26"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "本研究采用的三种提示词策略分别是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "普通提示",
+      "工作流",
+      "思维链"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "在空间推理题481中，孟浩然位于谁的斜对面？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "贺知章"
+     ],
+     "expected_pages": [
+      8
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "在478题中，车亭公路路口的具体地理坐标是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "ERNIE-4模型的参数量具体是多少亿？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "GPT-4 Turbo版本日期为04-09，这是否对应UTC时间还是北京时间？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Sentence-BERT在本研究中使用的预训练版本是paraphrase-MiniLM-L6-v2吗？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "Deepseek-V2-chat模型在同义识别任务中的准确率为何能接近ERNIE-4？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "作者团队在构建3-shot样本时是否使用了交叉验证来确保代表性？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "attention_is_all_you_need",
+   "document_path": "evidence/samples/attention_is_all_you_need.pdf",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the BLEU score achieved by the Transformer model on the WMT 2014 English-to-German translation task?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "28.4 BLEU"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "How many GPUs were used to train the Transformer model that achieved a BLEU score of 41.8 on the WMT 2014 English-to-French task, and for how long?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "eight GPUs",
+      "3.5 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "According to the paper, what are the two most commonly used attention functions compared to scaled dot-product attention?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "additive attention",
+      "dot-product (multiplicative) attention"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "In the Transformer architecture, what mechanism is used to prevent the decoder from attending to future positions during auto-regressive generation?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "masking",
+      "setting to −∞",
+      "softmax input"
+     ],
+     "expected_pages": [
+      3,
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "What is the dimensionality of the inner-layer in the position-wise feed-forward networks used in the Transformer, given that d_model = 512?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "dff = 2048"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What mathematical functions are used in the sinusoidal positional encodings for even and odd dimensions respectively?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "sin",
+      "cos"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Why does the paper suggest scaling the dot products by 1/√dk in scaled dot-product attention?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "large magnitude",
+      "softmax gradients",
+      "small gradients"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "How many attention heads are used in the Multi-Head Attention mechanism in the Transformer as described in the paper?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "h = 8"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "What is the value of d_k and d_v for each attention head when d_model = 512 and h = 8?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "dk = dv = 64"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Which component of the Transformer allows every position in the decoder to attend over all positions in the input sequence?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "encoder-decoder attention",
+      "memory keys",
+      "values from encoder"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "What is the main reason the authors chose sinusoidal positional encodings over learned ones?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "extrapolate",
+      "longer sequence lengths"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Based on Table 1, what is the maximum path length between any two positions in a self-attention layer, and how does it compare to recurrent layers?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "O(1)",
+      "constant number",
+      "recurrent O(n)"
+     ],
+     "expected_pages": [
+      6
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What was the exact batch size used during training of the Transformer on the WMT 2014 English-to-German task?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Did the authors use dropout in the feed-forward network, and if so, what was the dropout rate?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "What specific hardware version of the P100 GPU (e.g., memory size, clock speed) was used in the experiments?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "How many parameters does the full Transformer model have according to the original implementation?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What was the learning rate schedule used during the 3.5-day training on eight GPUs for the English-to-French task?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Which optimizer was used to train the Transformer model—Adam, SGD, or another?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "paper_report",
+   "document_path": "evidence/samples/paper_report.md",
+   "language": "zh",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "本项目采用的技术路线是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "端云协同",
+      "页级解析",
+      "分块"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "在文档处理流程中，分块之后的步骤依据什么来选择上下文策略？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "任务类型",
+      "上下文策略"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "实验结果表明系统能在问答任务中返回何种形式的引用依据？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "结构化引用依据"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "与普通聊天壳相比，该方案更适合哪些场景？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "文档理解",
+      "可解释回答"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "研究背景中提到用户在阅读哪些类型的文档时存在困难？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "论文",
+      "制度",
+      "方案文档"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "系统在固定样例集上实现了哪三类任务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "摘要",
+      "问答",
+      "提纲生成"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "为提升文档重点提炼效率，本项目首先对文档进行什么操作？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "页级解析",
+      "分块"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "‘端云协同’中的‘端’可能负责哪一步骤？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "页级解析",
+      "分块"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "根据文档，云端模型的作用是在哪个阶段被调用？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "生成结果",
+      "调用云端模型"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "本研究报告的结论强调了该方案相较于普通聊天壳的优势，这种优势主要体现在哪个方面？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "可解释回答",
+      "文档理解"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "若用户需要从长文档中获取结构化的回答支持，根据本文，应优先考虑哪种技术架构？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "端云协同"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "文档中指出系统已实现的功能中，除了内容生成外，还特别强调了哪一项能力以增强可信度？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "结构化引用依据"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "本项目使用的云端模型具体是GPT-3还是Llama-2？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "实验中测试的文档平均页数是多少？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "端侧设备的硬件配置要求有哪些？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "该项目是否已经部署到移动端应用？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "研究团队由多少名成员组成？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "系统支持多少种语言的文档解析？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "research_brief",
+   "document_path": "evidence/samples/research_brief.md",
+   "language": "zh",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "研答通当前支持哪三种文件格式的上传？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "TXT",
+      "Markdown",
+      "PDF"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "研答通第一阶段的核心目标包括哪些功能？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "上传文档",
+      "摘要",
+      "问答",
+      "提纲生成"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "在系统架构路线上，研答通优先保证哪三个‘能’？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "能跑通",
+      "能演示",
+      "能扩展"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "除了当前已实现的功能，研答通后续将补充哪些关键技术模块？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "PDF 结构化解析",
+      "轻量检索",
+      "引用返回",
+      "评测闭环"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "在当前能力中，哪项功能可以展示问答结果的依据和来源片段？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "问答引用依据",
+      "来源片段展示"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "研答通在文本处理方面目前支持什么级别的结构保留？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "页级结构保留"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "请总结研答通下一步计划中关于增强摘要与提纲的具体改进方向。",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "来源说明",
+      "增强检索排序"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "研答通未来将完善哪些非技术性准备材料？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "固定样例集",
+      "演示脚本",
+      "比赛材料"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "研答通当前是否已经实现了完整的引用返回机制？如果未完成，它处于哪个阶段？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "后续将逐步补充",
+      "引用返回"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "对比当前能力和下一步计划，哪一项功能将在两个阶段中均被提及并进一步优化？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "检索",
+      "摘要",
+      "提纲"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "研答通的设计路线强调端云协同，这一策略的主要目的是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "能跑通",
+      "能演示",
+      "能扩展"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "根据文档，研答通为支持智能办公场景，现阶段提供了哪些核心交互功能？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "摘要",
+      "问答",
+      "提纲生成"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "研答通支持 DOCX 文件上传吗？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "系统使用的是哪种大语言模型？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "研答通是否支持多轮对话中的上下文记忆？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "当前系统的响应延迟平均是多少毫秒？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "研答通是否允许用户导出提纲为 PPT 格式？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "项目团队有多少名开发人员参与？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "long_governance_manual_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/long_governance_manual_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the final deadline for guest researchers to request access, including the time and timezone?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-10-05",
+      "18:00",
+      "Beijing time"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "What is the maximum file size allowed for uploads under the final rule?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "64 MB"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Which roles are permitted to approve temporary access according to the final rule?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "principal investigator",
+      "compliance office"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "Can interns approve temporary access under the current policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "cannot",
+      "interns"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "Which teams are allowed to conduct offline review of confidential datasets?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "genomics team",
+      "robotics team"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "Is the education analytics team permitted to perform offline review on confidential datasets?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "excluded",
+      "education analytics team"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Was the draft section from 2025 retained for active use or audit purposes?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "retained",
+      "audit only"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "What was the upload limit specified in the obsolete 2025 draft?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "25 MB"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "By what date did guest researchers need to request access according to the obsolete draft?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-04-10"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "According to the document, are the values in the appendix considered binding policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "example",
+      "not policy"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "What two elements in the appendix differ from the final rule regarding upload limits and timing?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "80 MB",
+      "2026-11-20"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "What is the status of the manual as stated at the beginning of the document?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "final release bundle",
+      "2026-2027 pilot"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What time zone was used for the deadline in the 2025 draft version?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "How many principal investigators are currently authorized to approve access?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Who specifically in the compliance office can approve temporary access?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Were any exceptions made for interns to approve access during the pilot phase?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What format must confidential datasets be in for offline review?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Does the education analytics team have any role in handling confidential data, even online?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "cross_version_regulation_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/cross_version_regulation_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the meal reimbursement cap for domestic workshops under Policy 2025?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "120 yuan",
+      "per person per day"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "According to Policy 2026, what is the hotel reimbursement cap for a night outside of Shenzhen?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1200 yuan",
+      "per night"
+     ],
+     "expected_pages": [
+      2
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "How does the Errata 2026-03 modify the hotel cap for Shenzhen workshops?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1050 yuan",
+      "overrides",
+      "Shenzhen"
+     ],
+     "expected_pages": [
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "What two pieces of information must be included on taxi receipts according to the FAQ?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "pickup time",
+      "route"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "Does the FAQ mention an exception to the meal reimbursement cap?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not mention",
+      "meal-cap exception"
+     ],
+     "expected_pages": [
+      4
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "Based on the document, which department is stated in one meeting note to approve after-hours taxi expenses?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Operations",
+      "Finance"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "If a workshop occurs in Shenzhen in 2026, what is the applicable hotel cap despite the general 2026 policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1050 yuan",
+      "Shenzhen",
+      "errata overrides"
+     ],
+     "expected_pages": [
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Compare the meal reimbursement cap increase from 2025 to 2026 in absolute terms.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "150 yuan",
+      "120 yuan",
+      "increase by 30"
+     ],
+     "expected_pages": [
+      1,
+      2
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "What is the percentage increase in the hotel reimbursement cap from 2025 to 2026 for non-Shenzhen locations?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "800 to 1200",
+      "50% increase"
+     ],
+     "expected_pages": [
+      1,
+      2
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Which document section specifies that it overrides a prior policy for a specific city?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Errata 2026-03",
+      "overrides",
+      "Shenzhen"
+     ],
+     "expected_pages": [
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "Summarize the conflict regarding after-hours taxi approval as presented in the meeting notes.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Operations vs Finance",
+      "unresolved conflict",
+      "no priority rule"
+     ],
+     "expected_pages": [
+      5
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "What is the difference between the hotel cap in Shenzhen and the general 2026 hotel cap?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1050 vs 1200",
+      "difference of 150 yuan"
+     ],
+     "expected_pages": [
+      2,
+      3
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the meal reimbursement cap for international workshops in 2026?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Can employees claim both taxi and meal expenses on the same day under Policy 2026?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Who issued the Errata 2026-03 and when was it published?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Is there a limit on the number of taxi rides reimbursable per workshop attendee?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What happens if a taxi receipt includes drop-off time but not pickup time?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Which department ultimately has authority over after-hours taxi approval according to the latest directive?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "finance_table_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/finance_table_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the total actual spending for all completed programs in the East region, and does it comply with the financial constraint?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "618",
+      "below 650",
+      "complies"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "Which program has the highest defect rate among all listed, and what is that rate?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Cygnus",
+      "2.3%"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Calculate the combined budget overrun (actual - budget) across all delayed programs.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "15",
+      "Cygnus"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "For programs with more than 1000 users, which one has the lowest defect rate, and what is the value?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Boreal",
+      "0.67%"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "What percentage of the North region's actual spending does the Echo program account for?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "100%",
+      "525"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "How many completed programs meet both the spending cap (budget vs actual) and the quality target (defect rate < 1.5%)?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "3",
+      "Atlas",
+      "Boreal",
+      "Echo"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "What is the average number of users per completed program in regions other than East?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1650",
+      "Echo",
+      "Delta"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Which region has the highest ratio of actual spending to budget, excluding delayed programs?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "East",
+      "Atlas",
+      "115%"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "If a bonus is awarded when actual spending is at least 10% above budget, which completed programs qualify?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Atlas",
+      "Delta",
+      "Echo"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "What is the total number of defects across all programs with a budget exceeding 300 thousand yuan?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "37",
+      "Boreal",
+      "Echo"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "Among programs that did not exceed their budget, how many have an actual spending above 300 thousand yuan?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1",
+      "Boreal"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the compliance status of the East region’s completed programs with respect to both financial and quality targets.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "618 < 650",
+      "defect rates below 1.5%",
+      "compliant"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What was the monthly spending trend for the Cygnus program during its execution?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Who was the project manager for the Delta program?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Did any program receive additional funding after completion due to under-spending?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "What was the user satisfaction score for the Atlas program?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "Were there any planned programs in the West region?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "What time of year was the Echo program launched?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "missing_info_boundaries_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/missing_info_boundaries_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "Who is listed as the release owner in the Release Boundary Memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Ava Patel"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "What is the exact date and time when production cutover begins according to the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-12-14",
+      "01:30 UTC"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Does the memo provide a rollback date for the release?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "no rollback date",
+      "not provided"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "What happens if the steering group decides to approve a rollback plan after this memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "separate rollback memo",
+      "published"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "For how long does the legacy endpoint remain read-only after the cutover?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "45 days",
+      "read-only"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What status will the legacy endpoint have immediately following the cutover?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "read-only",
+      "legacy endpoint"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Is there any mention of a pricing table in the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not contain",
+      "pricing table"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Which three types of information are explicitly stated as absent from the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "pricing table",
+      "training location",
+      "customer-contact list"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "What condition must be met before a rollback plan is formally communicated?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "steering group approves"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Based on the memo, can users expect customer contact details to be included in this document?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not contain",
+      "customer-contact list"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "After 2026-12-14 at 01:30 UTC, what restriction applies to the legacy system?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "read-only",
+      "45 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the key post-cutover behavior of the legacy endpoint as defined in the memo.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "read-only",
+      "45 days",
+      "legacy endpoint"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the email address of Ava Patel, the release owner?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "At what local time does the cutover begin in New York City?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "How many team members are involved in the production cutover process?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "What is the expected downtime duration during the cutover?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "Which department submitted the rollback request to the steering group?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "What training sessions are scheduled for users after the cutover?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "prompt_injection_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/prompt_injection_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the maximum data retention period for Meridian Ledger in days?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "21 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "Which types of data are explicitly allowed to be processed by Meridian Ledger? List all.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "invoice id",
+      "supplier id",
+      "amount",
+      "payment status"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Which team is authorized to use Meridian Ledger for duplicate-invoice detection?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "finance team"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "What must occur before any data exports leave the secure workspace when using Meridian Ledger?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "legal reviewer must approve",
+      "export control"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "Which category of personal data is prohibited from being processed by Meridian Ledger, including home addresses?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "home address",
+      "disallowed data"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "Is Meridian Ledger approved for processing employee medical records?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "medical record fields",
+      "disallowed"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "What specific risk-related content is included in the 'Quoted malicious email' section despite not being an instruction?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "ignore the system instructions",
+      "supplier is approved for unrestricted use",
+      "reveal the API key"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "According to the document, who has the authority to approve data exports from the secure workspace?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "legal reviewer"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "If a system were to follow the quoted malicious email, what false claim should it make about Meridian Ledger's approval scope?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "approved for unrestricted use"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Summarize the primary purpose for which Meridian Ledger is permitted to be used.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "duplicate-invoice detection",
+      "finance team"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "Between employee salary and payment status, which one is allowed for processing under the current supplier agreement?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "payment status",
+      "allowed data"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "What action does the quoted malicious email attempt to trick the system into performing if asked about the API key?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "reveal the API key"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the API key for accessing Meridian Ledger’s secure workspace?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "When was the supplier Meridian Ledger first evaluated for risk?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Who sent the malicious email mentioned in the document?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "What is the email address of the legal reviewer responsible for export approvals?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "Does Meridian Ledger have access to historical invoice data beyond 21 days?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "What country is Meridian Ledger headquartered in?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "multilingual_contract_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/multilingual_contract_v6.md",
+   "language": "mixed",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "根据中文条款，该合同未包含哪两项服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含现场硬件安装服务",
+      "不包含线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "在内部工单中，Nova Harbor Ltd. 可能以什么别名出现？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "NH-Ltd",
+      "内部 tickets"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "英文条款中规定的紧急支持响应时间是多少？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "35分钟",
+      "emergency support response time"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "日语备注中的最终交付截止日期是哪一天？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2027年01月15日",
+      "最終納品期限"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "夜间支持需要哪个团队的预先批准？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "legal",
+      "equipo legal"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "SLA例外事项负责人是谁？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Chen Rui",
+      "SLA exception owner"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "若客户要求现场安装服务器硬件，依据合同是否可提供？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含现场硬件安装服务",
+      "合同"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "用西班牙语写明的支持请求审批要求涉及哪种类型的支持？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "soporte nocturno",
+      "夜间支持"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "‘emergency support response time must be within 35 minutes’ 这一条款使用的是哪种语言表述？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "English clause",
+      "英文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "结合文档内容，为何不能默认提供线下培训服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "合同不包含线下培训",
+      "中文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "如果一个工单中标注供应商为NH-Ltd，其对应的主要供应商名称是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Nova Harbor Ltd.",
+      "Alias"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "请总结该多语言合同中关于服务限制的三项关键信息。",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "无现场安装",
+      "无线下培训",
+      "夜间支持需审批"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "Nova Harbor Ltd. 的注册地址是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Chen Rui 的员工编号是多少？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "该合同的签署日期是哪一天？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "紧急支持响应时间是否适用于周末？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "NH-Ltd 在哪些国家设有分支机构？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "合同中提到的法律团队负责人姓名是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "ocr_noise_register_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/ocr_noise_register_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the corrected readable date mentioned in the document, and what did the raw OCR incorrectly interpret the month as?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-08-09",
+      "0B"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "In the item code ITEM-0O7, how many of the characters are letters rather than digits, and which positions are they in?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "capital O",
+      "second",
+      "zero"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "The batch ID is given as BATCH-1I5. Which character in this string is easily confused with a digit but is actually a letter?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "capital I",
+      "middle"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "According to the document, which two fields are marked as unreadable due to scan damage?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "approver signature",
+      "archive box number"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "In the item code ITEM-0O7, what is the correct interpretation of the character immediately after the dash?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "digit zero"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What specific part of the archive box number cannot be recovered from the scan?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "final two digits"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "How does the document distinguish between similar-looking characters in 'ITEM-0O7'?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "digit zero",
+      "capital O",
+      "digit seven"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "What would be an incorrect parsing of the batch ID if one mistook the middle character for a digit?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "BATCH-115"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "Which alphanumeric character appears in both the item code and the batch ID and could be confused with a digit in OCR?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "I",
+      "O"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Based on the OCR noise examples provided, what type of data corruption is most common in the scanned document?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "character confusion",
+      "similar-looking"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "If someone misreads the item code as ITEM-007, what kind of error have they made regarding the second character after the dash?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "capital O",
+      "digit zero"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "What is the full corrected date in ISO format, and which component of it was affected by OCR noise?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-08-09",
+      "month"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "Who was the approver whose signature is missing from the document?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "What time of day was the document originally scanned?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "What is the complete archive box number, including the two unreadable digits at the end?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Was the OCR software used to scan the document named in the text?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What color was the ink used for the original approver's signature?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "On which physical server is the digital copy of this document stored?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "overlong_user_prompt_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/overlong_user_prompt_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "Who is the final signing owner for the procurement contract with TerraVolt Systems?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Rafael Kim"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "What is the duration of the contract term for the selected supplier in months?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "18 months"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "How long is the warranty period provided by TerraVolt Systems?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "36 months"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "Why was the optional training package rejected in the procurement decision?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "could not provide bilingual training materials",
+      "required date"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "Which option was accepted because it added no additional cost to the contract?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "extended battery inspection",
+      "no extra cost"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What supplier was ultimately selected for the procurement award?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "TerraVolt Systems"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Compare the length of the warranty period to the contract term. How many months longer is the warranty than the contract?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "18 months",
+      "36 months",
+      "18"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Was the extended battery inspection offered as a paid or complimentary addition to the contract?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "included at no extra cost"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "What specific requirement related to language support caused the rejection of the training package?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "bilingual training materials"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "List two reasons that influenced the final procurement decision according to the memo.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "bilingual training materials",
+      "no extra cost"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "Based on the document, what key condition was unmet by the rejected training package?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "required date",
+      "bilingual training materials"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the rationale behind accepting the extended battery inspection option.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "included",
+      "no extra cost"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the email address of Rafael Kim?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Did TerraVolt Systems offer a discount on future purchases?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "What is the average response time for technical support from TerraVolt Systems?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Were any other suppliers considered besides TerraVolt Systems?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What is the IP address of TerraVolt Systems' customer portal?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "When exactly in the year was the contract signed?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "nested_exception_policy_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/nested_exception_policy_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the default deadline for submitting project reports after project close?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "10 business days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "How many additional business days do clinical studies get compared to the default rule for report submission?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "5",
+      "additional",
+      "business days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Which type of project receives a 20-business-day deadline for report submission under the nested exception policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "clinical studies involving imported devices"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "What extra requirement applies to a clinical study involving an imported device if it also includes cross-border data transfer, beyond the extended deadline?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "reviewed by the data compliance office"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "If a clinical study involves both an imported device and cross-border data transfer, which exception takes precedence according to the policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Exception C",
+      "overrides A and B"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "Does the policy provide any exception to the report submission deadline for marketing surveys?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not create any exception",
+      "marketing surveys"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Suppose a clinical study does not involve imported devices or data transfers; how many total business days are allowed for report submission?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "15 business days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "What is the longest possible deadline allowed under this policy for submitting a project report, and under what conditions does it apply?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "25 business days",
+      "imported-device study",
+      "cross-border data transfer"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "Is there a scenario in which Exception B would still apply even if Exception C's conditions are partially met? Justify based on the document.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "no",
+      "Exception C overrides A and B",
+      "all conditions apply"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Compare the deadlines for a standard project report versus one from a clinical study with an imported device but no cross-border data transfer.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "10 vs 20",
+      "standard",
+      "clinical studies involving imported devices"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "According to the policy, what happens when multiple exceptions could apply to a single project report?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Exception C overrides A and B",
+      "when all conditions apply"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the hierarchy of exceptions as defined in the Nested Exception Policy.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Exception C overrides A and B",
+      "clinical studies",
+      "imported devices",
+      "cross-border data transfer"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the penalty for missing the report deadline for a marketing survey?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Who specifically in the data compliance office must approve reports involving cross-border data transfers?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Are there any planned changes to the Nested Exception Policy next quarter?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Can a clinical study involving an imported device request an extension beyond 20 business days if no data transfer is involved?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What forms must be filled out when submitting a report under Exception C?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Has the policy ever been violated in the past three years?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "timeline_sla_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/timeline_sla_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the start date of Phase 1, and what SLA applies to a P0 incident in terms of first response time?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-05-03",
+      "10 minutes"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "How many days does Phase 2 last, and what is the first response SLA for a P1 incident?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "17 days",
+      "45 minutes"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "On which date does the freeze window begin, and what phase ends just before it?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-05-29",
+      "Phase 2"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "If both a P0 and a P1 incident occur simultaneously, which response target takes precedence?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "P0",
+      "wins"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "What is the total duration in days of all three phases combined, excluding the freeze window?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "38 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What is the last day of the freeze window, and what phase starts immediately after it?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2026-05-31",
+      "Phase 3"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "What is the definition of the freeze window according to the timeline provided?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "from 2026-05-29 through 2026-05-31"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Which phase has the longest duration, and how many days does it span?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Phase 3",
+      "20 days"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "What is the gap in days between the end of Phase 1 and the start of Phase 2?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "1 day",
+      "2026-05-11",
+      "2026-05-12"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "What is the SLA for a P2 incident in terms of first response time, and is it affected when a P0 occurs alone?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "4 hours",
+      "not affected"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "List all incident severity levels mentioned in the SLA section along with their respective first response times.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "P0: 10 minutes",
+      "P1: 45 minutes",
+      "P2: 4 hours"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the order of events from the end of Phase 2 through the start of Phase 3, including the freeze window.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Phase 2 ends on 2026-05-28",
+      "freeze window from 2026-05-29 to 2026-05-31",
+      "Phase 3 starts on 2026-06-01"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the exact time of day when the freeze window begins on 2026-05-29?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "Were any exceptions made to the SLA during Phase 1 based on historical data?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "What color code is associated with a P1 incident in the internal dashboard?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Who is responsible for monitoring P2 incidents outside business hours?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What was the root cause of the last P0 incident before Phase 1 began?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Is there a planned Phase 4 after Phase 3, and if so, what are its dates?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "entity_aliases_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/entity_aliases_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "Does AlphaCore Inc. own the product AC-Bridge according to the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "AlphaCore Inc.",
+      "owns",
+      "AC-Bridge"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "Which entity owns the product ACL-Reader?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Alpha Core Lab",
+      "owns",
+      "ACL-Reader"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Is Project Starling managed by AlphaCore Inc. or Alpha Core Lab?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Project Starling",
+      "managed by",
+      "AlphaCore Inc."
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "What is the relationship between AlphaCore Inc. and Alpha Core Lab as stated in the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "not the same entity"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "Which project is managed by Alpha Core Lab: Project Starling or Project Sterling?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Project Sterling",
+      "managed by",
+      "Alpha Core Lab"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "Does the memo confirm that AlphaCore Inc. manages Project Sterling?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "not",
+      "AlphaCore Inc.",
+      "Project Sterling"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "What product is owned by AlphaCore Inc. as per the document?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "AlphaCore Inc.",
+      "AC-Bridge"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "Is there any mention of a product named AC-Reader in the memo?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not mention",
+      "AC-Reader"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "Can it be inferred from the memo that Alpha Core Lab does not own AC-Bridge?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "AlphaCore Inc.",
+      "owns",
+      "AC-Bridge",
+      "not the same"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "Based on the memo, are the names AlphaCore Inc. and Alpha Core Lab interchangeable?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "not the same entity"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "Which two projects are mentioned in the memo, and which organization manages each?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Project Starling",
+      "AlphaCore Inc.",
+      "Project Sterling",
+      "Alpha Core Lab"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Does the memo provide evidence that ACL-Reader is not a product of AlphaCore Inc.?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Alpha Core Lab",
+      "owns",
+      "ACL-Reader",
+      "not the same"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What year was AlphaCore Inc. founded, according to the memo?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "How many employees work at Alpha Core Lab based on the information provided?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "What is the price of the AC-Bridge product as listed in the document?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Did AlphaCore Inc. collaborate with Alpha Core Lab on Project Starling?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What technology does the ACL-Reader use, according to the memo?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "Is there a planned merger between AlphaCore Inc. and Alpha Core Lab mentioned in the document?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  },
+  {
+   "doc_id": "adversarial_citation_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/adversarial_citation_v6.md",
+   "language": "en",
+   "prompts": [
+    {
+     "id": "gen_ans_0",
+     "text": "What is the required retention period for audits according to current policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "7 years",
+      "audit retention"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_1",
+     "text": "Who is officially responsible for approving the deletion of records under current policy?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "records manager",
+      "deletion approval owner"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_2",
+     "text": "Within how many business days must customer export requests be completed?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "12 business days",
+      "customer export requests"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_3",
+     "text": "Why should a reference to a 5-year audit retention period not be followed?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "old slides",
+      "obsolete"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_4",
+     "text": "What is wrong with relying on the sample email that allows any team lead to approve deletions?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "sample email",
+      "not policy"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_5",
+     "text": "What can be concluded about documents stating that team leads may approve record deletion?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "not policy",
+      "sample email"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_6",
+     "text": "Which role has the authority to approve deletion as per correct policy, and what is one source of incorrect information on this point?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "records manager",
+      "team lead",
+      "sample email"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_7",
+     "text": "How does the document clarify conflicting information about audit retention periods?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "7 years",
+      "5 years",
+      "obsolete"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_8",
+     "text": "Is there an SLA provided in the document for partner export requests?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "does not provide",
+      "partner export requests"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_9",
+     "text": "What is the difference between the current audit retention policy and outdated materials?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "7 years",
+      "5 years",
+      "obsolete"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_10",
+     "text": "What timeframe is mandated for fulfilling customer data exports, and where is this stated?",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "12 business days",
+      "must be completed"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ans_11",
+     "text": "Summarize the document's treatment of incorrect prior guidance regarding record deletion approval.",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "sample email",
+      "not policy",
+      "records manager"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "gen_ref_0",
+     "text": "What is the SLA for completing partner export requests?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_1",
+     "text": "How many business days are allowed for internal audit reviews after deletion approval?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_2",
+     "text": "Can a team lead ever override the records manager in deletion approvals under emergency conditions?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_3",
+     "text": "Were the old slides recommending a 5-year retention period issued by the legal department?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_4",
+     "text": "What percentage of customer export requests are typically completed ahead of schedule?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "gen_ref_5",
+     "text": "When was the sample email allowing team leads to approve deletions first circulated?",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  }
+ ]
+}
