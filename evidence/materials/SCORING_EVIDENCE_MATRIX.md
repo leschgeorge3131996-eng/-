@@ -18,7 +18,7 @@
 | 评分线 | 评委想看什么 | 当前主证据 | 答辩时怎么讲 |
 | --- | --- | --- | --- |
 | **赛题主题：端侧/云端协同** | 作品是否回应赛题一"端侧/云端协同应用"命题，而非纯云端网页 | `ARCHITECTURE.md`（Edge\|近端\|Cloud 分层图）、`evidence/reports/edge_hybrid_eval.md`、`evidence/reports/token_compression_eval.md` | 近端跑**本地句向量模型（BGE-small-zh-v1.5 ONNX，纯 CPU、零云依赖）**做语义编码与词法+语义混合检索——这是**真实的端侧 ML 算力实体**（小模型在端理解、大模型在云生成），不是纯云端网页。诚实标注：语义检索与已高度调优的词法**持平、零回归**，价值在实体本身与措辞鲁棒性、非检索刷分。Token 压缩（长文 ask 平均省 86.6%）是协同的另一量化收益。 |
-| 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl`（含平台 request_id）、`evidence/reports/gold_sample_qa_compare_latest.md`、调用截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹；每次调用都落 token 与**平台 request_id**，可在 infini-ai 控制台逐条对账（本地 request_id 仅作内部追踪）。 |
+| 平台使用 `20` | 是否真实使用无问芯穹平台，而不是口头挂名 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl`（含平台 request_id）、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/multi_model_eval.md`、调用截图 | 我们不是只把平台放进环境变量，而是把主链路真实切到无问芯穹；每次调用都落 token 与**平台 request_id**，可在 infini-ai 控制台逐条对账。并已**跨 DeepSeek/Qwen/Kimi/GLM 四大家族实测**（`multi_model_eval.md`：6 模型 × 10 题 = 60 次真实调用、均带 request_id、同一检索流水线全部答对），证明真实深度使用平台、非单模型挂名。 |
 | 产品能力 `40` | 作品是否围绕清晰场景解决真实问题，是否有稳定、可理解的用户价值 | `PROJECT_ONE_PAGER.md`、`PRODUCT_TECHNICAL_WRITEUP.md`、最终 `3` 页 PPT / `5` 分钟视频、四张核心截图 | 我们解决的是“论文/报告阅读时能答、还能回到证据”的问题，不是泛化聊天。 |
 | 技术能力 `40` | 技术链路是否成立，是否有可验证的工程细节与实验支撑 | `HARD_EVIDENCE_SUMMARY.md`、`ARCHITECTURE.md`、`evidence/reports/gold_sample_qa_compare_latest.md`、`evidence/reports/gold_sample_replay_real_summary_latest.md`、`evidence/experiments/20260419_q2_declared_stability_check.md`、`evidence/reports/extended_eval_v1_latest.md` | 主链路是 `upload -> ask -> citation -> PDF -> refusal`，不是只给一个答案，而是把检索、引用、PDF 回链和拒答闸门都做实。 |
 | 现场演示 / 答辩 | 是否能稳、能复现、能扛追问 | `GOLD_SAMPLE_RUNBOOK.md`、`QA_BRIEF.md`、`HARD_EVIDENCE_SUMMARY.md`、最终截图集、最终 `3` 页 PPT / `5` 分钟视频 | 演示不现场 improvisation，只走锁定样例、锁定问题和预定备用路径；追问时按证据页和 runbook 回答。 |
@@ -29,10 +29,10 @@
 
 | 加分项 | 当前命中情况 | 证据 |
 | --- | --- | --- |
-| 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS：**QA 主链路（`deepseek-v4-flash`）调用留痕含平台 `request_id`，可在 infini-ai 控制台逐条对账**；`summary/outline` 多模型路由（`qwen3-235b`）已在代码 + config 实现、现场主打 ask（诚实口径：非-ask 路径封板前未跑平台留痕，不与"含 request_id 可对账"绑为同一句） | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl` |
+| 平台利用率 `5` | 主链路真实跑在无问芯穹 MaaS：**QA 主链路（`deepseek-v4-flash`）调用留痕含平台 `request_id`，可在 infini-ai 控制台逐条对账**；`summary/outline` 多模型路由（`qwen3-235b`）已在代码 + config 实现、现场主打 ask（诚实口径：非-ask 路径封板前未跑平台留痕，不与"含 request_id 可对账"绑为同一句）；并**跨 DeepSeek/Qwen/Kimi/GLM 四家族实测 60 次真实调用、同一流水线全过**，证明充分利用平台模型资源 | `PLATFORM_USAGE_EVIDENCE.md`、`data/logs/call_logs.jsonl`、`evidence/reports/multi_model_eval.md` |
 | 商业化潜力 `5` | 已选定 **B 端高校实验室/课题组席位**为主路径 + C 端答辩季入口，完成市场量级 / 竞品差异 / 单位经济（token 压缩支撑低边际成本）/ 获客论证 | `COMMERCIALIZATION_CASE.md` |
 | 大模型与智能体能力 `5` | 主链路使用无问芯穹大模型 + 单层 **agentic 检索循环**（检索→模型自评证据是否充分→**有界二次重试 `iter≤2`**，需新证据时改写 `followup_query` 补检索）+ 检索/模型双层拒答。诚实口径：改写补检索分支已实现且单测覆盖，固定集上模型多单轮收敛、二轮多为同上下文复核，故 `query_rewrites` 多为空；`agent_iterations` 落日志 | `ARCHITECTURE.md` 设计点 4、`HARD_EVIDENCE_SUMMARY.md` 第 9 节 |
-| **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `86.6%`，峰值 `93.1%`（Attention 论文 `10,263 → 704` tokens）；同时是端侧/云端协同的量化收益** | **`evidence/reports/token_compression_eval.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
+| **Token 消耗压缩 `5`** | **三层预处理流水线，长文档 ask 平均节省 `86.6%`，峰值 `93.1%`（Attention 论文 `10,263 → 704` tokens）；受控对照「直接喂全文」真实平台 token 省 `4.3×`（39 题真实论文 / 78 次调用，正确率实质持平、唯一子串漏配已核验非真失败）；同时是端侧/云端协同的量化收益** | **`evidence/reports/token_compression_eval.md`、`evidence/reports/baseline_compare_real39.md`、`HARD_EVIDENCE_SUMMARY.md` 第 8 节** |
 
 ## 平台使用：评委追问点
 
