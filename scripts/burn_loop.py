@@ -39,7 +39,13 @@ def main() -> int:
     ap.add_argument("--answerable", type=int, default=20)
     ap.add_argument("--refusal", type=int, default=10)
     ap.add_argument("--sleep", type=int, default=15)
+    ap.add_argument("--tag", default="", help="instance tag for parallel loops (separate dirs + cumulative file; STOP_BURN is shared)")
     args = ap.parse_args()
+
+    global BURN_DIR, CUM
+    if args.tag:
+        BURN_DIR = ROOT / "tmp" / f"burn_{args.tag}"
+        CUM = ROOT / "evidence" / "reports" / f"burn_campaign_cumulative_{args.tag}.json"
 
     BURN_DIR.mkdir(parents=True, exist_ok=True)
     CUM.parent.mkdir(parents=True, exist_ok=True)
