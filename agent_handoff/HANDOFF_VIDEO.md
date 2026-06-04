@@ -31,13 +31,24 @@
 
 ## 3. 怎么录真实演示（live 录屏）
 
-**起服务**（在项目根目录，PowerShell）：
+**先把环境弄好**（这步决定能不能跑起来）：
+- **用项目那台已配好的机器**（有 `.venv`、`.env` 里 key 已填）→ 跳过装环境，直接起服务。
+- **新拉代码 / 换了台电脑** → 先装一次依赖，否则 `dev.ps1` 会直接报错要你先 bootstrap：
+  ```
+  Copy-Item .env.example .env        # 复制配置模板
+  # 打开 .env 改两项：
+  #   WUQIONG_API_KEY=<跟队长要代金券号那把，sk- 开头，别提交进 git>
+  #   DEMO_MODE=true                  # 必须 true，否则首屏冒出登录/邀请码界面（撞红线）
+  powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1   # 建 .venv+pip+npm install，几分钟
+  ```
+
+**起服务**（项目根目录，PowerShell）：
 ```
 pwsh scripts/dev.ps1
 ```
-→ 后端跑在 `:8000`、前端跑在 `http://localhost:5173`。浏览器打开 `localhost:5173`。
+→ 后端 `:8000`、前端 `http://localhost:5173`。浏览器打开 `localhost:5173`。
 
-> ⚠️ 录 live 前先确认 `.env` 里有**能用的无问芯穹 key**（代金券号那个），否则提问会报错。端侧开关对这次中文样例**没影响**（开/关结果一样），不用纠结。
+> ⚠️ 录 live 前两个必查：① `.env` 里 `WUQIONG_API_KEY` 是**能用的**无问芯穹 key（代金券号那个），否则提问报错；② `DEMO_MODE=true`，否则首屏是登录/邀请码界面、不能录进去。端侧开关对这次中文样例**没影响**（开/关结果一样），不用纠结。
 
 **演示就走这条锁定流程（顺序别变）**：
 1. 上传锁定文档 `evidence/samples/chinese_llm_spatial_eval.pdf`
@@ -46,7 +57,7 @@ pwsh scripts/dev.ps1
 4. 问 **Q2**：`作者最终的方法排名和总体准确率分别是多少？` → 第六名 / 56.20%，带 citation
 5. 问 **拒答**：`木星有几颗卫星？` → 直接拒答（不编）
 
-**录屏延迟高/不稳就走最小路径**：用 §1 那 4 张截图 + 字幕旁白拼，照样达标。
+**录屏延迟高/不稳才走兜底**（live 优先）：用 §1 那 4 张截图 + 旁白拼。但官方要的是"介绍**+演示**"，所以兜底也要做出"在演示"的感觉——加光标移动/缩放/逐步切换，照旁白把 `上传→提问→点citation→数值→拒答` 讲清楚；能补一小段真实开站/翻 PDF 的录屏更稳。**走兜底就全程用这 4 张旧截图，别和当前新 UI 混用**（见 §7）。
 
 ---
 
@@ -75,6 +86,7 @@ pwsh scripts/dev.ps1
 
 - ❌ 不说"开放域/任意论文 100%"；是**锁定集**成绩。
 - ❌ 不说"端侧显著提升"；不说"智能体可现场核验改写"。
+- ❌ 不把定位说成"通用 SaaS / 智能办公工具"——是"引用可核验的论文/答辩助手"。
 - ❌ 不把 登录/邀请码/stats panel 放进主叙事。
 
 ---
@@ -103,4 +115,4 @@ pwsh scripts/dev.ps1
 
 - **不要改代码、锁定样例、锁定题、`evidence/`、`backend/`。** 你只产出视频文件。
 - 对照口径看 `evidence/materials/JUDGE_SCORING_MAP.md`，或问负责人。
-- 成片放进 `deliverables/competition_kit/`，命名如 `研答通_5分钟演示_最终版.mp4`。
+- 成片放进 `deliverables/competition_kit/`，命名如 `研答通_5分钟演示_最终版.mp4`（提交系统若不收中文名，用 `yandatong_5min_demo_final.mp4`）。

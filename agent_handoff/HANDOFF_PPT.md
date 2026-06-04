@@ -20,7 +20,10 @@
 | 文字大纲（参考措辞） | `evidence/materials/PPT_DECK_3PAGES_FINAL.md` | ⚠️ 文字稿略旧，**遇冲突以上面那份 PDF 为准** |
 | 4 张配图 | `evidence/screenshots/20260529_gold_*.png` | 答题/PDF回链/数值/拒答 |
 
-> **最省事路径**：如果提交平台接受 PDF，`deck_3page_final.pdf` **可以直接交**（它就是成品）。若平台**必须 `.pptx`**，就照这份 PDF **一页一页复刻**成原生 PPT。
+> **最省事路径**：
+> 1. **先确认平台收什么格式**——查提交系统的文件类型要求，或在赛题 QQ 群（`1090729513`）问一句。
+> 2. **收 PDF** → `deck_3page_final.pdf` 就是成品，**直接交**，别的不用做。
+> 3. **必须 `.pptx`** → 最稳做法：新建一个 **16:9** 空白 PPT，把 PDF **每页作为整页图片插入**对应幻灯片（一页 PDF = 一页 slide），版式和字都跟现成 deck 一致；别重新设计模板。做完导出一次 PDF，核一下还是 3 页、没崩版。
 
 ---
 
@@ -42,7 +45,7 @@
 
 ## 4. 口径必须对（这些数字别写错）
 
-- 默认 QA 模型 = **`deepseek-v4-flash`**（V6 holdout 71/72）；`qwen3-235b` 是 **rollback**，不是默认。
+- 默认 QA 模型 = **`deepseek-v4-flash`**（V6 holdout 71/72）；`qwen3-235b` 是 **rollback**，不是默认。（`qwen3-235b` = 全名 `qwen3-235b-a22b-instruct-2507`，写哪个都行，别写成别的型号。）
 - strict G3 = **六轮**（首批3+续3，fallback 0/6）。**不是三轮。**
 - Token：长文 ask 省 **86.6%**；对照喂全文省 **4.37×** —— **4.37× 必须连"准确率持平"一起出现**。
 - 端侧：本地 BGE 小模型、纯 CPU、零云依赖（真端侧实体）。
@@ -54,6 +57,7 @@
 - ❌ 不写"开放域/任意论文 100%"；成绩是**锁定集**口径。
 - ❌ 不写"端侧检索显著提升"——是"固定集持平、难文档补召回"。
 - ❌ 不写"智能体能现场核验 query 改写"——讲"有界自评重试"。
+- ❌ 不写"通用 SaaS / 智能办公工具"——定位是"引用可核验的论文/答辩助手"。
 - ❌ 不把 登录/邀请码/stats panel/api docs 当亮点。
 
 ---
@@ -72,4 +76,4 @@
 
 - **不要改代码、不要改锁定样例和锁定题、不要改 `evidence/`、`backend/` 里的东西。** 你只产出 PPT 文件。
 - 想确认"某个数字对不对"，看 `evidence/materials/JUDGE_SCORING_MAP.md`（一页对照表）或问负责人。
-- 成片做好放进 `deliverables/competition_kit/`，命名如 `研答通_3页PPT_最终版.pptx`。
+- 成片做好放进 `deliverables/competition_kit/`，命名如 `研答通_3页PPT_最终版.pptx`（提交系统若不收中文名，用 `yandatong_3page_final.pptx`）。
