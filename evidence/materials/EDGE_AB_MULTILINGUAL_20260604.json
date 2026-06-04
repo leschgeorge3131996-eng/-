@@ -1,0 +1,608 @@
+{
+ "version": "edge-ab-multilingual",
+ "name": "Edge A/B on multilingual over-refusal",
+ "response_detail_level": "balanced",
+ "items": [
+  {
+   "doc_id": "multilingual_contract_v6",
+   "document_path": "evidence/samples/holdout_v6_extreme_full/multilingual_contract_v6.md",
+   "language": "mixed",
+   "prompts": [
+    {
+     "id": "r1_gen_ans_0",
+     "text": "根据中文条款，该合同未包含哪两项服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含现场硬件安装服务",
+      "不包含线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_1",
+     "text": "在内部工单中，Nova Harbor Ltd. 可能以什么别名出现？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "NH-Ltd",
+      "内部 tickets"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_2",
+     "text": "英文条款中规定的紧急支持响应时间是多少？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "35分钟",
+      "emergency support response time"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_3",
+     "text": "日语备注中的最终交付截止日期是哪一天？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2027年01月15日",
+      "最終納品期限"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_4",
+     "text": "夜间支持需要哪个团队的预先批准？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "legal",
+      "equipo legal"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_5",
+     "text": "SLA例外事项负责人是谁？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Chen Rui",
+      "SLA exception owner"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_6",
+     "text": "若客户要求现场安装服务器硬件，依据合同是否可提供？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含现场硬件安装服务",
+      "合同"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_7",
+     "text": "用西班牙语写明的支持请求审批要求涉及哪种类型的支持？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "soporte nocturno",
+      "夜间支持"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_8",
+     "text": "‘emergency support response time must be within 35 minutes’ 这一条款使用的是哪种语言表述？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "English clause",
+      "英文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_9",
+     "text": "结合文档内容，为何不能默认提供线下培训服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "合同不包含线下培训",
+      "中文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_10",
+     "text": "如果一个工单中标注供应商为NH-Ltd，其对应的主要供应商名称是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Nova Harbor Ltd.",
+      "Alias"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ans_11",
+     "text": "请总结该多语言合同中关于服务限制的三项关键信息。",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "无现场安装",
+      "无线下培训",
+      "夜间支持需审批"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r1_gen_ref_0",
+     "text": "Nova Harbor Ltd. 的注册地址是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r1_gen_ref_1",
+     "text": "Chen Rui 的员工编号是多少？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r1_gen_ref_2",
+     "text": "该合同的签署日期是哪一天？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r1_gen_ref_3",
+     "text": "紧急支持响应时间是否适用于周末？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r1_gen_ref_4",
+     "text": "NH-Ltd 在哪些国家设有分支机构？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r1_gen_ref_5",
+     "text": "合同中提到的法律团队负责人姓名是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ans_0",
+     "text": "根据中文条款，合同是否包含现场硬件安装服务？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含",
+      "现场硬件安装服务"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_1",
+     "text": "Nova Harbor Ltd. 在内部工单中可能以什么别名出现？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "NH-Ltd",
+      "内部 tickets"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_2",
+     "text": "英文条款中规定的紧急支持响应时间是多少分钟以内？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "35分钟",
+      "emergency support response time"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_3",
+     "text": "日语备忘录中提到的最终交付截止日期是哪一天？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "2027年01月15日",
+      "最終納品期限"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_4",
+     "text": "夜间支持需要哪个团队的预先批准？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "equipo legal",
+      "aprobacion previa"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_5",
+     "text": "SLA例外事项负责人是谁？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Chen Rui",
+      "SLA exception owner"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_6",
+     "text": "合同是否包含线下培训服务？依据是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "不包含",
+      "线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_7",
+     "text": "如果需要在夜间获得支持，必须获得谁的批准？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "equipo legal",
+      "aprobacion previa"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_8",
+     "text": "‘emergency support response time must be within 35 minutes’ 这一条款使用的是哪种语言表述？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "English clause",
+      "英文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_9",
+     "text": "‘NH-Ltd’ 是哪家公司的别名？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Nova Harbor Ltd.",
+      "Alias"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_10",
+     "text": "文档中哪一条款明确指出不提供线下培训？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "中文条款",
+      "不包含线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_11",
+     "text": "用西班牙语描述夜间支持要求的关键词是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "soporte nocturno",
+      "aprobacion previa"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_12",
+     "text": "2027年01月15日这一日期在文档中与什么事件相关？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "最終納品期限",
+      "最终交付截止日期"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_13",
+     "text": "哪个名字同时出现在SLA例外管理和中文人名格式中？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "Chen Rui",
+      "SLA exception owner"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_14",
+     "text": "‘el soporte nocturno requiere aprobacion previa del equipo legal’ 这句话的意思是什么？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "夜间支持需要法律团队预先批准"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_15",
+     "text": "Nova Harbor Ltd. 的简称出现在哪种上下文中？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "internal tickets",
+      "内部工单"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_16",
+     "text": "文档中提到了几种语言的内容？请列举。",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "English",
+      "中文",
+      "日本語",
+      "Spanish"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_17",
+     "text": "紧急支持响应时间的要求出自文档中的哪一部分？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "English clause",
+      "英文条款"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_18",
+     "text": "最终交付期限是否早于2027年2月？",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "是",
+      "2027年01月15日"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ans_19",
+     "text": "合同中未包含的服务有哪些？请根据中文条款回答。",
+     "kind": "answerable",
+     "category": "GEN-A",
+     "expected_any_of": [
+      "现场硬件安装服务",
+      "线下培训"
+     ],
+     "expected_pages": [
+      1
+     ],
+     "difficulty": "medium"
+    },
+    {
+     "id": "r2_gen_ref_0",
+     "text": "Nova Harbor Ltd. 的注册地址是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_1",
+     "text": "Chen Rui 的职位头衔是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_2",
+     "text": "该合同的签署日期是哪一天？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_3",
+     "text": "是否有季度审查机制？文档中有说明吗？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_4",
+     "text": "NH-Ltd 的法定代表人是谁？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_5",
+     "text": "紧急支持的35分钟响应时间是否包括节假日？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_6",
+     "text": "文档中提到的法律团队属于客户方还是供应商方？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_7",
+     "text": "Nova Harbor 是否提供远程培训服务？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_8",
+     "text": "最终交付期限能否延期？条件是什么？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    },
+    {
+     "id": "r2_gen_ref_9",
+     "text": "合同金额是多少美元？",
+     "kind": "refusal",
+     "category": "GEN-R",
+     "expected_any_of": [],
+     "expected_pages": [],
+     "difficulty": "hard"
+    }
+   ]
+  }
+ ]
+}
