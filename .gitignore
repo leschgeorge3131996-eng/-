@@ -43,3 +43,5 @@ AI_REVIEW_BRIEF.md
 ai-review-package-*/
 yandatong-ai-review-*.zip
 picture/
+# teammate hand-off zips: derived from tracked files, ~4MB binaries, send directly
+deliverables/teammate_packs/
