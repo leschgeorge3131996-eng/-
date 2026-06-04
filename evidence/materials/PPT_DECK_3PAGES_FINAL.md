@@ -139,6 +139,7 @@
 - 当前默认 QA：`deepseek-v4-flash`（V6 contract-patch holdout 后切换）
 - 当前 rollback：`qwen3-235b-a22b-instruct-2507`
 - summary / outline 仍跑在 `235b`，未单独重测前不切换
+- 端云协同：近端本地 BGE 句向量小模型（纯 CPU · 零云依赖）做语义检索，云端大模型只做生成——真端侧/云端协同
 
 下方右：strict `G3`
 

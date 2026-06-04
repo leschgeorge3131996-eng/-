@@ -107,20 +107,20 @@
 
 “如果问题和文档完全无关，系统不会为了看起来聪明而硬答，而是直接拒答。这里 refusal 走的是 `retrieval_no_match`，说明边界控制也是主链路的一部分。”
 
-### 235-265s 平台与模型决策
+### 235-265s 端云协同 · 平台与模型
 
 画面：
 
-- 两行对比卡片：
-  - `qwen3-235b-a22b-instruct-2507: 3 / 3`
-  - `qwen3-32b: 3 / 3`
-- 底部两行：
-  - `default = deepseek-v4-flash`（V6 contract-patch holdout 后切换）
-  - `rollback = qwen3-235b-a22b-instruct-2507`
+- 端云协同示意：
+  - 近端（本地 · 纯 CPU · 零云依赖）：BGE 句向量小模型 → 语义检索
+  - 云端（无问芯穹 MaaS）：大模型只做生成
+- 模型：
+  - `default = deepseek-v4-flash`（V6 holdout 71/72）
+  - `rollback = qwen3-235b`
 
 旁白：
 
-“当前锁定题组已经完成双模型 `3 / 3` 验证，证明平台路径真实可跑。我们在这之后又跑了一轮 V6 contract-patch holdout，`deepseek-v4-flash` 在 `72` 道题上拿到 `71`，超过 `qwen3-235b` 的 `56`，所以当前默认 QA 切到 Flash；`235b` 保留为 rollback fallback，summary 和 outline 仍跑在 `235b`。”
+“这套系统是真正的端云协同：近端有一个本地 BGE 句向量小模型，纯 CPU、零云依赖，负责把文档和问题编码、做语义检索；云端的大模型跑在无问芯穹 MaaS 平台上、只负责最后的生成。云端默认用 deepseek-v4-flash，在更难的 V6 holdout 上是 71/72，qwen3-235b 作为更稳的 rollback。”
 
 ### 265-290s strict G3 复现证据
 
