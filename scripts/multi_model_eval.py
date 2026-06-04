@@ -165,7 +165,13 @@ def run_eval(settings, models: list[str], max_per_doc: int) -> dict:
                 per_model[model]["errors"] += 1
                 rows.append({"model": model, "case_id": c["case_id"], "correct": False, "error": str(exc)[:160]})
                 mark = "ER"
-            print(f"[{mi}/{len(models)} {model:<32} {ci:>2}/{len(cases)}] {c['case_id']:<30} {mark}")
+            print(f"[{mi}/{len(models)} {model:<32} {ci:>2}/{len(cases)}] {c['case_id']:<30} {mark}", flush=True)
+        # incremental write after each model: partial results survive an interruption
+        # and the .md doubles as a live progress view while slow models run.
+        _data = {"rows": rows, "per_model": per_model, "n_cases": len(cases), "models": models}
+        OUT_JSON.write_text(json.dumps(_data, ensure_ascii=False, indent=2), encoding="utf-8")
+        OUT_MD.write_text(build_report_md(_data), encoding="utf-8")
+        print(f"  -> partial report written after {model} ({mi}/{len(models)})", flush=True)
     return {"rows": rows, "per_model": per_model, "n_cases": len(cases), "models": models}
 
 

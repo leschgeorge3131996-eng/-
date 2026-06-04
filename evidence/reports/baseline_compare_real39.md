@@ -70,3 +70,13 @@
 - `chinese_llm_spatial_eval:zh_a1_accuracy`: RAG `chatcmpl-59b4c5ee-fa42-9d24-b818-a78c8b5c41c2` · FULL `chatcmpl-53b110c4-edfb-97d8-aaf1-a48d438946af`
 - `chinese_llm_spatial_eval:zh_a1_best_model`: RAG `chatcmpl-6e84f30b-4f7b-9ac8-888e-b20ca4a895d3` · FULL `chatcmpl-5638252f-78c8-9d3d-813a-eff04f8293fa`
 - `chinese_llm_spatial_eval:zh_a1_authors`: RAG `chatcmpl-785695c3-2bcf-9e89-ab82-3b8d1268ce04` · FULL `chatcmpl-c7e1dd7e-0bd1-9471-9b4a-4ff1de29f1b3`
+
+## 唯一非命中项核查（诚实补注）
+
+严格批跑中 RAG 唯一未命中项 `chinese_llm_spatial_eval:zh_a2_ernie_weakness`（问「ERNIE-4 在哪类任务表现最弱」，期望含「推理」）经单独复核为**子串假阴性、非真实失败**：
+
+- 检索上下文（3198 字符）**确含**「空间推理 / 推理 / ERNIE」——答案块已进上下文，不是检索遗漏。
+- 重新提问 RAG **正确作答**：「ERNIE-4 …在空间推理任务上表现最弱」，并带 evidence_quote「…所有模型在角色识别任务的表现最优，在空间推理任务的表现相对最差」。复核 request_id `chatcmpl-e72956f3-21fd-97c0-8efe-a557a996c70d`，可控台对账。
+- 成因：单次生成的措辞抖动导致该次答案恰好未含目标子串（`expected_any_of` 子串判据的固有脆弱性），检索与能力均无问题。
+
+**结论：RAG 正确率实质与全文持平**（严格 substring 批跑 38/39，唯一差异为措辞抖动的子串漏配，已复核非真失败）；**4.3× input-token 压缩稳定成立**。这条按"评测诚实优先于刷分"纪律记录：既不把假阴性算成真失败，也不掩盖严格批的原始 38/39。

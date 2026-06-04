@@ -1,0 +1,471 @@
+{
+  "rows": [
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-11d54fb1-4874-9908-bc64-4248224a2d1f"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-fad7a97e-76f2-919b-b6f7-17cd6684723f"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-74b3173e-5546-92ac-9096-ef15958dcaff"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-964b05c6-a8a3-91af-bee7-43b20ce1665a"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-5381f571-b59a-92bb-96f8-a34590f021a3"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-9572f470-d8f4-9bf0-8554-4427df4214cc"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-d19419f3-53c8-94a2-8e4f-ffef9a1b63d5"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-b50b0728-def0-954e-b974-340f225f0ef8"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-e27af9ee-d3fa-9e83-ab7d-cfabef71dcb6"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-cad7cc3c-7709-9208-9983-5cb101a2ad38"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-19f041d9-c625-995a-a5bb-ba6c17c770a7"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-3d959cfa-5324-9ad5-bff5-a9edc3c4a71e"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-242375de-0734-96d6-b210-5ca191a171c9"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-174d1dc3-1e88-9dbc-af6a-ab9959574d4f"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-ba42a29c-8658-9bf1-960d-59768c77438c"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-a5bd8ea3-5664-9ea8-b952-a5bf94d50349"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-ab9850a3-65f4-9f2d-b84f-290cb8f94563"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-32e55af0-8ac5-94c9-a3e3-8b48728446e8"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-4f70d802-0424-9999-b7e0-a6e76bf2801e"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-64f741e5-8c8c-91d7-b90c-0066db02514e"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-f9f91c3a-d1b6-9e1b-9a5a-3f66acc37876"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-5ff11070-44ba-90b3-9382-069e9df0ee54"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-6606329c-6680-9059-a202-621d469d5bc8"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-433578d8-a7c0-9311-af4a-a22c8ab90755"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-68714641-45d7-9b4b-bee5-87c472226821"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-914efc18-dba2-9d59-8144-e6bd9b2ab28b"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-56e8a4b1-456a-95f0-a24c-e53681ef9321"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-7c00c159-d05d-9bf6-ba31-168aa5b9ce26"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-06fd62f3-a1cb-9652-a3c9-f5aa33118893"
+    },
+    {
+      "model": "qwen3-235b-a22b-instruct-2507",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-1ae1ac55-2796-9450-b567-f50a8e36593e"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-6b4cf9d9-c738-9380-b5a4-6d1637385f60"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-1a322f0f-99c7-97e6-bf4b-d795e339a1d1"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-01384a6b-0505-9651-881b-9a3634e0dd96"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-42e99cc2-0e1a-9747-81a7-70e1e2a1d5f5"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-5c5302e4-6a68-92d4-b881-47f8276685e6"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-33373e65-1db6-968c-8d58-d5c23524558b"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-1646518c-fd87-99af-9990-fa0f14684fbd"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-9785fbd0-1ce7-97ea-99c7-a1b200dce93b"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-cee82f5a-70eb-9ef1-9897-e580e5fcd593"
+    },
+    {
+      "model": "qwen3-32b",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": false,
+      "request_id": "chatcmpl-d07a05fc-ec7c-92e8-a08e-ee9b1e59f228"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "40350fef5ce5415fa51acac8b9cffa5e"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "490848fd562e4d55ba1938ffdd605d72"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "827730f1068e46b98bf07814755a89de"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "66cab9cd7e3a4b009756cdc09b3a9ce0"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "e15b284a16e240fb838613d16215acf1"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "bb3f693721d44788adefc10f570ba27f"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "3d36b90e00af419b843c09d377d7d984"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "10907d857f0c42eb8c86bf4c9a683aad"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "d740ff0c75bc4361828be9f59c0ce6d2"
+    },
+    {
+      "model": "kimi-k2.5",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": false,
+      "request_id": "f835ec13186c4fb289f29c60574798d7"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_accuracy",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604163722543ab2bc03034ffd"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_best_model",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604163816468a87ce33794020"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "chinese_llm_spatial_eval:zh_a1_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "2026060416390519db9f7bae65407e"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_two_questions",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604163942404a6b5477414d09"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "chinese_llm_spatial_eval:zh_a2_prompt_strategies",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604164012e771cb55ab124cf8"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "attention_is_all_you_need:en_a1_encoder_layers",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604164120ae7dd1e058354835"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "attention_is_all_you_need:en_a1_first_authors",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604164202aa3ac0504ace4cb9"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "attention_is_all_you_need:en_a1_arxiv_id",
+      "correct": true,
+      "refused": false,
+      "request_id": "2026060416424095b6f1f5d6e742c6"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "attention_is_all_you_need:en_a2_why_no_recurrence",
+      "correct": true,
+      "refused": false,
+      "request_id": "20260604164304685f0a100a884e98"
+    },
+    {
+      "model": "glm-4.6",
+      "case_id": "attention_is_all_you_need:en_a2_scaling_reason",
+      "correct": true,
+      "refused": null,
+      "request_id": "20260604164405f2bc68345ba646b6"
+    }
+  ],
+  "per_model": {
+    "deepseek-v4-flash": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "chatcmpl-11d54fb1-4874-9908-bc64-4248224a2d1f"
+    },
+    "deepseek-v4-pro": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "chatcmpl-19f041d9-c625-995a-a5bb-ba6c17c770a7"
+    },
+    "qwen3-235b-a22b-instruct-2507": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "chatcmpl-f9f91c3a-d1b6-9e1b-9a5a-3f66acc37876"
+    },
+    "qwen3-32b": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "chatcmpl-6b4cf9d9-c738-9380-b5a4-6d1637385f60"
+    },
+    "kimi-k2.5": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "40350fef5ce5415fa51acac8b9cffa5e"
+    },
+    "glm-4.6": {
+      "correct": 10,
+      "errors": 0,
+      "n": 10,
+      "sample_request_id": "20260604163722543ab2bc03034ffd"
+    }
+  },
+  "n_cases": 10,
+  "models": [
+    "deepseek-v4-flash",
+    "deepseek-v4-pro",
+    "qwen3-235b-a22b-instruct-2507",
+    "qwen3-32b",
+    "kimi-k2.5",
+    "glm-4.6"
+  ]
+}
