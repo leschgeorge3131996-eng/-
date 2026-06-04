@@ -191,6 +191,7 @@ def main() -> int:
     ap.add_argument("--rescue-sim", type=float, default=0.50, help="稠密救援相似度门槛（调严可减少误救陷阱）")
     ap.add_argument("--min-sim", type=float, default=0.40, help="稠密增召回相似度门槛")
     ap.add_argument("--cloud-embed-model", default=None, help="用云端 embedding（如 bge-m3）替本地 BGE-small 做对照")
+    ap.add_argument("--shard", default=None, help="并行分片 k/K：只处理 index%%K==k 的题（配 scripts/parallel_judged.py 用）")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -208,6 +209,9 @@ def main() -> int:
     cases = load_cases(ROOT / args.manifest)
     if args.limit:
         cases = cases[: args.limit]
+    if args.shard:
+        k, K = (int(x) for x in args.shard.split("/"))
+        cases = [c for i, c in enumerate(cases) if i % K == k]
     print(f"题目数：{len(cases)}（答题 deepseek-v4-flash / 裁判 {args.judge_model}）")
 
     # 同一文档只上传一次
