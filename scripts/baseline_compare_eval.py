@@ -87,18 +87,20 @@ def render_full_with_pages(structure) -> str:
     return "\n\n".join(parts)
 
 
-def load_pdf_answerable(manifest_path: Path) -> list[dict]:
+def load_pdf_answerable(
+    manifest_path: Path, all_docs: bool = False, max_per_doc: int = MAX_PER_DOC
+) -> list[dict]:
     raw = json.loads(manifest_path.read_text(encoding="utf-8"))
     cases = []
     for item in raw.get("items") or []:
         doc_path = str(item["document_path"])
-        if not doc_path.lower().endswith(".pdf"):
+        if not all_docs and not doc_path.lower().endswith(".pdf"):
             continue
         per_doc = 0
         for p in item.get("prompts") or []:
             if (p.get("kind") or "answerable") == "refusal":
                 continue
-            if per_doc >= MAX_PER_DOC:
+            if per_doc >= max_per_doc:
                 break
             per_doc += 1
             cases.append(
@@ -114,7 +116,7 @@ def load_pdf_answerable(manifest_path: Path) -> list[dict]:
     return cases
 
 
-def run_eval(settings) -> list[dict]:
+def run_eval(settings, manifest_path: Path, all_docs: bool, max_per_doc: int) -> list[dict]:
     """Run both conditions on every selected case; return per-case rows."""
     auth = AuthService(settings=settings)
     file_service = FileService(settings=settings)
@@ -122,7 +124,7 @@ def run_eval(settings) -> list[dict]:
     planner = ContextPlannerService(RetrievalService())
 
     session_id = auth.create_session("alpha-demo").session.session_id
-    cases = load_pdf_answerable(MANIFEST)
+    cases = load_pdf_answerable(manifest_path, all_docs, max_per_doc)
     print(f"Long-PDF answerable cases: {len(cases)} (x2 conditions = {len(cases) * 2} real calls)\n")
 
     def tok(r):
@@ -199,7 +201,7 @@ def compute_summary(rows: list[dict]) -> dict:
     return summary
 
 
-def build_report_md(rows: list[dict], summary: dict, settings, model_name: str) -> str:
+def build_report_md(rows: list[dict], summary: dict, settings, model_name: str, manifest_path: Path = MANIFEST) -> str:
     n = summary["n_cases"]
 
     def pct(x):
@@ -214,7 +216,7 @@ def build_report_md(rows: list[dict], summary: dict, settings, model_name: str) 
 
     md = []
     md.append("# Baseline Comparison — RAG (检索接地) vs Full-Context (全文喂入)\n")
-    md.append(f"- Manifest: `{MANIFEST.relative_to(PROJECT_ROOT)}` (long-PDF answerable cases only)")
+    md.append(f"- Manifest: `{manifest_path.relative_to(PROJECT_ROOT)}`")
     md.append(f"- Cases: **{n}** · Real MaaS calls: **{n * 2}** · Model: `{model_name}`")
     md.append("- Same ask prompt/contract on both sides; only `document_text` differs.\n")
     md.append("## Headline\n")
@@ -271,31 +273,42 @@ def main() -> None:
         action="store_true",
         help="rebuild the .md from the existing .json without making any MaaS calls",
     )
+    parser.add_argument("--manifest", default=str(MANIFEST), help="eval manifest JSON path")
+    parser.add_argument("--all-docs", action="store_true", help="include non-PDF docs (default: PDF only)")
+    parser.add_argument("--max-per-doc", type=int, default=MAX_PER_DOC, help="cap answerable cases per document")
+    parser.add_argument("--out-prefix", default="baseline_compare_eval", help="output stem under evidence/reports/")
     args = parser.parse_args()
+
+    manifest_path = Path(args.manifest)
+    if not manifest_path.is_absolute():
+        manifest_path = PROJECT_ROOT / manifest_path
+    out_md = PROJECT_ROOT / "evidence/reports" / f"{args.out_prefix}.md"
+    out_json = PROJECT_ROOT / "evidence/reports" / f"{args.out_prefix}.json"
+
     settings = get_settings()
     model_name = ModelClient(settings=settings).resolve_model_name("ask")
 
     if args.report_only:
-        if not OUT_JSON.exists():
-            print(f"ERROR: {OUT_JSON} not found; run without --report-only first.")
+        if not out_json.exists():
+            print(f"ERROR: {out_json} not found; run without --report-only first.")
             sys.exit(1)
-        data = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+        data = json.loads(out_json.read_text(encoding="utf-8"))
         rows = data["rows"]
         summary = data.get("summary") or compute_summary(rows)
-        OUT_MD.write_text(build_report_md(rows, summary, settings, model_name), encoding="utf-8")
-        print(f"Rebuilt {OUT_MD.relative_to(PROJECT_ROOT)} from {OUT_JSON.relative_to(PROJECT_ROOT)} (no calls)")
+        out_md.write_text(build_report_md(rows, summary, settings, model_name, manifest_path), encoding="utf-8")
+        print(f"Rebuilt {out_md.relative_to(PROJECT_ROOT)} from {out_json.relative_to(PROJECT_ROOT)} (no calls)")
         return
 
     if settings.use_mock_model:
         print("ERROR: mock model is enabled; this comparison needs real MaaS calls.")
         sys.exit(1)
 
-    rows = run_eval(settings)
+    rows = run_eval(settings, manifest_path, args.all_docs, args.max_per_doc)
     summary = compute_summary(rows)
-    OUT_JSON.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=2), encoding="utf-8")
-    OUT_MD.write_text(build_report_md(rows, summary, settings, model_name), encoding="utf-8")
+    out_json.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=2), encoding="utf-8")
+    out_md.write_text(build_report_md(rows, summary, settings, model_name, manifest_path), encoding="utf-8")
     print("\nSummary:", json.dumps(summary, ensure_ascii=False))
-    print(f"Wrote {OUT_MD.relative_to(PROJECT_ROOT)} and {OUT_JSON.relative_to(PROJECT_ROOT)}")
+    print(f"Wrote {out_md.relative_to(PROJECT_ROOT)} and {out_json.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":
