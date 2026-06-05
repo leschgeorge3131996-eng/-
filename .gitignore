@@ -45,3 +45,8 @@ yandatong-ai-review-*.zip
 picture/
 # teammate hand-off zips: derived from tracked files, ~4MB binaries, send directly
 deliverables/teammate_packs/
+
+# chat hand-off pack (derived copies)
+deliverables/chat_techdoc_pack.zip
+deliverables/chat_techdoc_pack/refs/
+deliverables/chat_techdoc_pack/reference_draft/
