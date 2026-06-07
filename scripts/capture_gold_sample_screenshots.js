@@ -412,7 +412,7 @@ async function startBrowser() {
   await cdp.send("Emulation.setDeviceMetricsOverride", {
     width: WINDOW_WIDTH,
     height: WINDOW_HEIGHT,
-    deviceScaleFactor: 1,
+    deviceScaleFactor: Number(process.env.CAPTURE_DSF || 1),
     mobile: false,
   });
 
