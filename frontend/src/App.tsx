@@ -801,7 +801,7 @@ export default function App() {
             ) : (
               <>
                 <form className="form" onSubmit={handleSubmit}>
-              <label className="field upload-field">
+              <div className="field upload-field">
                 <span>1. 上传文献</span>
                 <div
                   className={`drop-zone${dragOver ? " drop-zone-active" : ""}${loading ? " drop-zone-disabled" : ""}`}
@@ -861,7 +861,7 @@ export default function App() {
                     }
                   }}
                 />
-              </label>
+              </div>
               {loading && (loadStage === "uploading" || loadStage === "model" || uploadProgress > 0) ? (
                 <div className="upload-progress">
                   <div className="upload-progress-meta">
