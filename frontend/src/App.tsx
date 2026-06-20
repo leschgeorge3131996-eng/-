@@ -1192,6 +1192,18 @@ export default function App() {
             )}
           </article>
           </section>
+        <footer className="site-footer" aria-label="备案信息">
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer">
+            浙ICP备2026043125号
+          </a>
+          <a
+            href="https://beian.mps.gov.cn/#/query/webSearch?code=33038202005010"
+            target="_blank"
+            rel="noreferrer"
+          >
+            浙公网安备33038202005010号
+          </a>
+        </footer>
       </main>
     </div>
   );
